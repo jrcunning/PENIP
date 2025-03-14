@@ -16,62 +16,257 @@ library(tidyverse)
 
 # Import data
 ```{r}
+# Port Everglades site metadata
+sites <- readxl::read_xlsx("data/site_metadata.xlsx") %>%
+  janitor::clean_names() %>%
+  rename(penip_site = site,
+         site = drm_site_id,
+         latitude = lat,
+         longitude = lon)
+
 # Data from main DRM surveys
-adults <- read_csv("data/DRM_broward_corals.csv")
-juv <- read_csv("data/DRM_broward_juveniles.csv")
-pa <- read_csv("data/DRM_broward_spp_special_concern.csv")
+adults <- read_csv("data/DRM_broward_corals.csv") %>%
+  mutate(site = parse_number(site)) %>%
+  left_join(sites)
+
+# Juveniles
+juv <- read_csv("data/DRM_broward_juveniles.csv") %>%
+  mutate(site = parse_number(site)) %>%
+  left_join(sites)
+
+# Presence-absence of species of special concern
+pa <- read_csv("data/DRM_broward_spp_special_concern.csv") %>%
+  mutate(site = parse_number(site)) %>%
+  left_join(sites)
 
 # Additional bonus data collected only on Port Everglades surveys
+## Transects 1 and 2 -- juvenile coral counts for all taxa, acer/ofav/conch/tires p/a
 t1t2bonus <- read_csv("data/T1_T2_bonus_data.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  rename(penip_site = site) %>%
+  mutate(penip_site = replace_na(penip_site, "NA")) %>%
+  mutate(transect_num = parse_number(transect)) %>%
+  left_join(sites)
+## Transects 3 and 4 -- sediment depth and acer/ofav/conch/tires p/a
 t3t4bonus <- read_csv("data/T3_T4_bonus_data.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  rename(penip_site = site) %>%
+  mutate(penip_site = replace_na(penip_site, "NA")) %>%
+  mutate(transect_num = parse_number(transect)) %>%
+  left_join(sites)
+
+# Full site metadata
+drmsitemd <- adults %>%
+  distinct(site, date, latitude, longitude)
+penipsitemd <- sites %>%
+  distinct(site, date, latitude, longitude, penip_site, reef, direction, distance_m)
+
+allsitemd <- full_join(drmsitemd, penipsitemd, by = c("site", "date", "latitude", "longitude")) %>%
+  distinct(site, .keep_all = TRUE)
 ```
 
 # Combine data
 ```{r}
 # Get counts of adult corals (>4cm)
-## Add class >4cm for adults
+## Need to separately consider species that were searched for on all four transects, vs. those only searched on t1 and t2
+# Define the list of species searched for on transects 3 and 4
+searched_species <- c("CNAT", "DSTO", "DLAB", "MMEA", "MANG", "MALI", "MFER", "MLAM", "PCLI", "PSTR")
+
+# Get all site-transect combinations (ensuring transects 3 and 4 exist for each site)
+all_sites <- unique(adults$site)
+all_transects <- expand.grid(site = all_sites, transect_num = c(1, 2, 3, 4))  # Include all transects
+
+# Process the data
 adult.counts <- adults %>%
   drop_na(species) %>%
-  group_by(date, subregion, site, transect_num, species) %>%
-  summarize(count = n(), .groups = "drop") %>% # "drop" ungroups after summarizing
-  pivot_wider(names_from = species, values_from = count, values_fill = 0) %>%
+  group_by(site, transect_num, species) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  pivot_wider(names_from = species, values_from = count) %>%  # Do NOT fill missing values yet
+  full_join(all_transects, by = c("site", "transect_num")) %>%  # Ensure all transects exist
+  
+  # Replace NAs correctly:
+  mutate(across(
+    -c(site, transect_num),
+    ~ case_when(
+      transect_num %in% c(1, 2) & is.na(.) ~ 0,  # Set ALL species to 0 for transects 1 & 2
+      transect_num %in% c(3, 4) & is.na(.) & cur_column() %in% searched_species ~ 0,  # Only searched species get 0 for transects 3 & 4
+      transect_num %in% c(3, 4) & is.na(.) ~ NA,  # Keep non-searched species as NA for transects 3 & 4
+      TRUE ~ .  # Keep existing values
+    )
+  )) %>%
+  
   mutate(class = ">4cm")
 
+
+# check
+adult.counts %>% filter(site == "3068")
+
+
+
 # Add class <4cm for juveniles
-juv <- juv %>%
-  mutate(class = "<4cm")
+drmjuvs <- juv %>%
+  select(site, transect_num, ends_with("ct")) %>%
+  rename(MCAV = montastraea_ct, MUSS = mussinae_ct, FAVI = faviinae_ct, MEAN = meandrinidae_ct)
 
 t1t2juvs <- t1t2bonus %>%
-  select(site, transect, starts_with("small")) %>%
-  rename_with(~ toupper(gsub("^small_", "", .x)), starts_with("small_")) %>%
-  mutate(class = "<4cm")
+  select(site, transect_num, starts_with("small")) %>%
+  rename_with(~ toupper(gsub("^small_", "", .x)), starts_with("small_"))
 
-# Combine counted adults with juveniles
-full <- full_join(adult.counts, juv)
+alljuv <- full_join(drmjuvs, t1t2juvs, by = c("site", "transect_num")) %>%
+    mutate(class = "<4cm")
 
-# Subset Broward
-broward <- filter(full, latitude > 26.0, latitude < 26.3)
-nrow(broward)
+
+
+# 9 sites missing juvenile data -- still waiting on JS to send... (these were the sites she removed from overall DRM dataset)
+
+
+# Combine all adult and juvenile count data
+allcounts <- bind_rows(adult.counts, alljuv) %>%
+  full_join(allsitemd)
+# check
+allcounts %>% filter(site == "3110")
+
+# Pivot to long form and add area searched for each taxon/class to calculate densities
+counts_long <- allcounts %>% 
+  pivot_longer(
+    cols = matches("^[A-Z]{4}$", ignore.case = FALSE),  # Select columns with exactly four uppercase letters
+    names_to = "taxon",
+    values_to = "count"
+  ) %>%
+  drop_na(count)
+
+area_searched <- counts_long %>%
+  distinct(taxon, class) %>%
+  mutate(area = case_when(class == "<4cm" & taxon %in% c("MEAN", "MCAV", "MUSS", "FAVI") ~ 40,
+                          class == "<4cm" & !taxon %in% c("MEAN", "MCAV", "MUSS", "FAVI") ~ 20,
+                          class == ">4cm" & taxon %in% c("CNAT", "DSTO", "DLAB", "MMEA", "MANG",
+                                                         "MALI", "MFER", "MLAM", "PCLI", "PSTR") ~ 40,
+                          class == ">4cm" & !taxon %in% c("CNAT", "DSTO", "DLAB", "MMEA", "MANG",
+                                                         "MALI", "MFER", "MLAM", "PCLI", "PSTR") ~ 20))
+
+# Join counts with area searched and calculate density per m2
+counts_long <- full_join(counts_long, area_searched) %>%
+  mutate(n_per_m2 = count/area)
+
+counts_long %>% filter(site == "3110", taxon == "FAVI")
 ```
+
 
 ```{r}
-# Total corals per site
-broward_long <- broward %>%
-  pivot_longer(cols = c(DSTO, MCAV, PAST, SSID, PPOR, SRAD, PCLI, CNAT, HCUC, SINT, EFAS, MMEA,
-                        PFUR, PSTR, DLAB, AFRA, MDEC, OFAV, SBOU, AAGA, OFRA, PBRA, SCUB, AGAR, 
-                        OANN, PDIV, MARE, SIDE, SCOL, MALI, ALAM, MLAM, ACER, MANG, ODIF, CARB, 
-                        OCUL, PORI, FFRA, AHUM, SHYA, MAUR, MFER, MSEN, ORBI, AGRA, MYCE,
-                        mussinae_ct, faviinae_ct, meandrinidae_ct, montastraea_ct))
+# PENIP
+penip <- filter(counts_long, !is.na(penip_site))
 
-broward_totals <- broward_long %>%
-  group_by(date, subregion, site, batch, latitude, longitude, zone, field_habitat, team) %>%
-  summarize(total = sum(value))
+# total counts, total area per site
+totals <- penip %>%
+  group_by(site, reef, direction, distance_m, taxon, class) %>%
+  summarize(total = sum(count), area = unique(area)) %>%
+  ungroup()
 
-ggplot(broward_totals, aes(x = longitude, y = latitude))#, size = total)) + 
-  geom_point()
+totals2 <- penip %>%
+  group_by(site, reef, direction, distance_m, taxon, class) %>%
+  summarize(total = sum(count), area = n() * 10) %>%
+  ungroup()
+
+identical(totals, totals2)
+# Both ways we total area searched, same results. good check!
+
+
+# MODEL CORAL COUNTS
+
+# Quasi-poisson
+mod_qp <- glm(total ~ taxon:class * reef * direction * distance_m + offset(log(area)), 
+           family = quasipoisson(link = "log"), data = totals, na.action = na.fail)
+summary(mod_qp)
+anova(mod_qp, test = "F")
+
+# # Negative binomial
+# # Load necessary library
+# library(MASS)
+# 
+# # Fit the Negative Binomial GLM
+# mod_nb <- glm.nb(total ~ taxon:class * reef * direction * distance_m + offset(log(area)), 
+#                  data = totals)
+# 
+# # Display model summary
+# summary(mod_nb)
+# anova(mod_nb)
+
+# Decided to go with quasi-poisson
+
+# Stepwise model simplification 
+library(MuMIn)  # Install if needed: install.packages("MuMIn")
+
+mod_qp_reduced <- dredge(mod_qp, rank = "AIC", fixed = ~ taxon:class + offset(log(area)))
+mod_qp_reduced
+best_model <- get.models(mod_qp_reduced, 1)[[1]]
+summary(best_model)
+exp(coef(best_model))
+#0.05 corals per taxon per square meter?
+# get fitted for each taxon:class?
+
+
+
+
+
+# Maybe keep at transect level?
+mod_qp <- glm(count ~ taxon:class + offset(log(area)), family = quasipoisson(link = "log"), data = penip)
+
+penip$predicted_counts <- predict(mod_qp, type = "response")
+penip$predicted_density <- penip$predicted_counts / penip$area
+predicted_summary <- penip %>%
+  group_by(taxon, class) %>%
+  summarize(mean_density = mean(predicted_density))
+print(predicted_summary)
+ggplot(predicted_summary, aes(x = taxon, y = mean_density, color = class)) +
+  geom_point() +
+  ylim(0,0.6)
+
+sum(predicted_summary$mean_density)
+# 1.14 corals per square meter
+
+emm <- emmeans(mod_qp, ~ taxon:class, type = "response")
+# Extract the estimated means and standard errors
+emm_results <- as.data.frame(emm)
+
+# Compute estimated counts per unit area
+emm_results$estimated_density <- emm_results$response / mean(penip$area)
+
+# View results
+print(emm_results)
+
+###### following pom-dredge methods
+penip <- penip %>% mutate(taxclass = paste0(taxon, class))
+penip
+library(lme4)
+mod_qp <- glmer(count ~ taxclass + offset(log(area)) + (1|site/transect_num), 
+                family = "poisson", data = penip)
+# get fitted responses
+newdata_1 <- penip %>%
+  tidyr::expand(taxclass, area = 1)
+newdata_1$fit <- predict(mod_qp, newdata_1, type = "response", re.form = NA)
+
+newdata_1 <- newdata_1 %>%
+  mutate(taxon = substr(taxclass, 1, 4),
+         class = substr(taxclass, 5, nchar(taxclass)))
+ggplot(newdata_1, aes(x = taxon, y = fit, color = class)) +
+  geom_point() +
+  ylim(0,0.6)
+
+sum(newdata_1$fit)
+#0.96 corals per square meter
 ```
 
-```
+
+
+# First things to look at
+# factors to consider: reef habitat, direction from channel, distance from channel
+
+# total number of adult corals
+# size frequency of adult corals by species
+# total number of small corals
+# ESA corals especially - ACER/OFAV
+# need total area of NRC/IR/MR/etc with distance from channel moving north and south of channel as a function of distance
+# Rugosity?
+
+
 
