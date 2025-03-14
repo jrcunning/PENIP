@@ -13,9 +13,65 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-# Analyze all the data!
+
+# Import data
+```{r}
+# Data from main DRM surveys
+adults <- read_csv("data/DRM_broward_corals.csv")
+juv <- read_csv("data/DRM_broward_juveniles.csv")
+pa <- read_csv("data/DRM_broward_spp_special_concern.csv")
+
+# Additional bonus data collected only on Port Everglades surveys
+t1t2bonus <- read_csv("data/T1_T2_bonus_data.csv") %>%
+  janitor::clean_names()
+t3t4bonus <- read_csv("data/T3_T4_bonus_data.csv") %>%
+  janitor::clean_names()
+```
+
+# Combine data
+```{r}
+# Get counts of adult corals (>4cm)
+## Add class >4cm for adults
+adult.counts <- adults %>%
+  drop_na(species) %>%
+  group_by(date, subregion, site, transect_num, species) %>%
+  summarize(count = n(), .groups = "drop") %>% # "drop" ungroups after summarizing
+  pivot_wider(names_from = species, values_from = count, values_fill = 0) %>%
+  mutate(class = ">4cm")
+
+# Add class <4cm for juveniles
+juv <- juv %>%
+  mutate(class = "<4cm")
+
+t1t2juvs <- t1t2bonus %>%
+  select(site, transect, starts_with("small")) %>%
+  rename_with(~ toupper(gsub("^small_", "", .x)), starts_with("small_")) %>%
+  mutate(class = "<4cm")
+
+# Combine counted adults with juveniles
+full <- full_join(adult.counts, juv)
+
+# Subset Broward
+broward <- filter(full, latitude > 26.0, latitude < 26.3)
+nrow(broward)
+```
 
 ```{r}
+# Total corals per site
+broward_long <- broward %>%
+  pivot_longer(cols = c(DSTO, MCAV, PAST, SSID, PPOR, SRAD, PCLI, CNAT, HCUC, SINT, EFAS, MMEA,
+                        PFUR, PSTR, DLAB, AFRA, MDEC, OFAV, SBOU, AAGA, OFRA, PBRA, SCUB, AGAR, 
+                        OANN, PDIV, MARE, SIDE, SCOL, MALI, ALAM, MLAM, ACER, MANG, ODIF, CARB, 
+                        OCUL, PORI, FFRA, AHUM, SHYA, MAUR, MFER, MSEN, ORBI, AGRA, MYCE,
+                        mussinae_ct, faviinae_ct, meandrinidae_ct, montastraea_ct))
+
+broward_totals <- broward_long %>%
+  group_by(date, subregion, site, batch, latitude, longitude, zone, field_habitat, team) %>%
+  summarize(total = sum(value))
+
+ggplot(broward_totals, aes(x = longitude, y = latitude))#, size = total)) + 
+  geom_point()
+```
 
 ```
 
