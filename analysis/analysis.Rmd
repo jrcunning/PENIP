@@ -11,8 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(msm)  # Needed for the Delta Method
 ```
 
+Check site 3072 / IRN3-210 -- no corals counted?
 
 # Import data
 ```{r}
@@ -61,8 +63,19 @@ drmsitemd <- adults %>%
 penipsitemd <- sites %>%
   distinct(site, date, latitude, longitude, penip_site, reef, direction, distance_m)
 
+# Combine drm site and penip site metadata
 allsitemd <- full_join(drmsitemd, penipsitemd, by = c("site", "date", "latitude", "longitude")) %>%
+  group_by(site) %>%
+  mutate(across(c(penip_site, reef, direction, distance_m), ~ coalesce(.x, first(na.omit(.x))))) %>%
+  ungroup() %>%
   distinct(site, .keep_all = TRUE)
+
+# Plot sites
+allsitemd %>%
+  ggplot(aes(x = longitude, y = latitude, color = !is.na(penip_site))) +
+  geom_point()
+
+allsitemd %>% count(!is.na(penip_site))
 ```
 
 # Combine data
@@ -88,19 +101,13 @@ adult.counts <- adults %>%
   mutate(across(
     -c(site, transect_num),
     ~ case_when(
-      transect_num %in% c(1, 2) & is.na(.) ~ 0,  # Set ALL species to 0 for transects 1 & 2
-      transect_num %in% c(3, 4) & is.na(.) & cur_column() %in% searched_species ~ 0,  # Only searched species get 0 for transects 3 & 4
-      transect_num %in% c(3, 4) & is.na(.) ~ NA,  # Keep non-searched species as NA for transects 3 & 4
+      transect_num %in% c(1, 2) & is.na(.) ~ 0,  # Set ALL species to 0 for T1 & T2
+      transect_num %in% c(3, 4) & is.na(.) & cur_column() %in% searched_species ~ 0,  # Only searched species get 0 for T3 & T4
+      transect_num %in% c(3, 4) & is.na(.) ~ NA,  # Keep non-searched species as NA for T3 & T4
       TRUE ~ .  # Keep existing values
     )
   )) %>%
-  
   mutate(class = ">4cm")
-
-
-# check
-adult.counts %>% filter(site == "3068")
-
 
 
 # Add class <4cm for juveniles
@@ -115,101 +122,185 @@ t1t2juvs <- t1t2bonus %>%
 alljuv <- full_join(drmjuvs, t1t2juvs, by = c("site", "transect_num")) %>%
     mutate(class = "<4cm")
 
-
-
 # 9 sites missing juvenile data -- still waiting on JS to send... (these were the sites she removed from overall DRM dataset)
 
 
 # Combine all adult and juvenile count data
 allcounts <- bind_rows(adult.counts, alljuv) %>%
   full_join(allsitemd)
-# check
-allcounts %>% filter(site == "3110")
 
-# Pivot to long form and add area searched for each taxon/class to calculate densities
+
+# Pivot to long form
 counts_long <- allcounts %>% 
   pivot_longer(
     cols = matches("^[A-Z]{4}$", ignore.case = FALSE),  # Select columns with exactly four uppercase letters
     names_to = "taxon",
     values_to = "count"
   ) %>%
-  drop_na(count)
+  drop_na(count)  # Drop missing values (species not searched for on a given transect, since zeros already assigned above)
+```
 
-area_searched <- counts_long %>%
-  distinct(taxon, class) %>%
-  mutate(area = case_when(class == "<4cm" & taxon %in% c("MEAN", "MCAV", "MUSS", "FAVI") ~ 40,
-                          class == "<4cm" & !taxon %in% c("MEAN", "MCAV", "MUSS", "FAVI") ~ 20,
-                          class == ">4cm" & taxon %in% c("CNAT", "DSTO", "DLAB", "MMEA", "MANG",
-                                                         "MALI", "MFER", "MLAM", "PCLI", "PSTR") ~ 40,
-                          class == ">4cm" & !taxon %in% c("CNAT", "DSTO", "DLAB", "MMEA", "MANG",
-                                                         "MALI", "MFER", "MLAM", "PCLI", "PSTR") ~ 20))
+# Summarize total corals per site
+```{r}
+# Get PENIP subset
+penip <- filter(counts_long, !is.na(penip_site)) %>% 
+  mutate(taxclass = paste0(taxon, class))
 
-# Join counts with area searched and calculate density per m2
-counts_long <- full_join(counts_long, area_searched) %>%
-  mutate(n_per_m2 = count/area)
+# total counts for each taxon/class per site, and total area searched for each (since diff no. transects)
+taxclass_totals <- penip %>%
+  group_by(site, latitude, longitude, reef, direction, distance_m, taxon, class, taxclass) %>%
+  summarize(n = sum(count), area = n() * 10) %>%  # 10 m2 per counted transect
+  ungroup() %>%
+  mutate(n_per_m2 = n / area)
 
-counts_long %>% filter(site == "3110", taxon == "FAVI")
+# summarize site-level total coral density
+total_corals_per_m2 <- taxclass_totals %>%
+    group_by(site, latitude, longitude, reef, direction, distance_m) %>%
+    summarize(total_per_m2 = sum(n_per_m2)) %>%  # Sum per-m² densities
+    ungroup()
+
+# Average total coral density per square meter across all sites
+mean(total_corals_per_m2$total_per_m2)
+# 2.58 corals per square meter
+
+# Plot density across sites
+ggplot(total_corals_per_m2, aes(x = longitude, y = latitude, size = total_per_m2)) +
+  geom_point(alpha = 0.5)
 ```
 
 
+# Negative binomial GLM
 ```{r}
-# PENIP
-penip <- filter(counts_long, !is.na(penip_site))
-
-# total counts, total area per site
-totals <- penip %>%
-  group_by(site, reef, direction, distance_m, taxon, class) %>%
-  summarize(total = sum(count), area = unique(area)) %>%
-  ungroup()
-
-totals2 <- penip %>%
-  group_by(site, reef, direction, distance_m, taxon, class) %>%
-  summarize(total = sum(count), area = n() * 10) %>%
-  ungroup()
-
-identical(totals, totals2)
-# Both ways we total area searched, same results. good check!
-
-
 # MODEL CORAL COUNTS
 
-# Quasi-poisson
-mod_qp <- glm(total ~ taxon:class * reef * direction * distance_m + offset(log(area)), 
-           family = quasipoisson(link = "log"), data = totals, na.action = na.fail)
-summary(mod_qp)
-anova(mod_qp, test = "F")
+# Fit a Negative Binomial GLM
+mod_nb <- MASS::glm.nb(n ~ taxon * class + offset(log(area)), data = taxclass_totals)
 
-# # Negative binomial
-# # Load necessary library
-# library(MASS)
-# 
-# # Fit the Negative Binomial GLM
-# mod_nb <- glm.nb(total ~ taxon:class * reef * direction * distance_m + offset(log(area)), 
-#                  data = totals)
-# 
-# # Display model summary
-# summary(mod_nb)
-# anova(mod_nb)
+# Generate new data only for existing taxon-size class combinations
+newdata_1 <- taxclass_totals %>%
+  distinct(taxon, class) %>%  # Keep only observed taxon-class combinations
+  mutate(area = 1)  # Set area to 1 for density predictions
 
-# Decided to go with quasi-poisson
+# Get predicted values & standard errors (log scale)
+preds <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
 
-# Stepwise model simplification 
-library(MuMIn)  # Install if needed: install.packages("MuMIn")
+# Compute both total coral density & taxon-size class-specific densities in one step
+results <- newdata_1 %>%
+  mutate(
+    fit = exp(preds$fit),                    # Convert fitted values to response scale
+    fit_se = exp(preds$fit) * preds$se.fit,   # Convert SE using the Delta Method
+    fit_var = (fit * preds$se.fit)^2,         # Variance propagation
+    lower_95CI = exp(preds$fit - 1.96 * preds$se.fit),  # Lower CI
+    upper_95CI = exp(preds$fit + 1.96 * preds$se.fit)   # Upper CI
+  )
 
-mod_qp_reduced <- dredge(mod_qp, rank = "AIC", fixed = ~ taxon:class + offset(log(area)))
-mod_qp_reduced
-best_model <- get.models(mod_qp_reduced, 1)[[1]]
-summary(best_model)
-exp(coef(best_model))
-#0.05 corals per taxon per square meter?
-# get fitted for each taxon:class?
+# Compute total coral density + confidence intervals
+total_ci <- results %>%
+  summarize(
+    total_density = sum(fit),
+    total_se = sqrt(sum(fit_var)),
+    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
+    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
+  )
 
+total_ci
+# 2.62 total corals per m2 (95%CI 2.23-3.07)
+
+# Extract and plot taxon-size-class-specific densities
+taxclass_ci <- results %>%
+  dplyr::select(taxon, class, fit, fit_se, lower_95CI, upper_95CI)
+
+# Set a lower limit for visualization
+lower_limit <- 1e-3
+
+ggplot(taxclass_ci, aes(x = taxon, y = fit, color = class)) +
+  geom_point() +
+  geom_errorbar(aes(
+    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
+    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
+  ), width = 0.2) +
+  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
+  coord_flip() +
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
+  theme_minimal() +
+  labs(title = "Negative binomial GLM")
+  
+```
+
+# Include random site effeects
+```{r}
+# Fit a Bayesian Hurdle Model with Random Effects
+mod_hurdle_bayes <- brm(
+  bf(count ~ taxclass + (1 | site), hu ~ taxclass),  # `hu` models hurdle (zero vs. nonzero)
+  family = hurdle_negbinomial(),  # Hurdle Negative Binomial
+  data = penip,
+  chains = 4, cores = 4
+)
+
+# Model summary
+summary(mod_hurdle_bayes)
+
+# Generate posterior fitted values for each taxon-size class
+fitted_taxclass <- fitted(mod_hurdle_bayes, summary = TRUE) %>%
+  as_tibble() %>%
+  bind_cols(dplyr::select(penip, taxclass)) %>%
+  rename(fit = Estimate, fit_lower = Q2.5, fit_upper = Q97.5, fit_se = Est.Error) %>%
+  dplyr::select(taxclass, fit, fit_se, fit_lower, fit_upper) %>%
+  distinct(taxclass, .keep_all = TRUE)
+
+# Print fitted values for each taxon-size class
+fitted_taxclass
+
+# Define a small minimum threshold
+small_value <- 1e-5  
+
+# Replace Inf values with small_value
+fitted_taxclass <- fitted_taxclass %>%
+  mutate(across(c(fit, fit_se, fit_lower, fit_upper), ~ ifelse(is.infinite(.), small_value, .)))
+
+
+
+# Compute total coral density per m² (sum over taxon-size classes)
+total_density <- fitted_taxclass %>%
+  summarize(
+    total_fit = sum(fit),
+    total_se = sqrt(sum(fit_se^2)),  # Correct SE propagation
+    total_lower = sum(fit_lower),
+    total_upper = sum(fit_upper)
+  )
+
+# Print total coral density
+total_density
+# 23.5 per transect == 2.35 per square meter (1.33-3.94 95%CI)
+
+fitted_taxclass <- fitted_taxclass %>%
+  mutate(taxon = substr(taxclass, 1, 4),
+         class = substr(taxclass, 5, 8)) %>%
+  mutate(across(c(fit, fit_se, fit_lower, fit_upper), ~ . / 10))
+ggplot(fitted_taxclass, aes(x = taxon, y = fit, color = class)) +
+  geom_point() +
+  geom_errorbar(aes(
+    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
+    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
+  ), width = 0.2) +
+  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
+  coord_flip() +
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
+  theme_minimal() +
+  labs(title = "Bayesian Hurdle zinb with site random")
+  
+```
+
+
+
+
+```{r}
 
 
 
 
 # Maybe keep at transect level?
-mod_qp <- glm(count ~ taxon:class + offset(log(area)), family = quasipoisson(link = "log"), data = penip)
+mod_qp <- glm.nb(count ~ taxon:class + offset(log(area)), family = quasipoisson(link = "log"), data = penip)
 
 penip$predicted_counts <- predict(mod_qp, type = "response")
 penip$predicted_density <- penip$predicted_counts / penip$area
@@ -235,8 +326,7 @@ emm_results$estimated_density <- emm_results$response / mean(penip$area)
 print(emm_results)
 
 ###### following pom-dredge methods
-penip <- penip %>% mutate(taxclass = paste0(taxon, class))
-penip
+
 library(lme4)
 mod_qp <- glmer(count ~ taxclass + offset(log(area)) + (1|site/transect_num), 
                 family = "poisson", data = penip)
