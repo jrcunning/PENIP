@@ -171,7 +171,8 @@ ggplot(total_corals_per_m2, aes(x = longitude, y = latitude, size = total_per_m2
 
 # Negative binomial GLM
 ```{r}
-# MODEL CORAL COUNTS
+# MODEL CORAL COUNTS at the site level, using totals per taxon-size class per site (added up across transects)
+# offset(log(area)) has to be included because of the different number of transects used for different taxon-size class groups
 
 # Fit a Negative Binomial GLM
 mod_nb <- MASS::glm.nb(n ~ taxon * class + offset(log(area)), data = taxclass_totals)
@@ -211,7 +212,7 @@ taxclass_ci <- results %>%
   dplyr::select(taxon, class, fit, fit_se, lower_95CI, upper_95CI)
 
 # Set a lower limit for visualization
-lower_limit <- 1e-3
+lower_limit <- 1e-4
 
 ggplot(taxclass_ci, aes(x = taxon, y = fit, color = class)) +
   geom_point() +
@@ -227,7 +228,7 @@ ggplot(taxclass_ci, aes(x = taxon, y = fit, color = class)) +
   
 ```
 
-# Include random site effeects
+# Include random site effects
 ```{r}
 # Fit a Bayesian Hurdle Model with Random Effects
 mod_hurdle_bayes <- brm(
@@ -287,11 +288,103 @@ ggplot(fitted_taxclass, aes(x = taxon, y = fit, color = class)) +
   coord_flip() +
   labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
   theme_minimal() +
-  labs(title = "Bayesian Hurdle zinb with site random")
-  
+  labs(title = "Bayesian Hurdle with site random")
+
+
+# This output is pretty good, but some of the presumed lowest abundance taxon-size classes were unestimable,
+# and the fitted values were returned as Infinity.
+# I would like to find an approach that is able to produce estimates for all taxa-size classes.
 ```
 
 
+```{r}
+# Try to still use Bayesian approach for random site effects but use ZINB model instead of hurdle
+library(brms)
+library(future)
+
+# 🚀 Optimize parallel execution
+n_cores <- 4  # Use 4 cores for chains
+n_threads <- 5  # Use 5 threads per chain (total CPU usage = 4 * 5 = 10 cores)
+options(mc.cores = n_cores)
+future::plan(multisession)
+
+mod_zinb_bayes <- brm(
+  bf(count ~ taxclass + (1 | site), zi ~ taxclass),
+  family = zero_inflated_negbinomial(),
+  data = penip,
+  chains = n_cores,  # 4 chains
+  cores = n_cores,  # 4 parallel processes
+  threads = threading(n_threads),  # 5 threads per chain (full CPU utilization)
+  iter = 2500, warmup = 750,  # Optimized iteration balance
+  thin = 2,
+  control = list(adapt_delta = 0.90, max_treedepth = 10),
+  backend = "cmdstanr"
+)
+
+# Model summary
+summary(mod_zinb_bayes)
+
+# Generate posterior fitted values for each taxon-size class
+fitted_taxclass_zinb <- fitted(mod_zinb_bayes, summary = TRUE) %>%
+  as_tibble() %>%
+  bind_cols(dplyr::select(penip, taxclass)) %>%
+  rename(fit = Estimate, fit_lower = Q2.5, fit_upper = Q97.5, fit_se = Est.Error) %>%
+  dplyr::select(taxclass, fit, fit_se, fit_lower, fit_upper) %>%
+  distinct(taxclass, .keep_all = TRUE)
+
+# Compute total coral density per m² (sum over taxon-size classes)
+total_density_zinb <- fitted_taxclass_zinb %>%
+  summarize(
+    total_fit = sum(fit),
+    total_se = sqrt(sum(fit_se^2)),  # Correct SE propagation
+    total_lower = sum(fit_lower),
+    total_upper = sum(fit_upper)
+  )
+
+# Print total coral density per transect
+total_density_zinb
+# 30.7 per transect == 3.07 per square meter (1.70-5.27 95%CI)
+
+# Convert densities from per transect to per m2 (divide by 10m2)
+fitted_taxclass_zinb_per_m2 <- fitted_taxclass_zinb %>%
+  mutate(across(c(fit, fit_se, fit_lower, fit_upper), ~ . / 10)) %>%
+  mutate(taxon = substr(taxclass, 1, 4),
+         class = substr(taxclass, 5, 8))
+
+# Plot
+lower_limit <- 1e-4
+ggplot(fitted_taxclass_zinb_per_m2, aes(x = taxon, y = fit, color = class)) +
+  geom_point() +
+  geom_errorbar(aes(
+    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
+    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
+  ), width = 0.2) +
+  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
+  coord_flip() +
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
+  theme_minimal() +
+  labs(title = "Bayesian Zinb with site random")
+
+# Combine both size-classes?
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### parking lot below VVV
 
 
 ```{r}
