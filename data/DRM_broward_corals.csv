@@ -867,6 +867,755 @@ batch,site,latitude,longitude,subregion,zone,f_habitat,habitat,site_comments,tea
 2024B,AA1158,26.005774,-80.112419,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,20,SALE,0,NA,"lots of small SSIDs, sparse hard bottom",TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 2024B,AA1158,26.005774,-80.112419,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-10-16T00:00:00Z,19,SALE,0,NA,NA,FALSE,PPOR,7,4,Not Bleached,2,0,0,0,NA,NA,NA,NA
 2024B,AA1158,26.005774,-80.112419,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-10-16T00:00:00Z,19,SALE,0,NA,NA,FALSE,SBOU,29,15,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,47,SALE,0,NA,site covered in macroalgae (C. racemosa) and cyanobacteria,FALSE,PAST,16,4,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,47,SALE,0,NA,site covered in macroalgae (C. racemosa) and cyanobacteria,FALSE,SSID,6,3,Not Bleached,0,3,3,0,NA,NA,"PRD, MUC",NA
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,47,SALE,0,NA,site covered in macroalgae (C. racemosa) and cyanobacteria,FALSE,SINT,11,5,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,49,SALE,0,NA,NA,FALSE,CNAT,46,11,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,49,SALE,0,NA,NA,FALSE,SSID,18,5,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,49,SALE,0,NA,NA,FALSE,EFAS,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,49,SALE,0,NA,NA,FALSE,SINT,6,2,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,12,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,MCAV,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,10,5,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SINT,6,2,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,MCAV,70,34,Not Bleached,70,0,0,0,NA,NA,CLN,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,MCAV,65,30,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,5,2,Not Bleached,0,5,5,0,NA,NA,PRD,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,9,4,Not Bleached,1,5,5,0,NA,NA,SC,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SINT,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PCLI,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,DSTO,5,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,15,5,Not Bleached,85,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PPOR,5,1,Not Bleached,0,2,2,0,NA,NA,PRD,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,MCAV,37,18,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,SSID,7,3,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,9,3,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,11,3,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,SINT,4,3,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,14,6,Not Bleached,25,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,19,5,Not Bleached,85,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PPOR,7,6,Not Bleached,0,2,2,0,NA,NA,PRD,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,10,2,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,9,1,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,MCAV,62,21,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PPOR,8,2,Not Bleached,35,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PPOR,6,7,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PAST,22,9,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,PDIV,16,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,DSTO,7,3,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,20,SALE,0,NA,lots of Halimeda,FALSE,SBOU,39,15,Not Bleached,97,0,0,0,NA,NA,NA,NA
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,20,SALE,0,NA,lots of Halimeda,FALSE,SBOU,53,30,Not Bleached,3,1,1,0,NA,NA,PRD,NA
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,20,SALE,0,NA,lots of Halimeda,FALSE,SSID,4,3,Pale,40,0,0,0,NA,NA,NA,NA
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,20,SALE,0,NA,lots of Halimeda,FALSE,SSID,5,2,Pale,40,0,0,0,NA,NA,NA,NA
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-10-16T00:00:00Z,18,SALE,0,NA,NA,FALSE,SBOU,26,13,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-10-16T00:00:00Z,18,SALE,0,NA,NA,FALSE,SINT,17,15,Pale,1,0,0,0,NA,NA,NA,NA
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-10-16T00:00:00Z,18,SALE,0,NA,NA,FALSE,SBOU,38,40,Partly Bleached,15,1,1,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,PPOR,5,5,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,SSID,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,SSID,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,AAGA,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,OFAV,70,45,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,PAST,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,MCAV,10,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,SSID,12,5,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,SSID,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,PPOR,7,6,Not Bleached,0,8,8,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,PAST,23,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,CNAT,7,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,MCAV,28,18,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,SSID,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,PAST,15,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,SSID,14,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,OFAV,42,33,Not Bleached,35,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,PAST,12,4,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,MCAV,17,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,10,3,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,7,2,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,19,8,Partly Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,11,2,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,12,2,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,11,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,4,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,8,2,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SINT,12,2,Partly Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,MCAV,87,41,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,20,3,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,MCAV,45,32,Not Bleached,90,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SINT,10,5,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,5,1,Pale,1,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SINT,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,12,2,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,6,4,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,13,2,Not Bleached,50,5,5,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,18,6,Not Bleached,10,10,10,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,11,2,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,14,5,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,11,4,Not Bleached,15,10,10,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,7,2,Not Bleached,0,2,2,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,5,2,Not Bleached,2,5,5,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,8,2,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,5,1,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,33,4,Not Bleached,2,0,0,0,NA,NA,MUC,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,10,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,OFAV,105,37,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,12,8,Not Bleached,5,2,2,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,5,2,Not Bleached,10,5,5,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,8,5,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,12,5,Not Bleached,70,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PPOR,8,4,Not Bleached,2,10,10,0,NA,NA,PRD,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,6,1,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SRAD,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,MCAV,73,38,Not Bleached,70,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,6,2,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SINT,14,10,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,17,6,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,SSID,14,4,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,FALSE,PAST,10,5,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,21,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,21,SALE,0,NA,NA,FALSE,SSID,5,1,Pale,3,0,0,0,NA,NA,NA,NA
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,21,SALE,0,NA,NA,FALSE,SSID,4,1,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-16T00:00:00Z,21,SALE,0,NA,NA,FALSE,SBOU,32,25,Not Bleached,68,0,0,0,NA,NA,NA,NA
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-10-16T00:00:00Z,20,SALE,0,NA,NA,FALSE,SBOU,34,22,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-10-16T00:00:00Z,20,SALE,0,NA,NA,FALSE,MCAV,87,52,Pale,30,0,0,0,NA,NA,CLN,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,OFAV,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,10,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,7,1,Totally Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PPOR,15,8,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,11,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MMEA,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PPOR,11,3,Not Bleached,2,2,2,0,NA,NA,PRD,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,11,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,DSTO,6,3,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,12,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SINT,14,5,Pale,2,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,11,3,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,9,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MALI,19,4,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SINT,7,2,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,7,3,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MCAV,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,OFAV,77,34,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PPOR,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,10,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,9,2,Pale,3,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SINT,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,9,5,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SINT,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PPOR,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,1,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,13,7,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MCAV,50,38,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,7,2,Not Bleached,8,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,12,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,13,7,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,6,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MCAV,33,14,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,10,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PSTR,7,5,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MCAV,33,25,Not Bleached,25,0,0,0,NA,NA,CLN,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,12,5,Not Bleached,8,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SINT,10,5,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,9,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,6,2,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,12,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,8,2,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,PAST,7,5,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,EFAS,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MCAV,8,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,NOVA Southeastern Univ.,2,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,8,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,9,4,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SINT,11,4,Pale,10,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PAST,10,2,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PAST,14,4,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SINT,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,AAGA,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,MCAV,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,6,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,9,4,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,MCAV,60,28,Pale,15,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,7,3,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SINT,7,2,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PAST,4,1,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PAST,10,3,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,6,2,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,5,2,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SINT,6,3,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,9,4,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PAST,24,8,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,MCAV,35,17,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SINT,9,2,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,MCAV,13,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PPOR,5,2,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,MCAV,62,26,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,MCAV,46,22,Not Bleached,85,0,0,0,NA,NA,CLN,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PPOR,6,2,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PAST,11,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PPOR,7,5,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PPOR,16,10,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PAST,7,2,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,SSID,9,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,15,3,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,15,4,Not Bleached,7,0,0,0,NA,NA,CLN,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PPOR,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,27,15,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,12,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,26,14,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,75,35,Not Bleached,80,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SINT,20,10,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SBOU,6,2,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,11,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,5,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PPOR,9,5,Not Bleached,2,2,2,0,NA,NA,PRD,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PPOR,5,5,Not Bleached,2,5,5,0,NA,NA,PRD,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,15,3,Not Bleached,5,0,0,20,FA,UNK,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,32,28,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,7,1,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,29,32,Not Bleached,98,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,20,45,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,8,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SINT,11,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,45,19,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,MCAV,70,44,Not Bleached,25,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,SSID,5,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,SINT,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,PAST,12,3,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,PAST,7,3,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,SSID,47,23,Not Bleached,20,1,1,0,NA,NA,PRD,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,SSID,56,26,Not Bleached,75,0,0,0,NA,NA,CLN,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,OFAV,97,55,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,SINT,22,7,Partly Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,PAST,7,4,Pale,30,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,FALSE,SINT,7,2,Totally Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,14,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SBOU,31,17,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PAST,11,8,Not Bleached,25,0,0,0,NA,NA,MUC,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,PPOR,13,5,Not Bleached,5,5,5,0,NA,NA,PRD,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SINT,25,13,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,2,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,5,1,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SINT,11,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SSID,15,6,Not Bleached,7,0,0,0,NA,NA,NA,NA
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,2,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,SBOU,22,23,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,OFAV,30,8,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,SINT,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,SINT,8,4,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,MCAV,10,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,SINT,6,1,Partly Bleached,0,5,5,0,NA,NA,SC,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,PCLI,18,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,SINT,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,SINT,9,4,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,MALI,34,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SSID,12,6,Pale,20,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SSID,4,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,6,4,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,PAST,15,10,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,13,9,Not Bleached,45,0,0,0,NA,NA,OGI,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,13,5,Not Bleached,80,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,EFAS,13,8,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SSID,7,5,Not Bleached,95,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,MCAV,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SRAD,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SSID,6,4,Pale,25,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,6,3,Not Bleached,90,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,PAST,9,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,5,3,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,MMEA,8,2,Not Bleached,10,0,0,0,NA,NA,SC,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SSID,7,3,Not Bleached,0,8,8,0,NA,NA,"ABR, MUC",NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,10,8,Pale,30,0,0,0,NA,NA,SC,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,8,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,MCAV,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SSID,17,3,Not Bleached,2,0,0,0,NA,NA,MUC,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SINT,6,12,Not Bleached,70,0,0,0,NA,DC,NA,NA
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-10-24T00:00:00Z,56,TATU,0,NA,"Marine debris, rope, minor anchor damage",FALSE,SSID,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,SRAD,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PAST,11,9,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,SRAD,5,2,Partly Bleached,0,5,5,0,NA,NA,SC,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PPOR,10,10,Not Bleached,5,0,0,0,NA,NA,OGI,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,SINT,8,6,Not Bleached,50,0,0,0,NA,NA,SC,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PAST,18,12,Not Bleached,5,0,0,0,NA,NA,MUC,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,MCAV,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,SINT,8,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,DSTO,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PPOR,5,2,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PAST,7,3,Not Bleached,5,0,0,0,NA,NA,OGI,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PPOR,4,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,SSID,23,11,Partly Bleached,40,5,5,0,NA,NA,"OGI, CLN",NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PPOR,5,3,Not Bleached,2,0,0,0,NA,NA,"MUC, OGI",NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PSTR,46,38,Pale,0,3,3,0,NA,NA,SC,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,OFAV,90,34,Not Bleached,60,0,0,0,NA,NA,CLN,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,PAST,11,8,Not Bleached,0,5,5,0,NA,NA,OGI,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,PAST,13,13,Not Bleached,20,0,0,0,NA,NA,OGI,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,SSID,11,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,PAST,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,SRAD,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,PPOR,4,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,SINT,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,SINT,9,7,Not Bleached,0,5,5,0,NA,NA,OGI,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,SBOU,23,29,Not Bleached,65,0,0,0,NA,NA,OGI,NA
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,SSID,7,2,Not Bleached,0,0,0,0,NA,DSD,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,PAST,19,12,Pale,15,5,5,0,NA,NA,"PRD, OGI",NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,SINT,7,1,Partly Bleached,0,5,5,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,90,30,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,85,50,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,120,40,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,100,30,Pale,30,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,20,3,Not Bleached,95,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,40,15,Partly Bleached,90,0,0,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,30,22,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,50,27,Not Bleached,5,5,5,0,NA,NA,"SC, OGI",NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,PAST,22,13,Not Bleached,80,0,0,0,NA,NA,"OGI, PRD",NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,160,45,Not Bleached,15,5,5,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,34,11,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,32,10,Pale,90,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,30,10,Not Bleached,10,0,0,0,NA,NA,"SC, OGI",NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,MCAV,115,60,Not Bleached,15,0,0,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,10,10,Not Bleached,45,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,37,27,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,SINT,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,40,20,Not Bleached,10,0,0,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,PAST,10,7,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,ACER,55,18,Pale,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,PAST,15,3,Partly Bleached,5,5,5,0,NA,NA,"SC, OGI",NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,PAST,12,6,Pale,0,3,3,0,NA,NA,"SC, OGI",NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,SSID,10,9,Partly Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,17,TATU,0,NA,A lot of ACER at this site.,FALSE,PAST,4,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,SINT,9,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,24,21,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,PPOR,9,8,Not Bleached,5,5,5,0,NA,NA,"OGI, PRD",NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,29,18,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,11,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,DSTO,4,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,70,29,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,38,22,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,33,28,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,13,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,13,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,47,24,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,59,20,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,PAST,9,9,Not Bleached,40,0,0,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,SSID,25,6,Not Bleached,50,0,0,0,NA,NA,OGI,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,3,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,84,26,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,PAST,10,6,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,98,38,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,ACER,10,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,SSID,7,2,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,PAST,13,9,Not Bleached,10,1,1,0,NA,NA,"PRD, OGI",NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,SSID,12,3,Not Bleached,70,0,0,0,NA,NA,OGI,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,SINT,11,4,Not Bleached,50,0,0,0,NA,NA,OGI,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,SBOU,38,20,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,MCAV,35,10,Not Bleached,90,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,MCAV,50,16,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,PPOR,9,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,PAST,8,1,Partly Bleached,0,3,3,0,NA,NA,SC,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,PAST,10,3,Not Bleached,0,2,2,0,NA,NA,"OGI, PRD",NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,SSID,18,7,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,32,MARI,0,NA,NA,FALSE,SINT,10,2,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,32,MARI,0,NA,NA,FALSE,SSID,32,20,Pale,5,0,0,0,NA,NA,OGI,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,32,MARI,0,NA,NA,FALSE,SINT,21,12,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,32,MARI,0,NA,NA,FALSE,SSID,28,12,Not Bleached,2,1,1,0,NA,NA,PRD,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PAST,10,6,Not Bleached,0,5,5,0,NA,NA,"MUC, OGI",NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SINT,13,8,Pale,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PAST,9,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SSID,22,9,Pale,10,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SINT,8,2,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PAST,7,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SINT,11,5,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PAST,15,7,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SINT,7,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PPOR,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SSID,7,3,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SINT,20,12,Partly Bleached,20,8,8,0,NA,NA,"OGI, TRS",NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PPOR,8,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,MCAV,5,1,Partly Bleached,0,0,0,0,NA,NA,"OGI, SC",NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PPOR,7,2,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SINT,10,4,Pale,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,PAST,11,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SINT,10,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,1,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,SRAD,5,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SRAD,5,2,Pale,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SINT,10,6,Partly Bleached,0,5,5,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,PSTR,9,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SINT,5,2,Partly Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SINT,15,12,Not Bleached,0,5,5,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SINT,7,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,PAST,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,MCAV,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SINT,11,4,Partly Bleached,10,1,1,0,NA,NA,OGI,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,SSID,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,Contiguous Reef Other,PTCH,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,MCAV,12,12,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SSID,15,2,Partly Bleached,0,75,75,0,NA,NA,OGI,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,PRD,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,4,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PFUR,38,15,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SSID,6,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,OFRA,28,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,8,4,Partly Bleached,0,5,5,0,NA,NA,OGI,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,12,10,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PAST,9,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,7,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,ALAM,18,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,EFAS,12,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,OFRA,30,10,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PFUR,13,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,MCAV,28,29,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PAST,9,3,Pale,60,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,8,3,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PPOR,5,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,SSID,8,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,SBOU,27,20,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,SSID,7,4,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,SINT,9,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,SINT,5,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,MCAV,25,12,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,Contiguous Reef Other,LIRO,NA,DEP - Miami,2,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,FALSE,SINT,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,ACER,75,20,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,PPOR,32,8,Partly Bleached,35,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,MCAV,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,ACER,90,50,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,PAST,9,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,SBOU,25,20,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,PAST,15,1,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,SRAD,5,1,Pale,0,5,5,0,NA,NA,OGI,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,PPOR,25,3,Partly Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,ACER,100,20,Not Bleached,90,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,PAST,18,5,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,MCAV,20,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,ACER,55,10,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,ACER,150,40,Not Bleached,80,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,PPOR,9,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,20,MEMI,0,NA,Algae present,FALSE,PPOR,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,SRAD,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,PPOR,7,1,Pale,0,20,20,0,NA,NA,OGI,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,ACER,83,28,Pale,50,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,SSID,8,4,Pale,10,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,ACER,74,26,Not Bleached,55,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,ACER,106,42,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,ACER,12,13,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,MCAV,46,29,Not Bleached,35,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,ACER,49,27,Not Bleached,8,0,0,0,NA,NA,NA,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,PAST,6,3,Not Bleached,0,0,0,0,NA,NA,MUC,NA
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,FALSE,ACER,65,34,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,SINT,9,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,MCAV,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,SSID,4,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,SINT,10,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,SSID,6,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,MCAV,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,MCAV,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,PSTR,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,SINT,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,PCLI,8,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,DSTO,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,SSID,5,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,MCAV,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,DSTO,6,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,MCAV,6,6,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,PAST,13,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,SINT,7,4,Partly Bleached,0,40,40,0,NA,NA,SC,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,SRAD,5,1,Pale,10,0,0,0,NA,NA,NA,NA
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,FALSE,SSID,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,MCAV,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SSID,8,3,Not Bleached,0,0,0,0,NA,NA,"SC, OGI",NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SSID,26,12,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SSID,6,2,Not Bleached,0,0,0,0,NA,NA,MUC,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SINT,9,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,PAST,12,4,Not Bleached,0,5,5,0,NA,NA,"SC, OGI",NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,MMEA,7,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SSID,7,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,PAST,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SINT,10,4,Pale,0,0,0,0,NA,NA,"SC, OGI",NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,PAST,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SSID,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SINT,9,3,Not Bleached,0,10,10,0,NA,NA,SC,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,SINT,10,3,Partly Bleached,30,0,0,0,NA,NA,"SC, OGI",NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,PAST,20,9,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,MCAV,40,20,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,PAST,18,8,Not Bleached,5,0,0,0,NA,NA,"OGI, SC",NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,FALSE,DSTO,7,3,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,12,3,Pale,20,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,12,4,Not Bleached,90,0,0,0,NA,NA,CLN,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SINT,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,MCAV,62,35,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,11,8,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,48,20,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SINT,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SINT,18,8,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SBOU,22,18,Partly Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SINT,10,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,PAST,8,4,Pale,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SSID,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,AAGA,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,PAST,8,3,Pale,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SINT,8,4,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,MCAV,25,15,Not Bleached,80,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SINT,15,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,SINT,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,FALSE,MCAV,80,40,Not Bleached,35,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,ACER,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,ACER,15,10,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,ACER,45,35,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,ACER,9,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,PPOR,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,ACER,4,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,SBOU,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,SINT,15,7,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,SINT,9,3,Not Bleached,10,0,0,0,NA,NA,OGI,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,SRAD,7,5,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,SINT,5,3,Pale,10,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,ACER,35,32,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,ACER,30,25,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,PPOR,11,5,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,DSTO,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,SINT,35,29,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,FALSE,SSID,7,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,31,14,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,33,12,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,25,16,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,PAST,8,2,Pale,0,5,5,0,NA,NA,PRD,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,17,9,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,SSID,6,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,PAST,8,3,Not Bleached,25,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,SSID,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,SSID,7,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,PAST,12,5,Not Bleached,5,0,0,0,NA,NA,MUC,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,22,9,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,20,4,Not Bleached,45,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,PAST,18,7,Not Bleached,8,2,2,0,NA,NA,PRD,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,DSTO,9,6,Pale,2,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,SINT,12,7,Pale,70,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,38,13,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,PPOR,6,1,Not Bleached,0,8,8,0,NA,NA,PRD,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,ACER,35,17,Pale,15,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,MCAV,66,43,Not Bleached,15,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,SSID,6,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,PAST,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,FALSE,SINT,6,2,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SRAD,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,9,4,Partly Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,AFRA,7,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,8,4,Pale,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,7,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,AHUM,9,7,Not Bleached,0,0,0,0,NA,NA,PRD,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,10,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SINT,9,2,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,AHUM,9,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,10,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,10,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SINT,15,9,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,AHUM,12,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,12,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,ALAM,9,1,Not Bleached,3,0,0,0,NA,NA,"PRD, OGI",NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,15,9,Not Bleached,5,0,0,0,NA,NA,OGI,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SINT,9,3,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,MCAV,35,25,Not Bleached,3,0,0,0,NA,NA,PRD,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,15,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,23,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,9,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SSID,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,10,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SINT,9,2,Pale,0,0,0,0,NA,NA,"OUK, PRD",NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,PAST,15,20,Not Bleached,10,0,0,0,NA,NA,PRD,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,1,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,FALSE,SINT,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,SSID,7,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,PPOR,9,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,AAGA,7,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,PAST,10,18,Not Bleached,0,3,3,0,NA,NA,SC,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,PAST,12,13,Totally Bleached,0,0,0,0,NA,NA,PRD,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,PAST,7,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,SINT,4,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,OFAV,20,25,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,MMEA,11,10,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,SRAD,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,PAST,8,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,SSID,9,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,PAST,9,17,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,DSTO,3,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,DEP - Miami,2,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,FALSE,MDEC,13,50,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,ACER,30,20,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,PSTR,26,2,Pale,5,0,0,0,NA,NA,SC,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,SSID,15,3,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,SRAD,6,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,PAST,13,5,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,SSID,6,1,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,ACER,20,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,PAST,10,2,Not Bleached,0,2,2,0,NA,NA,PRD,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,PAST,13,4,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,DSTO,9,4,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,SSID,7,1,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,PAST,20,4,Not Bleached,0,0,0,0,NA,NA,OGI,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,SRAD,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,ACER,13,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,PAST,6,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,ACER,24,27,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,MCAV,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,PAST,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,ACER,20,13,Not Bleached,13,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,SSID,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,16,ALSH,0,NA,NA,FALSE,ACER,50,27,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,PRD,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,EFAS,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PAST,9,2,Partly Bleached,0,0,0,0,NA,NA,"SC, MUC",NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SINT,5,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SSID,18,5,Not Bleached,35,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PAST,4,1,Partly Bleached,0,25,25,0,NA,NA,"SC, MUC",NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PAST,14,7,Pale,0,0,0,0,NA,NA,SC,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,MCAV,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SSID,18,8,Partly Bleached,70,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,SSID,15,6,Partly Bleached,0,1,1,0,NA,NA,OGI,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,PAST,7,1,Partly Bleached,0,0,0,0,NA,NA,"SC, MUC",NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,1,2024-10-04T00:00:00Z,60,MARI,0,NA,NA,FALSE,ALAM,75,15,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,MCAV,21,12,Not Bleached,25,25,25,0,NA,NA,PRD,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SSID,8,2,Not Bleached,40,0,0,0,NA,NA,CLN,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SINT,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SSID,10,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,PAST,8,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SSID,13,10,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SINT,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SHYA,7,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,MCAV,13,15,Partly Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SSID,9,1,Pale,0,0,0,0,NA,NA,PRD,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,MCAV,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,MCAV,50,25,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SINT,8,5,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SSID,7,4,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SINT,7,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,MMEA,5,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SSID,8,5,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SINT,6,2,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SSID,20,15,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,Contiguous Reef Other,SPGR,NA,DEP - Miami,2,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,FALSE,SINT,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,PSTR,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,MCAV,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,SSID,7,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,PPOR,9,3,Partly Bleached,70,1,1,0,NA,NA,PRD,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,SSID,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,PPOR,4,1,Partly Bleached,25,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,SSID,6,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,PPOR,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,PPOR,4,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,DSTO,7,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,1,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,SSID,4,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,25,MAWA,0,NA,NA,FALSE,SINT,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,25,MAWA,0,NA,NA,FALSE,PAST,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,25,MAWA,0,NA,NA,FALSE,SBOU,26,17,Not Bleached,40,0,0,0,NA,NA,OGI,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,25,MAWA,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,Reef Rubble,CPSH,NA,DEP - Miami,2,2024-09-20T00:00:00Z,25,MAWA,0,NA,NA,FALSE,SRAD,7,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SINT,9,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,PAST,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,PAST,9,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SBOU,30,23,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SINT,12,6,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SCOL,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,PAST,12,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SSID,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SSID,10,4,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,SSID,5,2,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,1,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,FALSE,PAST,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,2,2024-09-20T00:00:00Z,43,MAWA,0,NA,NA,FALSE,SINT,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,2,2024-09-20T00:00:00Z,43,MAWA,0,NA,NA,FALSE,PAST,24,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,2,2024-09-20T00:00:00Z,43,MAWA,0,NA,NA,FALSE,DSTO,7,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,Reef Rubble,LIRM,NA,DEP - Miami,2,2024-09-20T00:00:00Z,43,MAWA,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SINT,12,10,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SSID,5,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SSID,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SRAD,5,1,Pale,10,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SINT,10,5,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SINT,18,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SINT,7,5,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,PPOR,7,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SINT,10,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,1,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,SRAD,7,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,SRAD,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,MCAV,5,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,MMEA,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,SINT,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,PAST,15,4,Partly Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,DSTO,11,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,MCAV,50,25,Not Bleached,80,0,0,0,NA,NA,NA,NA
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,DEP - Miami,2,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,SINT,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-06T00:00:00Z,51,MEMI,0,Lara Bracci,NA,FALSE,SINT,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-06T00:00:00Z,51,MEMI,0,Lara Bracci,NA,FALSE,MCAV,5,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-06T00:00:00Z,51,MEMI,0,Lara Bracci,NA,FALSE,SRAD,6,4,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-06T00:00:00Z,51,MEMI,0,Lara Bracci,NA,FALSE,SSID,6,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-06T00:00:00Z,51,MEMI,0,Lara Bracci,NA,FALSE,SINT,7,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-06T00:00:00Z,51,MEMI,0,Lara Bracci,NA,FALSE,SRAD,5,1,Totally Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,MCAV,7,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,SINT,10,6,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,SSID,8,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,SRAD,6,9,Partly Bleached,0,2,2,0,NA,NA,TRS,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,PAST,15,15,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,SSID,5,3,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,SINT,6,9,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,FALSE,PDIV,8,6,Not Bleached,0,0,0,0,NA,NA,NA,NA
 2024B,AA2097,26.154205,-80.096794,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-25T00:00:00Z,17,SALE,0,NA,NA,FALSE,SSID,5,1,Totally Bleached,2,0,0,0,NA,NA,NA,NA
 2024B,AA2097,26.154205,-80.096794,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-25T00:00:00Z,17,SALE,0,NA,NA,FALSE,PDIV,10,4,Not Bleached,20,0,0,0,NA,NA,NA,NA
 2024B,AA2097,26.154205,-80.096794,Broward-Miami,Forereef,Contiguous Reef Other,CPSH,NA,NOVA Southeastern Univ.,1,2024-10-25T00:00:00Z,17,SALE,0,NA,NA,FALSE,ACER,8,7,Not Bleached,20,0,0,0,NA,NA,NA,NA
@@ -1067,6 +1816,165 @@ batch,site,latitude,longitude,subregion,zone,f_habitat,habitat,site_comments,tea
 2024B,AA2120,26.069349,-80.099442,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,Shedd Aquarium,2,2024-09-10T00:00:00Z,29,SHMA,0,Mark and Xaymara,NA,FALSE,PAST,11,7,Not Bleached,40,0,0,20,FA,"DC, UNK",NA,NA
 2024B,AA2120,26.069349,-80.099442,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,Shedd Aquarium,2,2024-09-10T00:00:00Z,29,SHMA,0,Mark and Xaymara,NA,FALSE,SSID,8,5,Not Bleached,60,0,0,0,NA,NA,NA,NA
 2024B,AA2120,26.069349,-80.099442,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,NA,Shedd Aquarium,2,2024-09-10T00:00:00Z,29,SHMA,0,Mark and Xaymara,NA,FALSE,PAST,7,2,Not Bleached,30,10,10,0,NA,NA,SC,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,15,4,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,SINT,16,6,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,15,3,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PCLI,25,9,Pale,10,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,SSID,15,4,Not Bleached,80,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,8,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PCLI,18,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,20,10,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,11,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PPOR,9,4,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PPOR,6,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PCLI,15,7,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,9,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,MCAV,45,23,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PPOR,20,4,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,SSID,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,22,4,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,MCAV,35,23,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,10,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-04T00:00:00Z,21,MEMI,0,NA,Moderate algae presence,FALSE,PAST,20,4,Pale,20,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PPOR,5,1,Not Bleached,0,5,5,0,NA,NA,PRD,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,SSID,5,3,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,5,1,Not Bleached,0,5,5,0,NA,NA,OGI,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,9,1,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PPOR,9,3,Partly Bleached,8,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,5,1,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,MCAV,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,SSID,13,7,Pale,60,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,SSID,5,2,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,10,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,MCAV,14,12,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,34,12,Pale,30,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,11,1,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,12,9,Not Bleached,2,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,SSID,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PPOR,9,2,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PPOR,9,5,Not Bleached,0,0,0,45,FA,UNK,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,9,6,Not Bleached,1,0,0,0,NA,NA,NA,NA
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,PAST,18,6,Not Bleached,10,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,MCAV,55,38,Not Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,9,2,Partly Bleached,0,5,5,0,NA,NA,ABR,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,7,1,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,7,5,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,6,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,SINT,12,3,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,12,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,10,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,9,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,7,3,Partly Bleached,0,40,40,0,NA,NA,OUK,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,6,1,Partly Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,12,5,Not Bleached,50,0,0,0,NA,NA,"MUC, ABR",NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,18,5,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,10,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,15,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PPOR,8,1,Not Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,ACER,12,25,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,11,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,30,10,Partly Bleached,50,0,0,0,NA,NA,MUC,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,SSID,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,SSID,9,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PCLI,13,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,SSID,30,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,10,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PAST,15,9,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,SSID,20,8,Not Bleached,30,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,1,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,SBOU,25,30,Partly Bleached,40,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,6,1,Pale,5,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,4,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,12,5,Not Bleached,0,3,3,0,NA,NA,PRD,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,7,7,Not Bleached,60,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,13,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SSID,7,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,18,11,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,5,3,Partly Bleached,20,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,9,7,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Totally Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SSID,6,2,Totally Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,5,1,Totally Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,ACER,9,5,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,7,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,7,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,9,5,Not Bleached,2,0,0,0,NA,NA,PRD,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,ACER,25,13,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SSID,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,AAGA,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,14,6,Not Bleached,25,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,9,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,11,3,Pale,20,0,0,0,NA,NA,OGI,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,19,3,Not Bleached,0,5,5,0,NA,NA,ABR,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,8,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,6,1,Not Bleached,0,3,3,0,NA,NA,PRD,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,28,13,Not Bleached,3,1,1,0,NA,NA,PRD,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,ACER,29,20,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,ACER,22,12,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,8,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,15,8,Not Bleached,5,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Totally Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SSID,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,50,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,8,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,32,12,Not Bleached,5,2,2,0,NA,NA,"MUC, SC",NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,12,5,Not Bleached,6,0,0,0,NA,NA,ABR,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,9,3,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,9,2,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,13,6,Not Bleached,45,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,ACER,22,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,9,5,Not Bleached,3,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,5,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,5,1,Pale,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,SRAD,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,10,3,Not Bleached,0,3,3,0,NA,NA,OUK,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,7,1,Not Bleached,0,0,0,0,NA,NA,MUC,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,11,4,Not Bleached,0,6,6,0,NA,NA,OUK,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,ACER,4,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,ACER,7,9,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,6,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,6,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,4,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PAST,5,1,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,Contiguous Reef Other,RGSH,NA,DEP - Miami,2,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PPOR,8,2,Not Bleached,0,0,0,0,NA,NA,NA,NA
+2024B,AA3067,25.9586167,-80.0969333,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-12T00:00:00Z,43,TATU,0,NA,NA,FALSE,SINT,17,15,Pale,20,0,0,0,NA,NA,"SC, OGI",NA
+2024B,AA3067,25.9586167,-80.0969333,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-12T00:00:00Z,43,TATU,0,NA,NA,FALSE,SBOU,22,30,Not Bleached,30,0,0,0,NA,NA,OGI,NA
+2024B,AA3067,25.9586167,-80.0969333,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,1,2024-09-12T00:00:00Z,43,TATU,0,NA,NA,FALSE,SINT,13,9,Partly Bleached,60,0,0,0,NA,NA,"OGI, SC",NA
+2024B,AA3067,25.9586167,-80.0969333,Broward-Miami,Forereef,Contiguous Reef Other,LIRM,NA,DEP - Miami,2,2024-09-12T00:00:00Z,43,TATU,0,NA,cyanobacteria on the benthos made it hard to see juveniles.,FALSE,MCAV,32,21,Not Bleached,15,0,0,0,NA,NA,OGI,NA
 2024B,AA3068,26.0954,-80.1012,Broward-Miami,Forereef,Reef Rubble,RGSH,NA,Shedd Aquarium,1,2024-09-11T00:00:00Z,16,ANKO,0,NA,queen conch,FALSE,SBOU,14,8,Not Bleached,0,0,0,0,NA,NA,NA,NA
 2024B,AA3068,26.0954,-80.1012,Broward-Miami,Forereef,Reef Rubble,RGSH,NA,Shedd Aquarium,1,2024-09-11T00:00:00Z,16,ANKO,0,NA,queen conch,FALSE,PSTR,30,17,Not Bleached,0,0,0,0,NA,NA,NA,NA
 2024B,AA3068,26.0954,-80.1012,Broward-Miami,Forereef,Reef Rubble,RGSH,NA,Shedd Aquarium,1,2024-09-11T00:00:00Z,16,ANKO,0,NA,queen conch,FALSE,SBOU,5,4,Not Bleached,0,0,0,0,NA,NA,NA,NA
@@ -1573,6 +2481,71 @@ batch,site,latitude,longitude,subregion,zone,f_habitat,habitat,site_comments,tea
 2024B,AA1157,26.008459,-80.108398,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-10-16T00:00:00Z,21,SALE,0,NA,PCLI in site but not in transect,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA1158,26.005774,-80.112419,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-10-16T00:00:00Z,19,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA1158,26.005774,-80.112419,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-10-16T00:00:00Z,19,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-08-20T00:00:00Z,45,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-08-20T00:00:00Z,45,SALE,0,NA,NA,FALSE,CNAT,55,12,Not Bleached,2,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-08-20T00:00:00Z,45,SALE,0,NA,NA,FALSE,MMEA,6,1,Not Bleached,0,10,10,0,NA,NA,OGI,Contiguous Reef Other
+2024B,AA1159,25.999505,-80.095292,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-08-20T00:00:00Z,45,SALE,0,NA,NA,FALSE,MALI,23,10,Not Bleached,0,100,100,0,NA,NA,OUK,Contiguous Reef Other
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-09-06T00:00:00Z,30,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1160,25.998951,-80.103973,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-09-06T00:00:00Z,29,SALE,0,NA,NA,FALSE,MMEA,5,2,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-10-16T00:00:00Z,21,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1161,25.998102,-80.112976,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-10-16T00:00:00Z,21,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,DSTO,5,2,Not Bleached,2,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-09-06T00:00:00Z,31,SALE,0,NA,NA,FALSE,DSTO,6,2,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1162,25.996229,-80.101997,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-09-06T00:00:00Z,32,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-10-16T00:00:00Z,20,SALE,0,NA,"PCLI, ACER, and PSTR in the site but not in the transect",TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1163,25.995388,-80.112,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-10-16T00:00:00Z,20,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MMEA,26,5,Not Bleached,2,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1164,25.995295,-80.097008,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-08-20T00:00:00Z,34,SALE,0,NA,NA,FALSE,MMEA,15,6,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,PSTR,13,2,Not Bleached,2,15,15,0,NA,NA,OGI,Contiguous Reef Other
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,DLAB,5,2,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,FALSE,DSTO,5,2,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1166,25.98134,-80.103607,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-08-15T00:00:00Z,27,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-08-15T00:00:00Z,25,SALE,0,NA,NA,FALSE,DSTO,11,10,Not Bleached,10,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1167,25.975952,-80.108147,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-08-15T00:00:00Z,26,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,MMEA,10,3,Totally Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1168,25.965652,-80.093951,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-24T00:00:00Z,56,TATU,0,NA,NA,FALSE,MALI,20,8,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,DSTO,8,15,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-12T00:00:00Z,30,TATU,0,NA,NA,FALSE,PSTR,5,3,Not Bleached,0,0,0,0,NA,NA,OGI,Contiguous Reef Other
+2024B,AA1169,25.965549,-80.105232,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-12T00:00:00Z,31,MAWA,0,NA,NA,FALSE,PSTR,6,2,Pale,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-12T00:00:00Z,17,TATU,0,NA,NA,FALSE,DSTO,10,6,Not Bleached,2,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1171,25.957443,-80.108284,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-12T00:00:00Z,19,MAWA,0,NA,NA,FALSE,DSTO,10,5,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-12T00:00:00Z,32,MEMI,0,NA,NA,FALSE,DSTO,5,2,Partly Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1172,25.956972,-80.105293,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-12T00:00:00Z,32,MARI,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-12T00:00:00Z,42,MEMI,0,NA,NA,FALSE,MMEA,10,5,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1173,25.95618,-80.09909,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-12T00:00:00Z,43,MARI,0,NA,NA,FALSE,MALI,10,2,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-24T00:00:00Z,58,TATU,0,NA,NA,FALSE,MMEA,10,6,Totally Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1174,25.954613,-80.088829,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-04T00:00:00Z,57,STST,0,Matt Ringstad,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-04T00:00:00Z,20,MEMI,0,NA,NA,FALSE,DSTO,5,2,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1175,25.951584,-80.109825,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-04T00:00:00Z,18,ALSH,0,M. Miller,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,DSTO,4,2,Partly Bleached,0,5,5,0,NA,NA,OUK,Contiguous Reef Other
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,DSTO,7,5,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-20T00:00:00Z,21,MARI,0,NA,NA,FALSE,DSTO,5,2,Partly Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,MMEA,8,4,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1176,25.949341,-80.112343,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-20T00:00:00Z,20,MAWA,0,NA,NA,FALSE,DSTO,7,2,Pale,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1177,25.949293,-80.104355,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-13T00:00:00Z,32,ALSH,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-13T00:00:00Z,36,MEMI,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1178,25.945692,-80.106377,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-13T00:00:00Z,30,MARI,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-20T00:00:00Z,24,LABR,0,NA,NA,FALSE,CNAT,9,4,Pale,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1179,25.944366,-80.110878,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-20T00:00:00Z,20,STST,0,Lara Bracci,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1180,25.943899,-80.108391,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-13T00:00:00Z,17,ALSH,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-20T00:00:00Z,37,LABR,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1181,25.940453,-80.102147,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-20T00:00:00Z,30,STST,0,Lara Bracci,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-13T00:00:00Z,17,MEMI,0,NA,NA,FALSE,PCLI,58,15,Not Bleached,60,0,0,0,NA,NA,OGI,Contiguous Reef Other
+2024B,AA1182,25.939398,-80.11042,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-13T00:00:00Z,17,MARI,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,MMEA,10,4,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-24T00:00:00Z,56,MEMI,0,NA,NA,FALSE,MMEA,5,1,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1183,25.938812,-80.088951,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-04T00:00:00Z,53,STST,0,Matt Ringstad,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-20T00:00:00Z,24,MARI,0,NA,NA,FALSE,DSTO,5,3,Not Bleached,0,0,0,0,NA,NA,NA,Reef Rubble
+2024B,AA1184,25.932644,-80.113464,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-20T00:00:00Z,25,MAWA,0,NA,NA,FALSE,DSTO,9,4,Not Bleached,0,0,0,0,NA,NA,NA,Reef Rubble
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-20T00:00:00Z,46,MARI,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Reef Rubble
+2024B,AA1185,25.919012,-80.099091,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-20T00:00:00Z,43,MAWA,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Reef Rubble
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,MMEA,6,7,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-06T00:00:00Z,30,LABR,0,NA,NA,FALSE,CNAT,6,7,Pale,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1186,25.906393,-80.102684,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-06T00:00:00Z,31,MEMI,0,Lara Bracci,NA,FALSE,DSTO,5,1,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA1187,25.901132,-80.09552,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-06T00:00:00Z,51,LABR,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA2097,26.154205,-80.096794,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-10-25T00:00:00Z,17,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA2097,26.154205,-80.096794,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,4,2024-10-25T00:00:00Z,17,SALE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA2098,26.152846,-80.098598,Broward-Miami,Forereef,NA,NA,NA,NOVA Southeastern Univ.,3,2024-10-25T00:00:00Z,17,SALE,0,NA,NA,FALSE,DSTO,6,2,Not Bleached,2,0,0,0,NA,NA,NA,Contiguous Reef Other
@@ -1595,6 +2568,15 @@ batch,site,latitude,longitude,subregion,zone,f_habitat,habitat,site_comments,tea
 2024B,AA2116,26.077074,-80.107384,Broward-Miami,Forereef,NA,NA,NA,Shedd Aquarium,4,2024-09-09T00:00:00Z,18,MOHI,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA2120,26.069349,-80.099442,Broward-Miami,Forereef,NA,NA,NA,Shedd Aquarium,3,2024-09-10T00:00:00Z,29,XASE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA2120,26.069349,-80.099442,Broward-Miami,Forereef,NA,NA,NA,Shedd Aquarium,4,2024-09-10T00:00:00Z,29,XASE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-04T00:00:00Z,21,MEMI,0,NA,NA,FALSE,DSTO,7,2,Pale,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA2151,25.954735,-80.108307,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-04T00:00:00Z,21,ALSH,0,M. Miller,NA,FALSE,DSTO,7,4,Pale,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PCLI,80,8,Pale,80,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-10-24T00:00:00Z,20,MEMI,0,NA,NA,FALSE,PCLI,55,9,Not Bleached,70,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,DSTO,28,24,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,PCLI,43,24,Pale,2,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA2158,25.92765,-80.109009,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-10-24T00:00:00Z,20,TATU,0,NA,NA,FALSE,DSTO,9,4,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
+2024B,AA3067,25.9586167,-80.0969333,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,3,2024-09-12T00:00:00Z,43,TATU,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
+2024B,AA3067,25.9586167,-80.0969333,Broward-Miami,Forereef,NA,NA,NA,DEP - Miami,4,2024-09-12T00:00:00Z,43,TATU,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Contiguous Reef Other
 2024B,AA3068,26.0954,-80.1012,Broward-Miami,Forereef,NA,NA,NA,Shedd Aquarium,3,2024-09-11T00:00:00Z,19,KEBU,0,NA,NA,FALSE,PCLI,27,5,Not Bleached,0,0,0,0,NA,NA,NA,Reef Rubble
 2024B,AA3068,26.0954,-80.1012,Broward-Miami,Forereef,NA,NA,NA,Shedd Aquarium,4,2024-09-11T00:00:00Z,19,KEBU,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Reef Rubble
 2024B,AA3069,26.0981,-80.1011,Broward-Miami,Forereef,NA,NA,NA,Shedd Aquarium,3,2024-09-11T00:00:00Z,15,XASE,0,NA,NA,FALSE,PSTR,45,5,Not Bleached,0,0,0,0,NA,NA,NA,Contiguous Reef Other
@@ -1736,21 +2718,3 @@ batch,site,latitude,longitude,subregion,zone,f_habitat,habitat,site_comments,tea
 2024B,AA3097,26.07758,-80.09756,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,121-ASK-SS,Shedd Aquarium,1,2024-09-10T00:00:00Z,32,MOHI,0,NA,NA,FALSE,PPOR,6,3,Not Bleached,2,0,NA,NA,NA,NA,NA,NA
 2024B,AA3097,26.07758,-80.09756,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,121-ASK-SS,Shedd Aquarium,1,2024-09-10T00:00:00Z,32,MOHI,0,NA,NA,FALSE,PSTR,9,3,Not Bleached,0,0,NA,NA,NA,NA,NA,NA
 2024B,AA3097,26.07758,-80.09756,Broward-Miami,Forereef,Contiguous Reef Other,LIRI,121-ASK-SS,Shedd Aquarium,2,2024-09-10T00:00:00Z,31,HIWI,0,KEBU,NA,FALSE,SSID,10,4,Not Bleached,25,0,NA,NA,NA,NA,NA,NA
-2024B,AA1131,26.086544,-80.105812,Broward-Miami,Forereef,Reef Rubble,NA,NA,Shedd Aquarium,3,2024-09-09T00:00:00Z,14,ADNA,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA1131,26.086544,-80.105812,Broward-Miami,Forereef,Reef Rubble,NA,NA,Shedd Aquarium,4,2024-09-09T00:00:00Z,17,ADNA,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA1138,26.07617,-80.107391,Broward-Miami,Forereef,Contiguous Reef Other,NA,NA,Shedd Aquarium,3,2024-09-09T00:00:00Z,15,CAJO,0,MS,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA1138,26.07617,-80.107391,Broward-Miami,Forereef,Contiguous Reef Other,NA,NA,Shedd Aquarium,4,2024-09-09T00:00:00Z,15,AMSE,0,Cailyn Joseph,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA2117,26.07707,-80.10688,Broward-Miami,Forereef,Contiguous Reef Other,NA,NA,Shedd Aquarium,4,2024-09-09T00:00:00Z,18,XASE,0,NA,Site covered in macroalgae,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA2117,26.07707,-80.10688,Broward-Miami,Forereef,Contiguous Reef Other,NA,NA,Shedd Aquarium,3,2024-09-09T00:00:00Z,18,XASE,0,XS,Data collected by ML,FALSE,PCLI,5,1,Not Bleached,0,0,NA,NA,NA,NA,NA,NA
-2024B,AA3072,26.0962,-80.0959,Broward-Miami,Forereef,Contiguous Reef Other,NA,IRN3-210,Shedd Aquarium,4,2024-09-11T00:00:00Z,26,XASE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3072,26.0962,-80.0959,Broward-Miami,Forereef,Contiguous Reef Other,NA,IRN3-210,Shedd Aquarium,3,2024-09-11T00:00:00Z,26,XASE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3073,26.0954,-80.0951,Broward-Miami,Forereef,Contiguous Reef Other,NA,IRN4-110,Shedd Aquarium,3,2024-09-11T00:00:00Z,30,ANKO,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3073,26.0954,-80.0951,Broward-Miami,Forereef,Contiguous Reef Other,NA,IRN4-110,Shedd Aquarium,4,2024-09-11T00:00:00Z,31,HIWI,0,ANKO,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3076,26.092,-80.1032,Broward-Miami,Forereef,Reef Rubble,NA,IRS1-110,Shedd Aquarium,3,2024-09-09T00:00:00Z,16,XASE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3076,26.092,-80.1032,Broward-Miami,Forereef,Reef Rubble,NA,IRS1-110,Shedd Aquarium,4,2024-09-09T00:00:00Z,16,XASE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3078,26.0902,-80.1032,Broward-Miami,Forereef,Contiguous Reef Other,NA,IRS1-310,Shedd Aquarium,3,2024-09-09T00:00:00Z,17,ADNA,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3078,26.0902,-80.1032,Broward-Miami,Forereef,Contiguous Reef Other,NA,IRS1-310,Shedd Aquarium,4,2024-09-09T00:00:00Z,14,ADNA,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3079,26.0857,-80.1032,Broward-Miami,Forereef,Reef Rubble,NA,IRS1-810,Shedd Aquarium,4,2024-09-09T00:00:00Z,12,XASE,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3079,26.0857,-80.1032,Broward-Miami,Forereef,Reef Rubble,NA,IRS1-810,Shedd Aquarium,3,2024-09-09T00:00:00Z,12,XASE,0,NA,Acervicornis present,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3097,26.07758,-80.09756,Broward-Miami,Forereef,Contiguous Reef Other,NA,121-ASK-SS,Shedd Aquarium,3,2024-09-10T00:00:00Z,33,KEBU,0,NA,NA,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-2024B,AA3097,26.07758,-80.09756,Broward-Miami,Forereef,Contiguous Reef Other,NA,121-ASK-SS,Shedd Aquarium,4,2024-09-10T00:00:00Z,33,KEBU,0,NA,NA,FALSE,DSTO,12,8,Not Bleached,0,0,NA,NA,NA,NA,NA,NA
