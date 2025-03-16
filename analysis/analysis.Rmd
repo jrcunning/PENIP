@@ -140,8 +140,6 @@ counts_long <- allcounts %>%
   drop_na(count)  # Drop missing values (species not searched for on a given transect, since zeros already assigned above)
 ```
 
-
-
 # Summarize total corals per site
 ```{r}
 # Get PENIP subset
@@ -318,16 +316,8 @@ ggplot(taxclass_ci_zinb, aes(x = taxon, y = fit, color = class)) +
   
 ```
 
-```{r}
-mod_zinb <- zeroinfl(n ~ direction * distance_m + offset(log(area)), 
-                      data = taxclass_totals, 
-                      dist = "negbin",
-                      link = "logit")  
-summary(mod_zinb)
-```
 
-
-# Include random site effects
+# Bayesian zerio-inflated negative binomial with random site effects
 ```{r}
 # Bayesian ZINB model with random site effects
 library(brms)
@@ -600,7 +590,7 @@ ggplot(fitted_taxclass_zinb_per_m2, aes(x = taxon, y = fit, color = class)) +
   labs(title = "Bayesian Zinb with site random")
 
 
-# Sum densities across size classes?
+# Sum densities across size classes
 fitted_taxon_zinb_per_m2_ag <- fitted_taxclass_zinb_per_m2 %>%
   group_by(taxon) %>%
   summarize(
@@ -623,6 +613,43 @@ ggplot(fitted_taxon_zinb_per_m2_ag, aes(x = taxon, y = fit)) +
   labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
   theme_minimal() +
   labs(title = "Bayesian Zinb with site random")
+
+
+
+# PLOT ALL
+# Add type label to size-class-specific estimates
+fitted_taxclass_zinb_per_m2 <- fitted_taxclass_zinb_per_m2 %>%
+  mutate(type = "Size Class")
+
+# Add type label to taxon totals
+fitted_taxon_zinb_per_m2_ag <- fitted_taxon_zinb_per_m2_ag %>%
+  mutate(type = "Taxon Total", class = "Total")  # Assign "Total" as class for legend clarity
+
+# Combine both datasets
+fitted_combined <- bind_rows(fitted_taxclass_zinb_per_m2, fitted_taxon_zinb_per_m2_ag)
+
+# Reorder taxon levels based on total density (highest first)
+fitted_combined <- fitted_combined %>%
+  mutate(taxon = fct_reorder(taxon, fit))
+
+lower_limit <- 1e-4  # Define lower clipping limit
+
+ggplot(fitted_combined, aes(x = taxon, y = fit, color = class, shape = type)) +
+  geom_point(aes(size = type), 
+             position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(
+    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin
+    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)), width = 0, position = position_dodge(width = 0.2),
+    alpha = 0.6) +  
+  scale_y_log10(limits = c(lower_limit, 5)) +  
+  scale_size_manual(values = c("Taxon Total" = 4, "Size Class" = 2.5)) +  # Larger points for totals
+  scale_shape_manual(values = c("Taxon Total" = 15, "Size Class" = 16)) +  # Different shape for totals
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
+       color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "Bayesian ZINB Model: Taxon & Size-Class Coral Densities")
+
 
 ```
 
