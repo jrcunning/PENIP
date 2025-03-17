@@ -12,6 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(msm)  # Needed for the Delta Method
+library(brms)
+library(future)
+library(tidybayes)
 ```
 
 Check site 3072 / IRN3-210 -- no corals counted?
@@ -224,7 +227,7 @@ allsitemd.f %>%
   geom_hline(yintercept = c(26.125, 26.065), lty = 2)
 ```
 
-# Get coral data for selected sites
+# Filter coral data for selected sites
 ```{r}
 # ----- FILTER CORAL DATA FOR JUST SELECTED SITES -- 
 # Combine all adult and juvenile count data with site metadata
@@ -237,6 +240,7 @@ allcounts.f <- allcounts.f %>%
 # SHYA was removed (only observation was at sites that were filtered out)
 # ------
 
+
 # Pivot to long form
 counts_long <- allcounts.f %>% 
   pivot_longer(
@@ -247,7 +251,7 @@ counts_long <- allcounts.f %>%
   drop_na(count)  # Drop missing values (taxa not searched for on a given transect, since zeros already assigned above for searched taxa)
 ```
 
-# Summarize coral composition and aggregate taxa
+# Count coral taxa and aggregate
 ```{r}
 # Get counts of all taxa
 taxon_counts <- counts_long %>%
@@ -267,16 +271,24 @@ ggplot(taxon_counts, aes(x = reorder(taxon, -n), y = n)) +
   theme(axis.text.x = element_text(angle = 90))
 
 # Aggregate taxa
+## Also take care to aggregate only taxa that were given the same search effort
+## ie, cannot aggregate FFRA with other FAVIDS (CNAT, DLAB, etc) bc FFRA was 
+## only counted on T1 and T2, whereas others were counted on all 4. This could 
+## underestimate abundance of FFRA, or other similar cases (eg SCOL < MYCE in MUSS)
+# I think this only applies to FFRA and SCOL, also EFAS
 counts_long_ag <- counts_long %>%
   mutate(taxon = case_when(taxon %in% c("PPOR", "PFUR", "PDIV") ~ "PBRA",
                            taxon %in% c("OFAV", "OANN", "OFRA") ~ "ORBI",
-                           taxon %in% c("MALI", "MFER", "MYCE", "SCUB", "SCOL") ~ "MUSS",
-                           taxon %in% c("CNAT", "DLAB", "FFRA", "MARE", "PSTR", "PCLI") ~ "FAVI",
-                           taxon %in% c("DCYL", "DSTO", "EFAS", "MMEA") ~ "MEAN",
-                           taxon %in% c("AFRA", "AGAR", "AAGA", "AHUM", "ALAM") ~ "AGAR",
+                           taxon %in% c("CNAT", "DLAB", "PSTR", "PCLI") ~ "FAVI",
+                           taxon %in% c("AFRA", "AAGA", "AHUM", "ALAM") ~ "AGAR",
                            taxon %in% c("MAUR", "MDEC") ~ "MADR",
                            taxon %in% c("SHYA", "SBOU") ~ "SOLE",
-                           TRUE ~ taxon))
+                           TRUE ~ taxon)) %>%
+  # Sum counts of newly aggregated taxa on a per-transect basis
+  group_by(across(-count)) %>%  # Group by all columns except 'count'
+  summarize(count = sum(count)) %>%
+  ungroup()
+
 
 # Get counts of aggregated taxa
 taxon_ag_counts <- counts_long_ag %>%
@@ -291,16 +303,43 @@ ggplot(taxon_ag_counts, aes(x = reorder(taxon, -n), y = n)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   scale_y_log10() +
   theme(axis.text.x = element_text(angle = 90))
+
+taxon_ag_counts %>% arrange(n)
 ```
 
 
-# Start to analyze data
+# TOTAL CORAL COUNTS AT PENIP
 ```{r}
 # Get PENIP subset
-penip <- filter(counts_long_ag, !is.na(penip_site)) %>% 
+penip <- filter(counts_long_ag, set == "penip") %>% 
   mutate(taxclass = paste0(taxon, class))
 
+# Total corals counted per site
+site_totals <- penip %>%
+  group_by(site, latitude, longitude) %>%
+  summarize(n = sum(count)) %>%
+  arrange(n)
 
+hist(site_totals$n, breaks = 10)
+# Site with fewest corals (9, IRN3-210) I double checked the raw datasheet to confirm everything was correct.
+
+# Plot total corals counted at each site
+ggplot(site_totals, aes(x = longitude, y = latitude, size = n)) +
+  geom_point(alpha = 0.5)
+
+mean(site_totals$n)
+# average is 55 corals counted per site
+
+# We cannot convert this directly into a coral density metric, because the area in which
+# we counted corals differed across coral taxa and size classes. eg, some adult species
+# counted on all 4 transects, but most only on 2. Some small corals counted only on 2.
+# Therefore, we have to analyze density on a taxon-size class-specific basis
+```
+
+#1. raw averaging
+```{r}
+
+# FIRST PASS: RAW AVERAGING TAXA ABUNDANCES -- BUT THIS IS NOT A GOOD WAY TO LOOK AT ZERO-INFLATED DATA
 # total counts for each taxon/class per site, and total area searched for each (since diff no. transects)
 taxclass_totals <- penip %>%
   group_by(site, latitude, longitude, reef, direction, distance_m, taxon, class, taxclass) %>%
@@ -308,41 +347,173 @@ taxclass_totals <- penip %>%
   ungroup() %>%
   mutate(n_per_m2 = n / area)
 
+# doublecheck that effort is quantified correctly
+check <- taxclass_totals %>% distinct(taxon, class, area)
+
 # summarize site-level total coral density
 total_corals_per_m2 <- taxclass_totals %>%
     group_by(site, latitude, longitude, reef, direction, distance_m) %>%
     summarize(total_per_m2 = sum(n_per_m2)) %>%  # Sum per-m² densities
     ungroup()
 
-# Average total coral density per square meter across all sites
+# Raw average total coral density per square meter across all sites
 mean(total_corals_per_m2$total_per_m2)
-# 2.39 corals per square meter
+# 2.6 corals per square meter
+```
 
-# Plot density across sites
-ggplot(total_corals_per_m2, aes(x = longitude, y = latitude, size = total_per_m2)) +
-  geom_point(alpha = 0.5)
+#2. negative binomial model
+```{r}
+# MODEL CORAL COUNTS at the site level, using totals per taxon-size class per site (added up across transects)
+# offset(log(area)) has to be included because of the different number of transects used for different taxon-size class groups
+
+# Fit a Negative Binomial GLM
+mod_nb <- MASS::glm.nb(n ~ taxclass + offset(log(area)), data = taxclass_totals)
+
+# Generate new data only for existing taxon-size class combinations
+newdata_1 <- taxclass_totals %>%
+  distinct(taxon, class, taxclass) %>%  # Keep only observed taxon-class combinations
+  mutate(area = 1)  # Set area to 1 for density predictions on a per m2 basis
+
+# Get predicted values & standard errors (log scale)
+preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
+
+# Compute both total coral density & taxon-size class-specific densities in one step
+results_nb <- newdata_1 %>%
+  mutate(
+    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
+    fit_se = exp(preds_nb$fit) * preds_nb$se.fit,   # Convert SE using the Delta Method
+    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
+    fit_lower = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
+    fit_upper = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
+  )
+
+# Compute total coral density + confidence intervals
+total_ci_nb <- results_nb %>%
+  summarize(
+    total_density = sum(fit),
+    total_se = sqrt(sum(fit_var)),
+    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
+    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
+  )
+
+total_ci_nb
+# 2.64 total corals per m2 (95%CI 2.24-3.11)
+
+# Extract and plot taxon-size-class-specific densities
+taxclass_ci_nb <- results_nb %>%
+  dplyr::select(taxon, class, taxclass, fit, fit_se, fit_lower, fit_upper)
+
+# Compute total density per taxon (summing over size classes)
+fitted_taxon_nb <- taxclass_ci_nb %>%
+  group_by(taxon) %>%
+  summarize(
+    fit = sum(fit),  # Sum densities across size classes
+    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation (variance summation)
+    log_fit = log(fit),  # Log-transform fit for proper CI computation
+    log_se = fit_se / fit,  # Approximate log-scale standard error
+    fit_lower = exp(log_fit - 1.96 * log_se),  # Compute lower CI on log scale
+    fit_upper = exp(log_fit + 1.96 * log_se)   # Compute upper CI on log scale
+  ) %>%
+  ungroup() %>%
+  mutate(taxon = fct_reorder(taxon, fit), class = "Total")  # Reorder taxa by abundance
+
+
+fitted_combined_nb <- bind_rows(taxclass_ci_nb, fitted_taxon_nb) %>%
+  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
+
+ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = class, shape = class)) +
+  geom_point(aes(size = class), 
+             position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10(limits = c(1e-4, 5)) +  
+  scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
+  scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
+       color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "NB Model")
+```
+
+```{r}
+# Negative binomial but with simulated confidence intervals
+# Fit a Negative Binomial GLM
+mod_nb <- MASS::glm.nb(n ~ taxclass + offset(log(area)), data = taxclass_totals)
+
+# Generate new data only for existing taxon-size class combinations
+newdata_1 <- taxclass_totals %>%
+  distinct(taxon, class, taxclass) %>%
+  mutate(area = 1)  # Set area to 1 for density predictions
+
+# Get predicted values & standard errors (log scale)
+preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
+
+num_simulations <- 1000  # Number of posterior draws
+
+# Simulate posterior distributions for taxon-size class estimates
+simulated_posteriors <- newdata_1 %>%
+  mutate(
+    fit = exp(preds_nb$fit),  # Convert mean prediction back to response scale
+    fit_se = preds_nb$se.fit,
+    simulations = map2(preds_nb$fit, preds_nb$se.fit, 
+                       ~ exp(rnorm(num_simulations, mean = .x, sd = .y))) # Simulated draws
+  )
+
+# Compute confidence intervals from simulated posterior draws
+taxclass_ci_nb <- simulated_posteriors %>%
+  mutate(
+    fit_lower = map_dbl(simulations, ~ quantile(.x, 0.025)),  # 2.5% CI
+    fit_upper = map_dbl(simulations, ~ quantile(.x, 0.975))   # 97.5% CI
+  ) %>%
+  select(taxclass, taxon, class, fit, fit_se, fit_lower, fit_upper, simulations)  # Keep simulations column
+
+# Sum posterior distributions across size classes per taxon to compute total taxon uncertainty
+fitted_taxon_nb <- taxclass_ci_nb %>%
+  group_by(taxon) %>%
+  summarize(
+    fit = sum(fit),  # Sum densities across size classes
+    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation
+    simulations = list(reduce(simulations, `+`))  # Sum posterior samples correctly
+  ) %>%
+  ungroup()
+
+# Compute taxon-level confidence intervals from summed posterior distributions
+fitted_taxon_nb <- fitted_taxon_nb %>%
+  mutate(
+    fit_lower = map_dbl(simulations, ~ quantile(.x, 0.025)),  # 2.5% quantile
+    fit_upper = map_dbl(simulations, ~ quantile(.x, 0.975))   # 97.5% quantile
+  ) %>%
+  select(-simulations) %>%
+  mutate(class = "Total",
+         taxon = fct_reorder(taxon, fit))  # Mark as total for visualization
+
+# Combine taxon-size class estimates with total taxon estimates
+fitted_combined_nb <- bind_rows(taxclass_ci_nb, fitted_taxon_nb) %>%
+  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))  # Ensure taxon order
+
+ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = class, shape = class)) +
+  geom_point(aes(size = class), position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10(limits = c(1e-4, 5)) +  
+  scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
+  scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon",  
+       color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "Negative Binomial Model - Corrected Taxon Estimates")
+
 ```
 
 
+#3. zero-inflated negative binomial model
 ```{r}
-
-
-
-# Get aggregated PENIP subset
-penip_ag <- filter(counts_long_ag, !is.na(penip_site)) %>% 
-  mutate(taxclass = paste0(taxon, class))
-
-# total counts for each taxon/class per site, and total area searched for each (since diff no. transects)
-taxclass_totals_ag <- penip_ag %>%
-  group_by(site, latitude, longitude, reef, direction, distance_m, taxon, class, taxclass) %>%
-  summarize(n = sum(count), area = n() * 10) %>%  # 10 m2 per counted transect
-  ungroup() %>%
-  mutate(n_per_m2 = n / area)
-
 library(pscl)
-
+# offset(log(area)) has to be included because of the different number of transects used for different taxon-size class groups
 mod_zinb <- zeroinfl(n ~ taxclass + offset(log(area)), 
-                      data = taxclass_totals_ag, 
+                      data = taxclass_totals, 
                       dist = "negbin",
                       link = "logit",
                       start = list(count = rep(0, length(coef(mod_nb))),
@@ -352,7 +523,7 @@ summary(mod_zinb)
 
 
 # Generate new data only for existing taxon-size class combinations
-newdata_1 <- taxclass_totals_ag %>%
+newdata_1 <- taxclass_totals %>%
   distinct(taxon, class, taxclass) %>%  # Keep only observed taxon-class combinations
   mutate(area = 1)  # Set area to 1 for density predictions
 
@@ -366,7 +537,7 @@ boot_pred <- function(data, indices) {
 }
 
 # Perform bootstrapping (100 resamples)
-boot_res <- boot(data = taxclass_totals_ag, statistic = boot_pred, R = 100)
+boot_res <- boot::boot(data = taxclass_totals, statistic = boot_pred, R = 100)
 
 # Compute standard errors from bootstrap resamples
 pred_se <- apply(boot_res$t, 2, sd)
@@ -381,9 +552,6 @@ results_zinb <- newdata_1 %>%
     upper_95CI = fit + 1.96 * fit_se       # Compute upper CI
   )
 
-# Print taxon-size class densities
-results_zinb
-
 # Compute total coral density + confidence intervals
 total_ci_zinb <- results_zinb %>%
   summarize(
@@ -395,15 +563,13 @@ total_ci_zinb <- results_zinb %>%
 
 # Print total coral density estimate
 total_ci_zinb
-# 3.03 corals per m2 (2.59-3.47 CI)
-
+# 3.22 corals per m2 (2.74-3.69 CI)
 
 # Extract and plot taxon-size-class-specific densities
 taxclass_ci_zinb <- results_zinb %>%
-  dplyr::select(taxon, class, fit, fit_se, lower_95CI, upper_95CI)
+  dplyr::select(taxon, class, fit, fit_se, lower_95CI, upper_95CI) %>%
+  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
 
-# Set a lower limit for visualization
-lower_limit <- 1e-4
 
 ggplot(taxclass_ci_zinb, aes(x = taxon, y = fit, color = class)) +
   geom_point() +
@@ -411,167 +577,28 @@ ggplot(taxclass_ci_zinb, aes(x = taxon, y = fit, color = class)) +
     ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
     ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
   ), width = 0.2) +
-  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
+  scale_y_log10(limits = c(1e-4, 5)) +  # Set lower limit, allow auto upper limit
   coord_flip() +
   labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
   theme_minimal() +
   labs(title = "ZI Negative binomial GLM")
-```
 
 
-# Negative binomial GLM
-```{r}
-# MODEL CORAL COUNTS at the site level, using totals per taxon-size class per site (added up across transects)
-# offset(log(area)) has to be included because of the different number of transects used for different taxon-size class groups
-
-# Fit a Negative Binomial GLM
-mod_nb <- MASS::glm.nb(n ~ taxon * class + offset(log(area)), data = taxclass_totals)
-
-# Generate new data only for existing taxon-size class combinations
-newdata_1 <- taxclass_totals %>%
-  distinct(taxon, class) %>%  # Keep only observed taxon-class combinations
-  mutate(area = 1)  # Set area to 1 for density predictions
-
-# Get predicted values & standard errors (log scale)
-preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
-
-# Compute both total coral density & taxon-size class-specific densities in one step
-results_nb <- newdata_1 %>%
-  mutate(
-    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
-    fit_se = exp(preds_nb$fit) * preds$se.fit,   # Convert SE using the Delta Method
-    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
-    lower_95CI = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
-    upper_95CI = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
-  )
-
-# Compute total coral density + confidence intervals
-total_ci_nb <- results_nb %>%
-  summarize(
-    total_density = sum(fit),
-    total_se = sqrt(sum(fit_var)),
-    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
-    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
-  )
-
-total_ci_nb
-# 2.62 total corals per m2 (95%CI 2.23-3.07)
-
-# Extract and plot taxon-size-class-specific densities
-taxclass_ci_nb <- results_nb %>%
-  dplyr::select(taxon, class, fit, fit_se, lower_95CI, upper_95CI)
-
-# Set a lower limit for visualization
-lower_limit <- 1e-4
-
-ggplot(taxclass_ci_nb, aes(x = taxon, y = fit, color = class)) +
-  geom_point() +
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
-  ), width = 0.2) +
-  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
-  coord_flip() +
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
-  theme_minimal() +
-  labs(title = "Negative binomial GLM")
-  
-```
-
-
-# Try zero-inflated negative binomial
-```{r}
-library(pscl)
-
-mod_zinb <- zeroinfl(n ~ taxon * class + offset(log(area)), 
-                      data = taxclass_totals, 
-                      dist = "negbin",
-                      link = "logit",
-                      start = list(count = rep(0, length(coef(mod_nb))),
-                                   zero = rep(0, length(coef(mod_nb)))))  # Use stable starting values
-
-summary(mod_zinb)
-
-library(lmtest)
-
-lrtest(mod_nb, mod_zinb)  # Likelihood Ratio Test
+# Compare zinb to nb
+lmtest::lrtest(mod_zinb, mod_nb)  # Likelihood Ratio Test
 # Suggests zinb better than nb
-
-
-# Generate new data only for existing taxon-size class combinations
-newdata_1 <- taxclass_totals %>%
-  distinct(taxon, class) %>%  # Keep only observed taxon-class combinations
-  mutate(area = 1)  # Set area to 1 for density predictions
-
-# Get predicted values & standard errors (log scale)
-preds_zinb <- predict(mod_zinb, newdata_1, type = "response")
-
-# Function to generate predictions for bootstrapping
-boot_pred <- function(data, indices) {
-  boot_model <- update(mod_zinb, data = data[indices, ])
-  predict(boot_model, newdata = newdata_1, type = "response")
-}
-
-# Perform bootstrapping (100 resamples)
-boot_res <- boot(data = taxclass_totals, statistic = boot_pred, R = 100)
-
-# Compute standard errors from bootstrap resamples
-pred_se <- apply(boot_res$t, 2, sd)
-
-
-# Compute taxon-class-specific densities with confidence intervals
-results_zinb <- newdata_1 %>%
-  mutate(
-    fit = preds_zinb,                     # Fitted values (response scale)
-    fit_se = pred_se,                      # Bootstrapped SE
-    lower_95CI = fit - 1.96 * fit_se,      # Compute lower CI
-    upper_95CI = fit + 1.96 * fit_se       # Compute upper CI
-  )
-
-# Print taxon-size class densities
-results_zinb
-
-# Compute total coral density + confidence intervals
-total_ci_zinb <- results_zinb %>%
-  summarize(
-    total_density = sum(fit),
-    total_se = sqrt(sum(fit_se^2)),  # Propagate SE correctly
-    lower_95CI = total_density - 1.96 * total_se,
-    upper_95CI = total_density + 1.96 * total_se
-  )
-
-# Print total coral density estimate
-total_ci_zinb
-# 3.18 corals per m2 (2.73-3.63 CI)
-
-
-# Extract and plot taxon-size-class-specific densities
-taxclass_ci_zinb <- results_zinb %>%
-  dplyr::select(taxon, class, fit, fit_se, lower_95CI, upper_95CI)
-
-# Set a lower limit for visualization
-lower_limit <- 1e-4
-
-ggplot(taxclass_ci_zinb, aes(x = taxon, y = fit, color = class)) +
-  geom_point() +
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
-  ), width = 0.2) +
-  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
-  coord_flip() +
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
-  theme_minimal() +
-  labs(title = "ZI Negative binomial GLM")
-  
 ```
 
 
-# Bayesian zerio-inflated negative binomial with random site effects
+These models don't account for site random effects
+
+#4. Bayesian zero-inflated negative binomial with random site effects
 ```{r}
+# This is run at the transect level, so will predict consistent abundances per transect across taxa,
+# regardless of how many transects were performed for each taxon-size class (this is reflected in the data structure)
+
 # Bayesian ZINB model with random site effects
-library(brms)
-library(future)
+
 
 # 🚀 Optimize parallel execution
 n_cores <- 4  # Use 4 cores for chains
@@ -579,6 +606,7 @@ n_threads <- 5  # Use 5 threads per chain (total CPU usage = 4 * 5 = 10 cores)
 options(mc.cores = n_cores)
 future::plan(multisession)
 
+# original
 mod_zinb_bayes <- brm(
   bf(count ~ taxclass + (1 | site), zi ~ taxclass),
   family = zero_inflated_negbinomial(),
@@ -592,215 +620,187 @@ mod_zinb_bayes <- brm(
   backend = "cmdstanr"
 )
 
-# Model summary
-summary(mod_zinb_bayes)
-
-# Generate posterior fitted values for each taxon-size class
-fitted_taxclass_zinb <- fitted(mod_zinb_bayes, summary = TRUE) %>%
-  as_tibble() %>%
-  bind_cols(dplyr::select(penip, taxclass)) %>%
-  rename(fit = Estimate, fit_lower = Q2.5, fit_upper = Q97.5, fit_se = Est.Error) %>%
-  dplyr::select(taxclass, fit, fit_se, fit_lower, fit_upper) %>%
-  distinct(taxclass, .keep_all = TRUE)
-
-# Compute total coral density per m² (sum over taxon-size classes)
-total_density_zinb <- fitted_taxclass_zinb %>%
-  summarize(
-    total_fit = sum(fit),
-    total_se = sqrt(sum(fit_se^2)),  # Correct SE propagation
-    total_lower = sum(fit_lower),
-    total_upper = sum(fit_upper)
-  )
-
-# Print total coral density per transect
-total_density_zinb
-# 30.7 per transect == 3.07 per square meter (1.70-5.27 95%CI)
-
-# Convert densities from per transect to per m2 (divide by 10m2)
-fitted_taxclass_zinb_per_m2 <- fitted_taxclass_zinb %>%
-  mutate(across(c(fit, fit_se, fit_lower, fit_upper), ~ . / 10)) %>%
-  mutate(taxon = substr(taxclass, 1, 4),
-         class = substr(taxclass, 5, 8))
-
-# Plot
-lower_limit <- 1e-4
-ggplot(fitted_taxclass_zinb_per_m2, aes(x = taxon, y = fit, color = class)) +
-  geom_point() +
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
-  ), width = 0.2) +
-  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
-  coord_flip() +
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
-  theme_minimal() +
-  labs(title = "Bayesian Zinb with site random")
-
-
-# Sum densities across size classes?
-fitted_taxon_zinb_per_m2_ag <- fitted_taxclass_zinb_per_m2 %>%
-  group_by(taxon) %>%
-  summarize(
-    fit = sum(fit),  # Sum densities
-    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation (variance addition)
-    lower_95CI = fit - 1.96 * fit_se,  # Compute lower CI
-    upper_95CI = fit + 1.96 * fit_se   # Compute upper CI
-  ) %>%
-  ungroup() %>%
-  mutate(taxon = fct_reorder(taxon, fit)) 
-
-ggplot(fitted_taxon_zinb_per_m2_ag, aes(x = taxon, y = fit)) +
-  geom_point() +
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
-  ), width = 0.2) +
-  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
-  coord_flip() +
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
-  theme_minimal() +
-  labs(title = "Bayesian Zinb with site random")
-
-```
-
-
-
-
-# Try Bayesian ZINB with site effects with aggregated data
-```{r}
-# Bayesian ZINB model with random site effects
-library(brms)
-library(future)
-
-# 🚀 Optimize parallel execution
-n_cores <- 4  # Use 4 cores for chains
-n_threads <- 5  # Use 5 threads per chain (total CPU usage = 4 * 5 = 10 cores)
-options(mc.cores = n_cores)
-future::plan(multisession)
-
-mod_zinb_bayes <- brm(
+# Strong priors
+mod_zinb_strongpriors <- brm(
   bf(count ~ taxclass + (1 | site), zi ~ taxclass),
   family = zero_inflated_negbinomial(),
-  data = penip_ag,
-  chains = n_cores,  # 4 chains
-  cores = n_cores,  # 4 parallel processes
-  threads = threading(n_threads),  # 5 threads per chain (full CPU utilization)
-  iter = 2500, warmup = 750,  # Optimized iteration balance
+  data = penip,
+  prior = c(
+    prior(normal(0, 2), class = "b"),  # 🔥 Shrinkage prior for regression coefficients
+    prior(normal(0, 2), class = "Intercept"),  
+    prior(exponential(1), class = "sd"),  # 🔥 Regularizing prior for random effects
+    prior(normal(0, 2), class = "b", dpar = "zi")  # 🔥 Informative prior for zero-inflation
+  ),
+  chains = 4,  
+  cores = 4,  
+  threads = threading(5),  
+  iter = 4000, warmup = 1500,  
+  thin = 2,  
+  control = list(adapt_delta = 0.95, max_treedepth = 12),  
+  backend = "cmdstanr"
+)
+loo(mod_zinb_strongpriors)
+
+# Weak priors
+mod_zinb_weakpriors <- brm(
+  bf(count ~ taxclass + (1 | site), zi ~ taxclass),
+  family = zero_inflated_negbinomial(),
+  data = penip,
+  prior = c(
+    prior(normal(0, 5), class = "b"),  # Weaker fixed effect priors
+    prior(normal(0, 5), class = "Intercept"),  # Allow more extreme baseline density
+    prior(exponential(0.5), class = "sd"),  # Allow more site variation
+    prior(normal(0, 5), class = "b", dpar = "zi")  # Allow more extreme zero-inflation
+  ),
+  chains = 4,
+  cores = 4,
+  threads = threading(5),
+  iter = 4000, warmup = 1500,
   thin = 2,
-  control = list(adapt_delta = 0.90, max_treedepth = 10),
+  control = list(adapt_delta = 0.95, max_treedepth = 12),
   backend = "cmdstanr"
 )
 
-# Model summary
-summary(mod_zinb_bayes)
+# longtail taxon-abundance distribution priors
+mod_zinb_longtail <- brm(
+  bf(count ~ taxclass + (1 | site), zi ~ taxclass),
+  family = zero_inflated_negbinomial(),
+  data = penip,
+  prior = c(
+    prior(student_t(3, 0, 5), class = "b"),  # Heavy-tailed fixed effects
+    prior(student_t(3, 0, 5), class = "Intercept"),  # Long-tailed intercept
+    prior(student_t(3, 0, 3), class = "sd", lb = 0),  # Forces site variance to be positive
+    prior(student_t(3, 0, 5), class = "b", dpar = "zi")  # Flexible zero-inflation
+  ),
+  chains = 4,
+  cores = 4,
+  threads = threading(5),
+  iter = 4000, warmup = 1500,
+  thin = 2,
+  control = list(adapt_delta = 0.95, max_treedepth = 12),
+  backend = "cmdstanr"
+)
 
-# Generate posterior fitted values for each taxon-size class
-fitted_taxclass_zinb <- fitted(mod_zinb_bayes, summary = TRUE) %>%
-  as_tibble() %>%
-  bind_cols(dplyr::select(penip_ag, taxclass)) %>%
-  rename(fit = Estimate, fit_lower = Q2.5, fit_upper = Q97.5, fit_se = Est.Error) %>%
-  dplyr::select(taxclass, fit, fit_se, fit_lower, fit_upper) %>%
-  distinct(taxclass, .keep_all = TRUE)
+# Compare models
+loo(mod_zinb_weakpriors, mod_zinb_longtail)
+loo_weakpriors <- loo(mod_zinb_weakpriors)
+loo_longtail <- loo(mod_zinb_longtail)
+loo_strongpriors <- loo(mod_zinb_strongpriors)
 
-# Compute total coral density per m² (sum over taxon-size classes)
-total_density_zinb <- fitted_taxclass_zinb %>%
-  summarize(
-    total_fit = sum(fit),
-    total_se = sqrt(sum(fit_se^2)),  # Correct SE propagation
-    total_lower = sum(fit_lower),
-    total_upper = sum(fit_upper)
-  )
+bayes_factor(mod_zinb_longtail, mod_zinb_weakpriors)
 
-# Print total coral density per transect
-total_density_zinb
-# 28.8 per transect == 2.88 per square meter (1.57-4.94 95%CI)
+pp_check(mod_zinb_weakpriors, ndraws = 100)  # Weak priors
+pp_check(mod_zinb_longtail, ndraws = 100)  # Long-tailed priors
 
-# Convert densities from per transect to per m2 (divide by 10m2)
-fitted_taxclass_zinb_per_m2 <- fitted_taxclass_zinb %>%
-  mutate(across(c(fit, fit_se, fit_lower, fit_upper), ~ . / 10)) %>%
+
+## GET FITTED VALUES FOR EACH TAXCLASS
+# New data: all taxa at all sites
+newdata1 <- tidyr::expand(penip, taxclass, site)
+
+# 1. Get fitted values using 'fitted'
+# 1.1. re_formula = NA will include no site effects (predicts same value for a taxclass across all sites)
+fitted_vals1 <- fitted(mod_zinb_longtail, newdata = newdata1, re_formula = NA) # NO SITE EFFECTS
+fitted_vals1 <- bind_cols(newdata1, fitted_vals1) %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(Estimate),
+            fit_sd = mean(Est.Error),
+            fit_lower = mean(Q2.5),
+            fit_upper = mean(Q97.5))
+# 1.2. re_formula = NULL includes site effects (predicts site-specific values for taxclass across all sites)
+#      newdata = all combos of taxclass and site, even those not observed in data
+fitted_vals2 <- fitted(mod_zinb_longtail, newdata = newdata1, re_formula = NULL)
+fitted_vals2 <- bind_cols(newdata1, fitted_vals2) %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(Estimate),
+            fit_sd = mean(Est.Error),
+            fit_lower = mean(Q2.5),
+            fit_upper = mean(Q97.5))
+# 1.3. re_formula = NULL and 
+#      newdata = only observed site/taxclass combinations
+fitted_vals3 <- fitted(mod_zinb_longtail, newdata = select(penip, taxclass, site), re_formula = NULL)
+fitted_vals3 <- bind_cols(select(penip, taxclass, site), fitted_vals3) %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(Estimate),
+            fit_sd = mean(Est.Error),
+            fit_lower = mean(Q2.5),
+            fit_upper = mean(Q97.5))
+
+
+# 2. Get fitted values manually by computing summary statistics across all draws
+posterior_draws <- add_epred_draws(mod_zinb_longtail, newdata = newdata1)
+fitted_manual <- posterior_draws %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
+            fit_sd = sd(.epred),  # Posterior standard deviation
+            fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
+            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
+  
+# Choose which results to use for fitted taxclass estimates
+fitted_taxclass_zinb <- fitted_manual %>%
   mutate(taxon = substr(taxclass, 1, 4),
          class = substr(taxclass, 5, 8))
 
-# Plot
-lower_limit <- 1e-4
-ggplot(fitted_taxclass_zinb_per_m2, aes(x = taxon, y = fit, color = class)) +
-  geom_point() +
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
-  ), width = 0.2) +
-  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
-  coord_flip() +
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
-  theme_minimal() +
-  labs(title = "Bayesian Zinb with site random")
-
-
-# Sum densities across size classes
-fitted_taxon_zinb_per_m2_ag <- fitted_taxclass_zinb_per_m2 %>%
+### GET FITTED VALUE FOR EACH TAXON = SUMMING SIZECLASSES
+# Extract posterior expected predictions (epred) while keeping site info
+fitted_tax_zinb <- posterior_draws %>%
+  mutate(taxon = substr(taxclass, 1, 4),
+         class = substr(taxclass, 5, 8)) %>%
+  # Sum size classes of each taxon at each site for each draw
+  group_by(taxon, site, .draw) %>%
+  summarize(fit = sum(.epred), .groups = "drop") %>%  # Sum densities within each draw
+  # Average summed taxon densities across all draws
   group_by(taxon) %>%
-  summarize(
-    fit = sum(fit),  # Sum densities
-    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation (variance addition)
-    lower_95CI = fit - 1.96 * fit_se,  # Compute lower CI
-    upper_95CI = fit + 1.96 * fit_se   # Compute upper CI
+  dplyr::summarize(
+    fit_mean = mean(fit),  # Average posterior prediction per taxon
+    fit_sd = sd(fit),  # Correct SE propagation
+    fit_lower = quantile(fit, 0.025),  # Bayesian lower 95% CI
+    fit_upper = quantile(fit, 0.975)   # Bayesian upper 95% CI
   ) %>%
-  ungroup() %>%
-  mutate(taxon = fct_reorder(taxon, fit)) 
-
-ggplot(fitted_taxon_zinb_per_m2_ag, aes(x = taxon, y = fit)) +
-  geom_point() +
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
-  ), width = 0.2) +
-  scale_y_log10(limits = c(lower_limit, 5)) +  # Set lower limit, allow auto upper limit
-  coord_flip() +
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
-  theme_minimal() +
-  labs(title = "Bayesian Zinb with site random")
+  # Reorder taxa based on their total density
+  mutate(taxon = fct_reorder(taxon, fit_mean),
+         class = "Total") 
 
 
 
-# PLOT ALL
-# Add type label to size-class-specific estimates
-fitted_taxclass_zinb_per_m2 <- fitted_taxclass_zinb_per_m2 %>%
-  mutate(type = "Size Class")
+# Combine taxon totals with taxon-sizeclass totals, Reorder taxon levels based on total density (highest first)
+fitted_combined <- bind_rows(fitted_tax_zinb, fitted_taxclass_zinb) %>%
+  # Convert densities from per transect to per m2 (divide by 10m2)
+  mutate(across(c(fit_mean, fit_sd, fit_lower, fit_upper), ~ . / 10)) %>%
+  mutate(taxon = factor(taxon, levels = levels(fitted_tax_zinb$taxon)))
 
-# Add type label to taxon totals
-fitted_taxon_zinb_per_m2_ag <- fitted_taxon_zinb_per_m2_ag %>%
-  mutate(type = "Taxon Total", class = "Total")  # Assign "Total" as class for legend clarity
-
-# Combine both datasets
-fitted_combined <- bind_rows(fitted_taxclass_zinb_per_m2, fitted_taxon_zinb_per_m2_ag)
-
-# Reorder taxon levels based on total density (highest first)
-fitted_combined <- fitted_combined %>%
-  mutate(taxon = fct_reorder(taxon, fit))
-
-lower_limit <- 1e-4  # Define lower clipping limit
-
-ggplot(fitted_combined, aes(x = taxon, y = fit, color = class, shape = type)) +
-  geom_point(aes(size = type), 
+ggplot(fitted_combined, aes(x = taxon, y = fit_mean, color = class, shape = class)) +
+  geom_point(aes(size = class), 
              position = position_dodge(width = 0.2), alpha = 0.6) +  
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)), width = 0, position = position_dodge(width = 0.2),
-    alpha = 0.6) +  
-  scale_y_log10(limits = c(lower_limit, 5)) +  
-  scale_size_manual(values = c("Taxon Total" = 4, "Size Class" = 2.5)) +  # Larger points for totals
-  scale_shape_manual(values = c("Taxon Total" = 15, "Size Class" = 16)) +  # Different shape for totals
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10(limits = c(1e-4, 5)) +  
+  scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
+  scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
   coord_flip() +  
   labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
        color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
   theme_minimal() +  
-  labs(title = "Bayesian ZINB Model: Taxon & Size-Class Coral Densities")
+  labs(title = "Bayesian ZINB Model: longtail priors")
 
 
+# Overall total number of corals per m2
+# Extract posterior expected predictions (epred) while keeping site info
+fitted_total_zinb <- posterior_draws %>%
+  # Sum size classes of each taxon at each site for each draw
+  group_by(site, .draw) %>%
+  summarize(fit = sum(.epred), .groups = "drop") %>%  # Sum densities within each draw
+  # Average densities across all taxa, all draws
+  dplyr::summarize(
+    fit_mean = mean(fit),  # Average posterior prediction per taxon
+    fit_sd = sd(fit),  # Correct SE propagation
+    fit_lower = quantile(fit, 0.025),  # Bayesian lower 95% CI
+    fit_upper = quantile(fit, 0.975)   # Bayesian upper 95% CI
+  ) %>%
+  # Convert densities from per transect to per m2 (divide by 10m2)
+  mutate(across(c(fit_mean, fit_sd, fit_lower, fit_upper), ~ . / 10))
+
+fitted_total_zinb
 ```
-
-
-
 
 
 
