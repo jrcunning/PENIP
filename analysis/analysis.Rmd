@@ -507,89 +507,6 @@ ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = class, shape = class)
 
 ```
 
-
-#3. zero-inflated negative binomial model
-```{r}
-library(pscl)
-# offset(log(area)) has to be included because of the different number of transects used for different taxon-size class groups
-mod_zinb <- zeroinfl(n ~ taxclass + offset(log(area)), 
-                      data = taxclass_totals, 
-                      dist = "negbin",
-                      link = "logit",
-                      start = list(count = rep(0, length(coef(mod_nb))),
-                                   zero = rep(0, length(coef(mod_nb)))))  # Use stable starting values
-
-summary(mod_zinb)
-
-
-# Generate new data only for existing taxon-size class combinations
-newdata_1 <- taxclass_totals %>%
-  distinct(taxon, class, taxclass) %>%  # Keep only observed taxon-class combinations
-  mutate(area = 1)  # Set area to 1 for density predictions
-
-# Get predicted values & standard errors (log scale)
-preds_zinb <- predict(mod_zinb, newdata_1, type = "response")
-
-# Function to generate predictions for bootstrapping
-boot_pred <- function(data, indices) {
-  boot_model <- update(mod_zinb, data = data[indices, ])
-  predict(boot_model, newdata = newdata_1, type = "response")
-}
-
-# Perform bootstrapping (100 resamples)
-boot_res <- boot::boot(data = taxclass_totals, statistic = boot_pred, R = 100)
-
-# Compute standard errors from bootstrap resamples
-pred_se <- apply(boot_res$t, 2, sd)
-
-
-# Compute taxon-class-specific densities with confidence intervals
-results_zinb <- newdata_1 %>%
-  mutate(
-    fit = preds_zinb,                     # Fitted values (response scale)
-    fit_se = pred_se,                      # Bootstrapped SE
-    lower_95CI = fit - 1.96 * fit_se,      # Compute lower CI
-    upper_95CI = fit + 1.96 * fit_se       # Compute upper CI
-  )
-
-# Compute total coral density + confidence intervals
-total_ci_zinb <- results_zinb %>%
-  summarize(
-    total_density = sum(fit),
-    total_se = sqrt(sum(fit_se^2)),  # Propagate SE correctly
-    lower_95CI = total_density - 1.96 * total_se,
-    upper_95CI = total_density + 1.96 * total_se
-  )
-
-# Print total coral density estimate
-total_ci_zinb
-# 3.22 corals per m2 (2.74-3.69 CI)
-
-# Extract and plot taxon-size-class-specific densities
-taxclass_ci_zinb <- results_zinb %>%
-  dplyr::select(taxon, class, fit, fit_se, lower_95CI, upper_95CI) %>%
-  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
-
-
-ggplot(taxclass_ci_zinb, aes(x = taxon, y = fit, color = class)) +
-  geom_point() +
-  geom_errorbar(aes(
-    ymin = pmax(fit / exp(1.96 * fit_se / fit), lower_limit),  # Clip ymin at lower limit
-    ymax = pmax(fit * exp(1.96 * fit_se / fit), lower_limit)   # Clip ymax at lower limit
-  ), width = 0.2) +
-  scale_y_log10(limits = c(1e-4, 5)) +  # Set lower limit, allow auto upper limit
-  coord_flip() +
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", color = "Size Class") +
-  theme_minimal() +
-  labs(title = "ZI Negative binomial GLM")
-
-
-# Compare zinb to nb
-lmtest::lrtest(mod_zinb, mod_nb)  # Likelihood Ratio Test
-# Suggests zinb better than nb
-```
-
-
 These models don't account for site random effects
 
 #4. Bayesian zero-inflated negative binomial with random site effects
@@ -606,19 +523,6 @@ n_threads <- 5  # Use 5 threads per chain (total CPU usage = 4 * 5 = 10 cores)
 options(mc.cores = n_cores)
 future::plan(multisession)
 
-# original
-mod_zinb_bayes <- brm(
-  bf(count ~ taxclass + (1 | site), zi ~ taxclass),
-  family = zero_inflated_negbinomial(),
-  data = penip,
-  chains = n_cores,  # 4 chains
-  cores = n_cores,  # 4 parallel processes
-  threads = threading(n_threads),  # 5 threads per chain (full CPU utilization)
-  iter = 2500, warmup = 750,  # Optimized iteration balance
-  thin = 2,
-  control = list(adapt_delta = 0.90, max_treedepth = 10),
-  backend = "cmdstanr"
-)
 
 # Strong priors
 mod_zinb_strongpriors <- brm(
@@ -641,56 +545,8 @@ mod_zinb_strongpriors <- brm(
 )
 loo(mod_zinb_strongpriors)
 
-# Weak priors
-mod_zinb_weakpriors <- brm(
-  bf(count ~ taxclass + (1 | site), zi ~ taxclass),
-  family = zero_inflated_negbinomial(),
-  data = penip,
-  prior = c(
-    prior(normal(0, 5), class = "b"),  # Weaker fixed effect priors
-    prior(normal(0, 5), class = "Intercept"),  # Allow more extreme baseline density
-    prior(exponential(0.5), class = "sd"),  # Allow more site variation
-    prior(normal(0, 5), class = "b", dpar = "zi")  # Allow more extreme zero-inflation
-  ),
-  chains = 4,
-  cores = 4,
-  threads = threading(5),
-  iter = 4000, warmup = 1500,
-  thin = 2,
-  control = list(adapt_delta = 0.95, max_treedepth = 12),
-  backend = "cmdstanr"
-)
-
-# longtail taxon-abundance distribution priors
-mod_zinb_longtail <- brm(
-  bf(count ~ taxclass + (1 | site), zi ~ taxclass),
-  family = zero_inflated_negbinomial(),
-  data = penip,
-  prior = c(
-    prior(student_t(3, 0, 5), class = "b"),  # Heavy-tailed fixed effects
-    prior(student_t(3, 0, 5), class = "Intercept"),  # Long-tailed intercept
-    prior(student_t(3, 0, 3), class = "sd", lb = 0),  # Forces site variance to be positive
-    prior(student_t(3, 0, 5), class = "b", dpar = "zi")  # Flexible zero-inflation
-  ),
-  chains = 4,
-  cores = 4,
-  threads = threading(5),
-  iter = 4000, warmup = 1500,
-  thin = 2,
-  control = list(adapt_delta = 0.95, max_treedepth = 12),
-  backend = "cmdstanr"
-)
-
-# Compare models
-loo(mod_zinb_weakpriors, mod_zinb_longtail)
-loo_weakpriors <- loo(mod_zinb_weakpriors)
-loo_longtail <- loo(mod_zinb_longtail)
-loo_strongpriors <- loo(mod_zinb_strongpriors)
-
-bayes_factor(mod_zinb_longtail, mod_zinb_weakpriors)
-
-pp_check(mod_zinb_weakpriors, ndraws = 100)  # Weak priors
-pp_check(mod_zinb_longtail, ndraws = 100)  # Long-tailed priors
+## CHOOSE MODEL TO USE
+mod_zinb_bayes <- mod_zinb_strongpriors
 
 
 ## GET FITTED VALUES FOR EACH TAXCLASS
@@ -699,7 +555,7 @@ newdata1 <- tidyr::expand(penip, taxclass, site)
 
 # 1. Get fitted values using 'fitted'
 # 1.1. re_formula = NA will include no site effects (predicts same value for a taxclass across all sites)
-fitted_vals1 <- fitted(mod_zinb_longtail, newdata = newdata1, re_formula = NA) # NO SITE EFFECTS
+fitted_vals1 <- fitted(mod_zinb_bayes, newdata = newdata1, re_formula = NA) # NO SITE EFFECTS
 fitted_vals1 <- bind_cols(newdata1, fitted_vals1) %>%
   group_by(taxclass) %>%
   summarize(fit_mean = mean(Estimate),
@@ -708,7 +564,7 @@ fitted_vals1 <- bind_cols(newdata1, fitted_vals1) %>%
             fit_upper = mean(Q97.5))
 # 1.2. re_formula = NULL includes site effects (predicts site-specific values for taxclass across all sites)
 #      newdata = all combos of taxclass and site, even those not observed in data
-fitted_vals2 <- fitted(mod_zinb_longtail, newdata = newdata1, re_formula = NULL)
+fitted_vals2 <- fitted(mod_zinb_bayes, newdata = newdata1, re_formula = NULL)
 fitted_vals2 <- bind_cols(newdata1, fitted_vals2) %>%
   group_by(taxclass) %>%
   summarize(fit_mean = mean(Estimate),
@@ -717,7 +573,7 @@ fitted_vals2 <- bind_cols(newdata1, fitted_vals2) %>%
             fit_upper = mean(Q97.5))
 # 1.3. re_formula = NULL and 
 #      newdata = only observed site/taxclass combinations
-fitted_vals3 <- fitted(mod_zinb_longtail, newdata = select(penip, taxclass, site), re_formula = NULL)
+fitted_vals3 <- fitted(mod_zinb_bayes, newdata = select(penip, taxclass, site), re_formula = NULL)
 fitted_vals3 <- bind_cols(select(penip, taxclass, site), fitted_vals3) %>%
   group_by(taxclass) %>%
   summarize(fit_mean = mean(Estimate),
@@ -727,7 +583,7 @@ fitted_vals3 <- bind_cols(select(penip, taxclass, site), fitted_vals3) %>%
 
 
 # 2. Get fitted values manually by computing summary statistics across all draws
-posterior_draws <- add_epred_draws(mod_zinb_longtail, newdata = newdata1)
+posterior_draws <- add_epred_draws(mod_zinb_bayes, newdata = newdata1)
 fitted_manual <- posterior_draws %>%
   group_by(taxclass) %>%
   summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
@@ -771,9 +627,9 @@ fitted_combined <- bind_rows(fitted_tax_zinb, fitted_taxclass_zinb) %>%
 ggplot(fitted_combined, aes(x = taxon, y = fit_mean, color = class, shape = class)) +
   geom_point(aes(size = class), 
              position = position_dodge(width = 0.2), alpha = 0.6) +  
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
+  geom_errorbar(aes(ymin = pmax(fit_lower, 5e-4), ymax = fit_upper), 
                 width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
-  scale_y_log10(limits = c(1e-4, 5)) +  
+  scale_y_log10(limits = c(5e-4, 3)) +  
   scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
   scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
   coord_flip() +  
