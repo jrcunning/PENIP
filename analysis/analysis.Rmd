@@ -494,9 +494,9 @@ fitted_combined_nb <- bind_rows(taxclass_ci_nb, fitted_taxon_nb) %>%
 
 ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = class, shape = class)) +
   geom_point(aes(size = class), position = position_dodge(width = 0.2), alpha = 0.6) +  
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
+  geom_errorbar(aes(ymin = pmax(5e-4, fit_lower), ymax = fit_upper), 
                 width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
-  scale_y_log10(limits = c(1e-4, 5)) +  
+  scale_y_log10(limits = c(5e-4, 3)) +  
   scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
   scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
   coord_flip() +  
@@ -636,7 +636,7 @@ ggplot(fitted_combined, aes(x = taxon, y = fit_mean, color = class, shape = clas
   labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
        color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
   theme_minimal() +  
-  labs(title = "Bayesian ZINB Model: longtail priors")
+  labs(title = "Bayesian ZINB Model: strong priors")
 
 
 # Overall total number of corals per m2
@@ -658,8 +658,92 @@ fitted_total_zinb <- posterior_draws %>%
 fitted_total_zinb
 ```
 
+# Try adding distance and direction?
+```{r}
+# Strong priors
+mod_zinb_dirdist <- brm(
+  bf(count ~ taxon + reef * direction + distance_m + (1 | site), 
+     zi ~ taxon + reef * direction + distance_m),
+  family = zero_inflated_negbinomial(),
+  data = penip,
+  prior = c(
+    prior(normal(0, 2), class = "b"),  # 🔥 Shrinkage prior for regression coefficients
+    prior(normal(0, 2), class = "Intercept"),  
+    prior(exponential(1), class = "sd"),  # 🔥 Regularizing prior for random effects
+    prior(normal(0, 2), class = "b", dpar = "zi")  # 🔥 Informative prior for zero-inflation
+  ),
+  chains = 4,  
+  cores = 4,  
+  threads = threading(5),  
+  iter = 4000, warmup = 1500,  
+  thin = 2,  
+  control = list(adapt_delta = 0.95, max_treedepth = 12),  
+  backend = "cmdstanr"
+)
+
+summary(mod_zinb_dirdist)
+
+library(posterior)  # Required for `as_draws_df()`
+post_samples <- as_draws_df(mod_zinb_dirdist)  # Extract posterior samples
+
+# List all parameter names
+colnames(post_samples)
+
+post_samples %>%
+    select(matches("b_dist_from_channel"), matches("b_direction"), matches("b_reef")) %>%  # Select correct parameters
+    pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
+    group_by(parameter) %>%
+    summarise(
+        mean = mean(value),
+        lower95 = quantile(value, 0.025),
+        upper95 = quantile(value, 0.975)
+    ) %>%
+  print(n = nrow(.))
 
 
+hypothesis(mod_zinb_dirdist, "reefNRC > 0")
+
+# NRC has higher coral abundance?
+exp(0.626)
+#1.87x higher than reference reef (IR?)
+```
+
+```{r}
+# ESA P/A
+
+acer.pa <- pa %>% distinct(site, acer) %>%
+  mutate(acer = case_match(acer, "N" ~ 0, "Y" ~ 1)) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer))
+acer.t1t2 <- t1t2bonus %>% distinct(site, acer, ofav, conch) %>%
+  mutate(acer = case_when(acer == "0" ~ 0, TRUE ~ 1),
+         ofav = case_when(ofav == "0" ~ 0, TRUE ~ 1),
+         conch = case_when(conch == "0" ~ 0, TRUE ~ 1)) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer),
+            ofav = max(ofav),
+            conch = max(conch))
+acer.t3t4 <- t3t4bonus %>% distinct(site, acer, ofav, conch) %>%
+  mutate(acer = case_when(acer == "0" ~ 0, TRUE ~ 1),
+         ofav = case_when(ofav == "0" ~ 0, TRUE ~ 1),
+         conch = case_when(conch == "0" ~ 0, TRUE ~ 1)) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer),
+            ofav = max(ofav),
+            conch = max(conch))
+
+all <- bind_rows(acer.pa, acer.t1t2, acer.t3t4) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer, na.rm = T),
+            ofav = max(ofav, na.rm = T),
+            conch = max(conch, na.rm = T))
+
+all %>% left_join(allsitemd) %>%
+  filter(set == "penip") %>%
+  ggplot(aes(x = longitude, y = latitude, color = factor(conch))) +
+  geom_point() +
+  geom_hline(yintercept = 26.093528)
+```
 
 
 
