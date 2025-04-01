@@ -305,6 +305,8 @@ ggplot(taxon_ag_counts, aes(x = reorder(taxon, -n), y = n)) +
   theme(axis.text.x = element_text(angle = 90))
 
 taxon_ag_counts %>% arrange(n)
+
+write_csv(counts_long_ag, file = "data/counts.csv")
 ```
 
 
@@ -744,6 +746,60 @@ all %>% left_join(allsitemd) %>%
   geom_point() +
   geom_hline(yintercept = 26.093528)
 ```
+
+
+# Compare PENIP vs. N-S areas
+```{r}
+# Get only taxa that were surveyed in N-S (DRM survey only, no bonus data)
+counts_long_ag_f <- counts_long_ag %>%
+  filter((class == "<4cm" & taxon %in% c("MEAN", "MUSS", "FAVI", "MCAV")) | class == ">4cm") %>%
+  mutate(taxclass = paste0(taxon, class))
+  
+# Strong priors
+mod_zinb_set <- brm(
+  bf(count ~ taxclass * set + (1 | set/site), 
+     zi ~ taxclass * set),
+  family = zero_inflated_negbinomial(),
+  data = counts_long_ag_f,
+  prior = c(
+    prior(normal(0, 2), class = "b"),  # 🔥 Shrinkage prior for regression coefficients
+    prior(normal(0, 2), class = "Intercept"),  
+    prior(exponential(1), class = "sd"),  # 🔥 Regularizing prior for random effects
+    prior(normal(0, 2), class = "b", dpar = "zi")  # 🔥 Informative prior for zero-inflation
+  ),
+  #chains = 4,  cores = 4,  threads = threading(5), iter = 4000, warmup = 1500, thin = 2,  
+  chains = 4, cores = 4, threads = threading(5), iter = 1000, warmup = 500,
+  control = list(adapt_delta = 0.95, max_treedepth = 12),  
+  backend = "cmdstanr"
+)
+
+# New data: all taxa at all site sets
+newdata <- distinct(counts_long_ag_f, taxclass, set, site)
+
+# 2. Get fitted values manually by computing summary statistics across all draws
+posterior_draws <- add_epred_draws(mod_zinb_set, newdata = newdata)
+fitted_manual <- posterior_draws %>%
+  group_by(taxclass, set) %>%
+  summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
+            fit_sd = sd(.epred),  # Posterior standard deviation
+            fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
+            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
+
+ggplot(fitted_manual, aes(x = taxclass, y = fit_mean, color = set, shape = set)) +
+  geom_point(position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(ymin = pmax(fit_lower, 5e-4), ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10() +  #limits = c(5e-4, 3)
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
+       color = "Area", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "Bayesian ZINB Model: strong priors")
+```
+
+
+
+
 
 
 
