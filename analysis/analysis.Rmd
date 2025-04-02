@@ -11,11 +11,865 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(msm)  # Needed for the Delta Method
+library(brms)
+library(future)
+library(tidybayes)
 ```
 
-# Analyze all the data!
+Check site 3072 / IRN3-210 -- no corals counted?
+
+# Import data
+```{r}
+# Port Everglades site metadata
+sites <- readxl::read_xlsx("data/site_metadata.xlsx") %>%
+  janitor::clean_names() %>%
+  rename(penip_site = site,
+         site = drm_site_id,
+         latitude = lat,
+         longitude = lon)
+
+# Data from main DRM surveys
+adults <- read_csv("data/DRM_broward_corals.csv") %>%
+  mutate(site = parse_number(site)) %>%
+  left_join(sites)
+
+# Juveniles
+juv <- read_csv("data/DRM_broward_juveniles.csv") %>%
+  mutate(site = parse_number(site)) %>%
+  left_join(sites)
+
+# Presence-absence of species of special concern
+pa <- read_csv("data/DRM_broward_spp_special_concern.csv") %>%
+  mutate(site = parse_number(site)) %>%
+  left_join(sites)
+
+# Additional bonus data collected only on Port Everglades surveys
+## Transects 1 and 2 -- juvenile coral counts for all taxa, acer/ofav/conch/tires p/a
+t1t2bonus <- read_csv("data/T1_T2_bonus_data.csv") %>%
+  janitor::clean_names() %>%
+  rename(penip_site = site) %>%
+  mutate(penip_site = replace_na(penip_site, "NA")) %>%
+  mutate(transect_num = parse_number(transect)) %>%
+  left_join(sites)
+## Transects 3 and 4 -- sediment depth and acer/ofav/conch/tires p/a
+t3t4bonus <- read_csv("data/T3_T4_bonus_data.csv") %>%
+  janitor::clean_names() %>%
+  rename(penip_site = site) %>%
+  mutate(penip_site = replace_na(penip_site, "NA")) %>%
+  mutate(transect_num = parse_number(transect)) %>%
+  left_join(sites)
+
+# Full site metadata
+drmsitemd <- adults %>%
+  group_by(site, date, latitude, longitude, zone, f_habitat, habitat, team) %>%
+  summarize(depth = mean(end_depth))
+penipsitemd <- sites %>%
+  distinct(site, date, latitude, longitude, penip_site, reef, direction, distance_m)
+
+# Combine drm site and penip site metadata
+allsitemd <- full_join(drmsitemd, penipsitemd, by = c("site", "date", "latitude", "longitude")) %>%
+  group_by(site) %>%
+  mutate(across(c(penip_site, reef, direction, distance_m), ~ coalesce(.x, first(na.omit(.x))))) %>%
+  ungroup() %>%
+  distinct(site, .keep_all = TRUE)
+
+
+# ADD DEPTH 22FT FOR SITE 'NA'/3095 (FROM MARK LADD DRM DATASHEET)
+allsitemd[allsitemd$site == "3095", "depth"] <- 22
+```
+
+# Combine coral data
+```{r}
+# Pre-aggregate taxa where people may have only recorded genus instead of species
+# (without preaggregation, counting data will imply that 0 of these meta-taxa were observed, even if species was observed)
+adults %>% filter(species %in% c("ORBI", "PORI", "SCOL", "MYCE", "SOLE", "SIDE", 
+                                 "PSEU", "OCUL", "MEAN", "MADR", "ISOP", "DIPL")) %>%
+  distinct(species)
+
+# Only 1 SCOL recorded. Aggregate all SCOL/SCUB/SLAC to SCOL
+adults <- adults %>%
+  mutate(species = case_when(species %in% c("SCOL", "SCUB", "SLAC") ~ "SCOL",
+         TRUE ~ species))
+
+
+# Count adult corals (>4cm)
+## Need to separately consider species that were searched for on all four transects, vs. those only searched on t1 and t2
+# Define the list of species searched for on transects 3 and 4
+searched_species <- c("CNAT", "DSTO", "DLAB", "MMEA", "MANG", "MALI", "MFER", "MLAM", "PCLI", "PSTR")
+
+# Get all site-transect combinations (ensuring transects 3 and 4 exist for each site in case of implicit missing meaning no corals observed)
+all_sites <- unique(adults$site)
+all_transects <- expand.grid(site = all_sites, transect_num = c(1, 2, 3, 4))  # Include all transects
+
+# Process the data
+adult.counts <- adults %>%
+  drop_na(species) %>%
+  group_by(site, transect_num, species) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  pivot_wider(names_from = species, values_from = count) %>%  # Do NOT fill missing values yet
+  full_join(all_transects, by = c("site", "transect_num")) %>%  # Ensure all transects exist
+  
+  # Replace NAs correctly:
+  mutate(across(
+    -c(site, transect_num),
+    ~ case_when(
+      transect_num %in% c(1, 2) & is.na(.) ~ 0,  # Set ALL species to 0 for T1 & T2
+      transect_num %in% c(3, 4) & is.na(.) & cur_column() %in% searched_species ~ 0,  # Only searched species get 0 for T3 & T4
+      transect_num %in% c(3, 4) & is.na(.) ~ NA,  # Keep non-searched species as NA for T3 & T4
+      TRUE ~ .  # Keep existing values
+    )
+  )) %>%
+  mutate(class = ">4cm")
+
+
+# Add class <4cm for juveniles
+drmjuvs <- juv %>%
+  select(site, transect_num, ends_with("ct")) %>%
+  rename(MCAV = montastraea_ct, MUSS = mussinae_ct, FAVI = faviinae_ct, MEAN = meandrinidae_ct)
+
+t1t2juvs <- t1t2bonus %>%
+  select(site, transect_num, starts_with("small")) %>%
+  rename_with(~ toupper(gsub("^small_", "", .x)), starts_with("small_"))
+
+alljuv <- full_join(drmjuvs, t1t2juvs, by = c("site", "transect_num")) %>%
+    mutate(class = "<4cm")
+
+# 9 sites missing juvenile data -- still waiting on JS to send... (these were the sites she removed from overall DRM dataset)
+
+# Combine all adult and juvenile count data
+allcounts <- bind_rows(adult.counts, alljuv)
+```
+
+# Explore and select sites to include
+```{r sites}
+# Plot sites
+allsitemd %>%
+  ggplot(aes(x = longitude, y = latitude, color = habitat)) +
+  geom_point(aes(size = depth), alpha = 0.5) +
+  geom_hline(yintercept = 26.093528) +
+  geom_hline(yintercept = c(26.125, 26.065), lty = 2)
+
+# Function to compute north-south distance
+north_south_distance_geo <- function(lat1, lat2 = 26.093528) {
+  # Keep longitude fixed (e.g., 0)
+  lon <- 0  
+  # Compute great-circle distance using geosphere::distGeo()
+  distance_m <- geosphere::distGeo(c(lon, lat1), c(lon, lat2))
+  # Convert meters to kilometers
+  distance_km <- distance_m / 1000  
+  # Make distance negative if lat1 is south of lat2
+  if (lat1 < lat2) {
+    distance_km <- -distance_km
+  }
+  return(distance_km)
+}
+
+# Assign grouping variables to sites based on geography
+allsitemd <- allsitemd %>%
+  mutate(dist_from_channel = map_dbl(latitude, north_south_distance_geo))
+
+allsitemd <- allsitemd %>%
+  mutate(dir = if_else(dist_from_channel < 0, "S", "N"),
+         set = case_when(dist_from_channel < -3 ~ "Sref",
+                         dist_from_channel > 3 ~ "Nref",
+                         TRUE ~ "penip")) %>%
+  mutate(set = factor(set, levels = c("Sref", "penip", "Nref")))
+
+# Are these three sets of sites comparable?
+# Test depth
+kruskal.test(depth ~ set, data = allsitemd)
+set.seed(2)
+ggplot(allsitemd, aes(x = set, y = depth, color = habitat)) +
+  geom_jitter(width = 0.3, height = 0) +
+  theme_classic() +
+  geom_hline(yintercept = 45, lty = 2) +
+  labs(title = "Depth Distribution Across Sets", x = "Set", y = "Depth (m)")
+
+# Filtering out sites deeper than 45 feet will make sets more comparable 
+# in terms of both depth and habitat composition
+allsitemd.f <- allsitemd %>%
+  filter(depth <= 45)
+ggplot(allsitemd.f, aes(x = set, y = depth, color = habitat)) +
+  geom_jitter(width = 0.3, height = 0) +
+  theme_classic() +
+  labs(title = "Depth Distribution Across Sets", x = "Set", y = "Depth (m)")
+
+
+# Test habitat
+# Create a contingency table
+habitat_table <- table(allsitemd.f$set, allsitemd.f$habitat)
+
+# Chi-square test
+chisq.test(habitat_table)
+ggplot(allsitemd.f, aes(x = set, fill = habitat)) +
+  geom_bar(position = "fill") +
+  theme_classic() +
+  labs(title = "Habitat Composition Across Sets", x = "Set", y = "Proportion") +
+  scale_y_continuous(labels = scales::percent_format())
+
+# There are differences in habitat composition. Keep in mind for later.
+
+# Count sites in each set, and report range in distances from channel
+allsitemd.f %>%
+  group_by(set) %>%
+  summarize(
+    num_sites = n(),                          # Count of sites in each set
+    min_dist = min(dist_from_channel, na.rm = TRUE),  # Minimum distance
+    max_dist = max(dist_from_channel, na.rm = TRUE)   # Maximum distance
+  )
+
+# Plot filtered set of sites with metadata
+allsitemd.f %>%
+  ggplot(aes(x = longitude, y = latitude, color = habitat)) +
+  geom_point(aes(size = depth, shape = set), alpha = 0.5) +
+  geom_hline(yintercept = 26.093528) +
+  geom_hline(yintercept = c(26.125, 26.065), lty = 2)
+```
+
+# Filter coral data for selected sites
+```{r}
+# ----- FILTER CORAL DATA FOR JUST SELECTED SITES -- 
+# Combine all adult and juvenile count data with site metadata
+allcounts.f <- allcounts %>%
+  right_join(allsitemd.f) # CHOOSE METADATA FOR FULL OR FILTERED SET OF SITES
+
+# Remove any columns (species) that are all zeros or all NAs (meaning they were not observed in the filtered set of sites)
+allcounts.f <- allcounts.f %>%
+  select(where(~ !all(is.na(.x) | .x == 0)))
+# SHYA was removed (only observation was at sites that were filtered out)
+# ------
+
+
+# Pivot to long form
+counts_long <- allcounts.f %>% 
+  pivot_longer(
+    cols = matches("^[A-Z]{4}$", ignore.case = FALSE),  # Select columns with exactly four uppercase letters
+    names_to = "taxon",
+    values_to = "count"
+  ) %>%
+  drop_na(count)  # Drop missing values (taxa not searched for on a given transect, since zeros already assigned above for searched taxa)
+```
+
+# Count coral taxa and aggregate
+```{r}
+# Get counts of all taxa
+taxon_counts <- counts_long %>%
+  group_by(taxon) %>%
+  summarize(n = sum(count))
+
+# total corals 
+sum(taxon_counts$n)
+
+# Look at lowest abundances
+taxon_counts %>% arrange(n) %>% head(10)
+
+# Plot counts of all observed taxa
+ggplot(taxon_counts, aes(x = reorder(taxon, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 90))
+
+# Aggregate taxa
+## Also take care to aggregate only taxa that were given the same search effort
+## ie, cannot aggregate FFRA with other FAVIDS (CNAT, DLAB, etc) bc FFRA was 
+## only counted on T1 and T2, whereas others were counted on all 4. This could 
+## underestimate abundance of FFRA, or other similar cases (eg SCOL < MYCE in MUSS)
+# I think this only applies to FFRA and SCOL, also EFAS
+counts_long_ag <- counts_long %>%
+  mutate(taxon = case_when(taxon %in% c("PPOR", "PFUR", "PDIV") ~ "PBRA",
+                           taxon %in% c("OFAV", "OANN", "OFRA") ~ "ORBI",
+                           taxon %in% c("CNAT", "DLAB", "PSTR", "PCLI") ~ "FAVI",
+                           taxon %in% c("AFRA", "AAGA", "AHUM", "ALAM") ~ "AGAR",
+                           taxon %in% c("MAUR", "MDEC") ~ "MADR",
+                           taxon %in% c("SHYA", "SBOU") ~ "SOLE",
+                           TRUE ~ taxon)) %>%
+  # Sum counts of newly aggregated taxa on a per-transect basis
+  group_by(across(-count)) %>%  # Group by all columns except 'count'
+  summarize(count = sum(count)) %>%
+  ungroup()
+
+
+# Get counts of aggregated taxa
+taxon_ag_counts <- counts_long_ag %>%
+  group_by(taxon) %>%
+  summarize(n = sum(count))
+
+# total corals 
+sum(taxon_ag_counts$n)
+
+# Plot counts of aggregated taxa
+ggplot(taxon_ag_counts, aes(x = reorder(taxon, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 90))
+
+taxon_ag_counts %>% arrange(n)
+
+write_csv(counts_long_ag, file = "data/counts.csv")
+```
+
+
+# TOTAL CORAL COUNTS AT PENIP
+```{r}
+# Get PENIP subset
+penip <- filter(counts_long_ag, set == "penip") %>% 
+  mutate(taxclass = paste0(taxon, class))
+
+# Total corals counted per site
+site_totals <- penip %>%
+  group_by(site, latitude, longitude) %>%
+  summarize(n = sum(count)) %>%
+  arrange(n)
+
+hist(site_totals$n, breaks = 10)
+# Site with fewest corals (9, IRN3-210) I double checked the raw datasheet to confirm everything was correct.
+
+# Plot total corals counted at each site
+ggplot(site_totals, aes(x = longitude, y = latitude, size = n)) +
+  geom_point(alpha = 0.5)
+
+mean(site_totals$n)
+# average is 55 corals counted per site
+
+# We cannot convert this directly into a coral density metric, because the area in which
+# we counted corals differed across coral taxa and size classes. eg, some adult species
+# counted on all 4 transects, but most only on 2. Some small corals counted only on 2.
+# Therefore, we have to analyze density on a taxon-size class-specific basis
+```
+
+#1. raw averaging
+```{r}
+
+# FIRST PASS: RAW AVERAGING TAXA ABUNDANCES -- BUT THIS IS NOT A GOOD WAY TO LOOK AT ZERO-INFLATED DATA
+# total counts for each taxon/class per site, and total area searched for each (since diff no. transects)
+taxclass_totals <- penip %>%
+  group_by(site, latitude, longitude, reef, direction, distance_m, taxon, class, taxclass) %>%
+  summarize(n = sum(count), area = n() * 10) %>%  # 10 m2 per counted transect
+  ungroup() %>%
+  mutate(n_per_m2 = n / area)
+
+# doublecheck that effort is quantified correctly
+check <- taxclass_totals %>% distinct(taxon, class, area)
+
+# summarize site-level total coral density
+total_corals_per_m2 <- taxclass_totals %>%
+    group_by(site, latitude, longitude, reef, direction, distance_m) %>%
+    summarize(total_per_m2 = sum(n_per_m2)) %>%  # Sum per-m² densities
+    ungroup()
+
+# Raw average total coral density per square meter across all sites
+mean(total_corals_per_m2$total_per_m2)
+# 2.6 corals per square meter
+```
+
+#2. negative binomial model
+```{r}
+# MODEL CORAL COUNTS at the site level, using totals per taxon-size class per site (added up across transects)
+# offset(log(area)) has to be included because of the different number of transects used for different taxon-size class groups
+
+# Fit a Negative Binomial GLM
+mod_nb <- MASS::glm.nb(n ~ taxclass + offset(log(area)), data = taxclass_totals)
+
+# Generate new data only for existing taxon-size class combinations
+newdata_1 <- taxclass_totals %>%
+  distinct(taxon, class, taxclass) %>%  # Keep only observed taxon-class combinations
+  mutate(area = 1)  # Set area to 1 for density predictions on a per m2 basis
+
+# Get predicted values & standard errors (log scale)
+preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
+
+# Compute both total coral density & taxon-size class-specific densities in one step
+results_nb <- newdata_1 %>%
+  mutate(
+    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
+    fit_se = exp(preds_nb$fit) * preds_nb$se.fit,   # Convert SE using the Delta Method
+    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
+    fit_lower = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
+    fit_upper = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
+  )
+
+# Compute total coral density + confidence intervals
+total_ci_nb <- results_nb %>%
+  summarize(
+    total_density = sum(fit),
+    total_se = sqrt(sum(fit_var)),
+    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
+    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
+  )
+
+total_ci_nb
+# 2.64 total corals per m2 (95%CI 2.24-3.11)
+
+# Extract and plot taxon-size-class-specific densities
+taxclass_ci_nb <- results_nb %>%
+  dplyr::select(taxon, class, taxclass, fit, fit_se, fit_lower, fit_upper)
+
+# Compute total density per taxon (summing over size classes)
+fitted_taxon_nb <- taxclass_ci_nb %>%
+  group_by(taxon) %>%
+  summarize(
+    fit = sum(fit),  # Sum densities across size classes
+    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation (variance summation)
+    log_fit = log(fit),  # Log-transform fit for proper CI computation
+    log_se = fit_se / fit,  # Approximate log-scale standard error
+    fit_lower = exp(log_fit - 1.96 * log_se),  # Compute lower CI on log scale
+    fit_upper = exp(log_fit + 1.96 * log_se)   # Compute upper CI on log scale
+  ) %>%
+  ungroup() %>%
+  mutate(taxon = fct_reorder(taxon, fit), class = "Total")  # Reorder taxa by abundance
+
+
+fitted_combined_nb <- bind_rows(taxclass_ci_nb, fitted_taxon_nb) %>%
+  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
+
+ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = class, shape = class)) +
+  geom_point(aes(size = class), 
+             position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10(limits = c(1e-4, 5)) +  
+  scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
+  scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
+       color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "NB Model")
+```
+
+```{r}
+# Negative binomial but with simulated confidence intervals
+# Fit a Negative Binomial GLM
+mod_nb <- MASS::glm.nb(n ~ taxclass + offset(log(area)), data = taxclass_totals)
+
+# Generate new data only for existing taxon-size class combinations
+newdata_1 <- taxclass_totals %>%
+  distinct(taxon, class, taxclass) %>%
+  mutate(area = 1)  # Set area to 1 for density predictions
+
+# Get predicted values & standard errors (log scale)
+preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
+
+num_simulations <- 1000  # Number of posterior draws
+
+# Simulate posterior distributions for taxon-size class estimates
+simulated_posteriors <- newdata_1 %>%
+  mutate(
+    fit = exp(preds_nb$fit),  # Convert mean prediction back to response scale
+    fit_se = preds_nb$se.fit,
+    simulations = map2(preds_nb$fit, preds_nb$se.fit, 
+                       ~ exp(rnorm(num_simulations, mean = .x, sd = .y))) # Simulated draws
+  )
+
+# Compute confidence intervals from simulated posterior draws
+taxclass_ci_nb <- simulated_posteriors %>%
+  mutate(
+    fit_lower = map_dbl(simulations, ~ quantile(.x, 0.025)),  # 2.5% CI
+    fit_upper = map_dbl(simulations, ~ quantile(.x, 0.975))   # 97.5% CI
+  ) %>%
+  select(taxclass, taxon, class, fit, fit_se, fit_lower, fit_upper, simulations)  # Keep simulations column
+
+# Sum posterior distributions across size classes per taxon to compute total taxon uncertainty
+fitted_taxon_nb <- taxclass_ci_nb %>%
+  group_by(taxon) %>%
+  summarize(
+    fit = sum(fit),  # Sum densities across size classes
+    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation
+    simulations = list(reduce(simulations, `+`))  # Sum posterior samples correctly
+  ) %>%
+  ungroup()
+
+# Compute taxon-level confidence intervals from summed posterior distributions
+fitted_taxon_nb <- fitted_taxon_nb %>%
+  mutate(
+    fit_lower = map_dbl(simulations, ~ quantile(.x, 0.025)),  # 2.5% quantile
+    fit_upper = map_dbl(simulations, ~ quantile(.x, 0.975))   # 97.5% quantile
+  ) %>%
+  select(-simulations) %>%
+  mutate(class = "Total",
+         taxon = fct_reorder(taxon, fit))  # Mark as total for visualization
+
+# Combine taxon-size class estimates with total taxon estimates
+fitted_combined_nb <- bind_rows(taxclass_ci_nb, fitted_taxon_nb) %>%
+  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))  # Ensure taxon order
+
+ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = class, shape = class)) +
+  geom_point(aes(size = class), position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(ymin = pmax(5e-4, fit_lower), ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10(limits = c(5e-4, 3)) +  
+  scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
+  scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon",  
+       color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "Negative Binomial Model - Corrected Taxon Estimates")
+
+```
+
+These models don't account for site random effects
+
+#4. Bayesian zero-inflated negative binomial with random site effects
+```{r}
+# This is run at the transect level, so will predict consistent abundances per transect across taxa,
+# regardless of how many transects were performed for each taxon-size class (this is reflected in the data structure)
+
+# Bayesian ZINB model with random site effects
+
+
+# 🚀 Optimize parallel execution
+n_cores <- 4  # Use 4 cores for chains
+n_threads <- 5  # Use 5 threads per chain (total CPU usage = 4 * 5 = 10 cores)
+options(mc.cores = n_cores)
+future::plan(multisession)
+
+
+# Strong priors
+mod_zinb_strongpriors <- brm(
+  bf(count ~ taxclass + (1 | site), zi ~ taxclass),
+  family = zero_inflated_negbinomial(),
+  data = penip,
+  prior = c(
+    prior(normal(0, 2), class = "b"),  # 🔥 Shrinkage prior for regression coefficients
+    prior(normal(0, 2), class = "Intercept"),  
+    prior(exponential(1), class = "sd"),  # 🔥 Regularizing prior for random effects
+    prior(normal(0, 2), class = "b", dpar = "zi")  # 🔥 Informative prior for zero-inflation
+  ),
+  chains = 4,  
+  cores = 4,  
+  threads = threading(5),  
+  iter = 4000, warmup = 1500,  
+  thin = 2,  
+  control = list(adapt_delta = 0.95, max_treedepth = 12),  
+  backend = "cmdstanr"
+)
+loo(mod_zinb_strongpriors)
+
+## CHOOSE MODEL TO USE
+mod_zinb_bayes <- mod_zinb_strongpriors
+
+
+## GET FITTED VALUES FOR EACH TAXCLASS
+# New data: all taxa at all sites
+newdata1 <- tidyr::expand(penip, taxclass, site)
+
+# 1. Get fitted values using 'fitted'
+# 1.1. re_formula = NA will include no site effects (predicts same value for a taxclass across all sites)
+fitted_vals1 <- fitted(mod_zinb_bayes, newdata = newdata1, re_formula = NA) # NO SITE EFFECTS
+fitted_vals1 <- bind_cols(newdata1, fitted_vals1) %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(Estimate),
+            fit_sd = mean(Est.Error),
+            fit_lower = mean(Q2.5),
+            fit_upper = mean(Q97.5))
+# 1.2. re_formula = NULL includes site effects (predicts site-specific values for taxclass across all sites)
+#      newdata = all combos of taxclass and site, even those not observed in data
+fitted_vals2 <- fitted(mod_zinb_bayes, newdata = newdata1, re_formula = NULL)
+fitted_vals2 <- bind_cols(newdata1, fitted_vals2) %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(Estimate),
+            fit_sd = mean(Est.Error),
+            fit_lower = mean(Q2.5),
+            fit_upper = mean(Q97.5))
+# 1.3. re_formula = NULL and 
+#      newdata = only observed site/taxclass combinations
+fitted_vals3 <- fitted(mod_zinb_bayes, newdata = select(penip, taxclass, site), re_formula = NULL)
+fitted_vals3 <- bind_cols(select(penip, taxclass, site), fitted_vals3) %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(Estimate),
+            fit_sd = mean(Est.Error),
+            fit_lower = mean(Q2.5),
+            fit_upper = mean(Q97.5))
+
+
+# 2. Get fitted values manually by computing summary statistics across all draws
+posterior_draws <- add_epred_draws(mod_zinb_bayes, newdata = newdata1)
+fitted_manual <- posterior_draws %>%
+  group_by(taxclass) %>%
+  summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
+            fit_sd = sd(.epred),  # Posterior standard deviation
+            fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
+            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
+  
+# Choose which results to use for fitted taxclass estimates
+fitted_taxclass_zinb <- fitted_manual %>%
+  mutate(taxon = substr(taxclass, 1, 4),
+         class = substr(taxclass, 5, 8))
+
+### GET FITTED VALUE FOR EACH TAXON = SUMMING SIZECLASSES
+# Extract posterior expected predictions (epred) while keeping site info
+fitted_tax_zinb <- posterior_draws %>%
+  mutate(taxon = substr(taxclass, 1, 4),
+         class = substr(taxclass, 5, 8)) %>%
+  # Sum size classes of each taxon at each site for each draw
+  group_by(taxon, site, .draw) %>%
+  summarize(fit = sum(.epred), .groups = "drop") %>%  # Sum densities within each draw
+  # Average summed taxon densities across all draws
+  group_by(taxon) %>%
+  dplyr::summarize(
+    fit_mean = mean(fit),  # Average posterior prediction per taxon
+    fit_sd = sd(fit),  # Correct SE propagation
+    fit_lower = quantile(fit, 0.025),  # Bayesian lower 95% CI
+    fit_upper = quantile(fit, 0.975)   # Bayesian upper 95% CI
+  ) %>%
+  # Reorder taxa based on their total density
+  mutate(taxon = fct_reorder(taxon, fit_mean),
+         class = "Total") 
+
+
+
+# Combine taxon totals with taxon-sizeclass totals, Reorder taxon levels based on total density (highest first)
+fitted_combined <- bind_rows(fitted_tax_zinb, fitted_taxclass_zinb) %>%
+  # Convert densities from per transect to per m2 (divide by 10m2)
+  mutate(across(c(fit_mean, fit_sd, fit_lower, fit_upper), ~ . / 10)) %>%
+  mutate(taxon = factor(taxon, levels = levels(fitted_tax_zinb$taxon)))
+
+ggplot(fitted_combined, aes(x = taxon, y = fit_mean, color = class, shape = class)) +
+  geom_point(aes(size = class), 
+             position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(ymin = pmax(fit_lower, 5e-4), ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10(limits = c(5e-4, 3)) +  
+  scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
+  scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
+       color = "Size Class", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "Bayesian ZINB Model: strong priors")
+
+
+# Overall total number of corals per m2
+# Extract posterior expected predictions (epred) while keeping site info
+fitted_total_zinb <- posterior_draws %>%
+  # Sum size classes of each taxon at each site for each draw
+  group_by(site, .draw) %>%
+  summarize(fit = sum(.epred), .groups = "drop") %>%  # Sum densities within each draw
+  # Average densities across all taxa, all draws
+  dplyr::summarize(
+    fit_mean = mean(fit),  # Average posterior prediction per taxon
+    fit_sd = sd(fit),  # Correct SE propagation
+    fit_lower = quantile(fit, 0.025),  # Bayesian lower 95% CI
+    fit_upper = quantile(fit, 0.975)   # Bayesian upper 95% CI
+  ) %>%
+  # Convert densities from per transect to per m2 (divide by 10m2)
+  mutate(across(c(fit_mean, fit_sd, fit_lower, fit_upper), ~ . / 10))
+
+fitted_total_zinb
+```
+
+# Try adding distance and direction?
+```{r}
+# Strong priors
+mod_zinb_dirdist <- brm(
+  bf(count ~ taxon + reef * direction + distance_m + (1 | site), 
+     zi ~ taxon + reef * direction + distance_m),
+  family = zero_inflated_negbinomial(),
+  data = penip,
+  prior = c(
+    prior(normal(0, 2), class = "b"),  # 🔥 Shrinkage prior for regression coefficients
+    prior(normal(0, 2), class = "Intercept"),  
+    prior(exponential(1), class = "sd"),  # 🔥 Regularizing prior for random effects
+    prior(normal(0, 2), class = "b", dpar = "zi")  # 🔥 Informative prior for zero-inflation
+  ),
+  chains = 4,  
+  cores = 4,  
+  threads = threading(5),  
+  iter = 4000, warmup = 1500,  
+  thin = 2,  
+  control = list(adapt_delta = 0.95, max_treedepth = 12),  
+  backend = "cmdstanr"
+)
+
+summary(mod_zinb_dirdist)
+
+library(posterior)  # Required for `as_draws_df()`
+post_samples <- as_draws_df(mod_zinb_dirdist)  # Extract posterior samples
+
+# List all parameter names
+colnames(post_samples)
+
+post_samples %>%
+    select(matches("b_dist_from_channel"), matches("b_direction"), matches("b_reef")) %>%  # Select correct parameters
+    pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
+    group_by(parameter) %>%
+    summarise(
+        mean = mean(value),
+        lower95 = quantile(value, 0.025),
+        upper95 = quantile(value, 0.975)
+    ) %>%
+  print(n = nrow(.))
+
+
+hypothesis(mod_zinb_dirdist, "reefNRC > 0")
+
+# NRC has higher coral abundance?
+exp(0.626)
+#1.87x higher than reference reef (IR?)
+```
+
+```{r}
+# ESA P/A
+
+acer.pa <- pa %>% distinct(site, acer) %>%
+  mutate(acer = case_match(acer, "N" ~ 0, "Y" ~ 1)) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer))
+acer.t1t2 <- t1t2bonus %>% distinct(site, acer, ofav, conch) %>%
+  mutate(acer = case_when(acer == "0" ~ 0, TRUE ~ 1),
+         ofav = case_when(ofav == "0" ~ 0, TRUE ~ 1),
+         conch = case_when(conch == "0" ~ 0, TRUE ~ 1)) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer),
+            ofav = max(ofav),
+            conch = max(conch))
+acer.t3t4 <- t3t4bonus %>% distinct(site, acer, ofav, conch) %>%
+  mutate(acer = case_when(acer == "0" ~ 0, TRUE ~ 1),
+         ofav = case_when(ofav == "0" ~ 0, TRUE ~ 1),
+         conch = case_when(conch == "0" ~ 0, TRUE ~ 1)) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer),
+            ofav = max(ofav),
+            conch = max(conch))
+
+all <- bind_rows(acer.pa, acer.t1t2, acer.t3t4) %>%
+  group_by(site) %>%
+  summarize(acer = max(acer, na.rm = T),
+            ofav = max(ofav, na.rm = T),
+            conch = max(conch, na.rm = T))
+
+all %>% left_join(allsitemd) %>%
+  filter(set == "penip") %>%
+  ggplot(aes(x = longitude, y = latitude, color = factor(conch))) +
+  geom_point() +
+  geom_hline(yintercept = 26.093528)
+```
+
+
+# Compare PENIP vs. N-S areas
+```{r}
+# Get only taxa that were surveyed in N-S (DRM survey only, no bonus data)
+counts_long_ag_f <- counts_long_ag %>%
+  filter((class == "<4cm" & taxon %in% c("MEAN", "MUSS", "FAVI", "MCAV")) | class == ">4cm") %>%
+  mutate(taxclass = paste0(taxon, class))
+  
+# Strong priors
+mod_zinb_set <- brm(
+  bf(count ~ taxclass * set + (1 | set/site), 
+     zi ~ taxclass * set),
+  family = zero_inflated_negbinomial(),
+  data = counts_long_ag_f,
+  prior = c(
+    prior(normal(0, 2), class = "b"),  # 🔥 Shrinkage prior for regression coefficients
+    prior(normal(0, 2), class = "Intercept"),  
+    prior(exponential(1), class = "sd"),  # 🔥 Regularizing prior for random effects
+    prior(normal(0, 2), class = "b", dpar = "zi")  # 🔥 Informative prior for zero-inflation
+  ),
+  #chains = 4,  cores = 4,  threads = threading(5), iter = 4000, warmup = 1500, thin = 2,  
+  chains = 4, cores = 4, threads = threading(5), iter = 1000, warmup = 500,
+  control = list(adapt_delta = 0.95, max_treedepth = 12),  
+  backend = "cmdstanr"
+)
+
+# New data: all taxa at all site sets
+newdata <- distinct(counts_long_ag_f, taxclass, set, site)
+
+# 2. Get fitted values manually by computing summary statistics across all draws
+posterior_draws <- add_epred_draws(mod_zinb_set, newdata = newdata)
+fitted_manual <- posterior_draws %>%
+  group_by(taxclass, set) %>%
+  summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
+            fit_sd = sd(.epred),  # Posterior standard deviation
+            fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
+            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
+
+ggplot(fitted_manual, aes(x = taxclass, y = fit_mean, color = set, shape = set)) +
+  geom_point(position = position_dodge(width = 0.2), alpha = 0.6) +  
+  geom_errorbar(aes(ymin = pmax(fit_lower, 5e-4), ymax = fit_upper), 
+                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
+  scale_y_log10() +  #limits = c(5e-4, 3)
+  coord_flip() +  
+  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
+       color = "Area", shape = "Estimate Type", size = "Estimate Type") +  
+  theme_minimal() +  
+  labs(title = "Bayesian ZINB Model: strong priors")
+```
+
+
+
+
+
+
+
+
+#### parking lot below VVV
+
 
 ```{r}
 
+
+
+
+# Maybe keep at transect level?
+mod_qp <- glm.nb(count ~ taxon:class + offset(log(area)), family = quasipoisson(link = "log"), data = penip)
+
+penip$predicted_counts <- predict(mod_qp, type = "response")
+penip$predicted_density <- penip$predicted_counts / penip$area
+predicted_summary <- penip %>%
+  group_by(taxon, class) %>%
+  summarize(mean_density = mean(predicted_density))
+print(predicted_summary)
+ggplot(predicted_summary, aes(x = taxon, y = mean_density, color = class)) +
+  geom_point() +
+  ylim(0,0.6)
+
+sum(predicted_summary$mean_density)
+# 1.14 corals per square meter
+
+emm <- emmeans(mod_qp, ~ taxon:class, type = "response")
+# Extract the estimated means and standard errors
+emm_results <- as.data.frame(emm)
+
+# Compute estimated counts per unit area
+emm_results$estimated_density <- emm_results$response / mean(penip$area)
+
+# View results
+print(emm_results)
+
+###### following pom-dredge methods
+
+library(lme4)
+mod_qp <- glmer(count ~ taxclass + offset(log(area)) + (1|site/transect_num), 
+                family = "poisson", data = penip)
+# get fitted responses
+newdata_1 <- penip %>%
+  tidyr::expand(taxclass, area = 1)
+newdata_1$fit <- predict(mod_qp, newdata_1, type = "response", re.form = NA)
+
+newdata_1 <- newdata_1 %>%
+  mutate(taxon = substr(taxclass, 1, 4),
+         class = substr(taxclass, 5, nchar(taxclass)))
+ggplot(newdata_1, aes(x = taxon, y = fit, color = class)) +
+  geom_point() +
+  ylim(0,0.6)
+
+sum(newdata_1$fit)
+#0.96 corals per square meter
 ```
+
+
+
+# First things to look at
+# factors to consider: reef habitat, direction from channel, distance from channel
+
+# total number of adult corals
+# size frequency of adult corals by species
+# total number of small corals
+# ESA corals especially - ACER/OFAV
+# need total area of NRC/IR/MR/etc with distance from channel moving north and south of channel as a function of distance
+# Rugosity?
+
+
 
