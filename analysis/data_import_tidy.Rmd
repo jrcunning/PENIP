@@ -58,39 +58,85 @@ drm_sitemd <- read_csv("data/allsitemd.csv") %>%
 
 ```{r}
 # Adult coral data from main DRM surveys
-adults0 <- read_csv("data/DRM_broward_corals.csv")
+#adults0 <- read_csv("data/2024_shedd_drm/DRM_broward_corals.csv")
+#adults0 %>% filter(team == "Shedd Aquarium")
+
+# Most sites were included in main DRM database for 2024 -- Import these
+adultst1t2 <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_RawCoralDataTransect1and2_Shedd.xlsx") %>%
+  janitor::clean_names() %>%
+  filter(subregion == "Broward-Miami", team == "Shedd Aquarium") %>%
+  select(site, transect_num, species, width, height)
+adultst3t4 <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_RawCoralDataTransect3and4_Shedd.xlsx") %>%
+  janitor::clean_names() %>%
+  filter(subregion == "Broward-Miami", team == "Shedd Aquarium") %>%
+  select(site, transect_num, species, width, height)
+
+# 9 of our PEV sites were removed from DRM database to avoid oversaturating the ares -- Import these separately
+removedt1t2 <- readxl::read_xlsx(
+  "data/2024_shedd_drm/2024_DRM_Broward_RemovedSites_T1-T4_Shedd.xlsx", sheet = "Removed Sites T1-T2") %>%
+  janitor::clean_names() %>%
+  select(site, transect_num, species, width, height)
+removedt3t4 <- readxl::read_xlsx(
+  "data/2024_shedd_drm/2024_DRM_Broward_RemovedSites_T1-T4_Shedd.xlsx", sheet = "Removed Sites T3-T4") %>%
+  janitor::clean_names() %>%
+  select(site, transect_num, species, width, height)
+
+# Combine all adult coral data for Shedd DRM surveys at PEV
+adults0 <- bind_rows(adultst1t2, adultst3t4, removedt1t2, removedt3t4)
+# Convert adult data to long format
 adults_long <- adults0 %>%
   mutate(max_width_cm = pmax(width, height, na.rm = TRUE)) %>%
   mutate(max_width_cm = as.character(max_width_cm)) %>%
   mutate(site = str_remove(site, "^AA")) %>%
-  select(team, site, transect_num, taxon = species, max_width_cm) %>%
+  select(site, transect_num, taxon = species, max_width_cm) %>%
   drop_na(taxon)     # DROPS when taxon is blank, this is when no corals >4cm were observed
 
 # Juveniles from main DRM surveys (family-level tallies)
-drmjuv <- read_csv("data/DRM_broward_juveniles.csv") %>%
+# drmjuv <- read_csv("data/2024_shedd_drm/DRM_broward_juveniles.csv") %>%
+#   filter(team == "Shedd Aquarium") %>%
+#   mutate(site = str_remove(site, "^AA")) %>%
+#   select(team, site, transect_num, ends_with("ct")) %>%
+#   rename(MCAV = montastraea_ct, MUSS = mussinae_ct, FAVI = faviinae_ct, MEAN = meandrinidae_ct)
+
+# Import juvenile counts from main DRM dataset
+juv <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_JuvenileCoralData_Shedd.xlsx") %>%
+  janitor::clean_names() %>%
+  filter(subregion == "Broward-Miami", team == "Shedd Aquarium")
+
+# Import juvenile counts from sites that were removed from main DRM dataset
+removed_juv <- readxl::read_xlsx("data/2024_shedd_drm/Shedd_removed_sites_Juveniles_2024.xlsx") %>%
+  janitor::clean_names() %>%
+  # Missing values in count data should be zero counts (unique to this datasheet from FWC)
+  mutate(across(ends_with("_ct"), ~replace_na(., 0)))
+
+# Combine juvenile data
+juv0 <- bind_rows(juv, removed_juv) %>%
   mutate(site = str_remove(site, "^AA")) %>%
-  select(team, site, transect_num, ends_with("ct")) %>%
+  select(site, transect_num, ends_with("ct")) %>%
   rename(MCAV = montastraea_ct, MUSS = mussinae_ct, FAVI = faviinae_ct, MEAN = meandrinidae_ct)
-drmjuv_long <- drmjuv %>%
-  pivot_longer(4:7, names_to = "taxon", values_to = "n") %>%
+
+# Convert juvenile data to long format
+juv_long <- juv0 %>%
+  pivot_longer(c(MUSS, FAVI, MEAN, MCAV), names_to = "taxon", values_to = "n") %>%
   mutate(max_width_cm = "<4") %>%
   uncount(n)
 
-# Full juvenile counts from Transects 1 and 2 (bonus data)
-t1t2bonus <- read_csv("data/T1_T2_bonus_data.csv") %>%
+
+
+# Other juvenile taxa counts from Transects 1 and 2 (DRM 'bonus data')
+t1t2bonus <- read_csv("data/2024_shedd_drm/T1_T2_bonus_data.csv") %>%
   janitor::clean_names() %>%
   mutate(site = replace_na(site, "NA")) %>%    # Because one site is called "NA"
-  mutate(team = "Shedd Aquarium", transect_num = parse_number(transect))
+  mutate(transect_num = parse_number(transect))
 t1t2juv <- t1t2bonus %>%
-  select(team, site, transect_num, starts_with("small")) %>%
+  select(site, transect_num, starts_with("small")) %>%
   rename_with(~ toupper(gsub("^small_", "", .x)), starts_with("small_"))
 t1t2juv_long <- t1t2juv %>%
-  pivot_longer(4:11, names_to = "taxon", values_to = "n") %>%
+  pivot_longer(3:10, names_to = "taxon", values_to = "n") %>%
   mutate(max_width_cm = "<4") %>%
   uncount(n)
-
-# Replace site names in this t1t2 bonus data with the correct DRM site ID
-penipsites <- readxl::read_xlsx("data/site_metadata.xlsx") %>%
+# Replace site names in t1t2 bonus data with the correct DRM site ID
+penipsites <- readxl::read_xlsx("data/2024_shedd_drm/site_metadata.xlsx") %>%
   janitor::clean_names()
 t1t2juv_long_updated <- t1t2juv_long %>%
   left_join(penipsites %>% select(site, drm_site_id), by = "site") %>%
@@ -98,8 +144,9 @@ t1t2juv_long_updated <- t1t2juv_long %>%
   select(-drm_site_id)
 
 
-# Combine
-drm_long <- bind_rows(adults_long, drmjuv_long, t1t2juv_long_updated)
+# Combine all data
+drm_long <- bind_rows(adults_long, juv_long, t1t2juv_long_updated) %>%
+  mutate(team = "Shedd Aquarium")
 
 # Check species names
 sort(unique(drm_long$taxon))
@@ -138,12 +185,12 @@ all_juv_taxa <- c(juv_only_taxa, juv_both_taxa)
 
 # Step 3: Build search grid per site × transect × team
 search_grid <- drm_classed %>%
-  distinct(site, transect_num, team) %>%
+  distinct(site, transect_num, team) %>%    # if multiple teams in data, remove value for team
   mutate(
     searched_taxa_class = pmap(list(transect_num, team), function(transect, team) {
       # Helper: define juv taxa allowed for this transect/team
       juv_taxa <- if (transect %in% c(1, 2)) {
-        if (team == "Shedd Aquarium") {
+        if (team == "Shedd Aquarium") {      # Shedd searched for other juv taxa on T1 and T2, other DRM survey teams did not
           all_juv_taxa
         } else {
           c(juv_only_taxa, "MCAV")
