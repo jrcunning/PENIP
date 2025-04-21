@@ -139,6 +139,18 @@ alljuv <- full_join(drmjuvs, t1t2juvs, by = c("site", "transect_num")) %>%
 
 # Combine all adult and juvenile count data
 allcounts <- bind_rows(adult.counts, alljuv)
+
+# Write full processed dataset to file
+# Pivot to long form
+counts_long <- allcounts %>% 
+  pivot_longer(
+    cols = matches("^[A-Z]{4}$", ignore.case = FALSE),  # Select columns with exactly four uppercase letters
+    names_to = "taxon",
+    values_to = "count"
+  ) %>%
+  drop_na(count)  # Drop missing values (taxa not searched for on a given transect, since zeros already assigned above for searched taxa)
+
+write_csv(counts_long, "data/processed/drm_2024_counts.csv")
 ```
 
 # Explore and select sites to include
@@ -229,6 +241,12 @@ allsitemd.f %>%
 
 # Filter coral data for selected sites
 ```{r}
+
+
+
+
+
+
 # ----- FILTER CORAL DATA FOR JUST SELECTED SITES -- 
 # Combine all adult and juvenile count data with site metadata
 allcounts.f <- allcounts %>%
@@ -249,6 +267,8 @@ counts_long <- allcounts.f %>%
     values_to = "count"
   ) %>%
   drop_na(count)  # Drop missing values (taxa not searched for on a given transect, since zeros already assigned above for searched taxa)
+
+#write_csv(counts_long, "counts_long_full.csv")    # make sure NONFILTERED sites(above) to write full data to file
 ```
 
 # Count coral taxa and aggregate
@@ -339,7 +359,7 @@ mean(site_totals$n)
 ```
 
 #1. raw averaging
-```{r}
+```{r, eval = F}
 
 # FIRST PASS: RAW AVERAGING TAXA ABUNDANCES -- BUT THIS IS NOT A GOOD WAY TO LOOK AT ZERO-INFLATED DATA
 # total counts for each taxon/class per site, and total area searched for each (since diff no. transects)
@@ -364,7 +384,7 @@ mean(total_corals_per_m2$total_per_m2)
 ```
 
 #2. negative binomial model
-```{r}
+```{r, eval = F}
 # MODEL CORAL COUNTS at the site level, using totals per taxon-size class per site (added up across transects)
 # offset(log(area)) has to be included because of the different number of transects used for different taxon-size class groups
 
@@ -438,7 +458,7 @@ ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = class, shape = class)
   labs(title = "NB Model")
 ```
 
-```{r}
+```{r, eval = F}
 # Negative binomial but with simulated confidence intervals
 # Fit a Negative Binomial GLM
 mod_nb <- MASS::glm.nb(n ~ taxclass + offset(log(area)), data = taxclass_totals)
@@ -661,7 +681,7 @@ fitted_total_zinb
 ```
 
 # Try adding distance and direction?
-```{r}
+```{r, eval = F}
 # Strong priors
 mod_zinb_dirdist <- brm(
   bf(count ~ taxon + reef * direction + distance_m + (1 | site), 
@@ -758,7 +778,7 @@ counts_long_ag_f <- counts_long_ag %>%
 # Strong priors
 mod_zinb_set <- brm(
   bf(count ~ taxclass * set + (1 | set/site), 
-     zi ~ taxclass * set),
+     zi ~ set + (1 | set/site)),
   family = zero_inflated_negbinomial(),
   data = counts_long_ag_f,
   prior = c(
@@ -783,7 +803,12 @@ fitted_manual <- posterior_draws %>%
   summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
             fit_sd = sd(.epred),  # Posterior standard deviation
             fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
-            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
+            fit_upper = quantile(.epred, 0.975)) %>%   # 97.5% quantile (upper CI)
+  # Reorder taxa based on their total density
+  ungroup() %>%
+  mutate(taxclass = fct_reorder(taxclass, fit_mean, .fun = median)) 
+
+
 
 ggplot(fitted_manual, aes(x = taxclass, y = fit_mean, color = set, shape = set)) +
   geom_point(position = position_dodge(width = 0.2), alpha = 0.6) +  
@@ -800,64 +825,27 @@ ggplot(fitted_manual, aes(x = taxclass, y = fit_mean, color = set, shape = set))
 
 
 
+# Next steps
+Dive a little deeper into reef habitat differences within PENIP
+Get DCA and TetraTech data and compare to / integrate with our data
 
+
+PEV spillage analysis habitat acres
+
+Tab1: TotalcoralColoniesPerSite_2018
+-based on DCA 2017 ESA surveys with cross-transects
+-total Ofav colonies and Acer colonies per site
+
+
+Tab2: total area by habitat/reef type 
+-colors of spreadsheet cell correspond to spillage analysis zones
+
+
+COMBINE 2017 DCA RECON and TETRATECH 2023-24 RECENT IMPACT ZONE and OUR DATA
 
 
 
 #### parking lot below VVV
-
-
-```{r}
-
-
-
-
-# Maybe keep at transect level?
-mod_qp <- glm.nb(count ~ taxon:class + offset(log(area)), family = quasipoisson(link = "log"), data = penip)
-
-penip$predicted_counts <- predict(mod_qp, type = "response")
-penip$predicted_density <- penip$predicted_counts / penip$area
-predicted_summary <- penip %>%
-  group_by(taxon, class) %>%
-  summarize(mean_density = mean(predicted_density))
-print(predicted_summary)
-ggplot(predicted_summary, aes(x = taxon, y = mean_density, color = class)) +
-  geom_point() +
-  ylim(0,0.6)
-
-sum(predicted_summary$mean_density)
-# 1.14 corals per square meter
-
-emm <- emmeans(mod_qp, ~ taxon:class, type = "response")
-# Extract the estimated means and standard errors
-emm_results <- as.data.frame(emm)
-
-# Compute estimated counts per unit area
-emm_results$estimated_density <- emm_results$response / mean(penip$area)
-
-# View results
-print(emm_results)
-
-###### following pom-dredge methods
-
-library(lme4)
-mod_qp <- glmer(count ~ taxclass + offset(log(area)) + (1|site/transect_num), 
-                family = "poisson", data = penip)
-# get fitted responses
-newdata_1 <- penip %>%
-  tidyr::expand(taxclass, area = 1)
-newdata_1$fit <- predict(mod_qp, newdata_1, type = "response", re.form = NA)
-
-newdata_1 <- newdata_1 %>%
-  mutate(taxon = substr(taxclass, 1, 4),
-         class = substr(taxclass, 5, nchar(taxclass)))
-ggplot(newdata_1, aes(x = taxon, y = fit, color = class)) +
-  geom_point() +
-  ylim(0,0.6)
-
-sum(newdata_1$fit)
-#0.96 corals per square meter
-```
 
 
 
