@@ -18,10 +18,10 @@ AN-1,MEAN,<4cm,0
 AN-1,MMEA,>4cm,0
 AN-1,MUSS,<4cm,0
 AN-1,MYCE,>4cm,0
+AN-1,OCUL,<4cm,0
+AN-1,OCUL,>4cm,0
 AN-1,ORBI,<4cm,0
 AN-1,ORBI,>4cm,0
-AN-1,OROB,<4cm,0
-AN-1,OROB,>4cm,0
 AN-1,PAME,<4cm,0
 AN-1,PAME,>4cm,0
 AN-1,PORI,<4cm,0
@@ -52,10 +52,10 @@ AN-2,MEAN,<4cm,0
 AN-2,MMEA,>4cm,0
 AN-2,MUSS,<4cm,0
 AN-2,MYCE,>4cm,0
+AN-2,OCUL,<4cm,0
+AN-2,OCUL,>4cm,0
 AN-2,ORBI,<4cm,0
 AN-2,ORBI,>4cm,0
-AN-2,OROB,<4cm,0
-AN-2,OROB,>4cm,0
 AN-2,PAME,<4cm,0
 AN-2,PAME,>4cm,0
 AN-2,PAME,NA,2
@@ -87,10 +87,10 @@ C-13-a,MEAN,<4cm,1
 C-13-a,MMEA,>4cm,1
 C-13-a,MUSS,<4cm,0
 C-13-a,MYCE,>4cm,0
+C-13-a,OCUL,<4cm,0
+C-13-a,OCUL,>4cm,0
 C-13-a,ORBI,<4cm,0
 C-13-a,ORBI,>4cm,0
-C-13-a,OROB,<4cm,0
-C-13-a,OROB,>4cm,0
 C-13-a,PAME,<4cm,0
 C-13-a,PAME,>4cm,0
 C-13-a,PORI,<4cm,3
@@ -121,10 +121,10 @@ C-13-b,MEAN,<4cm,1
 C-13-b,MMEA,>4cm,1
 C-13-b,MUSS,<4cm,0
 C-13-b,MYCE,>4cm,0
+C-13-b,OCUL,<4cm,0
+C-13-b,OCUL,>4cm,0
 C-13-b,ORBI,<4cm,0
 C-13-b,ORBI,>4cm,0
-C-13-b,OROB,<4cm,0
-C-13-b,OROB,>4cm,0
 C-13-b,PAME,<4cm,0
 C-13-b,PAME,>4cm,0
 C-13-b,PORI,<4cm,1
@@ -155,10 +155,10 @@ C-13-c,MEAN,<4cm,0
 C-13-c,MMEA,>4cm,0
 C-13-c,MUSS,<4cm,0
 C-13-c,MYCE,>4cm,0
+C-13-c,OCUL,<4cm,0
+C-13-c,OCUL,>4cm,0
 C-13-c,ORBI,<4cm,0
 C-13-c,ORBI,>4cm,0
-C-13-c,OROB,<4cm,0
-C-13-c,OROB,>4cm,0
 C-13-c,PAME,<4cm,0
 C-13-c,PAME,>4cm,0
 C-13-c,PORI,<4cm,7
@@ -189,10 +189,10 @@ C-16-a,MEAN,<4cm,0
 C-16-a,MMEA,>4cm,0
 C-16-a,MUSS,<4cm,0
 C-16-a,MYCE,>4cm,0
+C-16-a,OCUL,<4cm,0
+C-16-a,OCUL,>4cm,0
 C-16-a,ORBI,<4cm,0
 C-16-a,ORBI,>4cm,0
-C-16-a,OROB,<4cm,0
-C-16-a,OROB,>4cm,0
 C-16-a,PAME,<4cm,0
 C-16-a,PAME,>4cm,0
 C-16-a,PORI,<4cm,4
@@ -223,10 +223,10 @@ C-16-b,MEAN,<4cm,0
 C-16-b,MMEA,>4cm,0
 C-16-b,MUSS,<4cm,0
 C-16-b,MYCE,>4cm,0
+C-16-b,OCUL,<4cm,0
+C-16-b,OCUL,>4cm,0
 C-16-b,ORBI,<4cm,0
 C-16-b,ORBI,>4cm,0
-C-16-b,OROB,<4cm,0
-C-16-b,OROB,>4cm,0
 C-16-b,PAME,<4cm,0
 C-16-b,PAME,>4cm,0
 C-16-b,PORI,<4cm,1
@@ -257,10 +257,10 @@ C-16-c,MEAN,<4cm,1
 C-16-c,MMEA,>4cm,0
 C-16-c,MUSS,<4cm,0
 C-16-c,MYCE,>4cm,0
+C-16-c,OCUL,<4cm,0
+C-16-c,OCUL,>4cm,0
 C-16-c,ORBI,<4cm,0
 C-16-c,ORBI,>4cm,0
-C-16-c,OROB,<4cm,0
-C-16-c,OROB,>4cm,0
 C-16-c,PAME,<4cm,0
 C-16-c,PAME,>4cm,0
 C-16-c,PORI,<4cm,4
@@ -291,10 +291,10 @@ C-31-a,MEAN,<4cm,0
 C-31-a,MMEA,>4cm,0
 C-31-a,MUSS,<4cm,0
 C-31-a,MYCE,>4cm,0
+C-31-a,OCUL,<4cm,0
+C-31-a,OCUL,>4cm,0
 C-31-a,ORBI,<4cm,0
 C-31-a,ORBI,>4cm,0
-C-31-a,OROB,<4cm,0
-C-31-a,OROB,>4cm,0
 C-31-a,PAME,<4cm,0
 C-31-a,PAME,>4cm,0
 C-31-a,PORI,<4cm,6
@@ -325,10 +325,10 @@ C-33-a,MEAN,<4cm,0
 C-33-a,MMEA,>4cm,0
 C-33-a,MUSS,<4cm,0
 C-33-a,MYCE,>4cm,0
+C-33-a,OCUL,<4cm,0
+C-33-a,OCUL,>4cm,0
 C-33-a,ORBI,<4cm,0
 C-33-a,ORBI,>4cm,0
-C-33-a,OROB,<4cm,0
-C-33-a,OROB,>4cm,0
 C-33-a,PAME,<4cm,0
 C-33-a,PAME,>4cm,0
 C-33-a,PORI,<4cm,2
@@ -359,10 +359,10 @@ C-33-b,MEAN,<4cm,0
 C-33-b,MMEA,>4cm,0
 C-33-b,MUSS,<4cm,0
 C-33-b,MYCE,>4cm,0
+C-33-b,OCUL,<4cm,0
+C-33-b,OCUL,>4cm,0
 C-33-b,ORBI,<4cm,0
 C-33-b,ORBI,>4cm,0
-C-33-b,OROB,<4cm,0
-C-33-b,OROB,>4cm,0
 C-33-b,PAME,<4cm,0
 C-33-b,PAME,>4cm,0
 C-33-b,PORI,<4cm,6
@@ -393,10 +393,10 @@ C-33-c,MEAN,<4cm,1
 C-33-c,MMEA,>4cm,1
 C-33-c,MUSS,<4cm,0
 C-33-c,MYCE,>4cm,0
+C-33-c,OCUL,<4cm,0
+C-33-c,OCUL,>4cm,0
 C-33-c,ORBI,<4cm,0
 C-33-c,ORBI,>4cm,0
-C-33-c,OROB,<4cm,0
-C-33-c,OROB,>4cm,0
 C-33-c,PAME,<4cm,0
 C-33-c,PAME,>4cm,0
 C-33-c,PORI,<4cm,6
@@ -427,10 +427,10 @@ C10a,MEAN,<4cm,0
 C10a,MMEA,>4cm,0
 C10a,MUSS,<4cm,3
 C10a,MYCE,>4cm,0
+C10a,OCUL,<4cm,0
+C10a,OCUL,>4cm,0
 C10a,ORBI,<4cm,0
 C10a,ORBI,>4cm,1
-C10a,OROB,<4cm,0
-C10a,OROB,>4cm,0
 C10a,PAME,<4cm,0
 C10a,PAME,>4cm,0
 C10a,PORI,<4cm,2
@@ -461,10 +461,10 @@ C10b,MEAN,<4cm,0
 C10b,MMEA,>4cm,0
 C10b,MUSS,<4cm,0
 C10b,MYCE,>4cm,0
+C10b,OCUL,<4cm,0
+C10b,OCUL,>4cm,0
 C10b,ORBI,<4cm,0
 C10b,ORBI,>4cm,0
-C10b,OROB,<4cm,0
-C10b,OROB,>4cm,0
 C10b,PAME,<4cm,0
 C10b,PAME,>4cm,0
 C10b,PORI,<4cm,3
@@ -495,10 +495,10 @@ C10c,MEAN,<4cm,0
 C10c,MMEA,>4cm,0
 C10c,MUSS,<4cm,0
 C10c,MYCE,>4cm,0
+C10c,OCUL,<4cm,0
+C10c,OCUL,>4cm,0
 C10c,ORBI,<4cm,0
 C10c,ORBI,>4cm,0
-C10c,OROB,<4cm,0
-C10c,OROB,>4cm,0
 C10c,PAME,<4cm,0
 C10c,PAME,>4cm,0
 C10c,PORI,<4cm,1
@@ -529,10 +529,10 @@ C11a,MEAN,<4cm,0
 C11a,MMEA,>4cm,0
 C11a,MUSS,<4cm,0
 C11a,MYCE,>4cm,0
+C11a,OCUL,<4cm,0
+C11a,OCUL,>4cm,0
 C11a,ORBI,<4cm,0
 C11a,ORBI,>4cm,0
-C11a,OROB,<4cm,0
-C11a,OROB,>4cm,0
 C11a,PAME,<4cm,0
 C11a,PAME,>4cm,0
 C11a,PORI,<4cm,20
@@ -563,10 +563,10 @@ C11b,MEAN,<4cm,3
 C11b,MMEA,>4cm,0
 C11b,MUSS,<4cm,0
 C11b,MYCE,>4cm,0
+C11b,OCUL,<4cm,0
+C11b,OCUL,>4cm,0
 C11b,ORBI,<4cm,0
 C11b,ORBI,>4cm,0
-C11b,OROB,<4cm,0
-C11b,OROB,>4cm,0
 C11b,PAME,<4cm,0
 C11b,PAME,>4cm,0
 C11b,PORI,<4cm,19
@@ -597,10 +597,10 @@ C11c,MEAN,<4cm,2
 C11c,MMEA,>4cm,0
 C11c,MUSS,<4cm,0
 C11c,MYCE,>4cm,0
+C11c,OCUL,<4cm,0
+C11c,OCUL,>4cm,0
 C11c,ORBI,<4cm,0
 C11c,ORBI,>4cm,0
-C11c,OROB,<4cm,0
-C11c,OROB,>4cm,0
 C11c,PAME,<4cm,0
 C11c,PAME,>4cm,0
 C11c,PORI,<4cm,5
@@ -631,10 +631,10 @@ C12a,MEAN,<4cm,0
 C12a,MMEA,>4cm,0
 C12a,MUSS,<4cm,0
 C12a,MYCE,>4cm,0
+C12a,OCUL,<4cm,0
+C12a,OCUL,>4cm,0
 C12a,ORBI,<4cm,0
 C12a,ORBI,>4cm,0
-C12a,OROB,<4cm,0
-C12a,OROB,>4cm,0
 C12a,PAME,<4cm,0
 C12a,PAME,>4cm,0
 C12a,PORI,<4cm,18
@@ -665,10 +665,10 @@ C12b,MEAN,<4cm,0
 C12b,MMEA,>4cm,0
 C12b,MUSS,<4cm,0
 C12b,MYCE,>4cm,0
+C12b,OCUL,<4cm,0
+C12b,OCUL,>4cm,0
 C12b,ORBI,<4cm,0
 C12b,ORBI,>4cm,0
-C12b,OROB,<4cm,0
-C12b,OROB,>4cm,0
 C12b,PAME,<4cm,0
 C12b,PAME,>4cm,0
 C12b,PORI,<4cm,24
@@ -700,10 +700,10 @@ C12c,MEAN,<4cm,0
 C12c,MMEA,>4cm,0
 C12c,MUSS,<4cm,0
 C12c,MYCE,>4cm,0
+C12c,OCUL,<4cm,0
+C12c,OCUL,>4cm,0
 C12c,ORBI,<4cm,0
 C12c,ORBI,>4cm,0
-C12c,OROB,<4cm,0
-C12c,OROB,>4cm,0
 C12c,PAME,<4cm,0
 C12c,PAME,>4cm,0
 C12c,PORI,<4cm,19
@@ -734,10 +734,10 @@ C15a,MEAN,<4cm,0
 C15a,MMEA,>4cm,0
 C15a,MUSS,<4cm,0
 C15a,MYCE,>4cm,0
+C15a,OCUL,<4cm,0
+C15a,OCUL,>4cm,0
 C15a,ORBI,<4cm,0
 C15a,ORBI,>4cm,0
-C15a,OROB,<4cm,0
-C15a,OROB,>4cm,0
 C15a,PAME,<4cm,0
 C15a,PAME,>4cm,0
 C15a,PORI,<4cm,2
@@ -768,10 +768,10 @@ C15b,MEAN,<4cm,2
 C15b,MMEA,>4cm,0
 C15b,MUSS,<4cm,0
 C15b,MYCE,>4cm,0
+C15b,OCUL,<4cm,0
+C15b,OCUL,>4cm,0
 C15b,ORBI,<4cm,0
 C15b,ORBI,>4cm,0
-C15b,OROB,<4cm,0
-C15b,OROB,>4cm,0
 C15b,PAME,<4cm,0
 C15b,PAME,>4cm,0
 C15b,PORI,<4cm,2
@@ -802,10 +802,10 @@ c15c,MEAN,<4cm,0
 c15c,MMEA,>4cm,0
 c15c,MUSS,<4cm,0
 c15c,MYCE,>4cm,0
+c15c,OCUL,<4cm,0
+c15c,OCUL,>4cm,0
 c15c,ORBI,<4cm,0
 c15c,ORBI,>4cm,0
-c15c,OROB,<4cm,0
-c15c,OROB,>4cm,0
 c15c,PAME,<4cm,0
 c15c,PAME,>4cm,0
 c15c,PORI,<4cm,7
@@ -836,10 +836,10 @@ C15c,MEAN,<4cm,0
 C15c,MMEA,>4cm,0
 C15c,MUSS,<4cm,0
 C15c,MYCE,>4cm,0
+C15c,OCUL,<4cm,0
+C15c,OCUL,>4cm,0
 C15c,ORBI,<4cm,0
 C15c,ORBI,>4cm,0
-C15c,OROB,<4cm,0
-C15c,OROB,>4cm,0
 C15c,PAME,<4cm,0
 C15c,PAME,>4cm,0
 C15c,PORI,<4cm,7
@@ -870,10 +870,10 @@ C18a,MEAN,<4cm,1
 C18a,MMEA,>4cm,0
 C18a,MUSS,<4cm,2
 C18a,MYCE,>4cm,0
+C18a,OCUL,<4cm,0
+C18a,OCUL,>4cm,0
 C18a,ORBI,<4cm,0
 C18a,ORBI,>4cm,0
-C18a,OROB,<4cm,0
-C18a,OROB,>4cm,0
 C18a,PAME,<4cm,0
 C18a,PAME,>4cm,0
 C18a,PORI,<4cm,1
@@ -905,10 +905,10 @@ C18b,MEAN,<4cm,1
 C18b,MMEA,>4cm,0
 C18b,MUSS,<4cm,2
 C18b,MYCE,>4cm,0
+C18b,OCUL,<4cm,0
+C18b,OCUL,>4cm,0
 C18b,ORBI,<4cm,0
 C18b,ORBI,>4cm,0
-C18b,OROB,<4cm,0
-C18b,OROB,>4cm,0
 C18b,PAME,<4cm,0
 C18b,PAME,>4cm,0
 C18b,PORI,<4cm,1
@@ -939,10 +939,10 @@ C18c,MEAN,<4cm,0
 C18c,MMEA,>4cm,0
 C18c,MUSS,<4cm,0
 C18c,MYCE,>4cm,0
+C18c,OCUL,<4cm,0
+C18c,OCUL,>4cm,0
 C18c,ORBI,<4cm,0
 C18c,ORBI,>4cm,0
-C18c,OROB,<4cm,0
-C18c,OROB,>4cm,0
 C18c,PAME,<4cm,0
 C18c,PAME,>4cm,0
 C18c,PORI,<4cm,0
@@ -973,10 +973,10 @@ C19a,MEAN,<4cm,1
 C19a,MMEA,>4cm,0
 C19a,MUSS,<4cm,0
 C19a,MYCE,>4cm,2
+C19a,OCUL,<4cm,0
+C19a,OCUL,>4cm,0
 C19a,ORBI,<4cm,0
 C19a,ORBI,>4cm,1
-C19a,OROB,<4cm,0
-C19a,OROB,>4cm,0
 C19a,PAME,<4cm,0
 C19a,PAME,>4cm,0
 C19a,PORI,<4cm,2
@@ -1007,10 +1007,10 @@ C19b,MEAN,<4cm,0
 C19b,MMEA,>4cm,1
 C19b,MUSS,<4cm,0
 C19b,MYCE,>4cm,0
+C19b,OCUL,<4cm,0
+C19b,OCUL,>4cm,0
 C19b,ORBI,<4cm,0
 C19b,ORBI,>4cm,0
-C19b,OROB,<4cm,0
-C19b,OROB,>4cm,0
 C19b,PAME,<4cm,0
 C19b,PAME,>4cm,0
 C19b,PORI,<4cm,2
@@ -1041,10 +1041,10 @@ C19c,MEAN,<4cm,0
 C19c,MMEA,>4cm,0
 C19c,MUSS,<4cm,0
 C19c,MYCE,>4cm,0
+C19c,OCUL,<4cm,0
+C19c,OCUL,>4cm,0
 C19c,ORBI,<4cm,0
 C19c,ORBI,>4cm,0
-C19c,OROB,<4cm,0
-C19c,OROB,>4cm,0
 C19c,PAME,<4cm,0
 C19c,PAME,>4cm,0
 C19c,PORI,<4cm,1
@@ -1075,10 +1075,10 @@ C21a,MEAN,<4cm,0
 C21a,MMEA,>4cm,0
 C21a,MUSS,<4cm,0
 C21a,MYCE,>4cm,0
+C21a,OCUL,<4cm,0
+C21a,OCUL,>4cm,0
 C21a,ORBI,<4cm,0
 C21a,ORBI,>4cm,0
-C21a,OROB,<4cm,0
-C21a,OROB,>4cm,0
 C21a,PAME,<4cm,0
 C21a,PAME,>4cm,0
 C21a,PORI,<4cm,1
@@ -1109,10 +1109,10 @@ C21b,MEAN,<4cm,0
 C21b,MMEA,>4cm,0
 C21b,MUSS,<4cm,0
 C21b,MYCE,>4cm,0
+C21b,OCUL,<4cm,0
+C21b,OCUL,>4cm,0
 C21b,ORBI,<4cm,0
 C21b,ORBI,>4cm,0
-C21b,OROB,<4cm,0
-C21b,OROB,>4cm,0
 C21b,PAME,<4cm,0
 C21b,PAME,>4cm,0
 C21b,PORI,<4cm,1
@@ -1143,10 +1143,10 @@ C21c,MEAN,<4cm,0
 C21c,MMEA,>4cm,0
 C21c,MUSS,<4cm,0
 C21c,MYCE,>4cm,0
+C21c,OCUL,<4cm,0
+C21c,OCUL,>4cm,0
 C21c,ORBI,<4cm,0
 C21c,ORBI,>4cm,0
-C21c,OROB,<4cm,0
-C21c,OROB,>4cm,0
 C21c,PAME,<4cm,0
 C21c,PAME,>4cm,0
 C21c,PORI,<4cm,0
@@ -1177,10 +1177,10 @@ C25a,MEAN,<4cm,0
 C25a,MMEA,>4cm,2
 C25a,MUSS,<4cm,0
 C25a,MYCE,>4cm,1
+C25a,OCUL,<4cm,0
+C25a,OCUL,>4cm,0
 C25a,ORBI,<4cm,0
 C25a,ORBI,>4cm,0
-C25a,OROB,<4cm,0
-C25a,OROB,>4cm,0
 C25a,PAME,<4cm,0
 C25a,PAME,>4cm,0
 C25a,PORI,<4cm,15
@@ -1211,10 +1211,10 @@ C25b,MEAN,<4cm,0
 C25b,MMEA,>4cm,1
 C25b,MUSS,<4cm,0
 C25b,MYCE,>4cm,0
+C25b,OCUL,<4cm,0
+C25b,OCUL,>4cm,0
 C25b,ORBI,<4cm,0
 C25b,ORBI,>4cm,0
-C25b,OROB,<4cm,0
-C25b,OROB,>4cm,0
 C25b,PAME,<4cm,0
 C25b,PAME,>4cm,0
 C25b,PORI,<4cm,1
@@ -1245,10 +1245,10 @@ C25c,MEAN,<4cm,2
 C25c,MMEA,>4cm,0
 C25c,MUSS,<4cm,0
 C25c,MYCE,>4cm,0
+C25c,OCUL,<4cm,0
+C25c,OCUL,>4cm,0
 C25c,ORBI,<4cm,0
 C25c,ORBI,>4cm,0
-C25c,OROB,<4cm,0
-C25c,OROB,>4cm,0
 C25c,PAME,<4cm,0
 C25c,PAME,>4cm,0
 C25c,PORI,<4cm,12
@@ -1279,10 +1279,10 @@ C26a,MEAN,<4cm,0
 C26a,MMEA,>4cm,0
 C26a,MUSS,<4cm,0
 C26a,MYCE,>4cm,0
+C26a,OCUL,<4cm,0
+C26a,OCUL,>4cm,0
 C26a,ORBI,<4cm,0
 C26a,ORBI,>4cm,1
-C26a,OROB,<4cm,0
-C26a,OROB,>4cm,0
 C26a,PAME,<4cm,0
 C26a,PAME,>4cm,0
 C26a,PORI,<4cm,0
@@ -1313,10 +1313,10 @@ C26b,MEAN,<4cm,0
 C26b,MMEA,>4cm,0
 C26b,MUSS,<4cm,0
 C26b,MYCE,>4cm,0
+C26b,OCUL,<4cm,0
+C26b,OCUL,>4cm,0
 C26b,ORBI,<4cm,0
 C26b,ORBI,>4cm,0
-C26b,OROB,<4cm,0
-C26b,OROB,>4cm,0
 C26b,PAME,<4cm,0
 C26b,PAME,>4cm,0
 C26b,PORI,<4cm,0
@@ -1347,10 +1347,10 @@ C26c,MEAN,<4cm,0
 C26c,MMEA,>4cm,0
 C26c,MUSS,<4cm,0
 C26c,MYCE,>4cm,0
+C26c,OCUL,<4cm,0
+C26c,OCUL,>4cm,0
 C26c,ORBI,<4cm,0
 C26c,ORBI,>4cm,0
-C26c,OROB,<4cm,0
-C26c,OROB,>4cm,0
 C26c,PAME,<4cm,0
 C26c,PAME,>4cm,0
 C26c,PORI,<4cm,0
@@ -1381,10 +1381,10 @@ C27a,MEAN,<4cm,0
 C27a,MMEA,>4cm,0
 C27a,MUSS,<4cm,0
 C27a,MYCE,>4cm,0
+C27a,OCUL,<4cm,0
+C27a,OCUL,>4cm,1
 C27a,ORBI,<4cm,0
 C27a,ORBI,>4cm,0
-C27a,OROB,<4cm,0
-C27a,OROB,>4cm,1
 C27a,PAME,<4cm,0
 C27a,PAME,>4cm,0
 C27a,PORI,<4cm,0
@@ -1415,10 +1415,10 @@ C27b,MEAN,<4cm,0
 C27b,MMEA,>4cm,0
 C27b,MUSS,<4cm,0
 C27b,MYCE,>4cm,0
+C27b,OCUL,<4cm,0
+C27b,OCUL,>4cm,0
 C27b,ORBI,<4cm,0
 C27b,ORBI,>4cm,0
-C27b,OROB,<4cm,0
-C27b,OROB,>4cm,0
 C27b,PAME,<4cm,0
 C27b,PAME,>4cm,0
 C27b,PORI,<4cm,0
@@ -1449,10 +1449,10 @@ c27c,MEAN,<4cm,0
 c27c,MMEA,>4cm,0
 c27c,MUSS,<4cm,0
 c27c,MYCE,>4cm,0
+c27c,OCUL,<4cm,0
+c27c,OCUL,>4cm,0
 c27c,ORBI,<4cm,0
 c27c,ORBI,>4cm,0
-c27c,OROB,<4cm,0
-c27c,OROB,>4cm,0
 c27c,PAME,<4cm,0
 c27c,PAME,>4cm,0
 c27c,PORI,<4cm,0
@@ -1483,10 +1483,10 @@ C28a,MEAN,<4cm,0
 C28a,MMEA,>4cm,0
 C28a,MUSS,<4cm,0
 C28a,MYCE,>4cm,0
+C28a,OCUL,<4cm,0
+C28a,OCUL,>4cm,0
 C28a,ORBI,<4cm,0
 C28a,ORBI,>4cm,0
-C28a,OROB,<4cm,0
-C28a,OROB,>4cm,0
 C28a,PAME,<4cm,0
 C28a,PAME,>4cm,0
 C28a,PORI,<4cm,1
@@ -1517,10 +1517,10 @@ C28b,MEAN,<4cm,0
 C28b,MMEA,>4cm,0
 C28b,MUSS,<4cm,0
 C28b,MYCE,>4cm,0
+C28b,OCUL,<4cm,0
+C28b,OCUL,>4cm,0
 C28b,ORBI,<4cm,0
 C28b,ORBI,>4cm,0
-C28b,OROB,<4cm,0
-C28b,OROB,>4cm,0
 C28b,PAME,<4cm,0
 C28b,PAME,>4cm,0
 C28b,PORI,<4cm,0
@@ -1551,10 +1551,10 @@ C28c,MEAN,<4cm,0
 C28c,MMEA,>4cm,0
 C28c,MUSS,<4cm,0
 C28c,MYCE,>4cm,0
+C28c,OCUL,<4cm,0
+C28c,OCUL,>4cm,0
 C28c,ORBI,<4cm,0
 C28c,ORBI,>4cm,0
-C28c,OROB,<4cm,0
-C28c,OROB,>4cm,0
 C28c,PAME,<4cm,0
 C28c,PAME,>4cm,0
 C28c,PORI,<4cm,3
@@ -1585,10 +1585,10 @@ C29a,MEAN,<4cm,0
 C29a,MMEA,>4cm,0
 C29a,MUSS,<4cm,0
 C29a,MYCE,>4cm,0
+C29a,OCUL,<4cm,0
+C29a,OCUL,>4cm,0
 C29a,ORBI,<4cm,0
 C29a,ORBI,>4cm,0
-C29a,OROB,<4cm,0
-C29a,OROB,>4cm,0
 C29a,PAME,<4cm,0
 C29a,PAME,>4cm,0
 C29a,PORI,<4cm,6
@@ -1619,10 +1619,10 @@ C29b,MEAN,<4cm,0
 C29b,MMEA,>4cm,0
 C29b,MUSS,<4cm,0
 C29b,MYCE,>4cm,0
+C29b,OCUL,<4cm,0
+C29b,OCUL,>4cm,0
 C29b,ORBI,<4cm,0
 C29b,ORBI,>4cm,0
-C29b,OROB,<4cm,0
-C29b,OROB,>4cm,0
 C29b,PAME,<4cm,0
 C29b,PAME,>4cm,0
 C29b,PORI,<4cm,1
@@ -1653,10 +1653,10 @@ C29C,MEAN,<4cm,0
 C29C,MMEA,>4cm,0
 C29C,MUSS,<4cm,0
 C29C,MYCE,>4cm,0
+C29C,OCUL,<4cm,0
+C29C,OCUL,>4cm,0
 C29C,ORBI,<4cm,0
 C29C,ORBI,>4cm,0
-C29C,OROB,<4cm,0
-C29C,OROB,>4cm,0
 C29C,PAME,<4cm,0
 C29C,PAME,>4cm,0
 C29C,PORI,<4cm,6
@@ -1687,10 +1687,10 @@ C2a,MEAN,<4cm,0
 C2a,MMEA,>4cm,0
 C2a,MUSS,<4cm,0
 C2a,MYCE,>4cm,0
+C2a,OCUL,<4cm,0
+C2a,OCUL,>4cm,0
 C2a,ORBI,<4cm,0
 C2a,ORBI,>4cm,0
-C2a,OROB,<4cm,0
-C2a,OROB,>4cm,0
 C2a,PAME,<4cm,0
 C2a,PAME,>4cm,0
 C2a,PORI,<4cm,6
@@ -1721,10 +1721,10 @@ C2b,MEAN,<4cm,0
 C2b,MMEA,>4cm,0
 C2b,MUSS,<4cm,0
 C2b,MYCE,>4cm,0
+C2b,OCUL,<4cm,0
+C2b,OCUL,>4cm,0
 C2b,ORBI,<4cm,0
 C2b,ORBI,>4cm,0
-C2b,OROB,<4cm,0
-C2b,OROB,>4cm,0
 C2b,PAME,<4cm,0
 C2b,PAME,>4cm,0
 C2b,PORI,<4cm,1
@@ -1755,10 +1755,10 @@ C2c,MEAN,<4cm,0
 C2c,MMEA,>4cm,0
 C2c,MUSS,<4cm,0
 C2c,MYCE,>4cm,0
+C2c,OCUL,<4cm,0
+C2c,OCUL,>4cm,0
 C2c,ORBI,<4cm,0
 C2c,ORBI,>4cm,0
-C2c,OROB,<4cm,0
-C2c,OROB,>4cm,0
 C2c,PAME,<4cm,0
 C2c,PAME,>4cm,0
 C2c,PORI,<4cm,0
@@ -1789,10 +1789,10 @@ C30a,MEAN,<4cm,0
 C30a,MMEA,>4cm,0
 C30a,MUSS,<4cm,0
 C30a,MYCE,>4cm,0
+C30a,OCUL,<4cm,0
+C30a,OCUL,>4cm,0
 C30a,ORBI,<4cm,0
 C30a,ORBI,>4cm,0
-C30a,OROB,<4cm,0
-C30a,OROB,>4cm,0
 C30a,PAME,<4cm,0
 C30a,PAME,>4cm,0
 C30a,PORI,<4cm,1
@@ -1823,10 +1823,10 @@ C30b,MEAN,<4cm,0
 C30b,MMEA,>4cm,0
 C30b,MUSS,<4cm,0
 C30b,MYCE,>4cm,0
+C30b,OCUL,<4cm,0
+C30b,OCUL,>4cm,0
 C30b,ORBI,<4cm,0
 C30b,ORBI,>4cm,0
-C30b,OROB,<4cm,0
-C30b,OROB,>4cm,0
 C30b,PAME,<4cm,0
 C30b,PAME,>4cm,0
 C30b,PORI,<4cm,4
@@ -1857,10 +1857,10 @@ C30c,MEAN,<4cm,0
 C30c,MMEA,>4cm,0
 C30c,MUSS,<4cm,0
 C30c,MYCE,>4cm,0
+C30c,OCUL,<4cm,0
+C30c,OCUL,>4cm,0
 C30c,ORBI,<4cm,0
 C30c,ORBI,>4cm,0
-C30c,OROB,<4cm,0
-C30c,OROB,>4cm,0
 C30c,PAME,<4cm,0
 C30c,PAME,>4cm,0
 C30c,PORI,<4cm,9
@@ -1891,10 +1891,10 @@ C32a,MEAN,<4cm,0
 C32a,MMEA,>4cm,0
 C32a,MUSS,<4cm,0
 C32a,MYCE,>4cm,0
+C32a,OCUL,<4cm,0
+C32a,OCUL,>4cm,0
 C32a,ORBI,<4cm,0
 C32a,ORBI,>4cm,0
-C32a,OROB,<4cm,0
-C32a,OROB,>4cm,0
 C32a,PAME,<4cm,0
 C32a,PAME,>4cm,0
 C32a,PORI,<4cm,1
@@ -1925,10 +1925,10 @@ C32b,MEAN,<4cm,0
 C32b,MMEA,>4cm,0
 C32b,MUSS,<4cm,0
 C32b,MYCE,>4cm,0
+C32b,OCUL,<4cm,0
+C32b,OCUL,>4cm,0
 C32b,ORBI,<4cm,0
 C32b,ORBI,>4cm,0
-C32b,OROB,<4cm,0
-C32b,OROB,>4cm,0
 C32b,PAME,<4cm,0
 C32b,PAME,>4cm,0
 C32b,PORI,<4cm,0
@@ -1959,10 +1959,10 @@ C32c,MEAN,<4cm,0
 C32c,MMEA,>4cm,0
 C32c,MUSS,<4cm,0
 C32c,MYCE,>4cm,0
+C32c,OCUL,<4cm,0
+C32c,OCUL,>4cm,0
 C32c,ORBI,<4cm,0
 C32c,ORBI,>4cm,0
-C32c,OROB,<4cm,0
-C32c,OROB,>4cm,0
 C32c,PAME,<4cm,0
 C32c,PAME,>4cm,0
 C32c,PORI,<4cm,1
@@ -1993,10 +1993,10 @@ C34a,MEAN,<4cm,0
 C34a,MMEA,>4cm,2
 C34a,MUSS,<4cm,0
 C34a,MYCE,>4cm,2
+C34a,OCUL,<4cm,0
+C34a,OCUL,>4cm,0
 C34a,ORBI,<4cm,0
 C34a,ORBI,>4cm,0
-C34a,OROB,<4cm,0
-C34a,OROB,>4cm,0
 C34a,PAME,<4cm,0
 C34a,PAME,>4cm,0
 C34a,PORI,<4cm,0
@@ -2027,10 +2027,10 @@ C34b,MEAN,<4cm,1
 C34b,MMEA,>4cm,1
 C34b,MUSS,<4cm,0
 C34b,MYCE,>4cm,0
+C34b,OCUL,<4cm,0
+C34b,OCUL,>4cm,0
 C34b,ORBI,<4cm,0
 C34b,ORBI,>4cm,0
-C34b,OROB,<4cm,0
-C34b,OROB,>4cm,0
 C34b,PAME,<4cm,0
 C34b,PAME,>4cm,0
 C34b,PORI,<4cm,4
@@ -2061,10 +2061,10 @@ C34c,MEAN,<4cm,0
 C34c,MMEA,>4cm,0
 C34c,MUSS,<4cm,0
 C34c,MYCE,>4cm,0
+C34c,OCUL,<4cm,0
+C34c,OCUL,>4cm,0
 C34c,ORBI,<4cm,0
 C34c,ORBI,>4cm,0
-C34c,OROB,<4cm,0
-C34c,OROB,>4cm,0
 C34c,PAME,<4cm,0
 C34c,PAME,>4cm,0
 C34c,PORI,<4cm,4
@@ -2095,10 +2095,10 @@ C3a,MEAN,<4cm,0
 C3a,MMEA,>4cm,0
 C3a,MUSS,<4cm,0
 C3a,MYCE,>4cm,0
+C3a,OCUL,<4cm,0
+C3a,OCUL,>4cm,0
 C3a,ORBI,<4cm,0
 C3a,ORBI,>4cm,0
-C3a,OROB,<4cm,0
-C3a,OROB,>4cm,0
 C3a,PAME,<4cm,0
 C3a,PAME,>4cm,0
 C3a,PORI,<4cm,1
@@ -2129,10 +2129,10 @@ C3b,MEAN,<4cm,0
 C3b,MMEA,>4cm,0
 C3b,MUSS,<4cm,0
 C3b,MYCE,>4cm,0
+C3b,OCUL,<4cm,0
+C3b,OCUL,>4cm,0
 C3b,ORBI,<4cm,0
 C3b,ORBI,>4cm,0
-C3b,OROB,<4cm,0
-C3b,OROB,>4cm,0
 C3b,PAME,<4cm,0
 C3b,PAME,>4cm,0
 C3b,PORI,<4cm,1
@@ -2163,10 +2163,10 @@ C3c,MEAN,<4cm,0
 C3c,MMEA,>4cm,0
 C3c,MUSS,<4cm,0
 C3c,MYCE,>4cm,0
+C3c,OCUL,<4cm,0
+C3c,OCUL,>4cm,0
 C3c,ORBI,<4cm,0
 C3c,ORBI,>4cm,0
-C3c,OROB,<4cm,0
-C3c,OROB,>4cm,0
 C3c,PAME,<4cm,0
 C3c,PAME,>4cm,0
 C3c,PORI,<4cm,2
@@ -2197,10 +2197,10 @@ C40a,MEAN,<4cm,1
 C40a,MMEA,>4cm,1
 C40a,MUSS,<4cm,0
 C40a,MYCE,>4cm,0
+C40a,OCUL,<4cm,0
+C40a,OCUL,>4cm,0
 C40a,ORBI,<4cm,0
 C40a,ORBI,>4cm,0
-C40a,OROB,<4cm,0
-C40a,OROB,>4cm,0
 C40a,PAME,<4cm,0
 C40a,PAME,>4cm,0
 C40a,PORI,<4cm,0
@@ -2231,10 +2231,10 @@ C40b,MEAN,<4cm,0
 C40b,MMEA,>4cm,0
 C40b,MUSS,<4cm,0
 C40b,MYCE,>4cm,0
+C40b,OCUL,<4cm,0
+C40b,OCUL,>4cm,0
 C40b,ORBI,<4cm,0
 C40b,ORBI,>4cm,0
-C40b,OROB,<4cm,0
-C40b,OROB,>4cm,0
 C40b,PAME,<4cm,0
 C40b,PAME,>4cm,0
 C40b,PORI,<4cm,1
@@ -2265,10 +2265,10 @@ C40c,MEAN,<4cm,0
 C40c,MMEA,>4cm,2
 C40c,MUSS,<4cm,1
 C40c,MYCE,>4cm,0
+C40c,OCUL,<4cm,0
+C40c,OCUL,>4cm,0
 C40c,ORBI,<4cm,0
 C40c,ORBI,>4cm,0
-C40c,OROB,<4cm,0
-C40c,OROB,>4cm,0
 C40c,PAME,<4cm,0
 C40c,PAME,>4cm,0
 C40c,PORI,<4cm,0
@@ -2299,10 +2299,10 @@ C41a,MEAN,<4cm,2
 C41a,MMEA,>4cm,0
 C41a,MUSS,<4cm,0
 C41a,MYCE,>4cm,0
+C41a,OCUL,<4cm,0
+C41a,OCUL,>4cm,0
 C41a,ORBI,<4cm,0
 C41a,ORBI,>4cm,0
-C41a,OROB,<4cm,0
-C41a,OROB,>4cm,0
 C41a,PAME,<4cm,0
 C41a,PAME,>4cm,0
 C41a,PORI,<4cm,8
@@ -2333,10 +2333,10 @@ C41b,MEAN,<4cm,0
 C41b,MMEA,>4cm,2
 C41b,MUSS,<4cm,0
 C41b,MYCE,>4cm,0
+C41b,OCUL,<4cm,0
+C41b,OCUL,>4cm,0
 C41b,ORBI,<4cm,0
 C41b,ORBI,>4cm,2
-C41b,OROB,<4cm,0
-C41b,OROB,>4cm,0
 C41b,PAME,<4cm,0
 C41b,PAME,>4cm,0
 C41b,PORI,<4cm,4
@@ -2367,10 +2367,10 @@ C41c,MEAN,<4cm,0
 C41c,MMEA,>4cm,2
 C41c,MUSS,<4cm,0
 C41c,MYCE,>4cm,0
+C41c,OCUL,<4cm,0
+C41c,OCUL,>4cm,0
 C41c,ORBI,<4cm,0
 C41c,ORBI,>4cm,0
-C41c,OROB,<4cm,0
-C41c,OROB,>4cm,0
 C41c,PAME,<4cm,0
 C41c,PAME,>4cm,0
 C41c,PORI,<4cm,0
@@ -2401,10 +2401,10 @@ C43A,MEAN,<4cm,1
 C43A,MMEA,>4cm,3
 C43A,MUSS,<4cm,0
 C43A,MYCE,>4cm,1
+C43A,OCUL,<4cm,0
+C43A,OCUL,>4cm,0
 C43A,ORBI,<4cm,0
 C43A,ORBI,>4cm,0
-C43A,OROB,<4cm,0
-C43A,OROB,>4cm,0
 C43A,PAME,<4cm,0
 C43A,PAME,>4cm,0
 C43A,PORI,<4cm,1
@@ -2435,10 +2435,10 @@ C43B,MEAN,<4cm,0
 C43B,MMEA,>4cm,0
 C43B,MUSS,<4cm,0
 C43B,MYCE,>4cm,0
+C43B,OCUL,<4cm,0
+C43B,OCUL,>4cm,0
 C43B,ORBI,<4cm,0
 C43B,ORBI,>4cm,0
-C43B,OROB,<4cm,0
-C43B,OROB,>4cm,0
 C43B,PAME,<4cm,0
 C43B,PAME,>4cm,0
 C43B,PORI,<4cm,3
@@ -2469,10 +2469,10 @@ C43c,MEAN,<4cm,0
 C43c,MMEA,>4cm,1
 C43c,MUSS,<4cm,0
 C43c,MYCE,>4cm,0
+C43c,OCUL,<4cm,0
+C43c,OCUL,>4cm,0
 C43c,ORBI,<4cm,0
 C43c,ORBI,>4cm,5
-C43c,OROB,<4cm,0
-C43c,OROB,>4cm,0
 C43c,PAME,<4cm,0
 C43c,PAME,>4cm,0
 C43c,PORI,<4cm,0
@@ -2503,10 +2503,10 @@ C44a,MEAN,<4cm,0
 C44a,MMEA,>4cm,0
 C44a,MUSS,<4cm,0
 C44a,MYCE,>4cm,0
+C44a,OCUL,<4cm,0
+C44a,OCUL,>4cm,0
 C44a,ORBI,<4cm,0
 C44a,ORBI,>4cm,0
-C44a,OROB,<4cm,0
-C44a,OROB,>4cm,0
 C44a,PAME,<4cm,0
 C44a,PAME,>4cm,0
 C44a,PORI,<4cm,1
@@ -2537,10 +2537,10 @@ C44b,MEAN,<4cm,0
 C44b,MMEA,>4cm,2
 C44b,MUSS,<4cm,0
 C44b,MYCE,>4cm,0
+C44b,OCUL,<4cm,0
+C44b,OCUL,>4cm,0
 C44b,ORBI,<4cm,0
 C44b,ORBI,>4cm,0
-C44b,OROB,<4cm,0
-C44b,OROB,>4cm,0
 C44b,PAME,<4cm,0
 C44b,PAME,>4cm,0
 C44b,PORI,<4cm,0
@@ -2571,10 +2571,10 @@ C44c,MEAN,<4cm,0
 C44c,MMEA,>4cm,4
 C44c,MUSS,<4cm,0
 C44c,MYCE,>4cm,0
+C44c,OCUL,<4cm,0
+C44c,OCUL,>4cm,0
 C44c,ORBI,<4cm,0
 C44c,ORBI,>4cm,0
-C44c,OROB,<4cm,0
-C44c,OROB,>4cm,0
 C44c,PAME,<4cm,0
 C44c,PAME,>4cm,0
 C44c,PORI,<4cm,0
@@ -2605,10 +2605,10 @@ C45a,MEAN,<4cm,0
 C45a,MMEA,>4cm,0
 C45a,MUSS,<4cm,0
 C45a,MYCE,>4cm,0
+C45a,OCUL,<4cm,0
+C45a,OCUL,>4cm,0
 C45a,ORBI,<4cm,0
 C45a,ORBI,>4cm,0
-C45a,OROB,<4cm,0
-C45a,OROB,>4cm,0
 C45a,PAME,<4cm,0
 C45a,PAME,>4cm,0
 C45a,PORI,<4cm,1
@@ -2639,10 +2639,10 @@ C45b,MEAN,<4cm,0
 C45b,MMEA,>4cm,0
 C45b,MUSS,<4cm,0
 C45b,MYCE,>4cm,0
+C45b,OCUL,<4cm,0
+C45b,OCUL,>4cm,0
 C45b,ORBI,<4cm,0
 C45b,ORBI,>4cm,0
-C45b,OROB,<4cm,0
-C45b,OROB,>4cm,0
 C45b,PAME,<4cm,0
 C45b,PAME,>4cm,0
 C45b,PORI,<4cm,1
@@ -2673,10 +2673,10 @@ C45c,MEAN,<4cm,0
 C45c,MMEA,>4cm,0
 C45c,MUSS,<4cm,0
 C45c,MYCE,>4cm,0
+C45c,OCUL,<4cm,0
+C45c,OCUL,>4cm,0
 C45c,ORBI,<4cm,0
 C45c,ORBI,>4cm,0
-C45c,OROB,<4cm,0
-C45c,OROB,>4cm,0
 C45c,PAME,<4cm,0
 C45c,PAME,>4cm,0
 C45c,PORI,<4cm,2
@@ -2707,10 +2707,10 @@ C46a,MEAN,<4cm,0
 C46a,MMEA,>4cm,0
 C46a,MUSS,<4cm,0
 C46a,MYCE,>4cm,0
+C46a,OCUL,<4cm,0
+C46a,OCUL,>4cm,0
 C46a,ORBI,<4cm,0
 C46a,ORBI,>4cm,0
-C46a,OROB,<4cm,0
-C46a,OROB,>4cm,0
 C46a,PAME,<4cm,0
 C46a,PAME,>4cm,0
 C46a,PORI,<4cm,6
@@ -2741,10 +2741,10 @@ C46b,MEAN,<4cm,0
 C46b,MMEA,>4cm,0
 C46b,MUSS,<4cm,0
 C46b,MYCE,>4cm,0
+C46b,OCUL,<4cm,0
+C46b,OCUL,>4cm,0
 C46b,ORBI,<4cm,0
 C46b,ORBI,>4cm,0
-C46b,OROB,<4cm,0
-C46b,OROB,>4cm,0
 C46b,PAME,<4cm,0
 C46b,PAME,>4cm,0
 C46b,PORI,<4cm,16
@@ -2775,10 +2775,10 @@ C46c,MEAN,<4cm,0
 C46c,MMEA,>4cm,0
 C46c,MUSS,<4cm,0
 C46c,MYCE,>4cm,0
+C46c,OCUL,<4cm,0
+C46c,OCUL,>4cm,0
 C46c,ORBI,<4cm,0
 C46c,ORBI,>4cm,0
-C46c,OROB,<4cm,0
-C46c,OROB,>4cm,0
 C46c,PAME,<4cm,0
 C46c,PAME,>4cm,0
 C46c,PORI,<4cm,10
@@ -2810,10 +2810,10 @@ C47a,MEAN,<4cm,0
 C47a,MMEA,>4cm,0
 C47a,MUSS,<4cm,0
 C47a,MYCE,>4cm,0
+C47a,OCUL,<4cm,0
+C47a,OCUL,>4cm,0
 C47a,ORBI,<4cm,0
 C47a,ORBI,>4cm,0
-C47a,OROB,<4cm,0
-C47a,OROB,>4cm,0
 C47a,PAME,<4cm,0
 C47a,PAME,>4cm,0
 C47a,PORI,<4cm,1
@@ -2844,10 +2844,10 @@ C47b,MEAN,<4cm,0
 C47b,MMEA,>4cm,0
 C47b,MUSS,<4cm,0
 C47b,MYCE,>4cm,0
+C47b,OCUL,<4cm,0
+C47b,OCUL,>4cm,0
 C47b,ORBI,<4cm,0
 C47b,ORBI,>4cm,0
-C47b,OROB,<4cm,0
-C47b,OROB,>4cm,0
 C47b,PAME,<4cm,0
 C47b,PAME,>4cm,0
 C47b,PORI,<4cm,2
@@ -2878,10 +2878,10 @@ C47c,MEAN,<4cm,0
 C47c,MMEA,>4cm,0
 C47c,MUSS,<4cm,0
 C47c,MYCE,>4cm,0
+C47c,OCUL,<4cm,0
+C47c,OCUL,>4cm,0
 C47c,ORBI,<4cm,0
 C47c,ORBI,>4cm,0
-C47c,OROB,<4cm,0
-C47c,OROB,>4cm,0
 C47c,PAME,<4cm,0
 C47c,PAME,>4cm,0
 C47c,PORI,<4cm,1
@@ -2912,10 +2912,10 @@ C50a,MEAN,<4cm,1
 C50a,MMEA,>4cm,0
 C50a,MUSS,<4cm,0
 C50a,MYCE,>4cm,0
+C50a,OCUL,<4cm,0
+C50a,OCUL,>4cm,0
 C50a,ORBI,<4cm,0
 C50a,ORBI,>4cm,0
-C50a,OROB,<4cm,0
-C50a,OROB,>4cm,0
 C50a,PAME,<4cm,0
 C50a,PAME,>4cm,0
 C50a,PORI,<4cm,5
@@ -2946,10 +2946,10 @@ C50b,MEAN,<4cm,1
 C50b,MMEA,>4cm,0
 C50b,MUSS,<4cm,0
 C50b,MYCE,>4cm,0
+C50b,OCUL,<4cm,0
+C50b,OCUL,>4cm,0
 C50b,ORBI,<4cm,0
 C50b,ORBI,>4cm,0
-C50b,OROB,<4cm,0
-C50b,OROB,>4cm,0
 C50b,PAME,<4cm,0
 C50b,PAME,>4cm,0
 C50b,PORI,<4cm,3
@@ -2980,10 +2980,10 @@ C50c,MEAN,<4cm,0
 C50c,MMEA,>4cm,0
 C50c,MUSS,<4cm,0
 C50c,MYCE,>4cm,0
+C50c,OCUL,<4cm,0
+C50c,OCUL,>4cm,0
 C50c,ORBI,<4cm,0
 C50c,ORBI,>4cm,0
-C50c,OROB,<4cm,0
-C50c,OROB,>4cm,0
 C50c,PAME,<4cm,0
 C50c,PAME,>4cm,0
 C50c,PORI,<4cm,2
@@ -3014,10 +3014,10 @@ C51a,MEAN,<4cm,0
 C51a,MMEA,>4cm,0
 C51a,MUSS,<4cm,0
 C51a,MYCE,>4cm,1
+C51a,OCUL,<4cm,0
+C51a,OCUL,>4cm,0
 C51a,ORBI,<4cm,0
 C51a,ORBI,>4cm,0
-C51a,OROB,<4cm,0
-C51a,OROB,>4cm,0
 C51a,PAME,<4cm,0
 C51a,PAME,>4cm,0
 C51a,PORI,<4cm,1
@@ -3048,10 +3048,10 @@ C51b,MEAN,<4cm,0
 C51b,MMEA,>4cm,1
 C51b,MUSS,<4cm,0
 C51b,MYCE,>4cm,0
+C51b,OCUL,<4cm,0
+C51b,OCUL,>4cm,0
 C51b,ORBI,<4cm,0
 C51b,ORBI,>4cm,1
-C51b,OROB,<4cm,0
-C51b,OROB,>4cm,0
 C51b,PAME,<4cm,0
 C51b,PAME,>4cm,0
 C51b,PORI,<4cm,3
@@ -3082,10 +3082,10 @@ C51c,MEAN,<4cm,0
 C51c,MMEA,>4cm,0
 C51c,MUSS,<4cm,0
 C51c,MYCE,>4cm,0
+C51c,OCUL,<4cm,0
+C51c,OCUL,>4cm,0
 C51c,ORBI,<4cm,0
 C51c,ORBI,>4cm,0
-C51c,OROB,<4cm,0
-C51c,OROB,>4cm,0
 C51c,PAME,<4cm,0
 C51c,PAME,>4cm,0
 C51c,PORI,<4cm,1
@@ -3116,10 +3116,10 @@ C52a,MEAN,<4cm,0
 C52a,MMEA,>4cm,2
 C52a,MUSS,<4cm,0
 C52a,MYCE,>4cm,1
+C52a,OCUL,<4cm,0
+C52a,OCUL,>4cm,0
 C52a,ORBI,<4cm,0
 C52a,ORBI,>4cm,0
-C52a,OROB,<4cm,0
-C52a,OROB,>4cm,0
 C52a,PAME,<4cm,0
 C52a,PAME,>4cm,0
 C52a,PORI,<4cm,6
@@ -3150,10 +3150,10 @@ C52b,MEAN,<4cm,0
 C52b,MMEA,>4cm,1
 C52b,MUSS,<4cm,0
 C52b,MYCE,>4cm,0
+C52b,OCUL,<4cm,0
+C52b,OCUL,>4cm,0
 C52b,ORBI,<4cm,0
 C52b,ORBI,>4cm,0
-C52b,OROB,<4cm,0
-C52b,OROB,>4cm,0
 C52b,PAME,<4cm,0
 C52b,PAME,>4cm,0
 C52b,PORI,<4cm,2
@@ -3184,10 +3184,10 @@ C52c,MEAN,<4cm,0
 C52c,MMEA,>4cm,0
 C52c,MUSS,<4cm,0
 C52c,MYCE,>4cm,0
+C52c,OCUL,<4cm,0
+C52c,OCUL,>4cm,0
 C52c,ORBI,<4cm,0
 C52c,ORBI,>4cm,0
-C52c,OROB,<4cm,0
-C52c,OROB,>4cm,0
 C52c,PAME,<4cm,0
 C52c,PAME,>4cm,0
 C52c,PORI,<4cm,0
@@ -3218,10 +3218,10 @@ C53a,MEAN,<4cm,1
 C53a,MMEA,>4cm,1
 C53a,MUSS,<4cm,1
 C53a,MYCE,>4cm,0
+C53a,OCUL,<4cm,0
+C53a,OCUL,>4cm,0
 C53a,ORBI,<4cm,0
 C53a,ORBI,>4cm,0
-C53a,OROB,<4cm,0
-C53a,OROB,>4cm,0
 C53a,PAME,<4cm,0
 C53a,PAME,>4cm,0
 C53a,PORI,<4cm,4
@@ -3252,10 +3252,10 @@ C53b,MEAN,<4cm,0
 C53b,MMEA,>4cm,0
 C53b,MUSS,<4cm,0
 C53b,MYCE,>4cm,0
+C53b,OCUL,<4cm,0
+C53b,OCUL,>4cm,0
 C53b,ORBI,<4cm,0
 C53b,ORBI,>4cm,0
-C53b,OROB,<4cm,0
-C53b,OROB,>4cm,0
 C53b,PAME,<4cm,0
 C53b,PAME,>4cm,0
 C53b,PORI,<4cm,4
@@ -3286,10 +3286,10 @@ C53c,MEAN,<4cm,1
 C53c,MMEA,>4cm,1
 C53c,MUSS,<4cm,0
 C53c,MYCE,>4cm,0
+C53c,OCUL,<4cm,0
+C53c,OCUL,>4cm,0
 C53c,ORBI,<4cm,0
 C53c,ORBI,>4cm,0
-C53c,OROB,<4cm,0
-C53c,OROB,>4cm,0
 C53c,PAME,<4cm,0
 C53c,PAME,>4cm,0
 C53c,PORI,<4cm,0
@@ -3320,10 +3320,10 @@ C6a,MEAN,<4cm,0
 C6a,MMEA,>4cm,0
 C6a,MUSS,<4cm,0
 C6a,MYCE,>4cm,0
+C6a,OCUL,<4cm,0
+C6a,OCUL,>4cm,0
 C6a,ORBI,<4cm,0
 C6a,ORBI,>4cm,0
-C6a,OROB,<4cm,0
-C6a,OROB,>4cm,0
 C6a,PAME,<4cm,0
 C6a,PAME,>4cm,0
 C6a,PORI,<4cm,1
@@ -3354,10 +3354,10 @@ C6b,MEAN,<4cm,0
 C6b,MMEA,>4cm,0
 C6b,MUSS,<4cm,0
 C6b,MYCE,>4cm,0
+C6b,OCUL,<4cm,0
+C6b,OCUL,>4cm,0
 C6b,ORBI,<4cm,0
 C6b,ORBI,>4cm,0
-C6b,OROB,<4cm,0
-C6b,OROB,>4cm,0
 C6b,PAME,<4cm,0
 C6b,PAME,>4cm,0
 C6b,PORI,<4cm,1
@@ -3388,10 +3388,10 @@ C6c,MEAN,<4cm,0
 C6c,MMEA,>4cm,0
 C6c,MUSS,<4cm,0
 C6c,MYCE,>4cm,0
+C6c,OCUL,<4cm,0
+C6c,OCUL,>4cm,0
 C6c,ORBI,<4cm,0
 C6c,ORBI,>4cm,0
-C6c,OROB,<4cm,0
-C6c,OROB,>4cm,0
 C6c,PAME,<4cm,0
 C6c,PAME,>4cm,0
 C6c,PORI,<4cm,1
@@ -3422,10 +3422,10 @@ C9a,MEAN,<4cm,0
 C9a,MMEA,>4cm,0
 C9a,MUSS,<4cm,0
 C9a,MYCE,>4cm,0
+C9a,OCUL,<4cm,0
+C9a,OCUL,>4cm,0
 C9a,ORBI,<4cm,0
 C9a,ORBI,>4cm,0
-C9a,OROB,<4cm,0
-C9a,OROB,>4cm,0
 C9a,PAME,<4cm,0
 C9a,PAME,>4cm,0
 C9a,PORI,<4cm,34
@@ -3456,10 +3456,10 @@ C9b,MEAN,<4cm,0
 C9b,MMEA,>4cm,0
 C9b,MUSS,<4cm,0
 C9b,MYCE,>4cm,0
+C9b,OCUL,<4cm,0
+C9b,OCUL,>4cm,0
 C9b,ORBI,<4cm,0
 C9b,ORBI,>4cm,0
-C9b,OROB,<4cm,0
-C9b,OROB,>4cm,0
 C9b,PAME,<4cm,0
 C9b,PAME,>4cm,0
 C9b,PORI,<4cm,18
@@ -3490,10 +3490,10 @@ C9c,MEAN,<4cm,0
 C9c,MMEA,>4cm,0
 C9c,MUSS,<4cm,0
 C9c,MYCE,>4cm,0
+C9c,OCUL,<4cm,0
+C9c,OCUL,>4cm,0
 C9c,ORBI,<4cm,0
 C9c,ORBI,>4cm,0
-C9c,OROB,<4cm,0
-C9c,OROB,>4cm,0
 C9c,PAME,<4cm,0
 C9c,PAME,>4cm,0
 C9c,PORI,<4cm,24
@@ -3524,10 +3524,10 @@ CPS N-1,MEAN,<4cm,0
 CPS N-1,MMEA,>4cm,1
 CPS N-1,MUSS,<4cm,0
 CPS N-1,MYCE,>4cm,0
+CPS N-1,OCUL,<4cm,0
+CPS N-1,OCUL,>4cm,0
 CPS N-1,ORBI,<4cm,0
 CPS N-1,ORBI,>4cm,0
-CPS N-1,OROB,<4cm,0
-CPS N-1,OROB,>4cm,0
 CPS N-1,PAME,<4cm,0
 CPS N-1,PAME,>4cm,0
 CPS N-1,PORI,<4cm,0
@@ -3558,10 +3558,10 @@ CPS N-2,MEAN,<4cm,0
 CPS N-2,MMEA,>4cm,0
 CPS N-2,MUSS,<4cm,0
 CPS N-2,MYCE,>4cm,0
+CPS N-2,OCUL,<4cm,0
+CPS N-2,OCUL,>4cm,0
 CPS N-2,ORBI,<4cm,0
 CPS N-2,ORBI,>4cm,0
-CPS N-2,OROB,<4cm,0
-CPS N-2,OROB,>4cm,0
 CPS N-2,PAME,<4cm,1
 CPS N-2,PAME,>4cm,0
 CPS N-2,PORI,<4cm,0
@@ -3592,10 +3592,10 @@ CPS N-3,MEAN,<4cm,0
 CPS N-3,MMEA,>4cm,0
 CPS N-3,MUSS,<4cm,0
 CPS N-3,MYCE,>4cm,0
+CPS N-3,OCUL,<4cm,0
+CPS N-3,OCUL,>4cm,0
 CPS N-3,ORBI,<4cm,0
 CPS N-3,ORBI,>4cm,0
-CPS N-3,OROB,<4cm,0
-CPS N-3,OROB,>4cm,0
 CPS N-3,PAME,<4cm,0
 CPS N-3,PAME,>4cm,0
 CPS N-3,PORI,<4cm,0
@@ -3626,10 +3626,10 @@ CPS N-4,MEAN,<4cm,0
 CPS N-4,MMEA,>4cm,0
 CPS N-4,MUSS,<4cm,4
 CPS N-4,MYCE,>4cm,1
+CPS N-4,OCUL,<4cm,0
+CPS N-4,OCUL,>4cm,0
 CPS N-4,ORBI,<4cm,0
 CPS N-4,ORBI,>4cm,0
-CPS N-4,OROB,<4cm,0
-CPS N-4,OROB,>4cm,0
 CPS N-4,PAME,<4cm,0
 CPS N-4,PAME,>4cm,0
 CPS N-4,PORI,<4cm,0
@@ -3660,10 +3660,10 @@ CPSN-1,MEAN,<4cm,0
 CPSN-1,MMEA,>4cm,0
 CPSN-1,MUSS,<4cm,0
 CPSN-1,MYCE,>4cm,0
+CPSN-1,OCUL,<4cm,0
+CPSN-1,OCUL,>4cm,0
 CPSN-1,ORBI,<4cm,0
 CPSN-1,ORBI,>4cm,0
-CPSN-1,OROB,<4cm,0
-CPSN-1,OROB,>4cm,0
 CPSN-1,PAME,<4cm,0
 CPSN-1,PAME,>4cm,0
 CPSN-1,PORI,<4cm,0
@@ -3694,10 +3694,10 @@ CPSN-2,MEAN,<4cm,0
 CPSN-2,MMEA,>4cm,0
 CPSN-2,MUSS,<4cm,0
 CPSN-2,MYCE,>4cm,0
+CPSN-2,OCUL,<4cm,0
+CPSN-2,OCUL,>4cm,0
 CPSN-2,ORBI,<4cm,0
 CPSN-2,ORBI,>4cm,0
-CPSN-2,OROB,<4cm,0
-CPSN-2,OROB,>4cm,0
 CPSN-2,PAME,<4cm,0
 CPSN-2,PAME,>4cm,0
 CPSN-2,PORI,<4cm,0
@@ -3728,10 +3728,10 @@ CPSN-3,MEAN,<4cm,0
 CPSN-3,MMEA,>4cm,0
 CPSN-3,MUSS,<4cm,0
 CPSN-3,MYCE,>4cm,0
+CPSN-3,OCUL,<4cm,0
+CPSN-3,OCUL,>4cm,0
 CPSN-3,ORBI,<4cm,0
 CPSN-3,ORBI,>4cm,0
-CPSN-3,OROB,<4cm,0
-CPSN-3,OROB,>4cm,0
 CPSN-3,PAME,<4cm,0
 CPSN-3,PAME,>4cm,0
 CPSN-3,PORI,<4cm,0
@@ -3762,10 +3762,10 @@ CPSN-4,MEAN,<4cm,0
 CPSN-4,MMEA,>4cm,0
 CPSN-4,MUSS,<4cm,0
 CPSN-4,MYCE,>4cm,0
+CPSN-4,OCUL,<4cm,0
+CPSN-4,OCUL,>4cm,0
 CPSN-4,ORBI,<4cm,0
 CPSN-4,ORBI,>4cm,0
-CPSN-4,OROB,<4cm,0
-CPSN-4,OROB,>4cm,0
 CPSN-4,PAME,<4cm,0
 CPSN-4,PAME,>4cm,0
 CPSN-4,PORI,<4cm,0
@@ -3796,10 +3796,10 @@ CPSSE 1,MEAN,<4cm,0
 CPSSE 1,MMEA,>4cm,0
 CPSSE 1,MUSS,<4cm,0
 CPSSE 1,MYCE,>4cm,0
+CPSSE 1,OCUL,<4cm,0
+CPSSE 1,OCUL,>4cm,0
 CPSSE 1,ORBI,<4cm,0
 CPSSE 1,ORBI,>4cm,0
-CPSSE 1,OROB,<4cm,0
-CPSSE 1,OROB,>4cm,0
 CPSSE 1,PAME,<4cm,0
 CPSSE 1,PAME,>4cm,0
 CPSSE 1,PORI,<4cm,0
@@ -3830,10 +3830,10 @@ CPSSE 2,MEAN,<4cm,0
 CPSSE 2,MMEA,>4cm,0
 CPSSE 2,MUSS,<4cm,0
 CPSSE 2,MYCE,>4cm,0
+CPSSE 2,OCUL,<4cm,0
+CPSSE 2,OCUL,>4cm,0
 CPSSE 2,ORBI,<4cm,0
 CPSSE 2,ORBI,>4cm,0
-CPSSE 2,OROB,<4cm,0
-CPSSE 2,OROB,>4cm,0
 CPSSE 2,PAME,<4cm,0
 CPSSE 2,PAME,>4cm,0
 CPSSE 2,PORI,<4cm,0
@@ -3864,10 +3864,10 @@ CPSSE 3,MEAN,<4cm,0
 CPSSE 3,MMEA,>4cm,0
 CPSSE 3,MUSS,<4cm,0
 CPSSE 3,MYCE,>4cm,0
+CPSSE 3,OCUL,<4cm,0
+CPSSE 3,OCUL,>4cm,0
 CPSSE 3,ORBI,<4cm,0
 CPSSE 3,ORBI,>4cm,0
-CPSSE 3,OROB,<4cm,0
-CPSSE 3,OROB,>4cm,0
 CPSSE 3,PAME,<4cm,0
 CPSSE 3,PAME,>4cm,0
 CPSSE 3,PORI,<4cm,0
@@ -3898,10 +3898,10 @@ CPSSE 4,MEAN,<4cm,0
 CPSSE 4,MMEA,>4cm,0
 CPSSE 4,MUSS,<4cm,0
 CPSSE 4,MYCE,>4cm,0
+CPSSE 4,OCUL,<4cm,0
+CPSSE 4,OCUL,>4cm,0
 CPSSE 4,ORBI,<4cm,0
 CPSSE 4,ORBI,>4cm,0
-CPSSE 4,OROB,<4cm,0
-CPSSE 4,OROB,>4cm,0
 CPSSE 4,PAME,<4cm,0
 CPSSE 4,PAME,>4cm,0
 CPSSE 4,PORI,<4cm,0
@@ -3932,10 +3932,10 @@ CPSSE 5,MEAN,<4cm,0
 CPSSE 5,MMEA,>4cm,0
 CPSSE 5,MUSS,<4cm,0
 CPSSE 5,MYCE,>4cm,0
+CPSSE 5,OCUL,<4cm,0
+CPSSE 5,OCUL,>4cm,0
 CPSSE 5,ORBI,<4cm,0
 CPSSE 5,ORBI,>4cm,0
-CPSSE 5,OROB,<4cm,0
-CPSSE 5,OROB,>4cm,0
 CPSSE 5,PAME,<4cm,0
 CPSSE 5,PAME,>4cm,0
 CPSSE 5,PORI,<4cm,0
@@ -3966,10 +3966,10 @@ CPSSE 6,MEAN,<4cm,0
 CPSSE 6,MMEA,>4cm,0
 CPSSE 6,MUSS,<4cm,0
 CPSSE 6,MYCE,>4cm,0
+CPSSE 6,OCUL,<4cm,0
+CPSSE 6,OCUL,>4cm,0
 CPSSE 6,ORBI,<4cm,0
 CPSSE 6,ORBI,>4cm,0
-CPSSE 6,OROB,<4cm,0
-CPSSE 6,OROB,>4cm,0
 CPSSE 6,PAME,<4cm,0
 CPSSE 6,PAME,>4cm,0
 CPSSE 6,PORI,<4cm,0
@@ -4000,10 +4000,10 @@ CPSSE 7,MEAN,<4cm,0
 CPSSE 7,MMEA,>4cm,0
 CPSSE 7,MUSS,<4cm,0
 CPSSE 7,MYCE,>4cm,0
+CPSSE 7,OCUL,<4cm,0
+CPSSE 7,OCUL,>4cm,0
 CPSSE 7,ORBI,<4cm,0
 CPSSE 7,ORBI,>4cm,0
-CPSSE 7,OROB,<4cm,0
-CPSSE 7,OROB,>4cm,0
 CPSSE 7,PAME,<4cm,0
 CPSSE 7,PAME,>4cm,0
 CPSSE 7,PORI,<4cm,0
@@ -4034,10 +4034,10 @@ CPSSE 8,MEAN,<4cm,0
 CPSSE 8,MMEA,>4cm,0
 CPSSE 8,MUSS,<4cm,0
 CPSSE 8,MYCE,>4cm,0
+CPSSE 8,OCUL,<4cm,0
+CPSSE 8,OCUL,>4cm,0
 CPSSE 8,ORBI,<4cm,0
 CPSSE 8,ORBI,>4cm,0
-CPSSE 8,OROB,<4cm,0
-CPSSE 8,OROB,>4cm,0
 CPSSE 8,PAME,<4cm,0
 CPSSE 8,PAME,>4cm,0
 CPSSE 8,PORI,<4cm,0
@@ -4068,10 +4068,10 @@ D-10-a,MEAN,<4cm,1
 D-10-a,MMEA,>4cm,0
 D-10-a,MUSS,<4cm,0
 D-10-a,MYCE,>4cm,0
+D-10-a,OCUL,<4cm,0
+D-10-a,OCUL,>4cm,0
 D-10-a,ORBI,<4cm,0
 D-10-a,ORBI,>4cm,1
-D-10-a,OROB,<4cm,0
-D-10-a,OROB,>4cm,0
 D-10-a,PAME,<4cm,0
 D-10-a,PAME,>4cm,0
 D-10-a,PORI,<4cm,7
@@ -4102,10 +4102,10 @@ D-10-b,MEAN,<4cm,1
 D-10-b,MMEA,>4cm,0
 D-10-b,MUSS,<4cm,0
 D-10-b,MYCE,>4cm,0
+D-10-b,OCUL,<4cm,0
+D-10-b,OCUL,>4cm,0
 D-10-b,ORBI,<4cm,0
 D-10-b,ORBI,>4cm,0
-D-10-b,OROB,<4cm,0
-D-10-b,OROB,>4cm,0
 D-10-b,PAME,<4cm,0
 D-10-b,PAME,>4cm,0
 D-10-b,PORI,<4cm,15
@@ -4136,10 +4136,10 @@ D-10-c,MEAN,<4cm,1
 D-10-c,MMEA,>4cm,1
 D-10-c,MUSS,<4cm,0
 D-10-c,MYCE,>4cm,0
+D-10-c,OCUL,<4cm,0
+D-10-c,OCUL,>4cm,0
 D-10-c,ORBI,<4cm,0
 D-10-c,ORBI,>4cm,0
-D-10-c,OROB,<4cm,0
-D-10-c,OROB,>4cm,0
 D-10-c,PAME,<4cm,0
 D-10-c,PAME,>4cm,0
 D-10-c,PORI,<4cm,26
@@ -4170,10 +4170,10 @@ D-17-a,MEAN,<4cm,2
 D-17-a,MMEA,>4cm,1
 D-17-a,MUSS,<4cm,1
 D-17-a,MYCE,>4cm,1
+D-17-a,OCUL,<4cm,0
+D-17-a,OCUL,>4cm,0
 D-17-a,ORBI,<4cm,0
 D-17-a,ORBI,>4cm,1
-D-17-a,OROB,<4cm,0
-D-17-a,OROB,>4cm,0
 D-17-a,PAME,<4cm,0
 D-17-a,PAME,>4cm,0
 D-17-a,PORI,<4cm,8
@@ -4204,10 +4204,10 @@ D-17-b,MEAN,<4cm,1
 D-17-b,MMEA,>4cm,1
 D-17-b,MUSS,<4cm,0
 D-17-b,MYCE,>4cm,0
+D-17-b,OCUL,<4cm,0
+D-17-b,OCUL,>4cm,0
 D-17-b,ORBI,<4cm,0
 D-17-b,ORBI,>4cm,0
-D-17-b,OROB,<4cm,0
-D-17-b,OROB,>4cm,0
 D-17-b,PAME,<4cm,0
 D-17-b,PAME,>4cm,0
 D-17-b,PORI,<4cm,6
@@ -4238,10 +4238,10 @@ D-17-c,MEAN,<4cm,0
 D-17-c,MMEA,>4cm,2
 D-17-c,MUSS,<4cm,1
 D-17-c,MYCE,>4cm,0
+D-17-c,OCUL,<4cm,0
+D-17-c,OCUL,>4cm,0
 D-17-c,ORBI,<4cm,0
 D-17-c,ORBI,>4cm,0
-D-17-c,OROB,<4cm,0
-D-17-c,OROB,>4cm,0
 D-17-c,PAME,<4cm,0
 D-17-c,PAME,>4cm,0
 D-17-c,PORI,<4cm,6
@@ -4272,10 +4272,10 @@ D-18-a,MEAN,<4cm,2
 D-18-a,MMEA,>4cm,0
 D-18-a,MUSS,<4cm,0
 D-18-a,MYCE,>4cm,0
+D-18-a,OCUL,<4cm,0
+D-18-a,OCUL,>4cm,0
 D-18-a,ORBI,<4cm,0
 D-18-a,ORBI,>4cm,1
-D-18-a,OROB,<4cm,0
-D-18-a,OROB,>4cm,0
 D-18-a,PAME,<4cm,0
 D-18-a,PAME,>4cm,0
 D-18-a,PORI,<4cm,10
@@ -4306,10 +4306,10 @@ D-18-b,MEAN,<4cm,1
 D-18-b,MMEA,>4cm,1
 D-18-b,MUSS,<4cm,1
 D-18-b,MYCE,>4cm,0
+D-18-b,OCUL,<4cm,0
+D-18-b,OCUL,>4cm,0
 D-18-b,ORBI,<4cm,0
 D-18-b,ORBI,>4cm,1
-D-18-b,OROB,<4cm,0
-D-18-b,OROB,>4cm,0
 D-18-b,PAME,<4cm,0
 D-18-b,PAME,>4cm,0
 D-18-b,PORI,<4cm,2
@@ -4340,10 +4340,10 @@ D-31-b,MEAN,<4cm,0
 D-31-b,MMEA,>4cm,0
 D-31-b,MUSS,<4cm,0
 D-31-b,MYCE,>4cm,0
+D-31-b,OCUL,<4cm,0
+D-31-b,OCUL,>4cm,0
 D-31-b,ORBI,<4cm,0
 D-31-b,ORBI,>4cm,0
-D-31-b,OROB,<4cm,0
-D-31-b,OROB,>4cm,0
 D-31-b,PAME,<4cm,0
 D-31-b,PAME,>4cm,0
 D-31-b,PORI,<4cm,6
@@ -4374,10 +4374,10 @@ D-31-c,MEAN,<4cm,0
 D-31-c,MMEA,>4cm,0
 D-31-c,MUSS,<4cm,0
 D-31-c,MYCE,>4cm,0
+D-31-c,OCUL,<4cm,0
+D-31-c,OCUL,>4cm,0
 D-31-c,ORBI,<4cm,0
 D-31-c,ORBI,>4cm,0
-D-31-c,OROB,<4cm,0
-D-31-c,OROB,>4cm,0
 D-31-c,PAME,<4cm,0
 D-31-c,PAME,>4cm,0
 D-31-c,PORI,<4cm,3
@@ -4408,10 +4408,10 @@ D-42-a,MEAN,<4cm,4
 D-42-a,MMEA,>4cm,5
 D-42-a,MUSS,<4cm,1
 D-42-a,MYCE,>4cm,0
+D-42-a,OCUL,<4cm,0
+D-42-a,OCUL,>4cm,0
 D-42-a,ORBI,<4cm,0
 D-42-a,ORBI,>4cm,1
-D-42-a,OROB,<4cm,0
-D-42-a,OROB,>4cm,0
 D-42-a,PAME,<4cm,0
 D-42-a,PAME,>4cm,0
 D-42-a,PORI,<4cm,7
@@ -4442,10 +4442,10 @@ D-42-b,MEAN,<4cm,2
 D-42-b,MMEA,>4cm,2
 D-42-b,MUSS,<4cm,2
 D-42-b,MYCE,>4cm,0
+D-42-b,OCUL,<4cm,0
+D-42-b,OCUL,>4cm,0
 D-42-b,ORBI,<4cm,0
 D-42-b,ORBI,>4cm,0
-D-42-b,OROB,<4cm,0
-D-42-b,OROB,>4cm,0
 D-42-b,PAME,<4cm,0
 D-42-b,PAME,>4cm,0
 D-42-b,PORI,<4cm,4
@@ -4476,10 +4476,10 @@ D-42-c,MEAN,<4cm,1
 D-42-c,MMEA,>4cm,0
 D-42-c,MUSS,<4cm,2
 D-42-c,MYCE,>4cm,1
+D-42-c,OCUL,<4cm,0
+D-42-c,OCUL,>4cm,0
 D-42-c,ORBI,<4cm,0
 D-42-c,ORBI,>4cm,0
-D-42-c,OROB,<4cm,0
-D-42-c,OROB,>4cm,0
 D-42-c,PAME,<4cm,0
 D-42-c,PAME,>4cm,0
 D-42-c,PORI,<4cm,6
@@ -4510,10 +4510,10 @@ D-5-a,MEAN,<4cm,0
 D-5-a,MMEA,>4cm,0
 D-5-a,MUSS,<4cm,0
 D-5-a,MYCE,>4cm,0
+D-5-a,OCUL,<4cm,0
+D-5-a,OCUL,>4cm,0
 D-5-a,ORBI,<4cm,0
 D-5-a,ORBI,>4cm,0
-D-5-a,OROB,<4cm,0
-D-5-a,OROB,>4cm,0
 D-5-a,PAME,<4cm,0
 D-5-a,PAME,>4cm,0
 D-5-a,PORI,<4cm,6
@@ -4544,10 +4544,10 @@ D-5-b,MEAN,<4cm,2
 D-5-b,MMEA,>4cm,0
 D-5-b,MUSS,<4cm,0
 D-5-b,MYCE,>4cm,0
+D-5-b,OCUL,<4cm,0
+D-5-b,OCUL,>4cm,0
 D-5-b,ORBI,<4cm,0
 D-5-b,ORBI,>4cm,0
-D-5-b,OROB,<4cm,0
-D-5-b,OROB,>4cm,0
 D-5-b,PAME,<4cm,0
 D-5-b,PAME,>4cm,0
 D-5-b,PORI,<4cm,9
@@ -4578,10 +4578,10 @@ D-5-c,MEAN,<4cm,0
 D-5-c,MMEA,>4cm,0
 D-5-c,MUSS,<4cm,0
 D-5-c,MYCE,>4cm,0
+D-5-c,OCUL,<4cm,0
+D-5-c,OCUL,>4cm,0
 D-5-c,ORBI,<4cm,0
 D-5-c,ORBI,>4cm,0
-D-5-c,OROB,<4cm,0
-D-5-c,OROB,>4cm,0
 D-5-c,PAME,<4cm,0
 D-5-c,PAME,>4cm,0
 D-5-c,PORI,<4cm,7
@@ -4612,10 +4612,10 @@ D18c,MEAN,<4cm,0
 D18c,MMEA,>4cm,1
 D18c,MUSS,<4cm,0
 D18c,MYCE,>4cm,0
+D18c,OCUL,<4cm,0
+D18c,OCUL,>4cm,0
 D18c,ORBI,<4cm,0
 D18c,ORBI,>4cm,0
-D18c,OROB,<4cm,0
-D18c,OROB,>4cm,0
 D18c,PAME,<4cm,0
 D18c,PAME,>4cm,0
 D18c,PORI,<4cm,5
@@ -4646,10 +4646,10 @@ D1a,MEAN,<4cm,1
 D1a,MMEA,>4cm,0
 D1a,MUSS,<4cm,0
 D1a,MYCE,>4cm,0
+D1a,OCUL,<4cm,0
+D1a,OCUL,>4cm,0
 D1a,ORBI,<4cm,0
 D1a,ORBI,>4cm,0
-D1a,OROB,<4cm,0
-D1a,OROB,>4cm,0
 D1a,PAME,<4cm,0
 D1a,PAME,>4cm,0
 D1a,PORI,<4cm,6
@@ -4680,10 +4680,10 @@ D1b,MEAN,<4cm,0
 D1b,MMEA,>4cm,0
 D1b,MUSS,<4cm,0
 D1b,MYCE,>4cm,0
+D1b,OCUL,<4cm,0
+D1b,OCUL,>4cm,0
 D1b,ORBI,<4cm,0
 D1b,ORBI,>4cm,0
-D1b,OROB,<4cm,0
-D1b,OROB,>4cm,0
 D1b,PAME,<4cm,0
 D1b,PAME,>4cm,0
 D1b,PORI,<4cm,3
@@ -4714,10 +4714,10 @@ D1c,MEAN,<4cm,0
 D1c,MMEA,>4cm,0
 D1c,MUSS,<4cm,0
 D1c,MYCE,>4cm,0
+D1c,OCUL,<4cm,0
+D1c,OCUL,>4cm,0
 D1c,ORBI,<4cm,0
 D1c,ORBI,>4cm,0
-D1c,OROB,<4cm,0
-D1c,OROB,>4cm,0
 D1c,PAME,<4cm,0
 D1c,PAME,>4cm,0
 D1c,PORI,<4cm,34
@@ -4748,10 +4748,10 @@ D23a,MEAN,<4cm,2
 D23a,MMEA,>4cm,0
 D23a,MUSS,<4cm,0
 D23a,MYCE,>4cm,0
+D23a,OCUL,<4cm,0
+D23a,OCUL,>4cm,0
 D23a,ORBI,<4cm,0
 D23a,ORBI,>4cm,1
-D23a,OROB,<4cm,0
-D23a,OROB,>4cm,0
 D23a,PAME,<4cm,0
 D23a,PAME,>4cm,0
 D23a,PORI,<4cm,6
@@ -4782,10 +4782,10 @@ D23b,MEAN,<4cm,1
 D23b,MMEA,>4cm,0
 D23b,MUSS,<4cm,1
 D23b,MYCE,>4cm,0
+D23b,OCUL,<4cm,0
+D23b,OCUL,>4cm,0
 D23b,ORBI,<4cm,0
 D23b,ORBI,>4cm,0
-D23b,OROB,<4cm,0
-D23b,OROB,>4cm,0
 D23b,PAME,<4cm,0
 D23b,PAME,>4cm,0
 D23b,PORI,<4cm,6
@@ -4816,10 +4816,10 @@ D23c,MEAN,<4cm,0
 D23c,MMEA,>4cm,1
 D23c,MUSS,<4cm,0
 D23c,MYCE,>4cm,0
+D23c,OCUL,<4cm,0
+D23c,OCUL,>4cm,0
 D23c,ORBI,<4cm,0
 D23c,ORBI,>4cm,0
-D23c,OROB,<4cm,0
-D23c,OROB,>4cm,0
 D23c,PAME,<4cm,0
 D23c,PAME,>4cm,0
 D23c,PORI,<4cm,2
@@ -4850,10 +4850,10 @@ D24a,MEAN,<4cm,0
 D24a,MMEA,>4cm,0
 D24a,MUSS,<4cm,0
 D24a,MYCE,>4cm,0
+D24a,OCUL,<4cm,0
+D24a,OCUL,>4cm,0
 D24a,ORBI,<4cm,0
 D24a,ORBI,>4cm,1
-D24a,OROB,<4cm,0
-D24a,OROB,>4cm,0
 D24a,PAME,<4cm,0
 D24a,PAME,>4cm,0
 D24a,PORI,<4cm,4
@@ -4884,10 +4884,10 @@ D24b,MEAN,<4cm,1
 D24b,MMEA,>4cm,2
 D24b,MUSS,<4cm,1
 D24b,MYCE,>4cm,0
+D24b,OCUL,<4cm,0
+D24b,OCUL,>4cm,0
 D24b,ORBI,<4cm,0
 D24b,ORBI,>4cm,0
-D24b,OROB,<4cm,0
-D24b,OROB,>4cm,0
 D24b,PAME,<4cm,0
 D24b,PAME,>4cm,0
 D24b,PORI,<4cm,1
@@ -4918,10 +4918,10 @@ D24c,MEAN,<4cm,0
 D24c,MMEA,>4cm,1
 D24c,MUSS,<4cm,0
 D24c,MYCE,>4cm,0
+D24c,OCUL,<4cm,0
+D24c,OCUL,>4cm,0
 D24c,ORBI,<4cm,0
 D24c,ORBI,>4cm,0
-D24c,OROB,<4cm,0
-D24c,OROB,>4cm,0
 D24c,PAME,<4cm,0
 D24c,PAME,>4cm,0
 D24c,PORI,<4cm,2
@@ -4952,10 +4952,10 @@ D25a,MEAN,<4cm,1
 D25a,MMEA,>4cm,1
 D25a,MUSS,<4cm,0
 D25a,MYCE,>4cm,0
+D25a,OCUL,<4cm,0
+D25a,OCUL,>4cm,0
 D25a,ORBI,<4cm,0
 D25a,ORBI,>4cm,0
-D25a,OROB,<4cm,0
-D25a,OROB,>4cm,0
 D25a,PAME,<4cm,0
 D25a,PAME,>4cm,0
 D25a,PORI,<4cm,0
@@ -4986,10 +4986,10 @@ D25b,MEAN,<4cm,0
 D25b,MMEA,>4cm,0
 D25b,MUSS,<4cm,0
 D25b,MYCE,>4cm,0
+D25b,OCUL,<4cm,0
+D25b,OCUL,>4cm,0
 D25b,ORBI,<4cm,0
 D25b,ORBI,>4cm,3
-D25b,OROB,<4cm,0
-D25b,OROB,>4cm,0
 D25b,PAME,<4cm,0
 D25b,PAME,>4cm,0
 D25b,PORI,<4cm,7
@@ -5020,10 +5020,10 @@ D25c,MEAN,<4cm,3
 D25c,MMEA,>4cm,0
 D25c,MUSS,<4cm,0
 D25c,MYCE,>4cm,0
+D25c,OCUL,<4cm,0
+D25c,OCUL,>4cm,0
 D25c,ORBI,<4cm,0
 D25c,ORBI,>4cm,1
-D25c,OROB,<4cm,0
-D25c,OROB,>4cm,0
 D25c,PAME,<4cm,0
 D25c,PAME,>4cm,0
 D25c,PORI,<4cm,4
@@ -5054,10 +5054,10 @@ D26a,MEAN,<4cm,0
 D26a,MMEA,>4cm,0
 D26a,MUSS,<4cm,0
 D26a,MYCE,>4cm,0
+D26a,OCUL,<4cm,0
+D26a,OCUL,>4cm,0
 D26a,ORBI,<4cm,0
 D26a,ORBI,>4cm,0
-D26a,OROB,<4cm,0
-D26a,OROB,>4cm,0
 D26a,PAME,<4cm,0
 D26a,PAME,>4cm,0
 D26a,PORI,<4cm,6
@@ -5088,10 +5088,10 @@ D26b,MEAN,<4cm,0
 D26b,MMEA,>4cm,0
 D26b,MUSS,<4cm,0
 D26b,MYCE,>4cm,0
+D26b,OCUL,<4cm,0
+D26b,OCUL,>4cm,0
 D26b,ORBI,<4cm,0
 D26b,ORBI,>4cm,0
-D26b,OROB,<4cm,0
-D26b,OROB,>4cm,0
 D26b,PAME,<4cm,0
 D26b,PAME,>4cm,0
 D26b,PORI,<4cm,4
@@ -5122,10 +5122,10 @@ D26c,MEAN,<4cm,0
 D26c,MMEA,>4cm,0
 D26c,MUSS,<4cm,0
 D26c,MYCE,>4cm,0
+D26c,OCUL,<4cm,0
+D26c,OCUL,>4cm,0
 D26c,ORBI,<4cm,0
 D26c,ORBI,>4cm,0
-D26c,OROB,<4cm,0
-D26c,OROB,>4cm,0
 D26c,PAME,<4cm,0
 D26c,PAME,>4cm,0
 D26c,PORI,<4cm,18
@@ -5156,10 +5156,10 @@ D27a,MEAN,<4cm,0
 D27a,MMEA,>4cm,0
 D27a,MUSS,<4cm,0
 D27a,MYCE,>4cm,0
+D27a,OCUL,<4cm,0
+D27a,OCUL,>4cm,0
 D27a,ORBI,<4cm,0
 D27a,ORBI,>4cm,0
-D27a,OROB,<4cm,0
-D27a,OROB,>4cm,0
 D27a,PAME,<4cm,0
 D27a,PAME,>4cm,0
 D27a,PORI,<4cm,13
@@ -5190,10 +5190,10 @@ D27b,MEAN,<4cm,1
 D27b,MMEA,>4cm,0
 D27b,MUSS,<4cm,0
 D27b,MYCE,>4cm,0
+D27b,OCUL,<4cm,0
+D27b,OCUL,>4cm,0
 D27b,ORBI,<4cm,0
 D27b,ORBI,>4cm,0
-D27b,OROB,<4cm,0
-D27b,OROB,>4cm,0
 D27b,PAME,<4cm,0
 D27b,PAME,>4cm,0
 D27b,PORI,<4cm,17
@@ -5224,10 +5224,10 @@ D27c,MEAN,<4cm,1
 D27c,MMEA,>4cm,0
 D27c,MUSS,<4cm,0
 D27c,MYCE,>4cm,0
+D27c,OCUL,<4cm,0
+D27c,OCUL,>4cm,0
 D27c,ORBI,<4cm,0
 D27c,ORBI,>4cm,0
-D27c,OROB,<4cm,0
-D27c,OROB,>4cm,0
 D27c,PAME,<4cm,0
 D27c,PAME,>4cm,0
 D27c,PORI,<4cm,12
@@ -5258,10 +5258,10 @@ D29a,MEAN,<4cm,0
 D29a,MMEA,>4cm,0
 D29a,MUSS,<4cm,0
 D29a,MYCE,>4cm,0
+D29a,OCUL,<4cm,0
+D29a,OCUL,>4cm,0
 D29a,ORBI,<4cm,0
 D29a,ORBI,>4cm,0
-D29a,OROB,<4cm,0
-D29a,OROB,>4cm,0
 D29a,PAME,<4cm,0
 D29a,PAME,>4cm,0
 D29a,PORI,<4cm,0
@@ -5292,10 +5292,10 @@ D29b,MEAN,<4cm,0
 D29b,MMEA,>4cm,0
 D29b,MUSS,<4cm,0
 D29b,MYCE,>4cm,0
+D29b,OCUL,<4cm,0
+D29b,OCUL,>4cm,0
 D29b,ORBI,<4cm,0
 D29b,ORBI,>4cm,0
-D29b,OROB,<4cm,0
-D29b,OROB,>4cm,0
 D29b,PAME,<4cm,0
 D29b,PAME,>4cm,0
 D29b,PORI,<4cm,0
@@ -5326,10 +5326,10 @@ D29c,MEAN,<4cm,0
 D29c,MMEA,>4cm,0
 D29c,MUSS,<4cm,0
 D29c,MYCE,>4cm,0
+D29c,OCUL,<4cm,0
+D29c,OCUL,>4cm,0
 D29c,ORBI,<4cm,0
 D29c,ORBI,>4cm,0
-D29c,OROB,<4cm,0
-D29c,OROB,>4cm,0
 D29c,PAME,<4cm,0
 D29c,PAME,>4cm,0
 D29c,PORI,<4cm,0
@@ -5360,10 +5360,10 @@ D2a,MEAN,<4cm,0
 D2a,MMEA,>4cm,0
 D2a,MUSS,<4cm,0
 D2a,MYCE,>4cm,0
+D2a,OCUL,<4cm,0
+D2a,OCUL,>4cm,0
 D2a,ORBI,<4cm,0
 D2a,ORBI,>4cm,0
-D2a,OROB,<4cm,0
-D2a,OROB,>4cm,0
 D2a,PAME,<4cm,0
 D2a,PAME,>4cm,0
 D2a,PORI,<4cm,6
@@ -5394,10 +5394,10 @@ D2c,MEAN,<4cm,0
 D2c,MMEA,>4cm,0
 D2c,MUSS,<4cm,0
 D2c,MYCE,>4cm,0
+D2c,OCUL,<4cm,0
+D2c,OCUL,>4cm,0
 D2c,ORBI,<4cm,0
 D2c,ORBI,>4cm,0
-D2c,OROB,<4cm,0
-D2c,OROB,>4cm,0
 D2c,PAME,<4cm,1
 D2c,PAME,>4cm,0
 D2c,PORI,<4cm,21
@@ -5428,10 +5428,10 @@ D30a,MEAN,<4cm,0
 D30a,MMEA,>4cm,0
 D30a,MUSS,<4cm,0
 D30a,MYCE,>4cm,0
+D30a,OCUL,<4cm,0
+D30a,OCUL,>4cm,0
 D30a,ORBI,<4cm,0
 D30a,ORBI,>4cm,0
-D30a,OROB,<4cm,0
-D30a,OROB,>4cm,0
 D30a,PAME,<4cm,0
 D30a,PAME,>4cm,0
 D30a,PORI,<4cm,1
@@ -5462,10 +5462,10 @@ D30b,MEAN,<4cm,0
 D30b,MMEA,>4cm,0
 D30b,MUSS,<4cm,0
 D30b,MYCE,>4cm,0
+D30b,OCUL,<4cm,0
+D30b,OCUL,>4cm,0
 D30b,ORBI,<4cm,0
 D30b,ORBI,>4cm,0
-D30b,OROB,<4cm,0
-D30b,OROB,>4cm,0
 D30b,PAME,<4cm,0
 D30b,PAME,>4cm,0
 D30b,PORI,<4cm,1
@@ -5496,10 +5496,10 @@ D30c,MEAN,<4cm,0
 D30c,MMEA,>4cm,0
 D30c,MUSS,<4cm,0
 D30c,MYCE,>4cm,0
+D30c,OCUL,<4cm,0
+D30c,OCUL,>4cm,0
 D30c,ORBI,<4cm,0
 D30c,ORBI,>4cm,0
-D30c,OROB,<4cm,0
-D30c,OROB,>4cm,0
 D30c,PAME,<4cm,0
 D30c,PAME,>4cm,0
 D30c,PORI,<4cm,1
@@ -5530,10 +5530,10 @@ D31a,MEAN,<4cm,0
 D31a,MMEA,>4cm,0
 D31a,MUSS,<4cm,0
 D31a,MYCE,>4cm,0
+D31a,OCUL,<4cm,0
+D31a,OCUL,>4cm,0
 D31a,ORBI,<4cm,0
 D31a,ORBI,>4cm,0
-D31a,OROB,<4cm,0
-D31a,OROB,>4cm,0
 D31a,PAME,<4cm,0
 D31a,PAME,>4cm,0
 D31a,PORI,<4cm,5
@@ -5564,10 +5564,10 @@ D31b,MEAN,<4cm,1
 D31b,MMEA,>4cm,0
 D31b,MUSS,<4cm,0
 D31b,MYCE,>4cm,0
+D31b,OCUL,<4cm,0
+D31b,OCUL,>4cm,0
 D31b,ORBI,<4cm,0
 D31b,ORBI,>4cm,0
-D31b,OROB,<4cm,0
-D31b,OROB,>4cm,0
 D31b,PAME,<4cm,0
 D31b,PAME,>4cm,0
 D31b,PORI,<4cm,3
@@ -5598,10 +5598,10 @@ D31c,MEAN,<4cm,0
 D31c,MMEA,>4cm,0
 D31c,MUSS,<4cm,0
 D31c,MYCE,>4cm,0
+D31c,OCUL,<4cm,0
+D31c,OCUL,>4cm,0
 D31c,ORBI,<4cm,0
 D31c,ORBI,>4cm,0
-D31c,OROB,<4cm,0
-D31c,OROB,>4cm,0
 D31c,PAME,<4cm,0
 D31c,PAME,>4cm,0
 D31c,PORI,<4cm,3
@@ -5632,10 +5632,10 @@ D32a,MEAN,<4cm,0
 D32a,MMEA,>4cm,2
 D32a,MUSS,<4cm,0
 D32a,MYCE,>4cm,0
+D32a,OCUL,<4cm,0
+D32a,OCUL,>4cm,0
 D32a,ORBI,<4cm,0
 D32a,ORBI,>4cm,0
-D32a,OROB,<4cm,0
-D32a,OROB,>4cm,0
 D32a,PAME,<4cm,0
 D32a,PAME,>4cm,0
 D32a,PORI,<4cm,6
@@ -5666,10 +5666,10 @@ D32b,MEAN,<4cm,1
 D32b,MMEA,>4cm,5
 D32b,MUSS,<4cm,0
 D32b,MYCE,>4cm,0
+D32b,OCUL,<4cm,0
+D32b,OCUL,>4cm,0
 D32b,ORBI,<4cm,0
 D32b,ORBI,>4cm,1
-D32b,OROB,<4cm,0
-D32b,OROB,>4cm,0
 D32b,PAME,<4cm,0
 D32b,PAME,>4cm,0
 D32b,PORI,<4cm,28
@@ -5700,10 +5700,10 @@ D32c,MEAN,<4cm,1
 D32c,MMEA,>4cm,0
 D32c,MUSS,<4cm,0
 D32c,MYCE,>4cm,0
+D32c,OCUL,<4cm,0
+D32c,OCUL,>4cm,0
 D32c,ORBI,<4cm,0
 D32c,ORBI,>4cm,0
-D32c,OROB,<4cm,0
-D32c,OROB,>4cm,0
 D32c,PAME,<4cm,0
 D32c,PAME,>4cm,0
 D32c,PORI,<4cm,24
@@ -5734,10 +5734,10 @@ D32C,MEAN,<4cm,0
 D32C,MMEA,>4cm,0
 D32C,MUSS,<4cm,1
 D32C,MYCE,>4cm,0
+D32C,OCUL,<4cm,0
+D32C,OCUL,>4cm,0
 D32C,ORBI,<4cm,0
 D32C,ORBI,>4cm,1
-D32C,OROB,<4cm,0
-D32C,OROB,>4cm,0
 D32C,PAME,<4cm,0
 D32C,PAME,>4cm,0
 D32C,PORI,<4cm,2
@@ -5768,10 +5768,10 @@ D33a,MEAN,<4cm,0
 D33a,MMEA,>4cm,0
 D33a,MUSS,<4cm,0
 D33a,MYCE,>4cm,1
+D33a,OCUL,<4cm,0
+D33a,OCUL,>4cm,0
 D33a,ORBI,<4cm,0
 D33a,ORBI,>4cm,0
-D33a,OROB,<4cm,0
-D33a,OROB,>4cm,0
 D33a,PAME,<4cm,0
 D33a,PAME,>4cm,0
 D33a,PORI,<4cm,1
@@ -5802,10 +5802,10 @@ D33b,MEAN,<4cm,1
 D33b,MMEA,>4cm,1
 D33b,MUSS,<4cm,0
 D33b,MYCE,>4cm,0
+D33b,OCUL,<4cm,0
+D33b,OCUL,>4cm,0
 D33b,ORBI,<4cm,0
 D33b,ORBI,>4cm,0
-D33b,OROB,<4cm,0
-D33b,OROB,>4cm,0
 D33b,PAME,<4cm,0
 D33b,PAME,>4cm,0
 D33b,PORI,<4cm,5
@@ -5836,10 +5836,10 @@ D33c,MEAN,<4cm,0
 D33c,MMEA,>4cm,1
 D33c,MUSS,<4cm,1
 D33c,MYCE,>4cm,2
+D33c,OCUL,<4cm,0
+D33c,OCUL,>4cm,0
 D33c,ORBI,<4cm,0
 D33c,ORBI,>4cm,0
-D33c,OROB,<4cm,0
-D33c,OROB,>4cm,0
 D33c,PAME,<4cm,0
 D33c,PAME,>4cm,0
 D33c,PORI,<4cm,4
@@ -5870,10 +5870,10 @@ D34a,MEAN,<4cm,0
 D34a,MMEA,>4cm,0
 D34a,MUSS,<4cm,0
 D34a,MYCE,>4cm,0
+D34a,OCUL,<4cm,0
+D34a,OCUL,>4cm,0
 D34a,ORBI,<4cm,0
 D34a,ORBI,>4cm,0
-D34a,OROB,<4cm,0
-D34a,OROB,>4cm,0
 D34a,PAME,<4cm,0
 D34a,PAME,>4cm,0
 D34a,PORI,<4cm,0
@@ -5904,10 +5904,10 @@ D34b,MEAN,<4cm,1
 D34b,MMEA,>4cm,0
 D34b,MUSS,<4cm,0
 D34b,MYCE,>4cm,0
+D34b,OCUL,<4cm,0
+D34b,OCUL,>4cm,0
 D34b,ORBI,<4cm,0
 D34b,ORBI,>4cm,0
-D34b,OROB,<4cm,0
-D34b,OROB,>4cm,0
 D34b,PAME,<4cm,0
 D34b,PAME,>4cm,0
 D34b,PORI,<4cm,0
@@ -5938,10 +5938,10 @@ D34C,MEAN,<4cm,1
 D34C,MMEA,>4cm,1
 D34C,MUSS,<4cm,1
 D34C,MYCE,>4cm,1
+D34C,OCUL,<4cm,0
+D34C,OCUL,>4cm,0
 D34C,ORBI,<4cm,0
 D34C,ORBI,>4cm,0
-D34C,OROB,<4cm,0
-D34C,OROB,>4cm,0
 D34C,PAME,<4cm,0
 D34C,PAME,>4cm,0
 D34C,PORI,<4cm,0
@@ -5972,10 +5972,10 @@ D35a,MEAN,<4cm,0
 D35a,MMEA,>4cm,2
 D35a,MUSS,<4cm,0
 D35a,MYCE,>4cm,0
+D35a,OCUL,<4cm,0
+D35a,OCUL,>4cm,0
 D35a,ORBI,<4cm,0
 D35a,ORBI,>4cm,1
-D35a,OROB,<4cm,0
-D35a,OROB,>4cm,0
 D35a,PAME,<4cm,0
 D35a,PAME,>4cm,0
 D35a,PORI,<4cm,1
@@ -6006,10 +6006,10 @@ D35b,MEAN,<4cm,0
 D35b,MMEA,>4cm,0
 D35b,MUSS,<4cm,0
 D35b,MYCE,>4cm,1
+D35b,OCUL,<4cm,0
+D35b,OCUL,>4cm,0
 D35b,ORBI,<4cm,0
 D35b,ORBI,>4cm,1
-D35b,OROB,<4cm,0
-D35b,OROB,>4cm,0
 D35b,PAME,<4cm,0
 D35b,PAME,>4cm,0
 D35b,PORI,<4cm,2
@@ -6040,10 +6040,10 @@ D35c,MEAN,<4cm,0
 D35c,MMEA,>4cm,2
 D35c,MUSS,<4cm,0
 D35c,MYCE,>4cm,0
+D35c,OCUL,<4cm,0
+D35c,OCUL,>4cm,0
 D35c,ORBI,<4cm,0
 D35c,ORBI,>4cm,0
-D35c,OROB,<4cm,0
-D35c,OROB,>4cm,0
 D35c,PAME,<4cm,0
 D35c,PAME,>4cm,0
 D35c,PORI,<4cm,0
@@ -6074,10 +6074,10 @@ D36a,MEAN,<4cm,1
 D36a,MMEA,>4cm,0
 D36a,MUSS,<4cm,1
 D36a,MYCE,>4cm,1
+D36a,OCUL,<4cm,0
+D36a,OCUL,>4cm,0
 D36a,ORBI,<4cm,0
 D36a,ORBI,>4cm,1
-D36a,OROB,<4cm,0
-D36a,OROB,>4cm,0
 D36a,PAME,<4cm,0
 D36a,PAME,>4cm,0
 D36a,PORI,<4cm,6
@@ -6108,10 +6108,10 @@ D36b,MEAN,<4cm,1
 D36b,MMEA,>4cm,2
 D36b,MUSS,<4cm,1
 D36b,MYCE,>4cm,0
+D36b,OCUL,<4cm,0
+D36b,OCUL,>4cm,0
 D36b,ORBI,<4cm,0
 D36b,ORBI,>4cm,1
-D36b,OROB,<4cm,0
-D36b,OROB,>4cm,0
 D36b,PAME,<4cm,0
 D36b,PAME,>4cm,0
 D36b,PORI,<4cm,3
@@ -6142,10 +6142,10 @@ D36c,MEAN,<4cm,0
 D36c,MMEA,>4cm,0
 D36c,MUSS,<4cm,0
 D36c,MYCE,>4cm,0
+D36c,OCUL,<4cm,0
+D36c,OCUL,>4cm,0
 D36c,ORBI,<4cm,0
 D36c,ORBI,>4cm,2
-D36c,OROB,<4cm,0
-D36c,OROB,>4cm,0
 D36c,PAME,<4cm,0
 D36c,PAME,>4cm,0
 D36c,PORI,<4cm,1
@@ -6176,10 +6176,10 @@ D37a,MEAN,<4cm,0
 D37a,MMEA,>4cm,0
 D37a,MUSS,<4cm,0
 D37a,MYCE,>4cm,0
+D37a,OCUL,<4cm,0
+D37a,OCUL,>4cm,0
 D37a,ORBI,<4cm,0
 D37a,ORBI,>4cm,0
-D37a,OROB,<4cm,0
-D37a,OROB,>4cm,0
 D37a,PAME,<4cm,0
 D37a,PAME,>4cm,0
 D37a,PORI,<4cm,0
@@ -6210,10 +6210,10 @@ D37b,MEAN,<4cm,0
 D37b,MMEA,>4cm,0
 D37b,MUSS,<4cm,0
 D37b,MYCE,>4cm,0
+D37b,OCUL,<4cm,0
+D37b,OCUL,>4cm,0
 D37b,ORBI,<4cm,0
 D37b,ORBI,>4cm,0
-D37b,OROB,<4cm,0
-D37b,OROB,>4cm,0
 D37b,PAME,<4cm,0
 D37b,PAME,>4cm,0
 D37b,PORI,<4cm,1
@@ -6244,10 +6244,10 @@ D37c,MEAN,<4cm,0
 D37c,MMEA,>4cm,0
 D37c,MUSS,<4cm,0
 D37c,MYCE,>4cm,0
+D37c,OCUL,<4cm,0
+D37c,OCUL,>4cm,0
 D37c,ORBI,<4cm,0
 D37c,ORBI,>4cm,0
-D37c,OROB,<4cm,0
-D37c,OROB,>4cm,0
 D37c,PAME,<4cm,0
 D37c,PAME,>4cm,0
 D37c,PORI,<4cm,1
@@ -6278,10 +6278,10 @@ D38a,MEAN,<4cm,0
 D38a,MMEA,>4cm,0
 D38a,MUSS,<4cm,0
 D38a,MYCE,>4cm,0
+D38a,OCUL,<4cm,0
+D38a,OCUL,>4cm,0
 D38a,ORBI,<4cm,0
 D38a,ORBI,>4cm,0
-D38a,OROB,<4cm,0
-D38a,OROB,>4cm,0
 D38a,PAME,<4cm,0
 D38a,PAME,>4cm,0
 D38a,PORI,<4cm,19
@@ -6312,10 +6312,10 @@ D38b,MEAN,<4cm,0
 D38b,MMEA,>4cm,1
 D38b,MUSS,<4cm,0
 D38b,MYCE,>4cm,0
+D38b,OCUL,<4cm,0
+D38b,OCUL,>4cm,0
 D38b,ORBI,<4cm,0
 D38b,ORBI,>4cm,0
-D38b,OROB,<4cm,0
-D38b,OROB,>4cm,0
 D38b,PAME,<4cm,0
 D38b,PAME,>4cm,0
 D38b,PORI,<4cm,9
@@ -6346,10 +6346,10 @@ D38c,MEAN,<4cm,0
 D38c,MMEA,>4cm,0
 D38c,MUSS,<4cm,0
 D38c,MYCE,>4cm,0
+D38c,OCUL,<4cm,0
+D38c,OCUL,>4cm,0
 D38c,ORBI,<4cm,0
 D38c,ORBI,>4cm,0
-D38c,OROB,<4cm,0
-D38c,OROB,>4cm,0
 D38c,PAME,<4cm,0
 D38c,PAME,>4cm,0
 D38c,PORI,<4cm,36
@@ -6380,10 +6380,10 @@ D3a,MEAN,<4cm,0
 D3a,MMEA,>4cm,0
 D3a,MUSS,<4cm,0
 D3a,MYCE,>4cm,0
+D3a,OCUL,<4cm,0
+D3a,OCUL,>4cm,0
 D3a,ORBI,<4cm,0
 D3a,ORBI,>4cm,0
-D3a,OROB,<4cm,0
-D3a,OROB,>4cm,0
 D3a,PAME,<4cm,0
 D3a,PAME,>4cm,0
 D3a,PORI,<4cm,0
@@ -6414,10 +6414,10 @@ D3b,MEAN,<4cm,0
 D3b,MMEA,>4cm,0
 D3b,MUSS,<4cm,0
 D3b,MYCE,>4cm,0
+D3b,OCUL,<4cm,0
+D3b,OCUL,>4cm,0
 D3b,ORBI,<4cm,0
 D3b,ORBI,>4cm,0
-D3b,OROB,<4cm,0
-D3b,OROB,>4cm,0
 D3b,PAME,<4cm,0
 D3b,PAME,>4cm,0
 D3b,PORI,<4cm,1
@@ -6448,10 +6448,10 @@ D3c,MEAN,<4cm,0
 D3c,MMEA,>4cm,0
 D3c,MUSS,<4cm,0
 D3c,MYCE,>4cm,0
+D3c,OCUL,<4cm,0
+D3c,OCUL,>4cm,0
 D3c,ORBI,<4cm,0
 D3c,ORBI,>4cm,0
-D3c,OROB,<4cm,0
-D3c,OROB,>4cm,0
 D3c,PAME,<4cm,0
 D3c,PAME,>4cm,0
 D3c,PORI,<4cm,0
@@ -6482,10 +6482,10 @@ D40a,MEAN,<4cm,1
 D40a,MMEA,>4cm,0
 D40a,MUSS,<4cm,0
 D40a,MYCE,>4cm,0
+D40a,OCUL,<4cm,0
+D40a,OCUL,>4cm,0
 D40a,ORBI,<4cm,0
 D40a,ORBI,>4cm,0
-D40a,OROB,<4cm,0
-D40a,OROB,>4cm,0
 D40a,PAME,<4cm,0
 D40a,PAME,>4cm,0
 D40a,PORI,<4cm,6
@@ -6516,10 +6516,10 @@ D40b,MEAN,<4cm,0
 D40b,MMEA,>4cm,0
 D40b,MUSS,<4cm,0
 D40b,MYCE,>4cm,0
+D40b,OCUL,<4cm,0
+D40b,OCUL,>4cm,0
 D40b,ORBI,<4cm,0
 D40b,ORBI,>4cm,0
-D40b,OROB,<4cm,0
-D40b,OROB,>4cm,0
 D40b,PAME,<4cm,0
 D40b,PAME,>4cm,0
 D40b,PORI,<4cm,4
@@ -6550,10 +6550,10 @@ D40c,MEAN,<4cm,1
 D40c,MMEA,>4cm,0
 D40c,MUSS,<4cm,0
 D40c,MYCE,>4cm,0
+D40c,OCUL,<4cm,0
+D40c,OCUL,>4cm,0
 D40c,ORBI,<4cm,0
 D40c,ORBI,>4cm,0
-D40c,OROB,<4cm,0
-D40c,OROB,>4cm,0
 D40c,PAME,<4cm,0
 D40c,PAME,>4cm,0
 D40c,PORI,<4cm,7
@@ -6584,10 +6584,10 @@ D41a,MEAN,<4cm,1
 D41a,MMEA,>4cm,1
 D41a,MUSS,<4cm,1
 D41a,MYCE,>4cm,0
+D41a,OCUL,<4cm,0
+D41a,OCUL,>4cm,0
 D41a,ORBI,<4cm,0
 D41a,ORBI,>4cm,0
-D41a,OROB,<4cm,0
-D41a,OROB,>4cm,0
 D41a,PAME,<4cm,0
 D41a,PAME,>4cm,0
 D41a,PORI,<4cm,3
@@ -6619,10 +6619,10 @@ D41b,MEAN,<4cm,4
 D41b,MMEA,>4cm,1
 D41b,MUSS,<4cm,1
 D41b,MYCE,>4cm,0
+D41b,OCUL,<4cm,0
+D41b,OCUL,>4cm,0
 D41b,ORBI,<4cm,0
 D41b,ORBI,>4cm,2
-D41b,OROB,<4cm,0
-D41b,OROB,>4cm,0
 D41b,PAME,<4cm,0
 D41b,PAME,>4cm,0
 D41b,PORI,<4cm,5
@@ -6653,10 +6653,10 @@ D41c,MEAN,<4cm,0
 D41c,MMEA,>4cm,2
 D41c,MUSS,<4cm,0
 D41c,MYCE,>4cm,0
+D41c,OCUL,<4cm,0
+D41c,OCUL,>4cm,0
 D41c,ORBI,<4cm,0
 D41c,ORBI,>4cm,0
-D41c,OROB,<4cm,0
-D41c,OROB,>4cm,0
 D41c,PAME,<4cm,0
 D41c,PAME,>4cm,0
 D41c,PORI,<4cm,9
@@ -6687,10 +6687,10 @@ D43a,MEAN,<4cm,0
 D43a,MMEA,>4cm,0
 D43a,MUSS,<4cm,0
 D43a,MYCE,>4cm,0
+D43a,OCUL,<4cm,0
+D43a,OCUL,>4cm,0
 D43a,ORBI,<4cm,0
 D43a,ORBI,>4cm,0
-D43a,OROB,<4cm,0
-D43a,OROB,>4cm,0
 D43a,PAME,<4cm,0
 D43a,PAME,>4cm,0
 D43a,PORI,<4cm,1
@@ -6721,10 +6721,10 @@ D43b,MEAN,<4cm,0
 D43b,MMEA,>4cm,0
 D43b,MUSS,<4cm,0
 D43b,MYCE,>4cm,0
+D43b,OCUL,<4cm,0
+D43b,OCUL,>4cm,0
 D43b,ORBI,<4cm,0
 D43b,ORBI,>4cm,0
-D43b,OROB,<4cm,0
-D43b,OROB,>4cm,0
 D43b,PAME,<4cm,0
 D43b,PAME,>4cm,0
 D43b,PORI,<4cm,11
@@ -6755,10 +6755,10 @@ D43c,MEAN,<4cm,0
 D43c,MMEA,>4cm,0
 D43c,MUSS,<4cm,0
 D43c,MYCE,>4cm,0
+D43c,OCUL,<4cm,0
+D43c,OCUL,>4cm,0
 D43c,ORBI,<4cm,0
 D43c,ORBI,>4cm,0
-D43c,OROB,<4cm,0
-D43c,OROB,>4cm,0
 D43c,PAME,<4cm,0
 D43c,PAME,>4cm,0
 D43c,PORI,<4cm,5
@@ -6789,10 +6789,10 @@ D44a,MEAN,<4cm,0
 D44a,MMEA,>4cm,0
 D44a,MUSS,<4cm,0
 D44a,MYCE,>4cm,0
+D44a,OCUL,<4cm,0
+D44a,OCUL,>4cm,0
 D44a,ORBI,<4cm,0
 D44a,ORBI,>4cm,0
-D44a,OROB,<4cm,0
-D44a,OROB,>4cm,0
 D44a,PAME,<4cm,0
 D44a,PAME,>4cm,0
 D44a,PORI,<4cm,9
@@ -6823,10 +6823,10 @@ D44b,MEAN,<4cm,0
 D44b,MMEA,>4cm,0
 D44b,MUSS,<4cm,0
 D44b,MYCE,>4cm,0
+D44b,OCUL,<4cm,0
+D44b,OCUL,>4cm,0
 D44b,ORBI,<4cm,0
 D44b,ORBI,>4cm,0
-D44b,OROB,<4cm,0
-D44b,OROB,>4cm,0
 D44b,PAME,<4cm,0
 D44b,PAME,>4cm,0
 D44b,PORI,<4cm,5
@@ -6857,10 +6857,10 @@ D44c,MEAN,<4cm,0
 D44c,MMEA,>4cm,0
 D44c,MUSS,<4cm,0
 D44c,MYCE,>4cm,0
+D44c,OCUL,<4cm,0
+D44c,OCUL,>4cm,0
 D44c,ORBI,<4cm,0
 D44c,ORBI,>4cm,0
-D44c,OROB,<4cm,0
-D44c,OROB,>4cm,0
 D44c,PAME,<4cm,0
 D44c,PAME,>4cm,0
 D44c,PORI,<4cm,13
@@ -6891,10 +6891,10 @@ D4a,MEAN,<4cm,0
 D4a,MMEA,>4cm,1
 D4a,MUSS,<4cm,0
 D4a,MYCE,>4cm,0
+D4a,OCUL,<4cm,0
+D4a,OCUL,>4cm,0
 D4a,ORBI,<4cm,2
 D4a,ORBI,>4cm,0
-D4a,OROB,<4cm,0
-D4a,OROB,>4cm,0
 D4a,PAME,<4cm,0
 D4a,PAME,>4cm,0
 D4a,PORI,<4cm,0
@@ -6925,10 +6925,10 @@ D4c,MEAN,<4cm,0
 D4c,MMEA,>4cm,0
 D4c,MUSS,<4cm,0
 D4c,MYCE,>4cm,0
+D4c,OCUL,<4cm,0
+D4c,OCUL,>4cm,0
 D4c,ORBI,<4cm,0
 D4c,ORBI,>4cm,2
-D4c,OROB,<4cm,0
-D4c,OROB,>4cm,0
 D4c,PAME,<4cm,0
 D4c,PAME,>4cm,0
 D4c,PORI,<4cm,0
@@ -6959,10 +6959,10 @@ D6a,MEAN,<4cm,0
 D6a,MMEA,>4cm,1
 D6a,MUSS,<4cm,0
 D6a,MYCE,>4cm,0
+D6a,OCUL,<4cm,0
+D6a,OCUL,>4cm,0
 D6a,ORBI,<4cm,0
 D6a,ORBI,>4cm,0
-D6a,OROB,<4cm,0
-D6a,OROB,>4cm,0
 D6a,PAME,<4cm,0
 D6a,PAME,>4cm,0
 D6a,PORI,<4cm,35
@@ -6993,10 +6993,10 @@ D6b,MEAN,<4cm,0
 D6b,MMEA,>4cm,0
 D6b,MUSS,<4cm,0
 D6b,MYCE,>4cm,0
+D6b,OCUL,<4cm,0
+D6b,OCUL,>4cm,0
 D6b,ORBI,<4cm,0
 D6b,ORBI,>4cm,0
-D6b,OROB,<4cm,0
-D6b,OROB,>4cm,0
 D6b,PAME,<4cm,0
 D6b,PAME,>4cm,0
 D6b,PORI,<4cm,18
@@ -7028,10 +7028,10 @@ D6c,MEAN,<4cm,0
 D6c,MMEA,>4cm,0
 D6c,MUSS,<4cm,0
 D6c,MYCE,>4cm,0
+D6c,OCUL,<4cm,0
+D6c,OCUL,>4cm,0
 D6c,ORBI,<4cm,0
 D6c,ORBI,>4cm,0
-D6c,OROB,<4cm,0
-D6c,OROB,>4cm,0
 D6c,PAME,<4cm,0
 D6c,PAME,>4cm,0
 D6c,PORI,<4cm,21
@@ -7062,10 +7062,10 @@ D7a,MEAN,<4cm,0
 D7a,MMEA,>4cm,0
 D7a,MUSS,<4cm,0
 D7a,MYCE,>4cm,0
+D7a,OCUL,<4cm,0
+D7a,OCUL,>4cm,0
 D7a,ORBI,<4cm,0
 D7a,ORBI,>4cm,0
-D7a,OROB,<4cm,0
-D7a,OROB,>4cm,0
 D7a,PAME,<4cm,0
 D7a,PAME,>4cm,0
 D7a,PORI,<4cm,2
@@ -7096,10 +7096,10 @@ D7b,MEAN,<4cm,0
 D7b,MMEA,>4cm,0
 D7b,MUSS,<4cm,0
 D7b,MYCE,>4cm,0
+D7b,OCUL,<4cm,0
+D7b,OCUL,>4cm,0
 D7b,ORBI,<4cm,0
 D7b,ORBI,>4cm,0
-D7b,OROB,<4cm,0
-D7b,OROB,>4cm,0
 D7b,PAME,<4cm,0
 D7b,PAME,>4cm,0
 D7b,PORI,<4cm,3
@@ -7130,10 +7130,10 @@ D7c,MEAN,<4cm,0
 D7c,MMEA,>4cm,0
 D7c,MUSS,<4cm,0
 D7c,MYCE,>4cm,0
+D7c,OCUL,<4cm,0
+D7c,OCUL,>4cm,0
 D7c,ORBI,<4cm,0
 D7c,ORBI,>4cm,0
-D7c,OROB,<4cm,0
-D7c,OROB,>4cm,0
 D7c,PAME,<4cm,0
 D7c,PAME,>4cm,0
 D7c,PORI,<4cm,0
@@ -7164,10 +7164,10 @@ D8a,MEAN,<4cm,0
 D8a,MMEA,>4cm,0
 D8a,MUSS,<4cm,0
 D8a,MYCE,>4cm,0
+D8a,OCUL,<4cm,0
+D8a,OCUL,>4cm,0
 D8a,ORBI,<4cm,0
 D8a,ORBI,>4cm,0
-D8a,OROB,<4cm,0
-D8a,OROB,>4cm,0
 D8a,PAME,<4cm,0
 D8a,PAME,>4cm,0
 D8a,PORI,<4cm,9
@@ -7198,10 +7198,10 @@ D8b,MEAN,<4cm,0
 D8b,MMEA,>4cm,0
 D8b,MUSS,<4cm,0
 D8b,MYCE,>4cm,0
+D8b,OCUL,<4cm,0
+D8b,OCUL,>4cm,0
 D8b,ORBI,<4cm,0
 D8b,ORBI,>4cm,0
-D8b,OROB,<4cm,0
-D8b,OROB,>4cm,0
 D8b,PAME,<4cm,0
 D8b,PAME,>4cm,0
 D8b,PORI,<4cm,10
@@ -7232,10 +7232,10 @@ D8c,MEAN,<4cm,0
 D8c,MMEA,>4cm,0
 D8c,MUSS,<4cm,0
 D8c,MYCE,>4cm,0
+D8c,OCUL,<4cm,0
+D8c,OCUL,>4cm,0
 D8c,ORBI,<4cm,0
 D8c,ORBI,>4cm,0
-D8c,OROB,<4cm,0
-D8c,OROB,>4cm,0
 D8c,PAME,<4cm,0
 D8c,PAME,>4cm,0
 D8c,PORI,<4cm,8
@@ -7266,10 +7266,10 @@ LRIN-1,MEAN,<4cm,0
 LRIN-1,MMEA,>4cm,0
 LRIN-1,MUSS,<4cm,0
 LRIN-1,MYCE,>4cm,0
+LRIN-1,OCUL,<4cm,0
+LRIN-1,OCUL,>4cm,0
 LRIN-1,ORBI,<4cm,0
 LRIN-1,ORBI,>4cm,0
-LRIN-1,OROB,<4cm,0
-LRIN-1,OROB,>4cm,0
 LRIN-1,PAME,<4cm,0
 LRIN-1,PAME,>4cm,1
 LRIN-1,PORI,<4cm,0
@@ -7300,10 +7300,10 @@ LRIN-2,MEAN,<4cm,0
 LRIN-2,MMEA,>4cm,1
 LRIN-2,MUSS,<4cm,0
 LRIN-2,MYCE,>4cm,0
+LRIN-2,OCUL,<4cm,0
+LRIN-2,OCUL,>4cm,0
 LRIN-2,ORBI,<4cm,0
 LRIN-2,ORBI,>4cm,0
-LRIN-2,OROB,<4cm,0
-LRIN-2,OROB,>4cm,0
 LRIN-2,PAME,<4cm,0
 LRIN-2,PAME,>4cm,0
 LRIN-2,PORI,<4cm,0
@@ -7334,10 +7334,10 @@ LRIS 1,MEAN,<4cm,0
 LRIS 1,MMEA,>4cm,0
 LRIS 1,MUSS,<4cm,0
 LRIS 1,MYCE,>4cm,0
+LRIS 1,OCUL,<4cm,0
+LRIS 1,OCUL,>4cm,0
 LRIS 1,ORBI,<4cm,0
 LRIS 1,ORBI,>4cm,1
-LRIS 1,OROB,<4cm,0
-LRIS 1,OROB,>4cm,0
 LRIS 1,PAME,<4cm,0
 LRIS 1,PAME,>4cm,0
 LRIS 1,PORI,<4cm,0
@@ -7368,10 +7368,10 @@ LRIS 2,MEAN,<4cm,0
 LRIS 2,MMEA,>4cm,0
 LRIS 2,MUSS,<4cm,0
 LRIS 2,MYCE,>4cm,0
+LRIS 2,OCUL,<4cm,0
+LRIS 2,OCUL,>4cm,0
 LRIS 2,ORBI,<4cm,0
 LRIS 2,ORBI,>4cm,1
-LRIS 2,OROB,<4cm,0
-LRIS 2,OROB,>4cm,0
 LRIS 2,PAME,<4cm,0
 LRIS 2,PAME,>4cm,0
 LRIS 2,PORI,<4cm,0
@@ -7402,10 +7402,10 @@ LRMNW1,MEAN,<4cm,0
 LRMNW1,MMEA,>4cm,0
 LRMNW1,MUSS,<4cm,0
 LRMNW1,MYCE,>4cm,0
+LRMNW1,OCUL,<4cm,0
+LRMNW1,OCUL,>4cm,0
 LRMNW1,ORBI,<4cm,0
 LRMNW1,ORBI,>4cm,0
-LRMNW1,OROB,<4cm,0
-LRMNW1,OROB,>4cm,0
 LRMNW1,PAME,<4cm,0
 LRMNW1,PAME,>4cm,0
 LRMNW1,PORI,<4cm,0
@@ -7436,10 +7436,10 @@ LRMNW2,MEAN,<4cm,0
 LRMNW2,MMEA,>4cm,0
 LRMNW2,MUSS,<4cm,0
 LRMNW2,MYCE,>4cm,0
+LRMNW2,OCUL,<4cm,0
+LRMNW2,OCUL,>4cm,0
 LRMNW2,ORBI,<4cm,0
 LRMNW2,ORBI,>4cm,0
-LRMNW2,OROB,<4cm,0
-LRMNW2,OROB,>4cm,0
 LRMNW2,PAME,<4cm,0
 LRMNW2,PAME,>4cm,0
 LRMNW2,PORI,<4cm,3
@@ -7470,10 +7470,10 @@ LRMSW 1,MEAN,<4cm,0
 LRMSW 1,MMEA,>4cm,0
 LRMSW 1,MUSS,<4cm,0
 LRMSW 1,MYCE,>4cm,0
+LRMSW 1,OCUL,<4cm,0
+LRMSW 1,OCUL,>4cm,0
 LRMSW 1,ORBI,<4cm,0
 LRMSW 1,ORBI,>4cm,0
-LRMSW 1,OROB,<4cm,0
-LRMSW 1,OROB,>4cm,0
 LRMSW 1,PAME,<4cm,0
 LRMSW 1,PAME,>4cm,0
 LRMSW 1,PORI,<4cm,0
@@ -7504,10 +7504,10 @@ LRMSW 2,MEAN,<4cm,0
 LRMSW 2,MMEA,>4cm,0
 LRMSW 2,MUSS,<4cm,0
 LRMSW 2,MYCE,>4cm,0
+LRMSW 2,OCUL,<4cm,0
+LRMSW 2,OCUL,>4cm,0
 LRMSW 2,ORBI,<4cm,0
 LRMSW 2,ORBI,>4cm,0
-LRMSW 2,OROB,<4cm,0
-LRMSW 2,OROB,>4cm,0
 LRMSW 2,PAME,<4cm,0
 LRMSW 2,PAME,>4cm,0
 LRMSW 2,PORI,<4cm,0
@@ -7538,10 +7538,10 @@ NA1,MEAN,<4cm,0
 NA1,MMEA,>4cm,0
 NA1,MUSS,<4cm,0
 NA1,MYCE,>4cm,0
+NA1,OCUL,<4cm,0
+NA1,OCUL,>4cm,0
 NA1,ORBI,<4cm,0
 NA1,ORBI,>4cm,0
-NA1,OROB,<4cm,0
-NA1,OROB,>4cm,0
 NA1,PAME,<4cm,0
 NA1,PAME,>4cm,0
 NA1,PORI,<4cm,0
@@ -7572,10 +7572,10 @@ NA2,MEAN,<4cm,0
 NA2,MMEA,>4cm,0
 NA2,MUSS,<4cm,0
 NA2,MYCE,>4cm,0
+NA2,OCUL,<4cm,1
+NA2,OCUL,>4cm,0
 NA2,ORBI,<4cm,0
 NA2,ORBI,>4cm,0
-NA2,OROB,<4cm,1
-NA2,OROB,>4cm,0
 NA2,PAME,<4cm,0
 NA2,PAME,>4cm,0
 NA2,PORI,<4cm,0
@@ -7606,10 +7606,10 @@ NA3,MEAN,<4cm,0
 NA3,MMEA,>4cm,0
 NA3,MUSS,<4cm,0
 NA3,MYCE,>4cm,0
+NA3,OCUL,<4cm,0
+NA3,OCUL,>4cm,0
 NA3,ORBI,<4cm,0
 NA3,ORBI,>4cm,0
-NA3,OROB,<4cm,0
-NA3,OROB,>4cm,0
 NA3,PAME,<4cm,0
 NA3,PAME,>4cm,0
 NA3,PORI,<4cm,0
@@ -7640,10 +7640,10 @@ NA4,MEAN,<4cm,0
 NA4,MMEA,>4cm,0
 NA4,MUSS,<4cm,0
 NA4,MYCE,>4cm,0
+NA4,OCUL,<4cm,0
+NA4,OCUL,>4cm,0
 NA4,ORBI,<4cm,0
 NA4,ORBI,>4cm,0
-NA4,OROB,<4cm,0
-NA4,OROB,>4cm,0
 NA4,PAME,<4cm,0
 NA4,PAME,>4cm,0
 NA4,PORI,<4cm,2
@@ -7674,10 +7674,10 @@ NA5,MEAN,<4cm,0
 NA5,MMEA,>4cm,0
 NA5,MUSS,<4cm,0
 NA5,MYCE,>4cm,0
+NA5,OCUL,<4cm,0
+NA5,OCUL,>4cm,0
 NA5,ORBI,<4cm,0
 NA5,ORBI,>4cm,0
-NA5,OROB,<4cm,0
-NA5,OROB,>4cm,0
 NA5,PAME,<4cm,0
 NA5,PAME,>4cm,0
 NA5,PORI,<4cm,0
@@ -7708,10 +7708,10 @@ NA6,MEAN,<4cm,0
 NA6,MMEA,>4cm,0
 NA6,MUSS,<4cm,0
 NA6,MYCE,>4cm,0
+NA6,OCUL,<4cm,0
+NA6,OCUL,>4cm,0
 NA6,ORBI,<4cm,0
 NA6,ORBI,>4cm,0
-NA6,OROB,<4cm,0
-NA6,OROB,>4cm,0
 NA6,PAME,<4cm,0
 NA6,PAME,>4cm,0
 NA6,PORI,<4cm,0
@@ -7742,10 +7742,10 @@ NA7,MEAN,<4cm,0
 NA7,MMEA,>4cm,0
 NA7,MUSS,<4cm,0
 NA7,MYCE,>4cm,0
+NA7,OCUL,<4cm,0
+NA7,OCUL,>4cm,0
 NA7,ORBI,<4cm,0
 NA7,ORBI,>4cm,0
-NA7,OROB,<4cm,0
-NA7,OROB,>4cm,0
 NA7,PAME,<4cm,0
 NA7,PAME,>4cm,0
 NA7,PORI,<4cm,0
@@ -7776,10 +7776,10 @@ NA8,MEAN,<4cm,0
 NA8,MMEA,>4cm,0
 NA8,MUSS,<4cm,0
 NA8,MYCE,>4cm,0
+NA8,OCUL,<4cm,0
+NA8,OCUL,>4cm,0
 NA8,ORBI,<4cm,0
 NA8,ORBI,>4cm,0
-NA8,OROB,<4cm,0
-NA8,OROB,>4cm,0
 NA8,PAME,<4cm,0
 NA8,PAME,>4cm,0
 NA8,PORI,<4cm,2
@@ -7810,10 +7810,10 @@ Nb1,MEAN,<4cm,1
 Nb1,MMEA,>4cm,0
 Nb1,MUSS,<4cm,0
 Nb1,MYCE,>4cm,0
+Nb1,OCUL,<4cm,0
+Nb1,OCUL,>4cm,0
 Nb1,ORBI,<4cm,0
 Nb1,ORBI,>4cm,0
-Nb1,OROB,<4cm,0
-Nb1,OROB,>4cm,0
 Nb1,PAME,<4cm,0
 Nb1,PAME,>4cm,0
 Nb1,PORI,<4cm,0
@@ -7844,10 +7844,10 @@ Nb10,MEAN,<4cm,0
 Nb10,MMEA,>4cm,0
 Nb10,MUSS,<4cm,0
 Nb10,MYCE,>4cm,0
+Nb10,OCUL,<4cm,0
+Nb10,OCUL,>4cm,0
 Nb10,ORBI,<4cm,0
 Nb10,ORBI,>4cm,0
-Nb10,OROB,<4cm,0
-Nb10,OROB,>4cm,0
 Nb10,PAME,<4cm,0
 Nb10,PAME,>4cm,0
 Nb10,PORI,<4cm,0
@@ -7878,10 +7878,10 @@ Nb11,MEAN,<4cm,0
 Nb11,MMEA,>4cm,0
 Nb11,MUSS,<4cm,0
 Nb11,MYCE,>4cm,0
+Nb11,OCUL,<4cm,0
+Nb11,OCUL,>4cm,0
 Nb11,ORBI,<4cm,0
 Nb11,ORBI,>4cm,0
-Nb11,OROB,<4cm,0
-Nb11,OROB,>4cm,0
 Nb11,PAME,<4cm,0
 Nb11,PAME,>4cm,0
 Nb11,PORI,<4cm,1
@@ -7912,10 +7912,10 @@ Nb12,MEAN,<4cm,1
 Nb12,MMEA,>4cm,0
 Nb12,MUSS,<4cm,0
 Nb12,MYCE,>4cm,0
+Nb12,OCUL,<4cm,0
+Nb12,OCUL,>4cm,0
 Nb12,ORBI,<4cm,0
 Nb12,ORBI,>4cm,0
-Nb12,OROB,<4cm,0
-Nb12,OROB,>4cm,0
 Nb12,PAME,<4cm,0
 Nb12,PAME,>4cm,0
 Nb12,PORI,<4cm,0
@@ -7946,10 +7946,10 @@ Nb13,MEAN,<4cm,0
 Nb13,MMEA,>4cm,0
 Nb13,MUSS,<4cm,0
 Nb13,MYCE,>4cm,0
+Nb13,OCUL,<4cm,0
+Nb13,OCUL,>4cm,0
 Nb13,ORBI,<4cm,0
 Nb13,ORBI,>4cm,0
-Nb13,OROB,<4cm,0
-Nb13,OROB,>4cm,0
 Nb13,PAME,<4cm,0
 Nb13,PAME,>4cm,0
 Nb13,PORI,<4cm,1
@@ -7980,10 +7980,10 @@ Nb14,MEAN,<4cm,0
 Nb14,MMEA,>4cm,0
 Nb14,MUSS,<4cm,0
 Nb14,MYCE,>4cm,0
+Nb14,OCUL,<4cm,0
+Nb14,OCUL,>4cm,0
 Nb14,ORBI,<4cm,0
 Nb14,ORBI,>4cm,0
-Nb14,OROB,<4cm,0
-Nb14,OROB,>4cm,0
 Nb14,PAME,<4cm,0
 Nb14,PAME,>4cm,0
 Nb14,PORI,<4cm,0
@@ -8014,10 +8014,10 @@ Nb15,MEAN,<4cm,0
 Nb15,MMEA,>4cm,0
 Nb15,MUSS,<4cm,0
 Nb15,MYCE,>4cm,0
+Nb15,OCUL,<4cm,0
+Nb15,OCUL,>4cm,0
 Nb15,ORBI,<4cm,0
 Nb15,ORBI,>4cm,0
-Nb15,OROB,<4cm,0
-Nb15,OROB,>4cm,0
 Nb15,PAME,<4cm,0
 Nb15,PAME,>4cm,0
 Nb15,PORI,<4cm,0
@@ -8048,10 +8048,10 @@ Nb16,MEAN,<4cm,0
 Nb16,MMEA,>4cm,0
 Nb16,MUSS,<4cm,0
 Nb16,MYCE,>4cm,0
+Nb16,OCUL,<4cm,0
+Nb16,OCUL,>4cm,0
 Nb16,ORBI,<4cm,0
 Nb16,ORBI,>4cm,0
-Nb16,OROB,<4cm,0
-Nb16,OROB,>4cm,0
 Nb16,PAME,<4cm,0
 Nb16,PAME,>4cm,0
 Nb16,PORI,<4cm,1
@@ -8082,10 +8082,10 @@ Nb17,MEAN,<4cm,0
 Nb17,MMEA,>4cm,0
 Nb17,MUSS,<4cm,0
 Nb17,MYCE,>4cm,0
+Nb17,OCUL,<4cm,0
+Nb17,OCUL,>4cm,0
 Nb17,ORBI,<4cm,0
 Nb17,ORBI,>4cm,0
-Nb17,OROB,<4cm,0
-Nb17,OROB,>4cm,0
 Nb17,PAME,<4cm,0
 Nb17,PAME,>4cm,0
 Nb17,PORI,<4cm,0
@@ -8116,10 +8116,10 @@ Nb18,MEAN,<4cm,0
 Nb18,MMEA,>4cm,0
 Nb18,MUSS,<4cm,0
 Nb18,MYCE,>4cm,0
+Nb18,OCUL,<4cm,0
+Nb18,OCUL,>4cm,0
 Nb18,ORBI,<4cm,0
 Nb18,ORBI,>4cm,0
-Nb18,OROB,<4cm,0
-Nb18,OROB,>4cm,0
 Nb18,PAME,<4cm,0
 Nb18,PAME,>4cm,0
 Nb18,PORI,<4cm,0
@@ -8150,10 +8150,10 @@ Nb19,MEAN,<4cm,0
 Nb19,MMEA,>4cm,0
 Nb19,MUSS,<4cm,0
 Nb19,MYCE,>4cm,0
+Nb19,OCUL,<4cm,0
+Nb19,OCUL,>4cm,0
 Nb19,ORBI,<4cm,0
 Nb19,ORBI,>4cm,0
-Nb19,OROB,<4cm,0
-Nb19,OROB,>4cm,0
 Nb19,PAME,<4cm,0
 Nb19,PAME,>4cm,0
 Nb19,PORI,<4cm,1
@@ -8184,10 +8184,10 @@ Nb2,MEAN,<4cm,0
 Nb2,MMEA,>4cm,0
 Nb2,MUSS,<4cm,0
 Nb2,MYCE,>4cm,0
+Nb2,OCUL,<4cm,0
+Nb2,OCUL,>4cm,0
 Nb2,ORBI,<4cm,0
 Nb2,ORBI,>4cm,0
-Nb2,OROB,<4cm,0
-Nb2,OROB,>4cm,0
 Nb2,PAME,<4cm,0
 Nb2,PAME,>4cm,0
 Nb2,PORI,<4cm,0
@@ -8218,10 +8218,10 @@ Nb20,MEAN,<4cm,0
 Nb20,MMEA,>4cm,0
 Nb20,MUSS,<4cm,0
 Nb20,MYCE,>4cm,0
+Nb20,OCUL,<4cm,0
+Nb20,OCUL,>4cm,0
 Nb20,ORBI,<4cm,0
 Nb20,ORBI,>4cm,0
-Nb20,OROB,<4cm,0
-Nb20,OROB,>4cm,0
 Nb20,PAME,<4cm,0
 Nb20,PAME,>4cm,0
 Nb20,PORI,<4cm,0
@@ -8252,10 +8252,10 @@ Nb21,MEAN,<4cm,0
 Nb21,MMEA,>4cm,0
 Nb21,MUSS,<4cm,0
 Nb21,MYCE,>4cm,0
+Nb21,OCUL,<4cm,0
+Nb21,OCUL,>4cm,0
 Nb21,ORBI,<4cm,0
 Nb21,ORBI,>4cm,0
-Nb21,OROB,<4cm,0
-Nb21,OROB,>4cm,0
 Nb21,PAME,<4cm,0
 Nb21,PAME,>4cm,0
 Nb21,PORI,<4cm,1
@@ -8286,10 +8286,10 @@ Nb22,MEAN,<4cm,0
 Nb22,MMEA,>4cm,0
 Nb22,MUSS,<4cm,0
 Nb22,MYCE,>4cm,0
+Nb22,OCUL,<4cm,0
+Nb22,OCUL,>4cm,0
 Nb22,ORBI,<4cm,0
 Nb22,ORBI,>4cm,0
-Nb22,OROB,<4cm,0
-Nb22,OROB,>4cm,0
 Nb22,PAME,<4cm,0
 Nb22,PAME,>4cm,0
 Nb22,PORI,<4cm,0
@@ -8320,10 +8320,10 @@ Nb23,MEAN,<4cm,0
 Nb23,MMEA,>4cm,0
 Nb23,MUSS,<4cm,0
 Nb23,MYCE,>4cm,0
+Nb23,OCUL,<4cm,0
+Nb23,OCUL,>4cm,0
 Nb23,ORBI,<4cm,0
 Nb23,ORBI,>4cm,0
-Nb23,OROB,<4cm,0
-Nb23,OROB,>4cm,0
 Nb23,PAME,<4cm,0
 Nb23,PAME,>4cm,0
 Nb23,PORI,<4cm,0
@@ -8354,10 +8354,10 @@ Nb24,MEAN,<4cm,0
 Nb24,MMEA,>4cm,0
 Nb24,MUSS,<4cm,0
 Nb24,MYCE,>4cm,0
+Nb24,OCUL,<4cm,0
+Nb24,OCUL,>4cm,0
 Nb24,ORBI,<4cm,0
 Nb24,ORBI,>4cm,0
-Nb24,OROB,<4cm,0
-Nb24,OROB,>4cm,0
 Nb24,PAME,<4cm,0
 Nb24,PAME,>4cm,0
 Nb24,PORI,<4cm,0
@@ -8388,10 +8388,10 @@ Nb3,MEAN,<4cm,1
 Nb3,MMEA,>4cm,0
 Nb3,MUSS,<4cm,0
 Nb3,MYCE,>4cm,0
+Nb3,OCUL,<4cm,0
+Nb3,OCUL,>4cm,0
 Nb3,ORBI,<4cm,0
 Nb3,ORBI,>4cm,0
-Nb3,OROB,<4cm,0
-Nb3,OROB,>4cm,0
 Nb3,PAME,<4cm,0
 Nb3,PAME,>4cm,0
 Nb3,PORI,<4cm,0
@@ -8422,10 +8422,10 @@ Nb4,MEAN,<4cm,0
 Nb4,MMEA,>4cm,1
 Nb4,MUSS,<4cm,0
 Nb4,MYCE,>4cm,0
+Nb4,OCUL,<4cm,0
+Nb4,OCUL,>4cm,0
 Nb4,ORBI,<4cm,0
 Nb4,ORBI,>4cm,0
-Nb4,OROB,<4cm,0
-Nb4,OROB,>4cm,0
 Nb4,PAME,<4cm,0
 Nb4,PAME,>4cm,0
 Nb4,PORI,<4cm,1
@@ -8456,10 +8456,10 @@ Nb5,MEAN,<4cm,1
 Nb5,MMEA,>4cm,0
 Nb5,MUSS,<4cm,0
 Nb5,MYCE,>4cm,0
+Nb5,OCUL,<4cm,0
+Nb5,OCUL,>4cm,0
 Nb5,ORBI,<4cm,0
 Nb5,ORBI,>4cm,0
-Nb5,OROB,<4cm,0
-Nb5,OROB,>4cm,0
 Nb5,PAME,<4cm,0
 Nb5,PAME,>4cm,0
 Nb5,PORI,<4cm,2
@@ -8490,10 +8490,10 @@ Nb6,MEAN,<4cm,0
 Nb6,MMEA,>4cm,0
 Nb6,MUSS,<4cm,0
 Nb6,MYCE,>4cm,0
+Nb6,OCUL,<4cm,0
+Nb6,OCUL,>4cm,0
 Nb6,ORBI,<4cm,0
 Nb6,ORBI,>4cm,0
-Nb6,OROB,<4cm,0
-Nb6,OROB,>4cm,0
 Nb6,PAME,<4cm,0
 Nb6,PAME,>4cm,0
 Nb6,PORI,<4cm,0
@@ -8524,10 +8524,10 @@ Nb7,MEAN,<4cm,4
 Nb7,MMEA,>4cm,0
 Nb7,MUSS,<4cm,0
 Nb7,MYCE,>4cm,0
+Nb7,OCUL,<4cm,0
+Nb7,OCUL,>4cm,0
 Nb7,ORBI,<4cm,0
 Nb7,ORBI,>4cm,0
-Nb7,OROB,<4cm,0
-Nb7,OROB,>4cm,0
 Nb7,PAME,<4cm,0
 Nb7,PAME,>4cm,0
 Nb7,PORI,<4cm,2
@@ -8558,10 +8558,10 @@ Nb8,MEAN,<4cm,0
 Nb8,MMEA,>4cm,0
 Nb8,MUSS,<4cm,0
 Nb8,MYCE,>4cm,0
+Nb8,OCUL,<4cm,0
+Nb8,OCUL,>4cm,0
 Nb8,ORBI,<4cm,0
 Nb8,ORBI,>4cm,0
-Nb8,OROB,<4cm,0
-Nb8,OROB,>4cm,0
 Nb8,PAME,<4cm,0
 Nb8,PAME,>4cm,0
 Nb8,PORI,<4cm,0
@@ -8592,10 +8592,10 @@ Nb9,MEAN,<4cm,0
 Nb9,MMEA,>4cm,1
 Nb9,MUSS,<4cm,0
 Nb9,MYCE,>4cm,0
+Nb9,OCUL,<4cm,0
+Nb9,OCUL,>4cm,0
 Nb9,ORBI,<4cm,0
 Nb9,ORBI,>4cm,0
-Nb9,OROB,<4cm,0
-Nb9,OROB,>4cm,0
 Nb9,PAME,<4cm,0
 Nb9,PAME,>4cm,0
 Nb9,PORI,<4cm,0
@@ -8626,10 +8626,10 @@ NC1,MEAN,<4cm,0
 NC1,MMEA,>4cm,0
 NC1,MUSS,<4cm,0
 NC1,MYCE,>4cm,0
+NC1,OCUL,<4cm,0
+NC1,OCUL,>4cm,0
 NC1,ORBI,<4cm,0
 NC1,ORBI,>4cm,0
-NC1,OROB,<4cm,0
-NC1,OROB,>4cm,0
 NC1,PAME,<4cm,0
 NC1,PAME,>4cm,0
 NC1,PORI,<4cm,1
@@ -8660,10 +8660,10 @@ NC2,MEAN,<4cm,0
 NC2,MMEA,>4cm,0
 NC2,MUSS,<4cm,0
 NC2,MYCE,>4cm,0
+NC2,OCUL,<4cm,0
+NC2,OCUL,>4cm,0
 NC2,ORBI,<4cm,0
 NC2,ORBI,>4cm,0
-NC2,OROB,<4cm,0
-NC2,OROB,>4cm,0
 NC2,PAME,<4cm,0
 NC2,PAME,>4cm,0
 NC2,PORI,<4cm,0
@@ -8694,10 +8694,10 @@ NC3,MEAN,<4cm,0
 NC3,MMEA,>4cm,0
 NC3,MUSS,<4cm,0
 NC3,MYCE,>4cm,0
+NC3,OCUL,<4cm,0
+NC3,OCUL,>4cm,0
 NC3,ORBI,<4cm,0
 NC3,ORBI,>4cm,0
-NC3,OROB,<4cm,0
-NC3,OROB,>4cm,0
 NC3,PAME,<4cm,0
 NC3,PAME,>4cm,0
 NC3,PORI,<4cm,0
@@ -8728,10 +8728,10 @@ Nd1,MEAN,<4cm,1
 Nd1,MMEA,>4cm,0
 Nd1,MUSS,<4cm,0
 Nd1,MYCE,>4cm,0
+Nd1,OCUL,<4cm,0
+Nd1,OCUL,>4cm,0
 Nd1,ORBI,<4cm,0
 Nd1,ORBI,>4cm,0
-Nd1,OROB,<4cm,0
-Nd1,OROB,>4cm,0
 Nd1,PAME,<4cm,0
 Nd1,PAME,>4cm,0
 Nd1,PORI,<4cm,0
@@ -8762,10 +8762,10 @@ ND2,MEAN,<4cm,0
 ND2,MMEA,>4cm,0
 ND2,MUSS,<4cm,0
 ND2,MYCE,>4cm,0
+ND2,OCUL,<4cm,0
+ND2,OCUL,>4cm,0
 ND2,ORBI,<4cm,0
 ND2,ORBI,>4cm,0
-ND2,OROB,<4cm,0
-ND2,OROB,>4cm,0
 ND2,PAME,<4cm,0
 ND2,PAME,>4cm,0
 ND2,PORI,<4cm,0
@@ -8796,10 +8796,10 @@ Nd3,MEAN,<4cm,0
 Nd3,MMEA,>4cm,0
 Nd3,MUSS,<4cm,0
 Nd3,MYCE,>4cm,0
+Nd3,OCUL,<4cm,0
+Nd3,OCUL,>4cm,0
 Nd3,ORBI,<4cm,0
 Nd3,ORBI,>4cm,0
-Nd3,OROB,<4cm,0
-Nd3,OROB,>4cm,0
 Nd3,PAME,<4cm,0
 Nd3,PAME,>4cm,0
 Nd3,PORI,<4cm,0
@@ -8830,10 +8830,10 @@ ND4,MEAN,<4cm,0
 ND4,MMEA,>4cm,0
 ND4,MUSS,<4cm,0
 ND4,MYCE,>4cm,0
+ND4,OCUL,<4cm,0
+ND4,OCUL,>4cm,0
 ND4,ORBI,<4cm,0
 ND4,ORBI,>4cm,0
-ND4,OROB,<4cm,0
-ND4,OROB,>4cm,0
 ND4,PAME,<4cm,0
 ND4,PAME,>4cm,0
 ND4,PORI,<4cm,0
@@ -8864,10 +8864,10 @@ Nd5,MEAN,<4cm,0
 Nd5,MMEA,>4cm,0
 Nd5,MUSS,<4cm,0
 Nd5,MYCE,>4cm,0
+Nd5,OCUL,<4cm,0
+Nd5,OCUL,>4cm,0
 Nd5,ORBI,<4cm,0
 Nd5,ORBI,>4cm,0
-Nd5,OROB,<4cm,0
-Nd5,OROB,>4cm,0
 Nd5,PAME,<4cm,0
 Nd5,PAME,>4cm,0
 Nd5,PORI,<4cm,0
@@ -8898,10 +8898,10 @@ Nd6,MEAN,<4cm,0
 Nd6,MMEA,>4cm,0
 Nd6,MUSS,<4cm,0
 Nd6,MYCE,>4cm,0
+Nd6,OCUL,<4cm,0
+Nd6,OCUL,>4cm,0
 Nd6,ORBI,<4cm,0
 Nd6,ORBI,>4cm,0
-Nd6,OROB,<4cm,0
-Nd6,OROB,>4cm,0
 Nd6,PAME,<4cm,0
 Nd6,PAME,>4cm,0
 Nd6,PORI,<4cm,1
@@ -8932,10 +8932,10 @@ Nd7,MEAN,<4cm,1
 Nd7,MMEA,>4cm,1
 Nd7,MUSS,<4cm,0
 Nd7,MYCE,>4cm,0
+Nd7,OCUL,<4cm,0
+Nd7,OCUL,>4cm,0
 Nd7,ORBI,<4cm,0
 Nd7,ORBI,>4cm,0
-Nd7,OROB,<4cm,0
-Nd7,OROB,>4cm,0
 Nd7,PAME,<4cm,0
 Nd7,PAME,>4cm,0
 Nd7,PORI,<4cm,0
@@ -8966,10 +8966,10 @@ Nd8,MEAN,<4cm,0
 Nd8,MMEA,>4cm,0
 Nd8,MUSS,<4cm,0
 Nd8,MYCE,>4cm,0
+Nd8,OCUL,<4cm,0
+Nd8,OCUL,>4cm,0
 Nd8,ORBI,<4cm,0
 Nd8,ORBI,>4cm,0
-Nd8,OROB,<4cm,0
-Nd8,OROB,>4cm,0
 Nd8,PAME,<4cm,0
 Nd8,PAME,>4cm,0
 Nd8,PORI,<4cm,0
@@ -9000,10 +9000,10 @@ NE1,MEAN,<4cm,0
 NE1,MMEA,>4cm,0
 NE1,MUSS,<4cm,0
 NE1,MYCE,>4cm,0
+NE1,OCUL,<4cm,0
+NE1,OCUL,>4cm,0
 NE1,ORBI,<4cm,0
 NE1,ORBI,>4cm,0
-NE1,OROB,<4cm,0
-NE1,OROB,>4cm,0
 NE1,PAME,<4cm,0
 NE1,PAME,>4cm,0
 NE1,PORI,<4cm,2
@@ -9034,10 +9034,10 @@ Ne10,MEAN,<4cm,0
 Ne10,MMEA,>4cm,0
 Ne10,MUSS,<4cm,0
 Ne10,MYCE,>4cm,0
+Ne10,OCUL,<4cm,0
+Ne10,OCUL,>4cm,0
 Ne10,ORBI,<4cm,0
 Ne10,ORBI,>4cm,0
-Ne10,OROB,<4cm,0
-Ne10,OROB,>4cm,0
 Ne10,PAME,<4cm,0
 Ne10,PAME,>4cm,0
 Ne10,PORI,<4cm,2
@@ -9068,10 +9068,10 @@ Ne11,MEAN,<4cm,1
 Ne11,MMEA,>4cm,1
 Ne11,MUSS,<4cm,0
 Ne11,MYCE,>4cm,0
+Ne11,OCUL,<4cm,0
+Ne11,OCUL,>4cm,0
 Ne11,ORBI,<4cm,0
 Ne11,ORBI,>4cm,0
-Ne11,OROB,<4cm,0
-Ne11,OROB,>4cm,0
 Ne11,PAME,<4cm,0
 Ne11,PAME,>4cm,0
 Ne11,PORI,<4cm,1
@@ -9102,10 +9102,10 @@ NE2,MEAN,<4cm,0
 NE2,MMEA,>4cm,0
 NE2,MUSS,<4cm,0
 NE2,MYCE,>4cm,0
+NE2,OCUL,<4cm,0
+NE2,OCUL,>4cm,0
 NE2,ORBI,<4cm,0
 NE2,ORBI,>4cm,0
-NE2,OROB,<4cm,0
-NE2,OROB,>4cm,0
 NE2,PAME,<4cm,0
 NE2,PAME,>4cm,0
 NE2,PORI,<4cm,0
@@ -9136,10 +9136,10 @@ NE3,MEAN,<4cm,2
 NE3,MMEA,>4cm,0
 NE3,MUSS,<4cm,0
 NE3,MYCE,>4cm,0
+NE3,OCUL,<4cm,0
+NE3,OCUL,>4cm,0
 NE3,ORBI,<4cm,0
 NE3,ORBI,>4cm,0
-NE3,OROB,<4cm,0
-NE3,OROB,>4cm,0
 NE3,PAME,<4cm,0
 NE3,PAME,>4cm,0
 NE3,PORI,<4cm,1
@@ -9170,10 +9170,10 @@ Ne4,MEAN,<4cm,0
 Ne4,MMEA,>4cm,0
 Ne4,MUSS,<4cm,0
 Ne4,MYCE,>4cm,0
+Ne4,OCUL,<4cm,0
+Ne4,OCUL,>4cm,0
 Ne4,ORBI,<4cm,0
 Ne4,ORBI,>4cm,0
-Ne4,OROB,<4cm,0
-Ne4,OROB,>4cm,0
 Ne4,PAME,<4cm,0
 Ne4,PAME,>4cm,0
 Ne4,PORI,<4cm,1
@@ -9204,10 +9204,10 @@ Ne5,MEAN,<4cm,0
 Ne5,MMEA,>4cm,0
 Ne5,MUSS,<4cm,0
 Ne5,MYCE,>4cm,0
+Ne5,OCUL,<4cm,0
+Ne5,OCUL,>4cm,0
 Ne5,ORBI,<4cm,0
 Ne5,ORBI,>4cm,0
-Ne5,OROB,<4cm,0
-Ne5,OROB,>4cm,0
 Ne5,PAME,<4cm,0
 Ne5,PAME,>4cm,0
 Ne5,PORI,<4cm,1
@@ -9238,10 +9238,10 @@ Ne6,MEAN,<4cm,0
 Ne6,MMEA,>4cm,0
 Ne6,MUSS,<4cm,0
 Ne6,MYCE,>4cm,0
+Ne6,OCUL,<4cm,0
+Ne6,OCUL,>4cm,0
 Ne6,ORBI,<4cm,0
 Ne6,ORBI,>4cm,0
-Ne6,OROB,<4cm,0
-Ne6,OROB,>4cm,0
 Ne6,PAME,<4cm,0
 Ne6,PAME,>4cm,0
 Ne6,PORI,<4cm,0
@@ -9272,10 +9272,10 @@ Ne7,MEAN,<4cm,0
 Ne7,MMEA,>4cm,0
 Ne7,MUSS,<4cm,0
 Ne7,MYCE,>4cm,0
+Ne7,OCUL,<4cm,0
+Ne7,OCUL,>4cm,0
 Ne7,ORBI,<4cm,0
 Ne7,ORBI,>4cm,0
-Ne7,OROB,<4cm,0
-Ne7,OROB,>4cm,0
 Ne7,PAME,<4cm,0
 Ne7,PAME,>4cm,0
 Ne7,PORI,<4cm,0
@@ -9306,10 +9306,10 @@ Ne8,MEAN,<4cm,0
 Ne8,MMEA,>4cm,0
 Ne8,MUSS,<4cm,0
 Ne8,MYCE,>4cm,0
+Ne8,OCUL,<4cm,0
+Ne8,OCUL,>4cm,0
 Ne8,ORBI,<4cm,0
 Ne8,ORBI,>4cm,0
-Ne8,OROB,<4cm,0
-Ne8,OROB,>4cm,0
 Ne8,PAME,<4cm,0
 Ne8,PAME,>4cm,0
 Ne8,PORI,<4cm,1
@@ -9340,10 +9340,10 @@ Ne9,MEAN,<4cm,1
 Ne9,MMEA,>4cm,2
 Ne9,MUSS,<4cm,0
 Ne9,MYCE,>4cm,0
+Ne9,OCUL,<4cm,0
+Ne9,OCUL,>4cm,0
 Ne9,ORBI,<4cm,0
 Ne9,ORBI,>4cm,0
-Ne9,OROB,<4cm,0
-Ne9,OROB,>4cm,0
 Ne9,PAME,<4cm,0
 Ne9,PAME,>4cm,0
 Ne9,PORI,<4cm,0
@@ -9374,10 +9374,10 @@ Nf1,MEAN,<4cm,0
 Nf1,MMEA,>4cm,0
 Nf1,MUSS,<4cm,0
 Nf1,MYCE,>4cm,0
+Nf1,OCUL,<4cm,0
+Nf1,OCUL,>4cm,0
 Nf1,ORBI,<4cm,0
 Nf1,ORBI,>4cm,0
-Nf1,OROB,<4cm,0
-Nf1,OROB,>4cm,0
 Nf1,PAME,<4cm,0
 Nf1,PAME,>4cm,0
 Nf1,PORI,<4cm,0
@@ -9408,10 +9408,10 @@ Nf2,MEAN,<4cm,0
 Nf2,MMEA,>4cm,0
 Nf2,MUSS,<4cm,0
 Nf2,MYCE,>4cm,0
+Nf2,OCUL,<4cm,0
+Nf2,OCUL,>4cm,0
 Nf2,ORBI,<4cm,0
 Nf2,ORBI,>4cm,0
-Nf2,OROB,<4cm,0
-Nf2,OROB,>4cm,0
 Nf2,PAME,<4cm,0
 Nf2,PAME,>4cm,0
 Nf2,PORI,<4cm,0
@@ -9442,10 +9442,10 @@ Nf3,MEAN,<4cm,0
 Nf3,MMEA,>4cm,0
 Nf3,MUSS,<4cm,0
 Nf3,MYCE,>4cm,0
+Nf3,OCUL,<4cm,0
+Nf3,OCUL,>4cm,0
 Nf3,ORBI,<4cm,0
 Nf3,ORBI,>4cm,0
-Nf3,OROB,<4cm,0
-Nf3,OROB,>4cm,0
 Nf3,PAME,<4cm,0
 Nf3,PAME,>4cm,0
 Nf3,PORI,<4cm,0
@@ -9476,10 +9476,10 @@ Nf4,MEAN,<4cm,0
 Nf4,MMEA,>4cm,0
 Nf4,MUSS,<4cm,0
 Nf4,MYCE,>4cm,1
+Nf4,OCUL,<4cm,0
+Nf4,OCUL,>4cm,0
 Nf4,ORBI,<4cm,0
 Nf4,ORBI,>4cm,0
-Nf4,OROB,<4cm,0
-Nf4,OROB,>4cm,0
 Nf4,PAME,<4cm,0
 Nf4,PAME,>4cm,0
 Nf4,PORI,<4cm,0
@@ -9510,10 +9510,10 @@ Nf5,MEAN,<4cm,0
 Nf5,MMEA,>4cm,0
 Nf5,MUSS,<4cm,0
 Nf5,MYCE,>4cm,0
+Nf5,OCUL,<4cm,0
+Nf5,OCUL,>4cm,0
 Nf5,ORBI,<4cm,0
 Nf5,ORBI,>4cm,0
-Nf5,OROB,<4cm,0
-Nf5,OROB,>4cm,0
 Nf5,PAME,<4cm,0
 Nf5,PAME,>4cm,0
 Nf5,PORI,<4cm,0
@@ -9544,10 +9544,10 @@ NF7,MEAN,<4cm,0
 NF7,MMEA,>4cm,1
 NF7,MUSS,<4cm,0
 NF7,MYCE,>4cm,0
+NF7,OCUL,<4cm,0
+NF7,OCUL,>4cm,0
 NF7,ORBI,<4cm,0
 NF7,ORBI,>4cm,0
-NF7,OROB,<4cm,0
-NF7,OROB,>4cm,0
 NF7,PAME,<4cm,0
 NF7,PAME,>4cm,0
 NF7,PORI,<4cm,0
@@ -9578,10 +9578,10 @@ NF8,MEAN,<4cm,0
 NF8,MMEA,>4cm,1
 NF8,MUSS,<4cm,0
 NF8,MYCE,>4cm,0
+NF8,OCUL,<4cm,0
+NF8,OCUL,>4cm,0
 NF8,ORBI,<4cm,0
 NF8,ORBI,>4cm,0
-NF8,OROB,<4cm,0
-NF8,OROB,>4cm,0
 NF8,PAME,<4cm,0
 NF8,PAME,>4cm,0
 NF8,PORI,<4cm,0
@@ -9612,10 +9612,10 @@ Ng1,MEAN,<4cm,0
 Ng1,MMEA,>4cm,0
 Ng1,MUSS,<4cm,0
 Ng1,MYCE,>4cm,0
+Ng1,OCUL,<4cm,0
+Ng1,OCUL,>4cm,0
 Ng1,ORBI,<4cm,0
 Ng1,ORBI,>4cm,0
-Ng1,OROB,<4cm,0
-Ng1,OROB,>4cm,0
 Ng1,PAME,<4cm,0
 Ng1,PAME,>4cm,0
 Ng1,PORI,<4cm,4
@@ -9646,10 +9646,10 @@ Ng2,MEAN,<4cm,0
 Ng2,MMEA,>4cm,0
 Ng2,MUSS,<4cm,0
 Ng2,MYCE,>4cm,0
+Ng2,OCUL,<4cm,0
+Ng2,OCUL,>4cm,0
 Ng2,ORBI,<4cm,0
 Ng2,ORBI,>4cm,0
-Ng2,OROB,<4cm,0
-Ng2,OROB,>4cm,0
 Ng2,PAME,<4cm,0
 Ng2,PAME,>4cm,0
 Ng2,PORI,<4cm,10
@@ -9680,10 +9680,10 @@ Ng3,MEAN,<4cm,1
 Ng3,MMEA,>4cm,0
 Ng3,MUSS,<4cm,0
 Ng3,MYCE,>4cm,0
+Ng3,OCUL,<4cm,0
+Ng3,OCUL,>4cm,0
 Ng3,ORBI,<4cm,0
 Ng3,ORBI,>4cm,0
-Ng3,OROB,<4cm,0
-Ng3,OROB,>4cm,0
 Ng3,PAME,<4cm,0
 Ng3,PAME,>4cm,0
 Ng3,PORI,<4cm,4
@@ -9714,10 +9714,10 @@ Ng4,MEAN,<4cm,0
 Ng4,MMEA,>4cm,0
 Ng4,MUSS,<4cm,1
 Ng4,MYCE,>4cm,0
+Ng4,OCUL,<4cm,0
+Ng4,OCUL,>4cm,0
 Ng4,ORBI,<4cm,0
 Ng4,ORBI,>4cm,0
-Ng4,OROB,<4cm,0
-Ng4,OROB,>4cm,0
 Ng4,PAME,<4cm,0
 Ng4,PAME,>4cm,0
 Ng4,PORI,<4cm,2
@@ -9748,10 +9748,10 @@ Ng5,MEAN,<4cm,0
 Ng5,MMEA,>4cm,0
 Ng5,MUSS,<4cm,0
 Ng5,MYCE,>4cm,0
+Ng5,OCUL,<4cm,0
+Ng5,OCUL,>4cm,0
 Ng5,ORBI,<4cm,0
 Ng5,ORBI,>4cm,0
-Ng5,OROB,<4cm,0
-Ng5,OROB,>4cm,0
 Ng5,PAME,<4cm,0
 Ng5,PAME,>4cm,0
 Ng5,PORI,<4cm,5
@@ -9782,10 +9782,10 @@ Ng6,MEAN,<4cm,0
 Ng6,MMEA,>4cm,0
 Ng6,MUSS,<4cm,0
 Ng6,MYCE,>4cm,0
+Ng6,OCUL,<4cm,0
+Ng6,OCUL,>4cm,0
 Ng6,ORBI,<4cm,0
 Ng6,ORBI,>4cm,0
-Ng6,OROB,<4cm,0
-Ng6,OROB,>4cm,0
 Ng6,PAME,<4cm,0
 Ng6,PAME,>4cm,0
 Ng6,PORI,<4cm,4
@@ -9816,10 +9816,10 @@ Ng7,MEAN,<4cm,0
 Ng7,MMEA,>4cm,0
 Ng7,MUSS,<4cm,0
 Ng7,MYCE,>4cm,0
+Ng7,OCUL,<4cm,0
+Ng7,OCUL,>4cm,0
 Ng7,ORBI,<4cm,0
 Ng7,ORBI,>4cm,0
-Ng7,OROB,<4cm,0
-Ng7,OROB,>4cm,0
 Ng7,PAME,<4cm,0
 Ng7,PAME,>4cm,0
 Ng7,PORI,<4cm,3
@@ -9850,10 +9850,10 @@ Ng8,MEAN,<4cm,0
 Ng8,MMEA,>4cm,0
 Ng8,MUSS,<4cm,0
 Ng8,MYCE,>4cm,0
+Ng8,OCUL,<4cm,0
+Ng8,OCUL,>4cm,0
 Ng8,ORBI,<4cm,0
 Ng8,ORBI,>4cm,0
-Ng8,OROB,<4cm,0
-Ng8,OROB,>4cm,0
 Ng8,PAME,<4cm,0
 Ng8,PAME,>4cm,0
 Ng8,PORI,<4cm,0
@@ -9884,10 +9884,10 @@ Ng9,MEAN,<4cm,0
 Ng9,MMEA,>4cm,0
 Ng9,MUSS,<4cm,0
 Ng9,MYCE,>4cm,0
+Ng9,OCUL,<4cm,0
+Ng9,OCUL,>4cm,0
 Ng9,ORBI,<4cm,0
 Ng9,ORBI,>4cm,0
-Ng9,OROB,<4cm,0
-Ng9,OROB,>4cm,0
 Ng9,PAME,<4cm,0
 Ng9,PAME,>4cm,0
 Ng9,PORI,<4cm,3
@@ -9918,10 +9918,10 @@ Nh1,MEAN,<4cm,0
 Nh1,MMEA,>4cm,0
 Nh1,MUSS,<4cm,0
 Nh1,MYCE,>4cm,0
+Nh1,OCUL,<4cm,0
+Nh1,OCUL,>4cm,0
 Nh1,ORBI,<4cm,0
 Nh1,ORBI,>4cm,0
-Nh1,OROB,<4cm,0
-Nh1,OROB,>4cm,0
 Nh1,PAME,<4cm,0
 Nh1,PAME,>4cm,0
 Nh1,PORI,<4cm,0
@@ -9952,10 +9952,10 @@ Nh2,MEAN,<4cm,1
 Nh2,MMEA,>4cm,1
 Nh2,MUSS,<4cm,0
 Nh2,MYCE,>4cm,0
+Nh2,OCUL,<4cm,0
+Nh2,OCUL,>4cm,0
 Nh2,ORBI,<4cm,0
 Nh2,ORBI,>4cm,0
-Nh2,OROB,<4cm,0
-Nh2,OROB,>4cm,0
 Nh2,PAME,<4cm,0
 Nh2,PAME,>4cm,0
 Nh2,PORI,<4cm,4
@@ -9986,10 +9986,10 @@ NH3,MEAN,<4cm,0
 NH3,MMEA,>4cm,0
 NH3,MUSS,<4cm,0
 NH3,MYCE,>4cm,0
+NH3,OCUL,<4cm,0
+NH3,OCUL,>4cm,0
 NH3,ORBI,<4cm,0
 NH3,ORBI,>4cm,0
-NH3,OROB,<4cm,0
-NH3,OROB,>4cm,0
 NH3,PAME,<4cm,0
 NH3,PAME,>4cm,0
 NH3,PORI,<4cm,6
@@ -10020,10 +10020,10 @@ NH4,MEAN,<4cm,0
 NH4,MMEA,>4cm,0
 NH4,MUSS,<4cm,0
 NH4,MYCE,>4cm,0
+NH4,OCUL,<4cm,0
+NH4,OCUL,>4cm,0
 NH4,ORBI,<4cm,0
 NH4,ORBI,>4cm,0
-NH4,OROB,<4cm,0
-NH4,OROB,>4cm,0
 NH4,PAME,<4cm,0
 NH4,PAME,>4cm,0
 NH4,PORI,<4cm,4
@@ -10054,10 +10054,10 @@ Nh5,MEAN,<4cm,0
 Nh5,MMEA,>4cm,0
 Nh5,MUSS,<4cm,0
 Nh5,MYCE,>4cm,0
+Nh5,OCUL,<4cm,0
+Nh5,OCUL,>4cm,0
 Nh5,ORBI,<4cm,0
 Nh5,ORBI,>4cm,0
-Nh5,OROB,<4cm,0
-Nh5,OROB,>4cm,0
 Nh5,PAME,<4cm,0
 Nh5,PAME,>4cm,0
 Nh5,PORI,<4cm,2
@@ -10088,10 +10088,10 @@ Nh6,MEAN,<4cm,0
 Nh6,MMEA,>4cm,0
 Nh6,MUSS,<4cm,0
 Nh6,MYCE,>4cm,0
+Nh6,OCUL,<4cm,0
+Nh6,OCUL,>4cm,0
 Nh6,ORBI,<4cm,1
 Nh6,ORBI,>4cm,0
-Nh6,OROB,<4cm,0
-Nh6,OROB,>4cm,0
 Nh6,PAME,<4cm,0
 Nh6,PAME,>4cm,0
 Nh6,PORI,<4cm,6
@@ -10122,10 +10122,10 @@ Nh7,MEAN,<4cm,1
 Nh7,MMEA,>4cm,0
 Nh7,MUSS,<4cm,0
 Nh7,MYCE,>4cm,0
+Nh7,OCUL,<4cm,0
+Nh7,OCUL,>4cm,0
 Nh7,ORBI,<4cm,0
 Nh7,ORBI,>4cm,0
-Nh7,OROB,<4cm,0
-Nh7,OROB,>4cm,0
 Nh7,PAME,<4cm,0
 Nh7,PAME,>4cm,0
 Nh7,PORI,<4cm,6
@@ -10156,10 +10156,10 @@ Ni1,MEAN,<4cm,0
 Ni1,MMEA,>4cm,0
 Ni1,MUSS,<4cm,0
 Ni1,MYCE,>4cm,1
+Ni1,OCUL,<4cm,0
+Ni1,OCUL,>4cm,0
 Ni1,ORBI,<4cm,0
 Ni1,ORBI,>4cm,0
-Ni1,OROB,<4cm,0
-Ni1,OROB,>4cm,0
 Ni1,PAME,<4cm,0
 Ni1,PAME,>4cm,0
 Ni1,PORI,<4cm,0
@@ -10190,10 +10190,10 @@ Ni2,MEAN,<4cm,0
 Ni2,MMEA,>4cm,0
 Ni2,MUSS,<4cm,0
 Ni2,MYCE,>4cm,0
+Ni2,OCUL,<4cm,0
+Ni2,OCUL,>4cm,0
 Ni2,ORBI,<4cm,0
 Ni2,ORBI,>4cm,0
-Ni2,OROB,<4cm,0
-Ni2,OROB,>4cm,0
 Ni2,PAME,<4cm,0
 Ni2,PAME,>4cm,0
 Ni2,PORI,<4cm,0
@@ -10224,10 +10224,10 @@ Ni3,MEAN,<4cm,0
 Ni3,MMEA,>4cm,0
 Ni3,MUSS,<4cm,0
 Ni3,MYCE,>4cm,0
+Ni3,OCUL,<4cm,0
+Ni3,OCUL,>4cm,0
 Ni3,ORBI,<4cm,0
 Ni3,ORBI,>4cm,0
-Ni3,OROB,<4cm,0
-Ni3,OROB,>4cm,0
 Ni3,PAME,<4cm,0
 Ni3,PAME,>4cm,0
 Ni3,PORI,<4cm,0
@@ -10258,10 +10258,10 @@ Ni4,MEAN,<4cm,0
 Ni4,MMEA,>4cm,1
 Ni4,MUSS,<4cm,0
 Ni4,MYCE,>4cm,0
+Ni4,OCUL,<4cm,0
+Ni4,OCUL,>4cm,0
 Ni4,ORBI,<4cm,0
 Ni4,ORBI,>4cm,0
-Ni4,OROB,<4cm,0
-Ni4,OROB,>4cm,0
 Ni4,PAME,<4cm,0
 Ni4,PAME,>4cm,0
 Ni4,PORI,<4cm,0
@@ -10292,10 +10292,10 @@ Ni5,MEAN,<4cm,0
 Ni5,MMEA,>4cm,0
 Ni5,MUSS,<4cm,0
 Ni5,MYCE,>4cm,0
+Ni5,OCUL,<4cm,0
+Ni5,OCUL,>4cm,0
 Ni5,ORBI,<4cm,0
 Ni5,ORBI,>4cm,0
-Ni5,OROB,<4cm,0
-Ni5,OROB,>4cm,0
 Ni5,PAME,<4cm,0
 Ni5,PAME,>4cm,0
 Ni5,PORI,<4cm,4
@@ -10326,10 +10326,10 @@ Ni6,MEAN,<4cm,1
 Ni6,MMEA,>4cm,1
 Ni6,MUSS,<4cm,0
 Ni6,MYCE,>4cm,0
+Ni6,OCUL,<4cm,0
+Ni6,OCUL,>4cm,0
 Ni6,ORBI,<4cm,0
 Ni6,ORBI,>4cm,0
-Ni6,OROB,<4cm,0
-Ni6,OROB,>4cm,0
 Ni6,PAME,<4cm,0
 Ni6,PAME,>4cm,0
 Ni6,PORI,<4cm,2
@@ -10360,10 +10360,10 @@ RSS 1,MEAN,<4cm,0
 RSS 1,MMEA,>4cm,0
 RSS 1,MUSS,<4cm,0
 RSS 1,MYCE,>4cm,0
+RSS 1,OCUL,<4cm,0
+RSS 1,OCUL,>4cm,0
 RSS 1,ORBI,<4cm,0
 RSS 1,ORBI,>4cm,0
-RSS 1,OROB,<4cm,0
-RSS 1,OROB,>4cm,0
 RSS 1,PAME,<4cm,0
 RSS 1,PAME,>4cm,0
 RSS 1,PORI,<4cm,0
@@ -10394,10 +10394,10 @@ RSS 2,MEAN,<4cm,0
 RSS 2,MMEA,>4cm,0
 RSS 2,MUSS,<4cm,0
 RSS 2,MYCE,>4cm,0
+RSS 2,OCUL,<4cm,0
+RSS 2,OCUL,>4cm,0
 RSS 2,ORBI,<4cm,0
 RSS 2,ORBI,>4cm,0
-RSS 2,OROB,<4cm,0
-RSS 2,OROB,>4cm,0
 RSS 2,PAME,<4cm,0
 RSS 2,PAME,>4cm,0
 RSS 2,PORI,<4cm,0
@@ -10428,10 +10428,10 @@ RSS 3,MEAN,<4cm,0
 RSS 3,MMEA,>4cm,0
 RSS 3,MUSS,<4cm,0
 RSS 3,MYCE,>4cm,0
+RSS 3,OCUL,<4cm,0
+RSS 3,OCUL,>4cm,0
 RSS 3,ORBI,<4cm,0
 RSS 3,ORBI,>4cm,0
-RSS 3,OROB,<4cm,0
-RSS 3,OROB,>4cm,0
 RSS 3,PAME,<4cm,0
 RSS 3,PAME,>4cm,0
 RSS 3,PORI,<4cm,0
@@ -10462,10 +10462,10 @@ RSS 4,MEAN,<4cm,0
 RSS 4,MMEA,>4cm,0
 RSS 4,MUSS,<4cm,0
 RSS 4,MYCE,>4cm,0
+RSS 4,OCUL,<4cm,0
+RSS 4,OCUL,>4cm,0
 RSS 4,ORBI,<4cm,0
 RSS 4,ORBI,>4cm,0
-RSS 4,OROB,<4cm,0
-RSS 4,OROB,>4cm,0
 RSS 4,PAME,<4cm,0
 RSS 4,PAME,>4cm,0
 RSS 4,PORI,<4cm,0
@@ -10496,10 +10496,10 @@ Sa1,MEAN,<4cm,0
 Sa1,MMEA,>4cm,0
 Sa1,MUSS,<4cm,0
 Sa1,MYCE,>4cm,0
+Sa1,OCUL,<4cm,0
+Sa1,OCUL,>4cm,0
 Sa1,ORBI,<4cm,0
 Sa1,ORBI,>4cm,0
-Sa1,OROB,<4cm,0
-Sa1,OROB,>4cm,0
 Sa1,PAME,<4cm,0
 Sa1,PAME,>4cm,0
 Sa1,PORI,<4cm,0
@@ -10530,10 +10530,10 @@ Sa2,MEAN,<4cm,0
 Sa2,MMEA,>4cm,0
 Sa2,MUSS,<4cm,0
 Sa2,MYCE,>4cm,0
+Sa2,OCUL,<4cm,0
+Sa2,OCUL,>4cm,0
 Sa2,ORBI,<4cm,0
 Sa2,ORBI,>4cm,0
-Sa2,OROB,<4cm,0
-Sa2,OROB,>4cm,0
 Sa2,PAME,<4cm,0
 Sa2,PAME,>4cm,0
 Sa2,PORI,<4cm,0
@@ -10564,10 +10564,10 @@ Sb2,MEAN,<4cm,0
 Sb2,MMEA,>4cm,0
 Sb2,MUSS,<4cm,0
 Sb2,MYCE,>4cm,0
+Sb2,OCUL,<4cm,0
+Sb2,OCUL,>4cm,0
 Sb2,ORBI,<4cm,0
 Sb2,ORBI,>4cm,0
-Sb2,OROB,<4cm,0
-Sb2,OROB,>4cm,0
 Sb2,PAME,<4cm,0
 Sb2,PAME,>4cm,0
 Sb2,PORI,<4cm,0
@@ -10598,10 +10598,10 @@ Sb3,MEAN,<4cm,0
 Sb3,MMEA,>4cm,0
 Sb3,MUSS,<4cm,0
 Sb3,MYCE,>4cm,0
+Sb3,OCUL,<4cm,0
+Sb3,OCUL,>4cm,0
 Sb3,ORBI,<4cm,0
 Sb3,ORBI,>4cm,0
-Sb3,OROB,<4cm,0
-Sb3,OROB,>4cm,0
 Sb3,PAME,<4cm,0
 Sb3,PAME,>4cm,0
 Sb3,PORI,<4cm,0
@@ -10632,10 +10632,10 @@ Sb4,MEAN,<4cm,0
 Sb4,MMEA,>4cm,0
 Sb4,MUSS,<4cm,0
 Sb4,MYCE,>4cm,0
+Sb4,OCUL,<4cm,0
+Sb4,OCUL,>4cm,0
 Sb4,ORBI,<4cm,0
 Sb4,ORBI,>4cm,0
-Sb4,OROB,<4cm,0
-Sb4,OROB,>4cm,0
 Sb4,PAME,<4cm,0
 Sb4,PAME,>4cm,0
 Sb4,PORI,<4cm,2
@@ -10666,10 +10666,10 @@ Sb5,MEAN,<4cm,0
 Sb5,MMEA,>4cm,0
 Sb5,MUSS,<4cm,0
 Sb5,MYCE,>4cm,0
+Sb5,OCUL,<4cm,0
+Sb5,OCUL,>4cm,0
 Sb5,ORBI,<4cm,0
 Sb5,ORBI,>4cm,0
-Sb5,OROB,<4cm,0
-Sb5,OROB,>4cm,0
 Sb5,PAME,<4cm,0
 Sb5,PAME,>4cm,0
 Sb5,PORI,<4cm,0
@@ -10700,10 +10700,10 @@ Sb6,MEAN,<4cm,0
 Sb6,MMEA,>4cm,0
 Sb6,MUSS,<4cm,0
 Sb6,MYCE,>4cm,0
+Sb6,OCUL,<4cm,0
+Sb6,OCUL,>4cm,0
 Sb6,ORBI,<4cm,0
 Sb6,ORBI,>4cm,0
-Sb6,OROB,<4cm,0
-Sb6,OROB,>4cm,0
 Sb6,PAME,<4cm,0
 Sb6,PAME,>4cm,0
 Sb6,PORI,<4cm,0
@@ -10734,10 +10734,10 @@ Sb7,MEAN,<4cm,0
 Sb7,MMEA,>4cm,0
 Sb7,MUSS,<4cm,0
 Sb7,MYCE,>4cm,0
+Sb7,OCUL,<4cm,0
+Sb7,OCUL,>4cm,0
 Sb7,ORBI,<4cm,0
 Sb7,ORBI,>4cm,0
-Sb7,OROB,<4cm,0
-Sb7,OROB,>4cm,0
 Sb7,PAME,<4cm,0
 Sb7,PAME,>4cm,0
 Sb7,PORI,<4cm,0
@@ -10768,10 +10768,10 @@ Sb8,MEAN,<4cm,1
 Sb8,MMEA,>4cm,0
 Sb8,MUSS,<4cm,0
 Sb8,MYCE,>4cm,0
+Sb8,OCUL,<4cm,0
+Sb8,OCUL,>4cm,0
 Sb8,ORBI,<4cm,0
 Sb8,ORBI,>4cm,0
-Sb8,OROB,<4cm,0
-Sb8,OROB,>4cm,0
 Sb8,PAME,<4cm,0
 Sb8,PAME,>4cm,0
 Sb8,PORI,<4cm,2
@@ -10802,10 +10802,10 @@ Sb9,MEAN,<4cm,0
 Sb9,MMEA,>4cm,0
 Sb9,MUSS,<4cm,0
 Sb9,MYCE,>4cm,0
+Sb9,OCUL,<4cm,0
+Sb9,OCUL,>4cm,0
 Sb9,ORBI,<4cm,0
 Sb9,ORBI,>4cm,0
-Sb9,OROB,<4cm,0
-Sb9,OROB,>4cm,0
 Sb9,PAME,<4cm,0
 Sb9,PAME,>4cm,0
 Sb9,PORI,<4cm,1
@@ -10836,10 +10836,10 @@ SC1,MEAN,<4cm,0
 SC1,MMEA,>4cm,0
 SC1,MUSS,<4cm,0
 SC1,MYCE,>4cm,0
+SC1,OCUL,<4cm,0
+SC1,OCUL,>4cm,0
 SC1,ORBI,<4cm,0
 SC1,ORBI,>4cm,0
-SC1,OROB,<4cm,0
-SC1,OROB,>4cm,0
 SC1,PAME,<4cm,0
 SC1,PAME,>4cm,0
 SC1,PORI,<4cm,0
@@ -10870,10 +10870,10 @@ Sc10,MEAN,<4cm,0
 Sc10,MMEA,>4cm,0
 Sc10,MUSS,<4cm,0
 Sc10,MYCE,>4cm,0
+Sc10,OCUL,<4cm,0
+Sc10,OCUL,>4cm,0
 Sc10,ORBI,<4cm,0
 Sc10,ORBI,>4cm,0
-Sc10,OROB,<4cm,0
-Sc10,OROB,>4cm,0
 Sc10,PAME,<4cm,0
 Sc10,PAME,>4cm,0
 Sc10,PORI,<4cm,0
@@ -10904,10 +10904,10 @@ Sc11,MEAN,<4cm,0
 Sc11,MMEA,>4cm,1
 Sc11,MUSS,<4cm,0
 Sc11,MYCE,>4cm,0
+Sc11,OCUL,<4cm,0
+Sc11,OCUL,>4cm,0
 Sc11,ORBI,<4cm,0
 Sc11,ORBI,>4cm,0
-Sc11,OROB,<4cm,0
-Sc11,OROB,>4cm,0
 Sc11,PAME,<4cm,0
 Sc11,PAME,>4cm,0
 Sc11,PORI,<4cm,0
@@ -10938,10 +10938,10 @@ Sc12,MEAN,<4cm,0
 Sc12,MMEA,>4cm,0
 Sc12,MUSS,<4cm,0
 Sc12,MYCE,>4cm,0
+Sc12,OCUL,<4cm,0
+Sc12,OCUL,>4cm,0
 Sc12,ORBI,<4cm,0
 Sc12,ORBI,>4cm,0
-Sc12,OROB,<4cm,0
-Sc12,OROB,>4cm,0
 Sc12,PAME,<4cm,0
 Sc12,PAME,>4cm,0
 Sc12,PORI,<4cm,0
@@ -10972,10 +10972,10 @@ Sc13,MEAN,<4cm,0
 Sc13,MMEA,>4cm,0
 Sc13,MUSS,<4cm,0
 Sc13,MYCE,>4cm,0
+Sc13,OCUL,<4cm,0
+Sc13,OCUL,>4cm,0
 Sc13,ORBI,<4cm,0
 Sc13,ORBI,>4cm,0
-Sc13,OROB,<4cm,0
-Sc13,OROB,>4cm,0
 Sc13,PAME,<4cm,0
 Sc13,PAME,>4cm,0
 Sc13,PORI,<4cm,0
@@ -11006,10 +11006,10 @@ Sc14,MEAN,<4cm,0
 Sc14,MMEA,>4cm,0
 Sc14,MUSS,<4cm,0
 Sc14,MYCE,>4cm,0
+Sc14,OCUL,<4cm,0
+Sc14,OCUL,>4cm,0
 Sc14,ORBI,<4cm,0
 Sc14,ORBI,>4cm,0
-Sc14,OROB,<4cm,0
-Sc14,OROB,>4cm,0
 Sc14,PAME,<4cm,0
 Sc14,PAME,>4cm,0
 Sc14,PORI,<4cm,0
@@ -11040,10 +11040,10 @@ SC15,MEAN,<4cm,2
 SC15,MMEA,>4cm,1
 SC15,MUSS,<4cm,0
 SC15,MYCE,>4cm,0
+SC15,OCUL,<4cm,0
+SC15,OCUL,>4cm,0
 SC15,ORBI,<4cm,0
 SC15,ORBI,>4cm,0
-SC15,OROB,<4cm,0
-SC15,OROB,>4cm,0
 SC15,PAME,<4cm,0
 SC15,PAME,>4cm,0
 SC15,PORI,<4cm,0
@@ -11074,10 +11074,10 @@ Sc16,MEAN,<4cm,2
 Sc16,MMEA,>4cm,0
 Sc16,MUSS,<4cm,0
 Sc16,MYCE,>4cm,0
+Sc16,OCUL,<4cm,0
+Sc16,OCUL,>4cm,0
 Sc16,ORBI,<4cm,0
 Sc16,ORBI,>4cm,0
-Sc16,OROB,<4cm,0
-Sc16,OROB,>4cm,0
 Sc16,PAME,<4cm,0
 Sc16,PAME,>4cm,0
 Sc16,PORI,<4cm,0
@@ -11108,10 +11108,10 @@ Sc17,MEAN,<4cm,0
 Sc17,MMEA,>4cm,0
 Sc17,MUSS,<4cm,0
 Sc17,MYCE,>4cm,0
+Sc17,OCUL,<4cm,0
+Sc17,OCUL,>4cm,0
 Sc17,ORBI,<4cm,0
 Sc17,ORBI,>4cm,0
-Sc17,OROB,<4cm,0
-Sc17,OROB,>4cm,0
 Sc17,PAME,<4cm,0
 Sc17,PAME,>4cm,0
 Sc17,PORI,<4cm,0
@@ -11142,10 +11142,10 @@ SC2,MEAN,<4cm,0
 SC2,MMEA,>4cm,0
 SC2,MUSS,<4cm,0
 SC2,MYCE,>4cm,0
+SC2,OCUL,<4cm,0
+SC2,OCUL,>4cm,0
 SC2,ORBI,<4cm,0
 SC2,ORBI,>4cm,0
-SC2,OROB,<4cm,0
-SC2,OROB,>4cm,0
 SC2,PAME,<4cm,0
 SC2,PAME,>4cm,0
 SC2,PORI,<4cm,0
@@ -11176,10 +11176,10 @@ Sc3,MEAN,<4cm,0
 Sc3,MMEA,>4cm,1
 Sc3,MUSS,<4cm,0
 Sc3,MYCE,>4cm,0
+Sc3,OCUL,<4cm,0
+Sc3,OCUL,>4cm,0
 Sc3,ORBI,<4cm,0
 Sc3,ORBI,>4cm,0
-Sc3,OROB,<4cm,0
-Sc3,OROB,>4cm,0
 Sc3,PAME,<4cm,0
 Sc3,PAME,>4cm,0
 Sc3,PORI,<4cm,0
@@ -11210,10 +11210,10 @@ Sc4,MEAN,<4cm,0
 Sc4,MMEA,>4cm,0
 Sc4,MUSS,<4cm,0
 Sc4,MYCE,>4cm,0
+Sc4,OCUL,<4cm,0
+Sc4,OCUL,>4cm,0
 Sc4,ORBI,<4cm,0
 Sc4,ORBI,>4cm,0
-Sc4,OROB,<4cm,0
-Sc4,OROB,>4cm,0
 Sc4,PAME,<4cm,0
 Sc4,PAME,>4cm,0
 Sc4,PORI,<4cm,0
@@ -11244,10 +11244,10 @@ Sc5,MEAN,<4cm,0
 Sc5,MMEA,>4cm,0
 Sc5,MUSS,<4cm,0
 Sc5,MYCE,>4cm,0
+Sc5,OCUL,<4cm,0
+Sc5,OCUL,>4cm,0
 Sc5,ORBI,<4cm,0
 Sc5,ORBI,>4cm,0
-Sc5,OROB,<4cm,0
-Sc5,OROB,>4cm,0
 Sc5,PAME,<4cm,0
 Sc5,PAME,>4cm,0
 Sc5,PORI,<4cm,1
@@ -11278,10 +11278,10 @@ Sc6,MEAN,<4cm,0
 Sc6,MMEA,>4cm,0
 Sc6,MUSS,<4cm,0
 Sc6,MYCE,>4cm,0
+Sc6,OCUL,<4cm,0
+Sc6,OCUL,>4cm,0
 Sc6,ORBI,<4cm,0
 Sc6,ORBI,>4cm,0
-Sc6,OROB,<4cm,0
-Sc6,OROB,>4cm,0
 Sc6,PAME,<4cm,0
 Sc6,PAME,>4cm,0
 Sc6,PORI,<4cm,0
@@ -11312,10 +11312,10 @@ Sc7,MEAN,<4cm,1
 Sc7,MMEA,>4cm,1
 Sc7,MUSS,<4cm,0
 Sc7,MYCE,>4cm,0
+Sc7,OCUL,<4cm,0
+Sc7,OCUL,>4cm,0
 Sc7,ORBI,<4cm,0
 Sc7,ORBI,>4cm,0
-Sc7,OROB,<4cm,0
-Sc7,OROB,>4cm,0
 Sc7,PAME,<4cm,0
 Sc7,PAME,>4cm,0
 Sc7,PORI,<4cm,0
@@ -11346,10 +11346,10 @@ SC8,MEAN,<4cm,1
 SC8,MMEA,>4cm,0
 SC8,MUSS,<4cm,0
 SC8,MYCE,>4cm,0
+SC8,OCUL,<4cm,0
+SC8,OCUL,>4cm,0
 SC8,ORBI,<4cm,0
 SC8,ORBI,>4cm,0
-SC8,OROB,<4cm,0
-SC8,OROB,>4cm,0
 SC8,PAME,<4cm,0
 SC8,PAME,>4cm,0
 SC8,PORI,<4cm,0
@@ -11380,10 +11380,10 @@ Sc9,MEAN,<4cm,1
 Sc9,MMEA,>4cm,0
 Sc9,MUSS,<4cm,0
 Sc9,MYCE,>4cm,0
+Sc9,OCUL,<4cm,0
+Sc9,OCUL,>4cm,0
 Sc9,ORBI,<4cm,0
 Sc9,ORBI,>4cm,0
-Sc9,OROB,<4cm,0
-Sc9,OROB,>4cm,0
 Sc9,PAME,<4cm,0
 Sc9,PAME,>4cm,0
 Sc9,PORI,<4cm,0
@@ -11414,10 +11414,10 @@ SD1,MEAN,<4cm,0
 SD1,MMEA,>4cm,0
 SD1,MUSS,<4cm,0
 SD1,MYCE,>4cm,0
+SD1,OCUL,<4cm,0
+SD1,OCUL,>4cm,0
 SD1,ORBI,<4cm,0
 SD1,ORBI,>4cm,0
-SD1,OROB,<4cm,0
-SD1,OROB,>4cm,0
 SD1,PAME,<4cm,0
 SD1,PAME,>4cm,0
 SD1,PORI,<4cm,0
@@ -11448,10 +11448,10 @@ Se1,MEAN,<4cm,0
 Se1,MMEA,>4cm,0
 Se1,MUSS,<4cm,0
 Se1,MYCE,>4cm,0
+Se1,OCUL,<4cm,0
+Se1,OCUL,>4cm,0
 Se1,ORBI,<4cm,0
 Se1,ORBI,>4cm,0
-Se1,OROB,<4cm,0
-Se1,OROB,>4cm,0
 Se1,PAME,<4cm,0
 Se1,PAME,>4cm,0
 Se1,PORI,<4cm,0
@@ -11482,10 +11482,10 @@ Se2,MEAN,<4cm,0
 Se2,MMEA,>4cm,0
 Se2,MUSS,<4cm,0
 Se2,MYCE,>4cm,0
+Se2,OCUL,<4cm,0
+Se2,OCUL,>4cm,0
 Se2,ORBI,<4cm,0
 Se2,ORBI,>4cm,0
-Se2,OROB,<4cm,0
-Se2,OROB,>4cm,0
 Se2,PAME,<4cm,0
 Se2,PAME,>4cm,0
 Se2,PORI,<4cm,0
@@ -11516,10 +11516,10 @@ Se3,MEAN,<4cm,0
 Se3,MMEA,>4cm,0
 Se3,MUSS,<4cm,0
 Se3,MYCE,>4cm,1
+Se3,OCUL,<4cm,0
+Se3,OCUL,>4cm,0
 Se3,ORBI,<4cm,0
 Se3,ORBI,>4cm,0
-Se3,OROB,<4cm,0
-Se3,OROB,>4cm,0
 Se3,PAME,<4cm,0
 Se3,PAME,>4cm,0
 Se3,PORI,<4cm,0
@@ -11550,10 +11550,10 @@ Se4,MEAN,<4cm,0
 Se4,MMEA,>4cm,1
 Se4,MUSS,<4cm,0
 Se4,MYCE,>4cm,0
+Se4,OCUL,<4cm,0
+Se4,OCUL,>4cm,0
 Se4,ORBI,<4cm,0
 Se4,ORBI,>4cm,0
-Se4,OROB,<4cm,0
-Se4,OROB,>4cm,0
 Se4,PAME,<4cm,0
 Se4,PAME,>4cm,0
 Se4,PORI,<4cm,0
@@ -11584,10 +11584,10 @@ Se5,MEAN,<4cm,1
 Se5,MMEA,>4cm,0
 Se5,MUSS,<4cm,0
 Se5,MYCE,>4cm,2
+Se5,OCUL,<4cm,0
+Se5,OCUL,>4cm,0
 Se5,ORBI,<4cm,0
 Se5,ORBI,>4cm,0
-Se5,OROB,<4cm,0
-Se5,OROB,>4cm,0
 Se5,PAME,<4cm,0
 Se5,PAME,>4cm,0
 Se5,PORI,<4cm,0
@@ -11618,10 +11618,10 @@ Se6,MEAN,<4cm,0
 Se6,MMEA,>4cm,0
 Se6,MUSS,<4cm,0
 Se6,MYCE,>4cm,1
+Se6,OCUL,<4cm,0
+Se6,OCUL,>4cm,0
 Se6,ORBI,<4cm,0
 Se6,ORBI,>4cm,0
-Se6,OROB,<4cm,0
-Se6,OROB,>4cm,0
 Se6,PAME,<4cm,0
 Se6,PAME,>4cm,0
 Se6,PORI,<4cm,0
@@ -11652,10 +11652,10 @@ Se7,MEAN,<4cm,1
 Se7,MMEA,>4cm,0
 Se7,MUSS,<4cm,0
 Se7,MYCE,>4cm,0
+Se7,OCUL,<4cm,0
+Se7,OCUL,>4cm,0
 Se7,ORBI,<4cm,0
 Se7,ORBI,>4cm,0
-Se7,OROB,<4cm,0
-Se7,OROB,>4cm,0
 Se7,PAME,<4cm,0
 Se7,PAME,>4cm,0
 Se7,PORI,<4cm,0
@@ -11686,10 +11686,10 @@ SF1,MEAN,<4cm,1
 SF1,MMEA,>4cm,0
 SF1,MUSS,<4cm,0
 SF1,MYCE,>4cm,0
+SF1,OCUL,<4cm,0
+SF1,OCUL,>4cm,0
 SF1,ORBI,<4cm,0
 SF1,ORBI,>4cm,1
-SF1,OROB,<4cm,0
-SF1,OROB,>4cm,0
 SF1,PAME,<4cm,0
 SF1,PAME,>4cm,0
 SF1,PORI,<4cm,1
@@ -11720,10 +11720,10 @@ Sf2,MEAN,<4cm,0
 Sf2,MMEA,>4cm,0
 Sf2,MUSS,<4cm,0
 Sf2,MYCE,>4cm,0
+Sf2,OCUL,<4cm,0
+Sf2,OCUL,>4cm,0
 Sf2,ORBI,<4cm,0
 Sf2,ORBI,>4cm,0
-Sf2,OROB,<4cm,0
-Sf2,OROB,>4cm,0
 Sf2,PAME,<4cm,0
 Sf2,PAME,>4cm,0
 Sf2,PORI,<4cm,2
@@ -11754,10 +11754,10 @@ Sf3,MEAN,<4cm,0
 Sf3,MMEA,>4cm,0
 Sf3,MUSS,<4cm,0
 Sf3,MYCE,>4cm,0
+Sf3,OCUL,<4cm,0
+Sf3,OCUL,>4cm,0
 Sf3,ORBI,<4cm,0
 Sf3,ORBI,>4cm,0
-Sf3,OROB,<4cm,0
-Sf3,OROB,>4cm,0
 Sf3,PAME,<4cm,0
 Sf3,PAME,>4cm,0
 Sf3,PORI,<4cm,0
@@ -11788,10 +11788,10 @@ Sf4,MEAN,<4cm,0
 Sf4,MMEA,>4cm,0
 Sf4,MUSS,<4cm,0
 Sf4,MYCE,>4cm,0
+Sf4,OCUL,<4cm,0
+Sf4,OCUL,>4cm,0
 Sf4,ORBI,<4cm,0
 Sf4,ORBI,>4cm,0
-Sf4,OROB,<4cm,0
-Sf4,OROB,>4cm,0
 Sf4,PAME,<4cm,0
 Sf4,PAME,>4cm,0
 Sf4,PORI,<4cm,0
@@ -11822,10 +11822,10 @@ Sg1,MEAN,<4cm,0
 Sg1,MMEA,>4cm,2
 Sg1,MUSS,<4cm,0
 Sg1,MYCE,>4cm,0
+Sg1,OCUL,<4cm,0
+Sg1,OCUL,>4cm,1
 Sg1,ORBI,<4cm,0
 Sg1,ORBI,>4cm,0
-Sg1,OROB,<4cm,0
-Sg1,OROB,>4cm,1
 Sg1,PAME,<4cm,0
 Sg1,PAME,>4cm,0
 Sg1,PORI,<4cm,0
@@ -11856,10 +11856,10 @@ Sg2,MEAN,<4cm,0
 Sg2,MMEA,>4cm,1
 Sg2,MUSS,<4cm,0
 Sg2,MYCE,>4cm,0
+Sg2,OCUL,<4cm,0
+Sg2,OCUL,>4cm,0
 Sg2,ORBI,<4cm,0
 Sg2,ORBI,>4cm,0
-Sg2,OROB,<4cm,0
-Sg2,OROB,>4cm,0
 Sg2,PAME,<4cm,0
 Sg2,PAME,>4cm,0
 Sg2,PORI,<4cm,0
@@ -11890,10 +11890,10 @@ Sg3,MEAN,<4cm,1
 Sg3,MMEA,>4cm,0
 Sg3,MUSS,<4cm,0
 Sg3,MYCE,>4cm,0
+Sg3,OCUL,<4cm,0
+Sg3,OCUL,>4cm,0
 Sg3,ORBI,<4cm,0
 Sg3,ORBI,>4cm,0
-Sg3,OROB,<4cm,0
-Sg3,OROB,>4cm,0
 Sg3,PAME,<4cm,0
 Sg3,PAME,>4cm,0
 Sg3,PORI,<4cm,2
@@ -11924,10 +11924,10 @@ Sg4,MEAN,<4cm,0
 Sg4,MMEA,>4cm,0
 Sg4,MUSS,<4cm,0
 Sg4,MYCE,>4cm,2
+Sg4,OCUL,<4cm,0
+Sg4,OCUL,>4cm,0
 Sg4,ORBI,<4cm,0
 Sg4,ORBI,>4cm,0
-Sg4,OROB,<4cm,0
-Sg4,OROB,>4cm,0
 Sg4,PAME,<4cm,0
 Sg4,PAME,>4cm,0
 Sg4,PORI,<4cm,1
@@ -11958,10 +11958,10 @@ Sg5,MEAN,<4cm,0
 Sg5,MMEA,>4cm,1
 Sg5,MUSS,<4cm,0
 Sg5,MYCE,>4cm,0
+Sg5,OCUL,<4cm,0
+Sg5,OCUL,>4cm,0
 Sg5,ORBI,<4cm,0
 Sg5,ORBI,>4cm,0
-Sg5,OROB,<4cm,0
-Sg5,OROB,>4cm,0
 Sg5,PAME,<4cm,0
 Sg5,PAME,>4cm,0
 Sg5,PORI,<4cm,0
@@ -11992,10 +11992,10 @@ Sg6,MEAN,<4cm,0
 Sg6,MMEA,>4cm,0
 Sg6,MUSS,<4cm,0
 Sg6,MYCE,>4cm,1
+Sg6,OCUL,<4cm,0
+Sg6,OCUL,>4cm,0
 Sg6,ORBI,<4cm,0
 Sg6,ORBI,>4cm,0
-Sg6,OROB,<4cm,0
-Sg6,OROB,>4cm,0
 Sg6,PAME,<4cm,0
 Sg6,PAME,>4cm,0
 Sg6,PORI,<4cm,0
@@ -12026,10 +12026,10 @@ Sg7,MEAN,<4cm,0
 Sg7,MMEA,>4cm,0
 Sg7,MUSS,<4cm,0
 Sg7,MYCE,>4cm,1
+Sg7,OCUL,<4cm,0
+Sg7,OCUL,>4cm,0
 Sg7,ORBI,<4cm,0
 Sg7,ORBI,>4cm,0
-Sg7,OROB,<4cm,0
-Sg7,OROB,>4cm,0
 Sg7,PAME,<4cm,0
 Sg7,PAME,>4cm,0
 Sg7,PORI,<4cm,1
@@ -12060,10 +12060,10 @@ Sg8,MEAN,<4cm,1
 Sg8,MMEA,>4cm,0
 Sg8,MUSS,<4cm,0
 Sg8,MYCE,>4cm,1
+Sg8,OCUL,<4cm,0
+Sg8,OCUL,>4cm,0
 Sg8,ORBI,<4cm,0
 Sg8,ORBI,>4cm,0
-Sg8,OROB,<4cm,0
-Sg8,OROB,>4cm,0
 Sg8,PAME,<4cm,0
 Sg8,PAME,>4cm,0
 Sg8,PORI,<4cm,0
@@ -12094,10 +12094,10 @@ Sg9,MEAN,<4cm,0
 Sg9,MMEA,>4cm,0
 Sg9,MUSS,<4cm,0
 Sg9,MYCE,>4cm,0
+Sg9,OCUL,<4cm,0
+Sg9,OCUL,>4cm,0
 Sg9,ORBI,<4cm,0
 Sg9,ORBI,>4cm,0
-Sg9,OROB,<4cm,0
-Sg9,OROB,>4cm,0
 Sg9,PAME,<4cm,0
 Sg9,PAME,>4cm,0
 Sg9,PORI,<4cm,0
@@ -12128,10 +12128,10 @@ Sh1,MEAN,<4cm,1
 Sh1,MMEA,>4cm,0
 Sh1,MUSS,<4cm,0
 Sh1,MYCE,>4cm,1
+Sh1,OCUL,<4cm,0
+Sh1,OCUL,>4cm,0
 Sh1,ORBI,<4cm,0
 Sh1,ORBI,>4cm,0
-Sh1,OROB,<4cm,0
-Sh1,OROB,>4cm,0
 Sh1,PAME,<4cm,0
 Sh1,PAME,>4cm,0
 Sh1,PORI,<4cm,1
@@ -12162,10 +12162,10 @@ Sh10,MEAN,<4cm,0
 Sh10,MMEA,>4cm,1
 Sh10,MUSS,<4cm,0
 Sh10,MYCE,>4cm,0
+Sh10,OCUL,<4cm,0
+Sh10,OCUL,>4cm,0
 Sh10,ORBI,<4cm,0
 Sh10,ORBI,>4cm,0
-Sh10,OROB,<4cm,0
-Sh10,OROB,>4cm,0
 Sh10,PAME,<4cm,0
 Sh10,PAME,>4cm,0
 Sh10,PORI,<4cm,8
@@ -12197,10 +12197,10 @@ Sh2,MEAN,<4cm,0
 Sh2,MMEA,>4cm,0
 Sh2,MUSS,<4cm,0
 Sh2,MYCE,>4cm,0
+Sh2,OCUL,<4cm,0
+Sh2,OCUL,>4cm,0
 Sh2,ORBI,<4cm,0
 Sh2,ORBI,>4cm,0
-Sh2,OROB,<4cm,0
-Sh2,OROB,>4cm,0
 Sh2,PAME,<4cm,0
 Sh2,PAME,>4cm,0
 Sh2,PORI,<4cm,3
@@ -12231,10 +12231,10 @@ Sh3,MEAN,<4cm,1
 Sh3,MMEA,>4cm,0
 Sh3,MUSS,<4cm,1
 Sh3,MYCE,>4cm,0
+Sh3,OCUL,<4cm,0
+Sh3,OCUL,>4cm,0
 Sh3,ORBI,<4cm,0
 Sh3,ORBI,>4cm,0
-Sh3,OROB,<4cm,0
-Sh3,OROB,>4cm,0
 Sh3,PAME,<4cm,0
 Sh3,PAME,>4cm,0
 Sh3,PORI,<4cm,5
@@ -12265,10 +12265,10 @@ Sh4,MEAN,<4cm,0
 Sh4,MMEA,>4cm,0
 Sh4,MUSS,<4cm,1
 Sh4,MYCE,>4cm,0
+Sh4,OCUL,<4cm,0
+Sh4,OCUL,>4cm,0
 Sh4,ORBI,<4cm,0
 Sh4,ORBI,>4cm,0
-Sh4,OROB,<4cm,0
-Sh4,OROB,>4cm,0
 Sh4,PAME,<4cm,0
 Sh4,PAME,>4cm,0
 Sh4,PORI,<4cm,3
@@ -12299,10 +12299,10 @@ Sh5,MEAN,<4cm,1
 Sh5,MMEA,>4cm,0
 Sh5,MUSS,<4cm,0
 Sh5,MYCE,>4cm,0
+Sh5,OCUL,<4cm,0
+Sh5,OCUL,>4cm,0
 Sh5,ORBI,<4cm,0
 Sh5,ORBI,>4cm,0
-Sh5,OROB,<4cm,0
-Sh5,OROB,>4cm,0
 Sh5,PAME,<4cm,0
 Sh5,PAME,>4cm,0
 Sh5,PORI,<4cm,8
@@ -12333,10 +12333,10 @@ Sh6,MEAN,<4cm,0
 Sh6,MMEA,>4cm,0
 Sh6,MUSS,<4cm,0
 Sh6,MYCE,>4cm,0
+Sh6,OCUL,<4cm,0
+Sh6,OCUL,>4cm,0
 Sh6,ORBI,<4cm,0
 Sh6,ORBI,>4cm,0
-Sh6,OROB,<4cm,0
-Sh6,OROB,>4cm,0
 Sh6,PAME,<4cm,0
 Sh6,PAME,>4cm,0
 Sh6,PORI,<4cm,5
@@ -12367,10 +12367,10 @@ Sh7,MEAN,<4cm,0
 Sh7,MMEA,>4cm,0
 Sh7,MUSS,<4cm,0
 Sh7,MYCE,>4cm,0
+Sh7,OCUL,<4cm,0
+Sh7,OCUL,>4cm,0
 Sh7,ORBI,<4cm,0
 Sh7,ORBI,>4cm,0
-Sh7,OROB,<4cm,0
-Sh7,OROB,>4cm,0
 Sh7,PAME,<4cm,0
 Sh7,PAME,>4cm,0
 Sh7,PORI,<4cm,13
@@ -12401,10 +12401,10 @@ Sh8,MEAN,<4cm,0
 Sh8,MMEA,>4cm,0
 Sh8,MUSS,<4cm,0
 Sh8,MYCE,>4cm,0
+Sh8,OCUL,<4cm,0
+Sh8,OCUL,>4cm,0
 Sh8,ORBI,<4cm,0
 Sh8,ORBI,>4cm,0
-Sh8,OROB,<4cm,0
-Sh8,OROB,>4cm,0
 Sh8,PAME,<4cm,0
 Sh8,PAME,>4cm,0
 Sh8,PORI,<4cm,10
@@ -12435,10 +12435,10 @@ Sh9,MEAN,<4cm,0
 Sh9,MMEA,>4cm,0
 Sh9,MUSS,<4cm,0
 Sh9,MYCE,>4cm,0
+Sh9,OCUL,<4cm,0
+Sh9,OCUL,>4cm,0
 Sh9,ORBI,<4cm,0
 Sh9,ORBI,>4cm,0
-Sh9,OROB,<4cm,0
-Sh9,OROB,>4cm,0
 Sh9,PAME,<4cm,0
 Sh9,PAME,>4cm,0
 Sh9,PORI,<4cm,13
@@ -12469,10 +12469,10 @@ Si1,MEAN,<4cm,5
 Si1,MMEA,>4cm,0
 Si1,MUSS,<4cm,0
 Si1,MYCE,>4cm,0
+Si1,OCUL,<4cm,0
+Si1,OCUL,>4cm,0
 Si1,ORBI,<4cm,0
 Si1,ORBI,>4cm,0
-Si1,OROB,<4cm,0
-Si1,OROB,>4cm,0
 Si1,PAME,<4cm,0
 Si1,PAME,>4cm,0
 Si1,PORI,<4cm,17
@@ -12503,10 +12503,10 @@ Si2,MEAN,<4cm,2
 Si2,MMEA,>4cm,0
 Si2,MUSS,<4cm,0
 Si2,MYCE,>4cm,0
+Si2,OCUL,<4cm,0
+Si2,OCUL,>4cm,0
 Si2,ORBI,<4cm,0
 Si2,ORBI,>4cm,0
-Si2,OROB,<4cm,0
-Si2,OROB,>4cm,0
 Si2,PAME,<4cm,0
 Si2,PAME,>4cm,0
 Si2,PORI,<4cm,22
@@ -12537,10 +12537,10 @@ Si3,MEAN,<4cm,0
 Si3,MMEA,>4cm,0
 Si3,MUSS,<4cm,0
 Si3,MYCE,>4cm,0
+Si3,OCUL,<4cm,0
+Si3,OCUL,>4cm,0
 Si3,ORBI,<4cm,0
 Si3,ORBI,>4cm,0
-Si3,OROB,<4cm,0
-Si3,OROB,>4cm,0
 Si3,PAME,<4cm,0
 Si3,PAME,>4cm,0
 Si3,PORI,<4cm,9
@@ -12571,10 +12571,10 @@ Si4,MEAN,<4cm,0
 Si4,MMEA,>4cm,0
 Si4,MUSS,<4cm,0
 Si4,MYCE,>4cm,0
+Si4,OCUL,<4cm,0
+Si4,OCUL,>4cm,0
 Si4,ORBI,<4cm,0
 Si4,ORBI,>4cm,0
-Si4,OROB,<4cm,0
-Si4,OROB,>4cm,0
 Si4,PAME,<4cm,0
 Si4,PAME,>4cm,0
 Si4,PORI,<4cm,14
@@ -12605,10 +12605,10 @@ Si5,MEAN,<4cm,0
 Si5,MMEA,>4cm,0
 Si5,MUSS,<4cm,0
 Si5,MYCE,>4cm,0
+Si5,OCUL,<4cm,0
+Si5,OCUL,>4cm,0
 Si5,ORBI,<4cm,0
 Si5,ORBI,>4cm,0
-Si5,OROB,<4cm,0
-Si5,OROB,>4cm,0
 Si5,PAME,<4cm,0
 Si5,PAME,>4cm,0
 Si5,PORI,<4cm,13
@@ -12639,10 +12639,10 @@ Si6,MEAN,<4cm,0
 Si6,MMEA,>4cm,0
 Si6,MUSS,<4cm,0
 Si6,MYCE,>4cm,0
+Si6,OCUL,<4cm,0
+Si6,OCUL,>4cm,0
 Si6,ORBI,<4cm,0
 Si6,ORBI,>4cm,0
-Si6,OROB,<4cm,0
-Si6,OROB,>4cm,0
 Si6,PAME,<4cm,0
 Si6,PAME,>4cm,0
 Si6,PORI,<4cm,7
@@ -12673,10 +12673,10 @@ SI7,MEAN,<4cm,0
 SI7,MMEA,>4cm,0
 SI7,MUSS,<4cm,0
 SI7,MYCE,>4cm,0
+SI7,OCUL,<4cm,0
+SI7,OCUL,>4cm,0
 SI7,ORBI,<4cm,0
 SI7,ORBI,>4cm,0
-SI7,OROB,<4cm,0
-SI7,OROB,>4cm,0
 SI7,PAME,<4cm,0
 SI7,PAME,>4cm,0
 SI7,PORI,<4cm,4
@@ -12708,10 +12708,10 @@ Sj1,MEAN,<4cm,0
 Sj1,MMEA,>4cm,0
 Sj1,MUSS,<4cm,0
 Sj1,MYCE,>4cm,0
+Sj1,OCUL,<4cm,0
+Sj1,OCUL,>4cm,0
 Sj1,ORBI,<4cm,0
 Sj1,ORBI,>4cm,0
-Sj1,OROB,<4cm,0
-Sj1,OROB,>4cm,0
 Sj1,PAME,<4cm,0
 Sj1,PAME,>4cm,0
 Sj1,PORI,<4cm,5
@@ -12742,10 +12742,10 @@ Sj2,MEAN,<4cm,0
 Sj2,MMEA,>4cm,1
 Sj2,MUSS,<4cm,0
 Sj2,MYCE,>4cm,0
+Sj2,OCUL,<4cm,0
+Sj2,OCUL,>4cm,0
 Sj2,ORBI,<4cm,0
 Sj2,ORBI,>4cm,0
-Sj2,OROB,<4cm,0
-Sj2,OROB,>4cm,0
 Sj2,PAME,<4cm,0
 Sj2,PAME,>4cm,0
 Sj2,PORI,<4cm,6
@@ -12776,10 +12776,10 @@ Sj3,MEAN,<4cm,1
 Sj3,MMEA,>4cm,1
 Sj3,MUSS,<4cm,0
 Sj3,MYCE,>4cm,0
+Sj3,OCUL,<4cm,0
+Sj3,OCUL,>4cm,0
 Sj3,ORBI,<4cm,0
 Sj3,ORBI,>4cm,0
-Sj3,OROB,<4cm,0
-Sj3,OROB,>4cm,0
 Sj3,PAME,<4cm,0
 Sj3,PAME,>4cm,0
 Sj3,PORI,<4cm,3
@@ -12810,10 +12810,10 @@ Sj4,MEAN,<4cm,0
 Sj4,MMEA,>4cm,1
 Sj4,MUSS,<4cm,0
 Sj4,MYCE,>4cm,0
+Sj4,OCUL,<4cm,0
+Sj4,OCUL,>4cm,0
 Sj4,ORBI,<4cm,0
 Sj4,ORBI,>4cm,0
-Sj4,OROB,<4cm,0
-Sj4,OROB,>4cm,0
 Sj4,PAME,<4cm,0
 Sj4,PAME,>4cm,0
 Sj4,PORI,<4cm,1
@@ -12844,10 +12844,10 @@ Sj5,MEAN,<4cm,0
 Sj5,MMEA,>4cm,0
 Sj5,MUSS,<4cm,0
 Sj5,MYCE,>4cm,0
+Sj5,OCUL,<4cm,0
+Sj5,OCUL,>4cm,0
 Sj5,ORBI,<4cm,0
 Sj5,ORBI,>4cm,0
-Sj5,OROB,<4cm,0
-Sj5,OROB,>4cm,0
 Sj5,PAME,<4cm,0
 Sj5,PAME,>4cm,0
 Sj5,PORI,<4cm,6
@@ -12878,10 +12878,10 @@ Sj6,MEAN,<4cm,0
 Sj6,MMEA,>4cm,1
 Sj6,MUSS,<4cm,0
 Sj6,MYCE,>4cm,0
+Sj6,OCUL,<4cm,0
+Sj6,OCUL,>4cm,0
 Sj6,ORBI,<4cm,0
 Sj6,ORBI,>4cm,0
-Sj6,OROB,<4cm,0
-Sj6,OROB,>4cm,0
 Sj6,PAME,<4cm,0
 Sj6,PAME,>4cm,0
 Sj6,PORI,<4cm,4
@@ -12912,10 +12912,10 @@ T1,MEAN,<4cm,0
 T1,MMEA,>4cm,0
 T1,MUSS,<4cm,0
 T1,MYCE,>4cm,0
+T1,OCUL,<4cm,0
+T1,OCUL,>4cm,0
 T1,ORBI,<4cm,0
 T1,ORBI,>4cm,2
-T1,OROB,<4cm,0
-T1,OROB,>4cm,0
 T1,PAME,<4cm,0
 T1,PAME,>4cm,0
 T1,PORI,<4cm,0
@@ -12946,10 +12946,10 @@ T10,MEAN,<4cm,0
 T10,MMEA,>4cm,0
 T10,MUSS,<4cm,0
 T10,MYCE,>4cm,0
+T10,OCUL,<4cm,0
+T10,OCUL,>4cm,0
 T10,ORBI,<4cm,0
 T10,ORBI,>4cm,0
-T10,OROB,<4cm,0
-T10,OROB,>4cm,0
 T10,PAME,<4cm,0
 T10,PAME,>4cm,0
 T10,PORI,<4cm,0
@@ -12980,10 +12980,10 @@ T11,MEAN,<4cm,0
 T11,MMEA,>4cm,0
 T11,MUSS,<4cm,0
 T11,MYCE,>4cm,1
+T11,OCUL,<4cm,0
+T11,OCUL,>4cm,0
 T11,ORBI,<4cm,0
 T11,ORBI,>4cm,0
-T11,OROB,<4cm,0
-T11,OROB,>4cm,0
 T11,PAME,<4cm,0
 T11,PAME,>4cm,0
 T11,PORI,<4cm,0
@@ -13014,10 +13014,10 @@ T12,MEAN,<4cm,0
 T12,MMEA,>4cm,2
 T12,MUSS,<4cm,0
 T12,MYCE,>4cm,0
+T12,OCUL,<4cm,0
+T12,OCUL,>4cm,0
 T12,ORBI,<4cm,0
 T12,ORBI,>4cm,0
-T12,OROB,<4cm,0
-T12,OROB,>4cm,0
 T12,PAME,<4cm,0
 T12,PAME,>4cm,0
 T12,PORI,<4cm,1
@@ -13048,10 +13048,10 @@ T13,MEAN,<4cm,1
 T13,MMEA,>4cm,1
 T13,MUSS,<4cm,1
 T13,MYCE,>4cm,0
+T13,OCUL,<4cm,0
+T13,OCUL,>4cm,0
 T13,ORBI,<4cm,0
 T13,ORBI,>4cm,0
-T13,OROB,<4cm,0
-T13,OROB,>4cm,0
 T13,PAME,<4cm,0
 T13,PAME,>4cm,0
 T13,PORI,<4cm,0
@@ -13082,10 +13082,10 @@ T14,MEAN,<4cm,0
 T14,MMEA,>4cm,2
 T14,MUSS,<4cm,0
 T14,MYCE,>4cm,0
+T14,OCUL,<4cm,0
+T14,OCUL,>4cm,0
 T14,ORBI,<4cm,0
 T14,ORBI,>4cm,0
-T14,OROB,<4cm,0
-T14,OROB,>4cm,0
 T14,PAME,<4cm,0
 T14,PAME,>4cm,0
 T14,PORI,<4cm,1
@@ -13116,10 +13116,10 @@ T15,MEAN,<4cm,0
 T15,MMEA,>4cm,0
 T15,MUSS,<4cm,0
 T15,MYCE,>4cm,0
+T15,OCUL,<4cm,0
+T15,OCUL,>4cm,0
 T15,ORBI,<4cm,0
 T15,ORBI,>4cm,0
-T15,OROB,<4cm,0
-T15,OROB,>4cm,0
 T15,PAME,<4cm,0
 T15,PAME,>4cm,0
 T15,PORI,<4cm,1
@@ -13150,10 +13150,10 @@ T16,MEAN,<4cm,0
 T16,MMEA,>4cm,0
 T16,MUSS,<4cm,0
 T16,MYCE,>4cm,0
+T16,OCUL,<4cm,0
+T16,OCUL,>4cm,0
 T16,ORBI,<4cm,0
 T16,ORBI,>4cm,0
-T16,OROB,<4cm,0
-T16,OROB,>4cm,0
 T16,PAME,<4cm,0
 T16,PAME,>4cm,0
 T16,PORI,<4cm,2
@@ -13184,10 +13184,10 @@ T17,MEAN,<4cm,0
 T17,MMEA,>4cm,0
 T17,MUSS,<4cm,0
 T17,MYCE,>4cm,0
+T17,OCUL,<4cm,0
+T17,OCUL,>4cm,0
 T17,ORBI,<4cm,0
 T17,ORBI,>4cm,0
-T17,OROB,<4cm,0
-T17,OROB,>4cm,0
 T17,PAME,<4cm,0
 T17,PAME,>4cm,0
 T17,PORI,<4cm,0
@@ -13218,10 +13218,10 @@ T18,MEAN,<4cm,1
 T18,MMEA,>4cm,1
 T18,MUSS,<4cm,1
 T18,MYCE,>4cm,0
+T18,OCUL,<4cm,0
+T18,OCUL,>4cm,0
 T18,ORBI,<4cm,0
 T18,ORBI,>4cm,1
-T18,OROB,<4cm,0
-T18,OROB,>4cm,0
 T18,PAME,<4cm,0
 T18,PAME,>4cm,0
 T18,PORI,<4cm,4
@@ -13252,10 +13252,10 @@ T19,MEAN,<4cm,0
 T19,MMEA,>4cm,0
 T19,MUSS,<4cm,0
 T19,MYCE,>4cm,0
+T19,OCUL,<4cm,0
+T19,OCUL,>4cm,0
 T19,ORBI,<4cm,0
 T19,ORBI,>4cm,0
-T19,OROB,<4cm,0
-T19,OROB,>4cm,0
 T19,PAME,<4cm,0
 T19,PAME,>4cm,0
 T19,PORI,<4cm,0
@@ -13286,10 +13286,10 @@ T2,MEAN,<4cm,0
 T2,MMEA,>4cm,0
 T2,MUSS,<4cm,0
 T2,MYCE,>4cm,0
+T2,OCUL,<4cm,0
+T2,OCUL,>4cm,0
 T2,ORBI,<4cm,0
 T2,ORBI,>4cm,0
-T2,OROB,<4cm,0
-T2,OROB,>4cm,0
 T2,PAME,<4cm,0
 T2,PAME,>4cm,0
 T2,PORI,<4cm,0
@@ -13320,10 +13320,10 @@ T20,MEAN,<4cm,0
 T20,MMEA,>4cm,0
 T20,MUSS,<4cm,0
 T20,MYCE,>4cm,0
+T20,OCUL,<4cm,0
+T20,OCUL,>4cm,0
 T20,ORBI,<4cm,0
 T20,ORBI,>4cm,0
-T20,OROB,<4cm,0
-T20,OROB,>4cm,0
 T20,PAME,<4cm,0
 T20,PAME,>4cm,0
 T20,PORI,<4cm,0
@@ -13354,10 +13354,10 @@ T21,MEAN,<4cm,1
 T21,MMEA,>4cm,1
 T21,MUSS,<4cm,0
 T21,MYCE,>4cm,1
+T21,OCUL,<4cm,0
+T21,OCUL,>4cm,0
 T21,ORBI,<4cm,0
 T21,ORBI,>4cm,1
-T21,OROB,<4cm,0
-T21,OROB,>4cm,0
 T21,PAME,<4cm,0
 T21,PAME,>4cm,0
 T21,PORI,<4cm,2
@@ -13388,10 +13388,10 @@ T22,MEAN,<4cm,0
 T22,MMEA,>4cm,1
 T22,MUSS,<4cm,0
 T22,MYCE,>4cm,0
+T22,OCUL,<4cm,0
+T22,OCUL,>4cm,0
 T22,ORBI,<4cm,0
 T22,ORBI,>4cm,0
-T22,OROB,<4cm,0
-T22,OROB,>4cm,0
 T22,PAME,<4cm,0
 T22,PAME,>4cm,0
 T22,PORI,<4cm,2
@@ -13422,10 +13422,10 @@ T23,MEAN,<4cm,1
 T23,MMEA,>4cm,0
 T23,MUSS,<4cm,0
 T23,MYCE,>4cm,0
+T23,OCUL,<4cm,0
+T23,OCUL,>4cm,0
 T23,ORBI,<4cm,0
 T23,ORBI,>4cm,0
-T23,OROB,<4cm,0
-T23,OROB,>4cm,0
 T23,PAME,<4cm,0
 T23,PAME,>4cm,0
 T23,PORI,<4cm,0
@@ -13456,10 +13456,10 @@ T24,MEAN,<4cm,0
 T24,MMEA,>4cm,1
 T24,MUSS,<4cm,0
 T24,MYCE,>4cm,0
+T24,OCUL,<4cm,0
+T24,OCUL,>4cm,0
 T24,ORBI,<4cm,0
 T24,ORBI,>4cm,6
-T24,OROB,<4cm,0
-T24,OROB,>4cm,0
 T24,PAME,<4cm,0
 T24,PAME,>4cm,0
 T24,PORI,<4cm,1
@@ -13490,10 +13490,10 @@ T25,MEAN,<4cm,0
 T25,MMEA,>4cm,2
 T25,MUSS,<4cm,0
 T25,MYCE,>4cm,1
+T25,OCUL,<4cm,0
+T25,OCUL,>4cm,0
 T25,ORBI,<4cm,0
 T25,ORBI,>4cm,2
-T25,OROB,<4cm,0
-T25,OROB,>4cm,0
 T25,PAME,<4cm,0
 T25,PAME,>4cm,0
 T25,PORI,<4cm,2
@@ -13524,10 +13524,10 @@ T26,MEAN,<4cm,0
 T26,MMEA,>4cm,1
 T26,MUSS,<4cm,0
 T26,MYCE,>4cm,0
+T26,OCUL,<4cm,0
+T26,OCUL,>4cm,0
 T26,ORBI,<4cm,0
 T26,ORBI,>4cm,3
-T26,OROB,<4cm,0
-T26,OROB,>4cm,0
 T26,PAME,<4cm,0
 T26,PAME,>4cm,0
 T26,PORI,<4cm,1
@@ -13558,10 +13558,10 @@ T27,MEAN,<4cm,0
 T27,MMEA,>4cm,0
 T27,MUSS,<4cm,0
 T27,MYCE,>4cm,1
+T27,OCUL,<4cm,0
+T27,OCUL,>4cm,0
 T27,ORBI,<4cm,0
 T27,ORBI,>4cm,0
-T27,OROB,<4cm,0
-T27,OROB,>4cm,0
 T27,PAME,<4cm,0
 T27,PAME,>4cm,0
 T27,PORI,<4cm,0
@@ -13592,10 +13592,10 @@ T28,MEAN,<4cm,0
 T28,MMEA,>4cm,0
 T28,MUSS,<4cm,0
 T28,MYCE,>4cm,0
+T28,OCUL,<4cm,0
+T28,OCUL,>4cm,0
 T28,ORBI,<4cm,0
 T28,ORBI,>4cm,0
-T28,OROB,<4cm,0
-T28,OROB,>4cm,0
 T28,PAME,<4cm,0
 T28,PAME,>4cm,0
 T28,PORI,<4cm,1
@@ -13626,10 +13626,10 @@ T29,MEAN,<4cm,1
 T29,MMEA,>4cm,1
 T29,MUSS,<4cm,0
 T29,MYCE,>4cm,0
+T29,OCUL,<4cm,0
+T29,OCUL,>4cm,0
 T29,ORBI,<4cm,2
 T29,ORBI,>4cm,2
-T29,OROB,<4cm,0
-T29,OROB,>4cm,0
 T29,PAME,<4cm,0
 T29,PAME,>4cm,0
 T29,PORI,<4cm,1
@@ -13660,10 +13660,10 @@ T3,MEAN,<4cm,0
 T3,MMEA,>4cm,0
 T3,MUSS,<4cm,0
 T3,MYCE,>4cm,0
+T3,OCUL,<4cm,0
+T3,OCUL,>4cm,0
 T3,ORBI,<4cm,0
 T3,ORBI,>4cm,0
-T3,OROB,<4cm,0
-T3,OROB,>4cm,0
 T3,PAME,<4cm,0
 T3,PAME,>4cm,0
 T3,PORI,<4cm,4
@@ -13695,11 +13695,11 @@ T30,MEAN,<4cm,0
 T30,MMEA,>4cm,0
 T30,MUSS,<4cm,0
 T30,MYCE,>4cm,0
+T30,OCUL,<4cm,0
+T30,OCUL,>4cm,0
 T30,ORBI,<4cm,0
 T30,ORBI,>4cm,0
 T30,ORBI,NA,1
-T30,OROB,<4cm,0
-T30,OROB,>4cm,0
 T30,PAME,<4cm,0
 T30,PAME,>4cm,0
 T30,PORI,<4cm,0
@@ -13734,10 +13734,10 @@ T31,MEAN,<4cm,1
 T31,MMEA,>4cm,0
 T31,MUSS,<4cm,2
 T31,MYCE,>4cm,0
+T31,OCUL,<4cm,0
+T31,OCUL,>4cm,0
 T31,ORBI,<4cm,0
 T31,ORBI,>4cm,2
-T31,OROB,<4cm,0
-T31,OROB,>4cm,0
 T31,PAME,<4cm,0
 T31,PAME,>4cm,0
 T31,PORI,<4cm,4
@@ -13768,10 +13768,10 @@ T32,MEAN,<4cm,1
 T32,MMEA,>4cm,1
 T32,MUSS,<4cm,1
 T32,MYCE,>4cm,0
+T32,OCUL,<4cm,0
+T32,OCUL,>4cm,0
 T32,ORBI,<4cm,0
 T32,ORBI,>4cm,0
-T32,OROB,<4cm,0
-T32,OROB,>4cm,0
 T32,PAME,<4cm,0
 T32,PAME,>4cm,0
 T32,PORI,<4cm,1
@@ -13802,10 +13802,10 @@ T33,MEAN,<4cm,0
 T33,MMEA,>4cm,0
 T33,MUSS,<4cm,0
 T33,MYCE,>4cm,0
+T33,OCUL,<4cm,0
+T33,OCUL,>4cm,0
 T33,ORBI,<4cm,0
 T33,ORBI,>4cm,0
-T33,OROB,<4cm,0
-T33,OROB,>4cm,0
 T33,PAME,<4cm,0
 T33,PAME,>4cm,0
 T33,PORI,<4cm,0
@@ -13836,10 +13836,10 @@ T34,MEAN,<4cm,0
 T34,MMEA,>4cm,1
 T34,MUSS,<4cm,0
 T34,MYCE,>4cm,1
+T34,OCUL,<4cm,0
+T34,OCUL,>4cm,0
 T34,ORBI,<4cm,0
 T34,ORBI,>4cm,0
-T34,OROB,<4cm,0
-T34,OROB,>4cm,0
 T34,PAME,<4cm,0
 T34,PAME,>4cm,0
 T34,PORI,<4cm,0
@@ -13870,10 +13870,10 @@ T35,MEAN,<4cm,0
 T35,MMEA,>4cm,2
 T35,MUSS,<4cm,0
 T35,MYCE,>4cm,0
+T35,OCUL,<4cm,0
+T35,OCUL,>4cm,0
 T35,ORBI,<4cm,0
 T35,ORBI,>4cm,1
-T35,OROB,<4cm,0
-T35,OROB,>4cm,0
 T35,PAME,<4cm,0
 T35,PAME,>4cm,0
 T35,PORI,<4cm,3
@@ -13904,10 +13904,10 @@ T36,MEAN,<4cm,0
 T36,MMEA,>4cm,0
 T36,MUSS,<4cm,0
 T36,MYCE,>4cm,0
+T36,OCUL,<4cm,0
+T36,OCUL,>4cm,0
 T36,ORBI,<4cm,0
 T36,ORBI,>4cm,4
-T36,OROB,<4cm,0
-T36,OROB,>4cm,0
 T36,PAME,<4cm,0
 T36,PAME,>4cm,0
 T36,PORI,<4cm,0
@@ -13938,10 +13938,10 @@ T37,MEAN,<4cm,0
 T37,MMEA,>4cm,0
 T37,MUSS,<4cm,3
 T37,MYCE,>4cm,0
+T37,OCUL,<4cm,0
+T37,OCUL,>4cm,0
 T37,ORBI,<4cm,0
 T37,ORBI,>4cm,1
-T37,OROB,<4cm,0
-T37,OROB,>4cm,0
 T37,PAME,<4cm,0
 T37,PAME,>4cm,0
 T37,PORI,<4cm,2
@@ -13972,10 +13972,10 @@ T38,MEAN,<4cm,0
 T38,MMEA,>4cm,1
 T38,MUSS,<4cm,0
 T38,MYCE,>4cm,0
+T38,OCUL,<4cm,0
+T38,OCUL,>4cm,0
 T38,ORBI,<4cm,0
 T38,ORBI,>4cm,0
-T38,OROB,<4cm,0
-T38,OROB,>4cm,0
 T38,PAME,<4cm,0
 T38,PAME,>4cm,0
 T38,PORI,<4cm,0
@@ -14006,10 +14006,10 @@ T39,MEAN,<4cm,0
 T39,MMEA,>4cm,0
 T39,MUSS,<4cm,0
 T39,MYCE,>4cm,0
+T39,OCUL,<4cm,0
+T39,OCUL,>4cm,0
 T39,ORBI,<4cm,0
 T39,ORBI,>4cm,0
-T39,OROB,<4cm,0
-T39,OROB,>4cm,0
 T39,PAME,<4cm,0
 T39,PAME,>4cm,0
 T39,PORI,<4cm,1
@@ -14040,10 +14040,10 @@ T4,MEAN,<4cm,0
 T4,MMEA,>4cm,0
 T4,MUSS,<4cm,0
 T4,MYCE,>4cm,1
+T4,OCUL,<4cm,0
+T4,OCUL,>4cm,0
 T4,ORBI,<4cm,0
 T4,ORBI,>4cm,2
-T4,OROB,<4cm,0
-T4,OROB,>4cm,0
 T4,PAME,<4cm,0
 T4,PAME,>4cm,0
 T4,PORI,<4cm,0
@@ -14074,10 +14074,10 @@ T40,MEAN,<4cm,0
 T40,MMEA,>4cm,3
 T40,MUSS,<4cm,0
 T40,MYCE,>4cm,0
+T40,OCUL,<4cm,0
+T40,OCUL,>4cm,0
 T40,ORBI,<4cm,0
 T40,ORBI,>4cm,0
-T40,OROB,<4cm,0
-T40,OROB,>4cm,0
 T40,PAME,<4cm,0
 T40,PAME,>4cm,0
 T40,PORI,<4cm,0
@@ -14108,10 +14108,10 @@ T41,MEAN,<4cm,0
 T41,MMEA,>4cm,3
 T41,MUSS,<4cm,0
 T41,MYCE,>4cm,0
+T41,OCUL,<4cm,0
+T41,OCUL,>4cm,0
 T41,ORBI,<4cm,0
 T41,ORBI,>4cm,0
-T41,OROB,<4cm,0
-T41,OROB,>4cm,0
 T41,PAME,<4cm,0
 T41,PAME,>4cm,0
 T41,PORI,<4cm,0
@@ -14142,10 +14142,10 @@ T5,MEAN,<4cm,0
 T5,MMEA,>4cm,0
 T5,MUSS,<4cm,0
 T5,MYCE,>4cm,0
+T5,OCUL,<4cm,0
+T5,OCUL,>4cm,0
 T5,ORBI,<4cm,0
 T5,ORBI,>4cm,0
-T5,OROB,<4cm,0
-T5,OROB,>4cm,0
 T5,PAME,<4cm,0
 T5,PAME,>4cm,0
 T5,PORI,<4cm,0
@@ -14176,10 +14176,10 @@ T6,MEAN,<4cm,0
 T6,MMEA,>4cm,0
 T6,MUSS,<4cm,0
 T6,MYCE,>4cm,0
+T6,OCUL,<4cm,0
+T6,OCUL,>4cm,0
 T6,ORBI,<4cm,0
 T6,ORBI,>4cm,1
-T6,OROB,<4cm,0
-T6,OROB,>4cm,0
 T6,PAME,<4cm,0
 T6,PAME,>4cm,0
 T6,PORI,<4cm,1
@@ -14210,10 +14210,10 @@ T7,MEAN,<4cm,0
 T7,MMEA,>4cm,1
 T7,MUSS,<4cm,0
 T7,MYCE,>4cm,0
+T7,OCUL,<4cm,0
+T7,OCUL,>4cm,0
 T7,ORBI,<4cm,0
 T7,ORBI,>4cm,0
-T7,OROB,<4cm,0
-T7,OROB,>4cm,0
 T7,PAME,<4cm,0
 T7,PAME,>4cm,0
 T7,PORI,<4cm,1
@@ -14244,10 +14244,10 @@ T8,MEAN,<4cm,0
 T8,MMEA,>4cm,1
 T8,MUSS,<4cm,0
 T8,MYCE,>4cm,0
+T8,OCUL,<4cm,0
+T8,OCUL,>4cm,0
 T8,ORBI,<4cm,0
 T8,ORBI,>4cm,0
-T8,OROB,<4cm,0
-T8,OROB,>4cm,0
 T8,PAME,<4cm,0
 T8,PAME,>4cm,0
 T8,PORI,<4cm,0
@@ -14278,10 +14278,10 @@ T9,MEAN,<4cm,0
 T9,MMEA,>4cm,0
 T9,MUSS,<4cm,0
 T9,MYCE,>4cm,0
+T9,OCUL,<4cm,0
+T9,OCUL,>4cm,0
 T9,ORBI,<4cm,0
 T9,ORBI,>4cm,0
-T9,OROB,<4cm,0
-T9,OROB,>4cm,0
 T9,PAME,<4cm,0
 T9,PAME,>4cm,0
 T9,PORI,<4cm,1
