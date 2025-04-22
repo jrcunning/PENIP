@@ -1215,24 +1215,72 @@ knitr::kable(res2, caption = "Total number of corals in each Impact Zone for the
 # Note: also tried pscl::zeroinfl and was nearly identical to glm.nb results
 mod_nb <- MASS::glm.nb(n ~ Type * taxon + dataset + offset(log(transect_area_m2)), data = dfftaxon)
 
-emm_taxon <- emmeans(mod_nb, ~ taxon | Type, offset = log(1), type = "response")  # per m²
-# emmeans is acting weird relative to the predict method using earlier.
-as_tibble(emm_taxon) %>%
-  full_join(area_summary2) %>%
-  mutate(total = asy)
+# Generate new data only for existing taxon-size class combinations
+newdata_1 <- dfftaxon %>%
+  distinct(dataset, Type, taxon) %>%  
+  mutate(transect_area_m2 = 1)  # Set area to 1 for density predictions on a per m2 basis
 
-total_density_df <- emm_taxon_df %>%
+# Get predicted values & standard errors (log scale)
+preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
+# newdata_1 <- bind_cols(newdata_1, preds_nb) %>% mutate(fit = exp(fit)) %>%
+#   mutate(taxon = fct_reorder(taxon, fit), class = "Total")  # Reorder taxa by abundance
+
+# Compute both total coral density & taxon-size class-specific densities in one step
+results_nb <- newdata_1 %>%
+  mutate(
+    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
+    fit_se = exp(preds_nb$fit) * preds_nb$se.fit,   # Convert SE using the Delta Method
+    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
+    fit_lower = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
+    fit_upper = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
+  )
+
+# Compute total coral density + confidence intervals
+total_ci_nb <- results_nb %>%
+  group_by(dataset, Type) %>%
+  summarize(
+    total_density = sum(fit),
+    total_se = sqrt(sum(fit_var)),
+    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
+    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
+  )
+
+
+
+avg_density_ci <- total_ci_nb %>%
   group_by(Type) %>%
   summarize(
-    total_density = sum(response),
-    se_total = sqrt(sum(SE^2)),
+    # Inverse-variance weights
+    w = 1 / (total_se^2),
+    
+    # Weighted average of density
+    avg_density = sum(total_density * w) / sum(w),
+    
+    # Standard error of the weighted mean
+    se_density = sqrt(1 / sum(w)),
+    
+    # Confidence intervals
+    lower_95CI = avg_density - 1.96 * se_density,
+    upper_95CI = avg_density + 1.96 * se_density,
+    
     .groups = "drop"
   )
 
-total_density_df %>%
-  full_join(area_summary2, by = "Type") %>%
-  mutate(total = total_density * total_area_m2) %>%
+tots <- avg_density_ci %>%
+  distinct(Type, avg_density, lower_95CI, upper_95CI) %>%
+  full_join(area_summary2) %>%
+  mutate(totlow = lower_95CI * total_area_m2,
+         totup = upper_95CI * total_area_m2) %>%
   group_by(ImpactZone) %>%
-  summarize(total = sum(total, na.rm = T))
+  summarize(totlow = sum(totlow),
+            totup = sum(totup))
+
+
+sum(tots$totlow)
+sum(tots$totup)
+
+
+
+
 ```
 
