@@ -20,7 +20,7 @@ library(xml2)
 library(tidyverse)
 ```
 
-```{r taxon_lookup_tables}
+```{r custom}
 # Define genus level taxon groups (plus one family FAVI)
 taxon_groups <- list(
   PORI = c("PPOR", "PFUR", "PDIV", "PAST", "PORI"),
@@ -50,6 +50,11 @@ taxon_groups_juv <- list(
 # Convert to lookup tibble
 taxon_lookup_juv <- enframe(taxon_groups_juv, name = "taxon_group", value = "taxon") %>%
   unnest(taxon)
+
+
+# Order levels of Habitat Types
+type_levels <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef",
+                 "Outer Reef", "Aggregated Patch Reef")
 ```
 
 # 1. Import data
@@ -865,7 +870,8 @@ sppcounts <- dff %>%
 sppcounts
 
 dff <- dff %>%
-  filter(taxon %in% filter(sppcounts, total >= 5)$taxon)
+  filter(taxon %in% filter(sppcounts, total >= 5)$taxon) %>%
+  mutate(Type = factor(Type, levels = type_levels))
 ```
 
 Taxa with less than 5 total observations were filtered out, which included: HCUC, MANG, PAME, FFRA, OCUL, SCOL
@@ -1040,39 +1046,139 @@ rbind(contrast_results) %>%
 ```{r}
 # Get total counts for each taxon at each site
 dfftaxon <- dff %>% 
-  group_by(dataset, Type, site, transect_num, transect_area_m2, taxon) %>%
+  group_by(dataset, Type, dir, site, transect_num, transect_area_m2, taxon) %>%
   summarize(n = sum(n)) %>%
   ungroup()
 
-# Remove any taxa not observed in a given dataset / habitat Type
+# Remove any taxa not observed in a given dataset / habitat Type ?????
 dfftaxon_trimmed <- dfftaxon %>%
-  group_by(dataset, Type, taxon) %>%
+  group_by(dataset, Type, dir, taxon) %>%
   filter(any(n > 0)) %>%
   ungroup()
 
-
+# SUPER MODEL
 library(brms)
 mod_nb <- brm(
-  bf(n ~ dataset * Type * taxon + offset(log(transect_area_m2))),
+  bf(n ~ dataset * Type * dir * taxon + offset(log(transect_area_m2))),
   family = negbinomial(),
-  data = dfftaxon,
+  data = dfftaxon_trimmed,
   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
             prior(exponential(1), class = "shape")),     # Reasonable prior for NB dispersion
   chains = 4,  
   cores = 4,  
   threads = threading(5),  
-  iter = 4000, warmup = 1500,  
+  iter = 1000, warmup = 500,  
   thin = 2,  
-  control = list(adapt_delta = 0.95, max_treedepth = 12),  
+  control = list(adapt_delta = 0.9, max_treedepth = 12),  
   backend = "cmdstanr"
 )
 
 
 # 1. Create newdata grid (1 m² for standardization)
 newdata <- dfftaxon_trimmed %>%
-  distinct(dataset, Type, taxon) %>%
-  mutate(transect_area_m2 = 1, row_id = row_number())
+  distinct(dataset, Type, dir, taxon) %>%
+  mutate(transect_area_m2 = 1)
+
+# 2. Get fitted values manually by computing summary statistics across all draws
+library(tidybayes)
+posterior_draws <- add_epred_draws(mod_nb, newdata = newdata)
+fitted_manual <- posterior_draws %>%
+  mutate(Type = factor(Type, levels = type_levels)) %>%
+  group_by(dataset, Type, dir, taxon) %>%
+  summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
+            fit_sd = sd(.epred),  # Posterior standard deviation
+            fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
+            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
+
+# Plot
+ggplot(fitted_manual, aes(y = fit_mean, x = taxon, color = dir)) +
+  facet_grid(dataset ~ Type) +
+  geom_point() +
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0) +
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(fitted_manual, aes(y = fit_mean, x = Type, color = dir, shape = dataset,
+                          group = interaction(dataset, dir))) +
+  facet_wrap(taxon ~ ., scales = "free_x") +
+  geom_point(position = position_dodge(width = 0.5)) +
+  #geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
+                position = position_dodge(width = 0.5), lwd = 0.25) +
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 0))
+
+# Any N-S differences in taxon abundance within habitat Types/datasets?
+#### Pivot wide so you can calculate N vs S difference per draw
+posterior_NS_diff <- posterior_draws %>%
+  ungroup() %>%
+  select(.draw, dataset, Type, dir, taxon, .epred) %>%
+  pivot_wider(names_from = dir, values_from = .epred) %>%
+  filter(!is.na(N), !is.na(S)) %>%  # ensure both directions exist for the draw
+  mutate(diff = S - N)  # or N - S depending on interpretation
+
+dir_comparisons <- posterior_NS_diff %>%
+  group_by(dataset, Type, taxon) %>%
+  summarize(
+    mean_diff = mean(diff),
+    lower_95 = quantile(diff, 0.025),
+    upper_95 = quantile(diff, 0.975),
+    p_gt_0 = mean(diff > 0),
+    p_lt_0 = mean(diff < 0),
+    sig = ifelse(lower_95 > 0 | upper_95 < 0, "yes", "no"),
+    .groups = "drop"
+  )
+
+dir_comparisons %>%
+  filter(sig == "yes") %>%
+  mutate(greater = if_else(mean_diff > 0, "N", "S")) %>%
+  group_by(dataset, Type, greater) %>%
+  summarize(taxa = paste(taxon, collapse = ",")) %>%
+  arrange(Type, greater)
+
+# Plot total coral abundance
+fitted_total <- posterior_draws %>%
+  group_by(.draw, dataset, Type, dir) %>%
+  summarize(total_epred = sum(.epred), .groups = "drop") %>%
+  group_by(dataset, Type, dir) %>%
+  summarize(
+    fit_mean = mean(total_epred),
+    fit_sd = sd(total_epred),
+    fit_lower = quantile(total_epred, 0.025),
+    fit_upper = quantile(total_epred, 0.975),
+    .groups = "drop"
+  )
+
+ggplot(fitted_total, aes(x = dataset, y = fit_mean, color = dir)) +
+  facet_grid(~ Type) +
+  geom_point(position = position_dodge(width = 0.5)) +
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
+                position = position_dodge(width = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90))
+
+# Any N-S differences in total coral abundance?
+posterior_NS_total_diff <- posterior_draws %>%
+  ungroup() %>%
+  group_by(.draw, dataset, Type, dir) %>%
+  summarize(total_epred = sum(.epred), .groups = "drop") %>%
+  pivot_wider(names_from = dir, values_from = total_epred) %>%
+  filter(!is.na(N), !is.na(S)) %>%  # make sure both are present
+  mutate(diff = N - S)  # or S - N depending on desired contrast
+
+total_diff_summary <- posterior_NS_total_diff %>%
+  group_by(dataset, Type) %>%
+  summarize(
+    mean_diff = mean(diff),
+    lower_95 = quantile(diff, 0.025),
+    upper_95 = quantile(diff, 0.975),
+    p_gt_0 = mean(diff > 0),
+    p_lt_0 = mean(diff < 0),
+    sig = ifelse(lower_95 > 0 | upper_95 < 0, "yes", "no"),
+    .groups = "drop"
+  )
+
+total_diff_summary
 
 # 2. Get posterior draws of fitted values on response scale (no random effects)
 fitted_draws <- fitted(
@@ -1081,6 +1187,8 @@ fitted_draws <- fitted(
   re_formula = NA,
   summary = FALSE
 )
+
+
 
 # 3. Reshape into long format and join with newdata
 draws_long <- as.data.frame(fitted_draws) %>%
