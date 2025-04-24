@@ -7,17 +7,21 @@ output:
     toc: true
     toc_float: true
     toc_depth: 2      
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
+# Setup
 ```{r libraries}
 # Load packages
 library(sf)
 library(xml2)
 library(tidyverse)
+library(tidybayes)
+library(brms)
 ```
 
 ```{r custom}
@@ -55,13 +59,337 @@ taxon_lookup_juv <- enframe(taxon_groups_juv, name = "taxon_group", value = "tax
 # Order levels of Habitat Types
 type_levels <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef",
                  "Outer Reef", "Aggregated Patch Reef")
+type_labels <- c("NRC", "IR", "MR", "OR", "APR")
+names(type_labels) <- type_levels
+
+# Order survey datasets
+dataset_levels <- c("dca", "tt21", "tt23", "drm")
+dataset_labels <- c("2017—DCA", "2021—TT", "2023—TT", "2024—Shedd")
+names(dataset_labels) <- dataset_levels
 ```
 
-# 1. Import data
+# Import data
 
-## 1.1. 2024 Shedd Survey
+## 2011 (NSU) and 2017 (DCA) ESA Surveys
 
-### 1.1.1. Shedd site metadata
+## 2017 Dial Cordy Recon Survey
+
+DCA site metadata
+```{r 2017_DCA_site_metadata}
+# Site metadata
+# Read in site coordinates
+dca_sitemd0 <- readxl::read_xlsx("data/2017_dca_recon/Recon_Site_Coordinates_Extracted.xlsx") %>%
+  janitor::clean_names()
+
+# All sites have start and end coordinates...
+
+# Tidy and Calculate midpoint per transect
+dca_sitemd <- dca_sitemd0 %>%
+  mutate(
+    depth = abs(as.numeric(depth)),
+    across(c(latitude, longitude), as.numeric)
+  ) %>%
+  group_by(site = transect) %>%
+  summarize(
+    latitude = mean(latitude, na.rm = TRUE),
+    longitude = mean(longitude, na.rm = TRUE),
+    depth = mean(depth, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+DCA coral data
+```{r 2017_DCA_coral_data}
+# Read in survey data
+dca0 <- readxl::read_xlsx("data/2017_dca_recon/Compiled_DCA_RECON_Belt_data.xlsx") %>%
+  janitor::clean_names()
+
+dca <- dca0 %>%
+  select(1:18) %>%
+  rename(site = site_name) %>%
+  mutate(site = factor(site)) %>%
+  select(site, taxon = coral_species, max_width_cm = max_size_cm)
+
+# Adjust/corrects species IDs
+sort(unique(dca$taxon))
+dca <- dca %>%
+  mutate(taxon = case_when(
+    taxon == "AGA SP" ~ "AGAR",
+    taxon == "LCUC" ~ "HCUC",
+    taxon %in% c("MYCSP", "Mycetophyllia spp.") ~ "MYCE",
+    taxon == "OFAV\\" ~ "OFAV",
+    taxon %in% c("MAD SP", "MADSP") ~ "MADR",
+    taxon == "Scolymia Spp" ~ "SCOL",
+    taxon %in% c("SIDSP", "Sid SP", "SID SP.", "SID SP") ~ "SIDE",
+    TRUE ~ taxon
+  ))
+sort(unique(dca$taxon))
+
+# Filter out unidentified corals
+dca <- dca %>%
+  filter(!taxon %in% c("CORAL", "Cup Coral"))
+
+# Write long data to file
+write_csv(dca, file = "data/processed/dca_2017_long.csv")
+
+
+# Convert to count data
+# Add explicit zeros for any taxon/size class missing at any site
+dca_counts <- dca %>%
+  mutate(class = ifelse(max_width_cm >= 4, ">4cm", "<4cm")) %>%
+  count(site, taxon, class) %>%
+  complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
+  # # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
+  filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
+
+write_csv(dca_counts, file = "data/processed/dca_2017_counts.csv")
+
+# Aggregate count data based on taxonomic groups defined above
+dca_counts_ag <- dca_counts %>%
+  left_join(taxon_lookup, by = "taxon") %>%
+  mutate(taxon = coalesce(taxon_group, taxon)) %>%
+  select(-taxon_group) %>%
+  group_by(across(-n)) %>%
+  summarize(n = sum(n), .groups = "drop")
+
+
+
+# Further aggregate juvenile counts to family (following DRM methods)
+dca_counts_ag <- dca_counts_ag %>%
+  left_join(taxon_lookup_juv, by = "taxon") %>%
+  mutate(
+    taxon = if_else(class == "<4cm" & !is.na(taxon_group), taxon_group, taxon)
+  ) %>%
+  select(-taxon_group) %>%
+  group_by(across(-n)) %>%
+  summarize(n = sum(n), .groups = "drop")
+
+
+write_csv(dca_counts_ag, file = "data/processed/dca_2017_counts_ag.csv")
+```
+
+## 2021 Tetra Tech Recon and ESA Surveys
+
+2021 TT site metadata
+```{r tt21_site_metadata}
+# site metadata
+tt21_sitemd0 <- read_csv("data/2021_tt_recon_esa/midpoints_latlon.csv") %>%
+  janitor::clean_names()
+
+tt21_sitemd <- tt21_sitemd0 %>%
+  mutate(name = str_remove(name, "A$")) %>%
+  select(site = name, longitude = lon, latitude = lat)
+```
+
+2021 TT coral data
+```{r tt21_coral_data}
+# coral data - recon belt transects
+tt21recon0 <- readxl::read_xlsx("data/2021_tt_recon_esa/Recon 30x1m Coral Belt Transect.xlsx") %>%
+  janitor::clean_names()
+
+tt21recon <- tt21recon0 %>%
+  select(site, taxon = id_abbrev, coral_length_cm, coral_width_cm) %>%
+  mutate(taxon = toupper(taxon), site = factor(site)) %>%
+  mutate(across(c(coral_length_cm, coral_width_cm), as.numeric)) %>%
+  mutate(max_width_cm = pmax(coral_length_cm, coral_width_cm)) %>%
+  select(site, taxon, max_width_cm)
+
+# ESA survey data
+tt21esa0 <- readxl::read_xlsx("data/2021_tt_recon_esa/ESA Coral Belt Transect.xlsx") %>%
+  janitor::clean_names()
+
+sort(unique(tt21esa0$esa_id))
+
+tt21esa <- tt21esa0 %>%
+  mutate(site = factor(site),
+         taxon = case_when(
+           esa_id == "Orbicella franksi" ~ "OFRA",
+           esa_id == "Orbicella faveolata" ~ "OFAV",
+           esa_id == "Acropora cervicornis" ~ "ACER")) %>%
+  filter(!is.na(taxon)) %>%
+  mutate(max_width_cm = pmax(coral_length_cm, coral_width_cm)) %>%
+  select(site, taxon, max_width_cm)
+
+# Combine Recon and ESA survey data
+tt21 <- bind_rows(tt21recon, tt21esa)
+
+
+# Check taxa names
+sort(unique(tt21recon$taxon))
+
+# Filter out unidentified OR NON-CORAL taxa
+tt21 <- tt21 %>%
+  filter(!taxon %in% c("0", "JUVENILE-UNIDENTIFIABLE", "XESTO", "MALC"))
+
+# Adjust/corrects species IDs
+tt21 <- tt21 %>%
+  mutate(taxon = case_when(
+    taxon == "AFRAG" ~ "AFRA",
+    taxon == "FFRAG" ~ "FFRA",
+    taxon == "MYALI" ~ "MALI",
+    taxon == "MYFER" ~ "MFER",
+    taxon == "MYLAM" ~ "MLAM",
+    taxon == "ODIF/OROB" ~ "OCUL",
+    taxon == "PDCLIV" ~ "PCLI",
+    taxon == "PDSTR" ~ "PSTR",
+    taxon == "PHYLLANGIA AMERICANA" ~ "PAME",
+    taxon == "SCOLYMIA CUBENSIS" ~ "SCUB",
+    taxon == "SCOLYMIA LACERA" ~ "SLAC",
+    TRUE ~ taxon
+  ))
+sort(unique(tt21$taxon))
+
+# Write long data to file
+write_csv(tt21, file = "data/processed/tt_2021_long.csv")
+
+
+
+
+
+# Count
+# Add explicit zeros for any taxon/size class missing at any site
+tt21_counts <- tt21 %>%
+  mutate(class = ifelse(max_width_cm >= 4, ">4cm", "<4cm")) %>%
+  count(site, taxon, class) %>%
+  complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
+  # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
+  filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
+
+write_csv(tt21_counts, file = "data/processed/tt_2021_counts.csv")
+
+
+
+
+# Aggregate count data based on taxonomic groups defined above
+tt21_counts_ag <- tt21_counts %>%
+  left_join(taxon_lookup, by = "taxon") %>%
+  mutate(taxon = coalesce(taxon_group, taxon)) %>%
+  select(-taxon_group) %>%
+  group_by(across(-n)) %>%
+  summarize(n = sum(n), .groups = "drop")
+
+# Further aggregate juvenile counts to family (following DRM methods)
+tt21_counts_ag <- tt21_counts_ag %>%
+  left_join(taxon_lookup_juv, by = "taxon") %>%
+  mutate(
+    taxon = if_else(class == "<4cm" & !is.na(taxon_group), taxon_group, taxon)
+  ) %>%
+  select(-taxon_group) %>%
+  group_by(across(-n)) %>%
+  summarize(n = sum(n), .groups = "drop")
+
+write_csv(tt21_counts_ag, file = "data/processed/tt21_counts_ag.csv")
+```
+
+## 2023 Tetra Tech Impact Survey
+
+TT site metadata
+```{r 2023_tt_site_metadata}
+# Site metadata
+tt_sitemd <- readxl::read_xlsx("data/2023_tt_impact/Impact site tracking.xlsx", skip = 1) %>%
+  janitor::clean_names()
+
+tt_sitemd <- tt_sitemd %>%
+  mutate(site = transect_name,
+         latitude = as.numeric(actual_start_y),
+         longitude = as.numeric(actual_start_x)) %>%
+  select(site, latitude, longitude) 
+
+# Many sites missing coords in sheet.... whats up with that
+tt_sitemd <- drop_na(tt_sitemd, longitude)
+```
+
+TT coral data
+```{r 2023_tt_coral_data}
+tt0 <- readxl::read_xlsx("data/2023_tt_impact/Impact Raw Data 05 31 2024.xlsx") %>%
+  janitor::clean_names() 
+
+tt <- tt0 %>%
+  select(site = transect_name, depth_ft_start,
+         taxon = id_abbrev, coral_length_cm, coral_width_cm) %>%
+  filter(taxon != "Xesto") %>%
+  mutate(taxon = toupper(taxon)) %>%
+  mutate(across(c(coral_length_cm, coral_width_cm), as.numeric)) %>%
+  mutate(site = factor(site))
+
+tt <- tt %>%
+  mutate(max_width_cm = pmax(coral_length_cm, coral_width_cm)) %>%
+  select(site, taxon, max_width_cm)
+
+# Check taxa names
+sort(unique(tt$taxon))
+
+# Filter out unidentified taxa
+tt <- tt %>%
+  filter(!taxon %in% c("?", "ID-ABBREV", "NONE", "MHEARD"))
+
+# Adjust/corrects species IDs
+tt <- tt %>%
+  mutate(taxon = case_when(
+    taxon == "AFRAG" ~ "AFRA",
+    taxon %in% c("ASP", "ASP.") ~ "AGAR",
+    taxon == "MCAV?" ~ "MCAV",
+    taxon == "MSP." ~ "MADR",
+    taxon == "MUSSID" ~ "MUSS",
+    taxon == "MYALI" ~ "MALI",
+    taxon == "MYFER" ~ "MFER",
+    taxon == "MYLAM" ~ "MLAM",
+    taxon == "OFR" ~ "OFRA",
+    taxon == "PCLI?" ~ "PCLI",
+    taxon %in% c("PSP", "PSP.") ~ "PORI",
+    taxon == "SSP." ~ "SIDE",
+    taxon == "STOK" ~ "DSTO",
+    TRUE ~ taxon
+  ))
+sort(unique(tt$taxon))
+
+# Write long data to file
+write_csv(tt, file = "data/processed/tt_2024_long.csv")
+
+
+
+
+
+# Count
+# Add explicit zeros for any taxon/size class missing at any site
+tt_counts <- tt %>%
+  mutate(class = ifelse(max_width_cm >= 4, ">4cm", "<4cm")) %>%
+  count(site, taxon, class) %>%
+  complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
+  # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
+  filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
+
+write_csv(tt_counts, file = "data/processed/tt_2024_counts.csv")
+
+
+
+
+# Aggregate count data based on taxonomic groups defined above
+tt_counts_ag <- tt_counts %>%
+  left_join(taxon_lookup, by = "taxon") %>%
+  mutate(taxon = coalesce(taxon_group, taxon)) %>%
+  select(-taxon_group) %>%
+  group_by(across(-n)) %>%
+  summarize(n = sum(n), .groups = "drop")
+
+# Further aggregate juvenile counts to family (following DRM methods)
+tt_counts_ag <- tt_counts_ag %>%
+  left_join(taxon_lookup_juv, by = "taxon") %>%
+  mutate(
+    taxon = if_else(class == "<4cm" & !is.na(taxon_group), taxon_group, taxon)
+  ) %>%
+  select(-taxon_group) %>%
+  group_by(across(-n)) %>%
+  summarize(n = sum(n), .groups = "drop")
+
+write_csv(tt_counts_ag, file = "data/processed/tt_counts_ag.csv")
+```
+
+
+
+## 2024 Shedd Survey
+
+Shedd site metadata
 ```{r 2024_shedd_site_metadata}
 # Site metadata
 drm_sitemd <- readxl::read_xlsx("data/2024_shedd_drm/site_metadata.xlsx") %>%
@@ -71,7 +399,7 @@ drm_sitemd <- readxl::read_xlsx("data/2024_shedd_drm/site_metadata.xlsx") %>%
   mutate(depth = NA)
 ```
 
-### 1.1.2. Shedd coral data
+Shedd coral data
 ```{r 2024_shedd_coral_data}
 # Adult coral data from main DRM surveys
 #adults0 <- read_csv("data/2024_shedd_drm/DRM_broward_corals.csv")
@@ -106,13 +434,6 @@ adults_long <- adults0 %>%
   mutate(site = str_remove(site, "^AA")) %>%
   select(site, transect_num, taxon = species, max_width_cm) %>%
   drop_na(taxon)     # DROPS when taxon is blank, this is when no corals >4cm were observed
-
-# Juveniles from main DRM surveys (family-level tallies)
-# drmjuv <- read_csv("data/2024_shedd_drm/DRM_broward_juveniles.csv") %>%
-#   filter(team == "Shedd Aquarium") %>%
-#   mutate(site = str_remove(site, "^AA")) %>%
-#   select(team, site, transect_num, ends_with("ct")) %>%
-#   rename(MCAV = montastraea_ct, MUSS = mussinae_ct, FAVI = faviinae_ct, MEAN = meandrinidae_ct)
 
 # Import juvenile counts from main DRM dataset
 juv <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_JuvenileCoralData_Shedd.xlsx") %>%
@@ -258,323 +579,11 @@ final_counts_ag <- final_counts %>%
 write_csv(final_counts_ag, file = "data/processed/drm_2024_counts_ag.csv")
 ```
 
-## 1.2. 2017 Dial Cordy Recon Survey
 
-### 1.2.1. DCA site metadata
-```{r 2017_DCA_site_metadata}
-# Site metadata
-# Read in site coordinates
-dca_sitemd0 <- readxl::read_xlsx("data/2017_dca_recon/Recon_Site_Coordinates_Extracted.xlsx") %>%
-  janitor::clean_names()
 
-# All sites have start and end coordinates...
 
-# Tidy and Calculate midpoint per transect
-dca_sitemd <- dca_sitemd0 %>%
-  mutate(
-    depth = abs(as.numeric(depth)),
-    across(c(latitude, longitude), as.numeric)
-  ) %>%
-  group_by(site = transect) %>%
-  summarize(
-    latitude = mean(latitude, na.rm = TRUE),
-    longitude = mean(longitude, na.rm = TRUE),
-    depth = mean(depth, na.rm = TRUE),
-    .groups = "drop"
-  )
-```
 
-### 1.2.2. DCA coral data
-```{r 2017_DCA_coral_data}
-# Read in survey data
-dca0 <- readxl::read_xlsx("data/2017_dca_recon/Compiled_DCA_RECON_Belt_data.xlsx") %>%
-  janitor::clean_names()
-
-dca <- dca0 %>%
-  select(1:18) %>%
-  rename(site = site_name) %>%
-  mutate(site = factor(site)) %>%
-  select(site, taxon = coral_species, max_width_cm = max_size_cm)
-
-# Adjust/corrects species IDs
-sort(unique(dca$taxon))
-dca <- dca %>%
-  mutate(taxon = case_when(
-    taxon == "AGA SP" ~ "AGAR",
-    taxon == "LCUC" ~ "HCUC",
-    taxon %in% c("MYCSP", "Mycetophyllia spp.") ~ "MYCE",
-    taxon == "OFAV\\" ~ "OFAV",
-    taxon %in% c("MAD SP", "MADSP") ~ "MADR",
-    taxon == "Scolymia Spp" ~ "SCOL",
-    taxon %in% c("SIDSP", "Sid SP", "SID SP.", "SID SP") ~ "SIDE",
-    TRUE ~ taxon
-  ))
-sort(unique(dca$taxon))
-
-# Filter out unidentified corals
-dca <- dca %>%
-  filter(!taxon %in% c("CORAL", "Cup Coral"))
-
-# Write long data to file
-write_csv(dca, file = "data/processed/dca_2017_long.csv")
-
-
-# Convert to count data
-# Add explicit zeros for any taxon/size class missing at any site
-dca_counts <- dca %>%
-  mutate(class = ifelse(max_width_cm >= 4, ">4cm", "<4cm")) %>%
-  count(site, taxon, class) %>%
-  complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
-  # # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
-  filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
-
-write_csv(dca_counts, file = "data/processed/dca_2017_counts.csv")
-
-# Aggregate count data based on taxonomic groups defined above
-dca_counts_ag <- dca_counts %>%
-  left_join(taxon_lookup, by = "taxon") %>%
-  mutate(taxon = coalesce(taxon_group, taxon)) %>%
-  select(-taxon_group) %>%
-  group_by(across(-n)) %>%
-  summarize(n = sum(n), .groups = "drop")
-
-
-
-# Further aggregate juvenile counts to family (following DRM methods)
-dca_counts_ag <- dca_counts_ag %>%
-  left_join(taxon_lookup_juv, by = "taxon") %>%
-  mutate(
-    taxon = if_else(class == "<4cm" & !is.na(taxon_group), taxon_group, taxon)
-  ) %>%
-  select(-taxon_group) %>%
-  group_by(across(-n)) %>%
-  summarize(n = sum(n), .groups = "drop")
-
-
-write_csv(dca_counts_ag, file = "data/processed/dca_2017_counts_ag.csv")
-```
-
-
-## 1.3. 2023 Tetra Tech Impact Survey
-
-### 1.3.1. TT site metadata
-```{r 2023_tt_site_metadata}
-# Site metadata
-tt_sitemd <- readxl::read_xlsx("data/2023_tt_impact/Impact site tracking.xlsx", skip = 1) %>%
-  janitor::clean_names()
-
-tt_sitemd <- tt_sitemd %>%
-  mutate(site = transect_name,
-         latitude = as.numeric(actual_start_y),
-         longitude = as.numeric(actual_start_x)) %>%
-  select(site, latitude, longitude) 
-
-# Many sites missing coords in sheet.... whats up with that
-tt_sitemd <- drop_na(tt_sitemd, longitude)
-```
-
-### 1.3.2. TT coral data
-```{r 2023_tt_coral_data}
-tt0 <- readxl::read_xlsx("data/2023_tt_impact/Impact Raw Data 05 31 2024.xlsx") %>%
-  janitor::clean_names() 
-
-tt <- tt0 %>%
-  select(site = transect_name, depth_ft_start,
-         taxon = id_abbrev, coral_length_cm, coral_width_cm) %>%
-  filter(taxon != "Xesto") %>%
-  mutate(taxon = toupper(taxon)) %>%
-  mutate(across(c(coral_length_cm, coral_width_cm), as.numeric)) %>%
-  mutate(site = factor(site))
-
-tt <- tt %>%
-  mutate(max_width_cm = pmax(coral_length_cm, coral_width_cm)) %>%
-  select(site, taxon, max_width_cm)
-
-# Check taxa names
-sort(unique(tt$taxon))
-
-# Filter out unidentified taxa
-tt <- tt %>%
-  filter(!taxon %in% c("?", "ID-ABBREV", "NONE", "MHEARD"))
-
-# Adjust/corrects species IDs
-tt <- tt %>%
-  mutate(taxon = case_when(
-    taxon == "AFRAG" ~ "AFRA",
-    taxon %in% c("ASP", "ASP.") ~ "AGAR",
-    taxon == "MCAV?" ~ "MCAV",
-    taxon == "MSP." ~ "MADR",
-    taxon == "MUSSID" ~ "MUSS",
-    taxon == "MYALI" ~ "MALI",
-    taxon == "MYFER" ~ "MFER",
-    taxon == "MYLAM" ~ "MLAM",
-    taxon == "OFR" ~ "OFRA",
-    taxon == "PCLI?" ~ "PCLI",
-    taxon %in% c("PSP", "PSP.") ~ "PORI",
-    taxon == "SSP." ~ "SIDE",
-    taxon == "STOK" ~ "DSTO",
-    TRUE ~ taxon
-  ))
-sort(unique(tt$taxon))
-
-# Write long data to file
-write_csv(tt, file = "data/processed/tt_2024_long.csv")
-
-
-
-
-
-# Count
-# Add explicit zeros for any taxon/size class missing at any site
-tt_counts <- tt %>%
-  mutate(class = ifelse(max_width_cm >= 4, ">4cm", "<4cm")) %>%
-  count(site, taxon, class) %>%
-  complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
-  # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
-  filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
-
-write_csv(tt_counts, file = "data/processed/tt_2024_counts.csv")
-
-
-
-
-# Aggregate count data based on taxonomic groups defined above
-tt_counts_ag <- tt_counts %>%
-  left_join(taxon_lookup, by = "taxon") %>%
-  mutate(taxon = coalesce(taxon_group, taxon)) %>%
-  select(-taxon_group) %>%
-  group_by(across(-n)) %>%
-  summarize(n = sum(n), .groups = "drop")
-
-# Further aggregate juvenile counts to family (following DRM methods)
-tt_counts_ag <- tt_counts_ag %>%
-  left_join(taxon_lookup_juv, by = "taxon") %>%
-  mutate(
-    taxon = if_else(class == "<4cm" & !is.na(taxon_group), taxon_group, taxon)
-  ) %>%
-  select(-taxon_group) %>%
-  group_by(across(-n)) %>%
-  summarize(n = sum(n), .groups = "drop")
-
-write_csv(tt_counts_ag, file = "data/processed/tt_counts_ag.csv")
-```
-
-## 1.4. 2021 Tetra Tech Recon and ESA Surveys
-
-### 1.4.1. 2021 TT site metadata
-```{r}
-# site metadata
-tt21_sitemd0 <- read_csv("data/2021_tt_recon_esa/midpoints_latlon.csv") %>%
-  janitor::clean_names()
-
-tt21_sitemd <- tt21_sitemd0 %>%
-  mutate(name = str_remove(name, "A$")) %>%
-  select(site = name, longitude = lon, latitude = lat)
-```
-
-### 1.4.2. 2021 TT coral data
-```{r}
-# coral data - recon belt transects
-tt21recon0 <- readxl::read_xlsx("data/2021_tt_recon_esa/Recon 30x1m Coral Belt Transect.xlsx") %>%
-  janitor::clean_names()
-
-tt21recon <- tt21recon0 %>%
-  select(site, taxon = id_abbrev, coral_length_cm, coral_width_cm) %>%
-  mutate(taxon = toupper(taxon), site = factor(site)) %>%
-  mutate(across(c(coral_length_cm, coral_width_cm), as.numeric)) %>%
-  mutate(max_width_cm = pmax(coral_length_cm, coral_width_cm)) %>%
-  select(site, taxon, max_width_cm)
-
-# ESA survey data
-tt21esa0 <- readxl::read_xlsx("data/2021_tt_recon_esa/ESA Coral Belt Transect.xlsx") %>%
-  janitor::clean_names()
-
-sort(unique(tt21esa0$esa_id))
-
-tt21esa <- tt21esa0 %>%
-  mutate(site = factor(site),
-         taxon = case_when(
-           esa_id == "Orbicella franksi" ~ "OFRA",
-           esa_id == "Orbicella faveolata" ~ "OFAV",
-           esa_id == "Acropora cervicornis" ~ "ACER")) %>%
-  filter(!is.na(taxon)) %>%
-  mutate(max_width_cm = pmax(coral_length_cm, coral_width_cm)) %>%
-  select(site, taxon, max_width_cm)
-
-# Combine Recon and ESA survey data
-tt21 <- bind_rows(tt21recon, tt21esa)
-
-
-# Check taxa names
-sort(unique(tt21recon$taxon))
-
-# Filter out unidentified OR NON-CORAL taxa
-tt21 <- tt21 %>%
-  filter(!taxon %in% c("0", "JUVENILE-UNIDENTIFIABLE", "XESTO", "MALC"))
-
-# Adjust/corrects species IDs
-tt21 <- tt21 %>%
-  mutate(taxon = case_when(
-    taxon == "AFRAG" ~ "AFRA",
-    taxon == "FFRAG" ~ "FFRA",
-    taxon == "MYALI" ~ "MALI",
-    taxon == "MYFER" ~ "MFER",
-    taxon == "MYLAM" ~ "MLAM",
-    taxon == "ODIF/OROB" ~ "OCUL",
-    taxon == "PDCLIV" ~ "PCLI",
-    taxon == "PDSTR" ~ "PSTR",
-    taxon == "PHYLLANGIA AMERICANA" ~ "PAME",
-    taxon == "SCOLYMIA CUBENSIS" ~ "SCUB",
-    taxon == "SCOLYMIA LACERA" ~ "SLAC",
-    TRUE ~ taxon
-  ))
-sort(unique(tt21$taxon))
-
-# Write long data to file
-write_csv(tt21, file = "data/processed/tt_2021_long.csv")
-
-
-
-
-
-# Count
-# Add explicit zeros for any taxon/size class missing at any site
-tt21_counts <- tt21 %>%
-  mutate(class = ifelse(max_width_cm >= 4, ">4cm", "<4cm")) %>%
-  count(site, taxon, class) %>%
-  complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
-  # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
-  filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
-
-write_csv(tt21_counts, file = "data/processed/tt_2021_counts.csv")
-
-
-
-
-# Aggregate count data based on taxonomic groups defined above
-tt21_counts_ag <- tt21_counts %>%
-  left_join(taxon_lookup, by = "taxon") %>%
-  mutate(taxon = coalesce(taxon_group, taxon)) %>%
-  select(-taxon_group) %>%
-  group_by(across(-n)) %>%
-  summarize(n = sum(n), .groups = "drop")
-
-# Further aggregate juvenile counts to family (following DRM methods)
-tt21_counts_ag <- tt21_counts_ag %>%
-  left_join(taxon_lookup_juv, by = "taxon") %>%
-  mutate(
-    taxon = if_else(class == "<4cm" & !is.na(taxon_group), taxon_group, taxon)
-  ) %>%
-  select(-taxon_group) %>%
-  group_by(across(-n)) %>%
-  summarize(n = sum(n), .groups = "drop")
-
-write_csv(tt21_counts_ag, file = "data/processed/tt21_counts_ag.csv")
-```
-
-## 1.5. 2011 (NSU) and 2017 (DCA) ESA Surveys
-
-## 1.6. Habitat classification polygons
+## Habitat classification polygons
 ```{r habitat_maps, fig.width = 10, fig.height = 10}
 # --- STEP 1: Load KML Polygons ---
 polygons <- st_read("data/Habitat classifications.kml")  # update path as needed
@@ -642,7 +651,7 @@ allsitemd <- joined_df
   labs(title = "Habitat Polygons Colored by Type", fill = "Type") +
   theme(legend.position = "right") +
   xlim(-80.11, -80.079) +
-  ylim(26.065, 26.11))
+  ylim(26.0675, 26.11))
 
 # 'Sand' overlaps some of the other polygons instead of just surrounding them...
 # If a point is classified as Sand AND something else, remove Sand...
@@ -650,78 +659,90 @@ multiclass <- allsitemd %>%
   group_by(site) %>%
   filter(n() > 1)
 
-# polyplot +
-#   geom_point(data = multiclass, aes(x = longitude, y = latitude), 
-#              pch = "X", inherit.aes = FALSE)
-
 allsitemd_clean <- allsitemd %>%
   group_by(site) %>%
   filter(!(Type == "Sand" & n() > 1)) %>%
   ungroup()
 ```
 
-# 2. Subset comparable survey data 
+# Filter data
 
-## 2.1. Find habitat and spatial overlap across surveys
+## By habitat type
 
-```{r, fig.width = 10, fig.height = 10}
-# Plot all sites and select subset based on overlap
-polyplot + 
-  geom_point(data = allsitemd_clean, 
-             aes(x = longitude, y = latitude, shape = dataset), 
-             inherit.aes = FALSE, alpha = 0.6) +
-  #geom_text(data = allsitemd_clean, aes(x = longitude, y = latitude, label = site)) +
-  scale_shape_manual(values = c(2, 3, 4, 5))
-
-# Select just Nearshore Ridge Complex, Inner Reef, and Middle Reef, because 2024 surveys did not include outer reef
-overlap_lat <- allsitemd_clean %>%
-  filter(latitude > 26.08, latitude < 26.11,
-         Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Artificial"))
-overlap_nolat <- allsitemd_clean %>%
-  filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Artificial"))
-#anti_join(overlap_nolat, overlap_lat)
-# Choose whether to also apply a latitudinal filter since DRM has a few sites further south than DCA/TT
-overlap <- overlap_nolat
-
-# Or also include Outer Reef and Aggregated Patch Reef?
-overlap <- allsitemd_clean %>%
+```{r}
+# Select sites in Nearshore Ridge Complex, Inner Reef, and Middle Reef, Outer Reef and Aggregated Patch Reef
+selected <- allsitemd_clean %>%
   filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", 
                      "Artificial", "Outer Reef", "Aggregated Patch Reef"))
 
-# Plot overlap sites
+# Plot selected sites
 polyplot + 
-  geom_point(data = overlap, 
+  geom_point(data = selected, 
              aes(x = longitude, y = latitude, shape = dataset), 
              inherit.aes = FALSE, alpha = 0.6) +
   scale_shape_manual(values = c(2, 3, 4, 5))
 
-# ggplot(overlap, aes(x = longitude, y = latitude)) +
-#   geom_point(aes(shape = dataset, color = Type), alpha = 0.4) +
-#   scale_shape_manual(values = c(2, 3, 4))
+```
+
+# Map datasets
+```{r, fig.width = 10, fig.height = 10}
+(dca_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "dca"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2017 — DCA Survey"))
+
+(tt21_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "tt21"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2021 — Tetra Tech Survey"))
+
+(tt23_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "tt23"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2023 — Tetra Tech Survey"))
+
+(drm_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "drm"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2024 — Shedd Survey"))
+```
 
 
-# Combine all aggregated count data and filter for sites in area of overlap
+```{r combine_selected_count_data}
+# Combine all aggregated count data and filter for selected sites
 df <- bind_rows(.id = "dataset",
   drm = final_counts_ag,
   dca = dca_counts_ag,
   tt23 = tt_counts_ag,
   tt21 = tt21_counts_ag
 ) %>%
-  filter(site %in% overlap$site) %>%
+  filter(site %in% selected$site) %>%
   select(dataset, site, transect_num, taxon, class, n) %>%
   droplevels() %>%
   left_join(allsitemd_clean)
 
-write_csv(df, file = "data/processed/all_overlap.csv")
+# Add transect area information
+df <- df %>%
+  mutate(transect_num = if_else(is.na(transect_num), 1, transect_num)) %>%
+  mutate(transect_area_m2 = case_when(
+    dataset == "drm" ~ 10,    # DRM belt transects were 10m
+    dataset == "tt23" ~ 20,     # TT23 belt transects were 20m
+    dataset == "tt21" ~ 30,     # TT21 belt transects were 30m
+    dataset == "dca" ~ 30     # DCA belt transects were 30m
+  ))
 ```
 
-## 2.2. Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
+Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
 
-'Artificial' is only present in DCA and minorly in TT -- but bsent from Shedd.   
+'Artificial' is only present in DCA and minorly in TT -- but absent from Shedd.   
 
 It is in close spatial proximity to Nearshore Ridge Complex -- can these be combined?
 
-### 2.2.1. Test for differences in coral density in DCA survey
+Test for differences in coral density in DCA survey
 ```{r}
 # Subset DCA data
 dcadf <- dca_counts_ag %>%
@@ -762,7 +783,7 @@ knitr::kable(total_ci_nb)
 ```
 Highly overlapping confidence intervals for Artifical and Nearshore Ridge Complex, so no difference in coral density.
 
-### 2.2.2. Test for differences in community composition in DCA survey
+Test for differences in community composition in DCA survey
 ```{r}
 library(vegan)
 
@@ -794,82 +815,27 @@ ggplot(scores_df, aes(x = NMDS1, y = NMDS2, color = Type)) +
 
 High degree of similarity between Artificial and Nearshore Ridge Complex coral communities.
 
-### 2.2.3. Combine 'Artificial' with 'Nearshore Ridge Complex'
+2.2.3. Combine 'Artificial' with 'Nearshore Ridge Complex'
 ```{r}
 # Based on these results, combine "Artificial" with "Nearshore Ridge Complex"
 df[df$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
 ```
 
-# 3. Analyze survey data
+## By coral taxa
 
-## 3.1. Total density 
-
-### 3.1.2. Density per m2 by habitat across surveys
-```{r}
-# Compare total corals per square meter across all surveys
-# (For DRM, can only include Transect 1 and 2, because 3 and 4 did not record all corals...)
-
-# Add transect size information
-df <- df %>%
-  mutate(transect_num = if_else(is.na(transect_num), 1, transect_num)) %>%
-  mutate(transect_area_m2 = case_when(
-    dataset == "drm" ~ 10,    # DRM belt transects were 10m
-    dataset == "tt23" ~ 20,     # TT23 belt transects were 20m
-    dataset == "tt21" ~ 30,     # TT21 belt transects were 30m
-    dataset == "dca" ~ 30     # DCA belt transects were 30m
-  )) %>%
-  mutate(n_per_m2 = n / transect_area_m2)
-
-# Summarize total corals per square meter across all surveys (only T1 and T2 from DRM)
-summ <- df %>%
-  filter(transect_num %in% c(1, 2)) %>%
-  distinct(dataset, site, transect_num, transect_area_m2) %>%  # avoid double-counting transects
-  group_by(dataset, site) %>%
-  summarize(
-    n_transects = n(),
-    area_per_transect = first(transect_area_m2),  # assume it's constant per transect
-    total_area = n_transects * area_per_transect,
-    .groups = "drop"
-  ) %>%
-  left_join(
-    df %>% group_by(dataset, site, Type) %>% summarize(total_n = sum(n), .groups = "drop"),
-    by = c("dataset", "site")
-  ) %>%
-  mutate(total_corals_per_m2 = total_n / total_area)
-
-# Plot by habitat type
-ggplot(summ, aes(x = total_corals_per_m2, fill = dataset)) +
-  facet_grid(Type~.) +
-  geom_histogram(position = "stack", alpha = 0.5, bins = 30)
-```
-
-### 3.1.2. Remove lowest density DCA and TT sites
-
-To be extra conservative, filter out tt/dca surveys with total corals per m2 less than the lowest drm survey. In case these would have been considered unsuitable for drm survey, biasing results to higher coral densities in 2024 drm surveys.
-
-```{r}
-# summ %>% 
-#   select(dataset, site, Type, total_corals_per_m2) %>%
-#   arrange(total_corals_per_m2) %>% print(n = 20)
-# lowsites <- summ %>% filter(total_corals_per_m2 < 0.45) %>% pull(site)
-# dff <- df %>%
-#   filter(!site %in% lowsites)
-dff <- df
-```
-
-### 3.1.3. Remove lowest abundance coral taxa
+Remove lowest abundance coral taxa
 
 These will be problematic for statistical models
 
 ```{r}
 # Drop taxa with very few observations
-sppcounts <- dff %>%
+sppcounts <- df %>%
   group_by(taxon) %>%
   summarize(total = sum(n), .groups = "drop") %>%
   arrange(total) 
 sppcounts
 
-dff <- dff %>%
+dff <- df %>%
   filter(taxon %in% filter(sppcounts, total >= 5)$taxon) %>%
   mutate(Type = factor(Type, levels = type_levels))
 ```
@@ -877,171 +843,11 @@ dff <- dff %>%
 Taxa with less than 5 total observations were filtered out, which included: HCUC, MANG, PAME, FFRA, OCUL, SCOL
 
 
-## 3.2. Taxon/size class density
+# Analyze coral density 
 
-### 3.2.1. By survey (overall)
-Negative binomial model with taxon-sizeclass
-```{r}
-# Get total counts for each taxon at each site
-dfftaxon <- dff %>% 
-  group_by(dataset, Type, site, transect_num, transect_area_m2, taxon) %>%
-  summarize(n = sum(n)) %>%
-  ungroup()
+## Fit Bayesian negative binomial model
 
-dff <- dff %>% mutate(taxclass = interaction(taxon, class, sep = ""))
-# Fit a Negative Binomial GLM
-mod_nb <- MASS::glm.nb(n ~ dataset * taxclass + offset(log(transect_area_m2)), data = dff)
-
-# Generate new data only for existing taxon-size class combinations
-newdata_1 <- dff %>%
-  distinct(dataset, taxon, class, taxclass) %>%  # Keep only observed taxon-class combinations
-  mutate(transect_area_m2 = 1)  # Set area to 1 for density predictions on a per m2 basis
-
-# Get predicted values & standard errors (log scale)
-preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
-
-# Compute both total coral density & taxon-size class-specific densities in one step
-results_nb <- newdata_1 %>%
-  mutate(
-    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
-    fit_se = exp(preds_nb$fit) * preds_nb$se.fit,   # Convert SE using the Delta Method
-    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
-    fit_lower = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
-    fit_upper = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
-  )
-
-# Compute total coral density + confidence intervals
-total_ci_nb <- results_nb %>%
-  group_by(dataset) %>%
-  summarize(
-    total_density = sum(fit),
-    total_se = sqrt(sum(fit_var)),
-    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
-    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
-  )
-
-knitr::kable(total_ci_nb)
-# 2.66 total corals per m2 in drm (2.63 if you filter out the further south sites using 'overlap_lat')
-# 1.69 in DCA
-# 1.69 in TT23
-# 1.99 in TT21
-
-# Extract and plot taxon-size-class-specific densities
-taxclass_ci_nb <- results_nb %>%
-  dplyr::select(dataset, taxon, class, taxclass, fit, fit_se, fit_lower, fit_upper)
-
-# Compute total density per taxon (summing over size classes)
-fitted_taxon_nb <- taxclass_ci_nb %>%
-  group_by(dataset, taxon) %>%
-  summarize(
-    fit = sum(fit),  # Sum densities across size classes
-    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation (variance summation)
-    log_fit = log(fit),  # Log-transform fit for proper CI computation
-    log_se = fit_se / fit,  # Approximate log-scale standard error
-    fit_lower = exp(log_fit - 1.96 * log_se),  # Compute lower CI on log scale
-    fit_upper = exp(log_fit + 1.96 * log_se)   # Compute upper CI on log scale
-  ) %>%
-  ungroup() %>%
-  mutate(taxon = fct_reorder(taxon, fit), class = "Total")  # Reorder taxa by abundance
-
-
-# fitted_combined_nb <- bind_rows(taxclass_ci_nb, fitted_taxon_nb) %>%
-#   mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
-
-# Combine taxclass and taxon totals, and remove taxa/classes not observed in a dataset
-fitted_combined_nb <- taxclass_ci_nb %>% right_join(dff %>% filter(n > 0) %>% distinct(dataset, taxon, class)) %>%
-  bind_rows(fitted_taxon_nb %>% right_join(dff %>% filter(n > 0) %>% distinct(dataset, taxon))) %>%
-  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
-
-# Plot size classes and taxon totals
-ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = dataset, shape = dataset)) +
-  geom_point(aes(size = class), 
-             position = position_dodge(width = 0.2), alpha = 0.6) +  
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
-                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
-  scale_y_log10(limits = c(1e-4, 5)) +  
-  scale_size_manual(values = c("Total" = 3, ">4cm" = 2, "<4cm" = 1)) +  # Larger points for totals
-  #scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
-  coord_flip() +  
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
-       color = "Dataset", shape = "Size class", size = "Size class") +  
-  theme_minimal() +  
-  labs(title = "NB Model")
-
-
-# Plot just taxon totals
-fitted_combined_nb %>%
-  filter(class == "Total") %>%
-  ggplot(aes(x = taxon, y = fit, color = dataset)) + #, shape = dataset)) +
-  geom_point(position = position_dodge(width = 0.2), alpha = 0.6) +  
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
-                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
-  scale_y_log10(limits = c(1e-4, 5)) +  
-  #scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
-  coord_flip() +  
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
-       color = "Dataset", shape = "Size class", size = "Size class") +  
-  theme_minimal() +  
-  labs(title = "NB Model")
-```
-
-### 3.2.2. Test for differences based on habitat and direction from channel (N vs. S)
-
-```{r}
-# Sum total coral counts per site in each dataset
-total_df <- dff %>%
-  filter(transect_num %in% c(1, 2)) %>%
-  group_by(dataset, Type, dir, site) %>%
-  summarize(n = sum(n),
-    transect_area_m2 = sum(distinct(cur_data(), transect_num, transect_area_m2)$transect_area_m2),
-    .groups = "drop")
-
-# Fit a model with total n
-mod_total <- MASS::glm.nb(n ~ dataset * Type * dir + offset(log(transect_area_m2)),
-                          data = total_df)
-
-# Use emmeans on this model
-library(emmeans)
-emm_total <- emmeans(mod_total, ~ dir | dataset * Type, offset = log(1))
-rbind(contrast(emm_total, method = "pairwise", by = c("dataset", "Type")))
-# only significant N-S difference in Nearshore Ridge Complex in tt21
-# However, TT21 is not really set up to test for N-S diffs because sites were almost all S on NRC...
-# polyplot + geom_point(data = tt21_sitemd, aes(x = longitude, y = latitude))
-
-# We can also combine all surveys and test for differences between N and S within Habitats
-mod_total2 <- MASS::glm.nb(n ~ Type * dir + offset(log(transect_area_m2)), data = total_df)
-anova(mod_total2)
-emm_total2 <- emmeans(mod_total2, ~ dir | Type, offset = log(1))
-rbind(contrast(emm_total2, method = "pairwise", by = "Type"))
-# No differences between N and S of the channel within habitat types
-
-# Further test at the taxon-level for abundant taxa
-# Get total counts for each taxon at each site
-dfftaxon <- dff %>% 
-  filter(transect_num %in% c(1, 2)) %>%
-  group_by(dataset, Type, dir, site, transect_num, transect_area_m2, taxon) %>%
-  summarize(n = sum(n)) %>%
-  ungroup()
-
-# Subset the most abundant taxa for testing N-S differences
-dfftaxon_abund <- filter(dfftaxon, taxon %in% c("SIDE", "SINT", "PORI", "MCAV"))
-
-# Fit model
-mod_nb <- MASS::glm.nb(n ~ dataset * Type * dir * taxon + offset(log(transect_area_m2)), 
-                       data = dfftaxon_abund)
-
-# Test differences
-emm <- emmeans(mod_nb, ~ dir | dataset * Type * taxon, type = "response")
-contrast_results <- contrast(emm, method = "pairwise", by = c("dataset", "Type", "taxon"))
-rbind(contrast_results) %>%
-  as_tibble() %>%
-  filter(p.value < 0.01)
-#polyplot + geom_point(data = dca_sitemd, aes(x = longitude, y = latitude))
-
-# In the DCA dataset NRC surveys, MCAV and SINT showed different abundance N and S of the channel. So, there could be some subtle differences. But no other surveys show any North-South differences within habitats for any species, or in overall total coral densities. Therefore, proceed with analysis that does NOT distinguish between North and South. 
-```
-
-### 3.2.2. By habitat, taxon, and survey
+Predictors: dataset, habitat Type, direction from channel, taxon
 
 ```{r}
 # Get total counts for each taxon at each site
@@ -1057,23 +863,24 @@ dfftaxon_trimmed <- dfftaxon %>%
   ungroup()
 
 # SUPER MODEL
-library(brms)
-mod_nb <- brm(
-  bf(n ~ dataset * Type * dir * taxon + offset(log(transect_area_m2))),
-  family = negbinomial(),
-  data = dfftaxon_trimmed,
-  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-            prior(exponential(1), class = "shape")),     # Reasonable prior for NB dispersion
-  chains = 4,  
-  cores = 4,  
-  threads = threading(5),  
-  iter = 1000, warmup = 500,  
-  thin = 2,  
-  control = list(adapt_delta = 0.9, max_treedepth = 12),  
-  backend = "cmdstanr"
-)
 
+# mod_nb <- brm(
+#   bf(n ~ dataset * Type * dir * taxon + offset(log(transect_area_m2))),
+#   family = negbinomial(),
+#   data = dfftaxon_trimmed,
+#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+#             prior(exponential(1), class = "shape")),     # Reasonable prior for NB dispersion
+#   chains = 4,  
+#   cores = 4,  
+#   threads = threading(5),  
+#   iter = 1000, warmup = 500,  
+#   thin = 2,  
+#   control = list(adapt_delta = 0.9, max_treedepth = 12),  
+#   backend = "cmdstanr"
+# )
+# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+mod_nb <- readRDS("data/processed/mod_nb.rds")
 
 # 1. Create newdata grid (1 m² for standardization)
 newdata <- dfftaxon_trimmed %>%
@@ -1081,64 +888,16 @@ newdata <- dfftaxon_trimmed %>%
   mutate(transect_area_m2 = 1)
 
 # 2. Get fitted values manually by computing summary statistics across all draws
-library(tidybayes)
-posterior_draws <- add_epred_draws(mod_nb, newdata = newdata)
-fitted_manual <- posterior_draws %>%
-  mutate(Type = factor(Type, levels = type_levels)) %>%
-  group_by(dataset, Type, dir, taxon) %>%
-  summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
-            fit_sd = sd(.epred),  # Posterior standard deviation
-            fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
-            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
+posterior_draws <- add_epred_draws(mod_nb, newdata = newdata) %>%
+  mutate(Type = factor(Type, levels = type_levels),
+         dataset = factor(dataset, levels = dataset_levels))
+```
 
-# Plot
-ggplot(fitted_manual, aes(y = fit_mean, x = taxon, color = dir)) +
-  facet_grid(dataset ~ Type) +
-  geom_point() +
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0) +
-  scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 90))
+## Totals by survey, habitat, direction
 
-ggplot(fitted_manual, aes(y = fit_mean, x = Type, color = dir, shape = dataset,
-                          group = interaction(dataset, dir))) +
-  facet_wrap(taxon ~ ., scales = "free_x") +
-  geom_point(position = position_dodge(width = 0.5)) +
-  #geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
-                position = position_dodge(width = 0.5), lwd = 0.25) +
-  scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 0))
-
-# Any N-S differences in taxon abundance within habitat Types/datasets?
-#### Pivot wide so you can calculate N vs S difference per draw
-posterior_NS_diff <- posterior_draws %>%
-  ungroup() %>%
-  select(.draw, dataset, Type, dir, taxon, .epred) %>%
-  pivot_wider(names_from = dir, values_from = .epred) %>%
-  filter(!is.na(N), !is.na(S)) %>%  # ensure both directions exist for the draw
-  mutate(diff = S - N)  # or N - S depending on interpretation
-
-dir_comparisons <- posterior_NS_diff %>%
-  group_by(dataset, Type, taxon) %>%
-  summarize(
-    mean_diff = mean(diff),
-    lower_95 = quantile(diff, 0.025),
-    upper_95 = quantile(diff, 0.975),
-    p_gt_0 = mean(diff > 0),
-    p_lt_0 = mean(diff < 0),
-    sig = ifelse(lower_95 > 0 | upper_95 < 0, "yes", "no"),
-    .groups = "drop"
-  )
-
-dir_comparisons %>%
-  filter(sig == "yes") %>%
-  mutate(greater = if_else(mean_diff > 0, "N", "S")) %>%
-  group_by(dataset, Type, greater) %>%
-  summarize(taxa = paste(taxon, collapse = ",")) %>%
-  arrange(Type, greater)
-
-# Plot total coral abundance
-fitted_total <- posterior_draws %>%
+```{r}
+# Compute and plot total coral abundance by dataset, habitat Type, and direction from channel
+total_abund <- posterior_draws %>%
   group_by(.draw, dataset, Type, dir) %>%
   summarize(total_epred = sum(.epred), .groups = "drop") %>%
   group_by(dataset, Type, dir) %>%
@@ -1150,15 +909,19 @@ fitted_total <- posterior_draws %>%
     .groups = "drop"
   )
 
-ggplot(fitted_total, aes(x = dataset, y = fit_mean, color = dir)) +
-  facet_grid(~ Type) +
+ggplot(total_abund, aes(x = dataset, y = fit_mean, color = dir)) +
+  facet_grid(~ Type, labeller = as_labeller(type_labels)) +
   geom_point(position = position_dodge(width = 0.5)) +
   geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
                 position = position_dodge(width = 0.5)) +
+  scale_x_discrete(labels = dataset_labels) +
   theme(axis.text.x = element_text(angle = 90))
+```
 
+### North-south differences?
+```{r}
 # Any N-S differences in total coral abundance?
-posterior_NS_total_diff <- posterior_draws %>%
+total_NS_diff <- posterior_draws %>%
   ungroup() %>%
   group_by(.draw, dataset, Type, dir) %>%
   summarize(total_epred = sum(.epred), .groups = "drop") %>%
@@ -1166,7 +929,7 @@ posterior_NS_total_diff <- posterior_draws %>%
   filter(!is.na(N), !is.na(S)) %>%  # make sure both are present
   mutate(diff = N - S)  # or S - N depending on desired contrast
 
-total_diff_summary <- posterior_NS_total_diff %>%
+total_NS_summ <- total_NS_diff %>%
   group_by(dataset, Type) %>%
   summarize(
     mean_diff = mean(diff),
@@ -1178,294 +941,174 @@ total_diff_summary <- posterior_NS_total_diff %>%
     .groups = "drop"
   )
 
-total_diff_summary
-
-# 2. Get posterior draws of fitted values on response scale (no random effects)
-fitted_draws <- fitted(
-  mod_nb,
-  newdata = newdata,
-  re_formula = NA,
-  summary = FALSE
-)
-
-
-
-# 3. Reshape into long format and join with newdata
-draws_long <- as.data.frame(fitted_draws) %>%
-  mutate(.draw = row_number()) %>%
-  pivot_longer(cols = starts_with("V"), names_to = "col", values_to = "fit") %>%
-  mutate(row_id = as.integer(gsub("V", "", col))) %>%
-  left_join(newdata, by = "row_id")
-
-# 4. Draw-wise sum across taxon to get total density per dataset × Type × draw
-total_draws <- draws_long %>%
-  group_by(.draw, dataset, Type) %>%
-  summarize(total = sum(fit), .groups = "drop") %>%
-  mutate(taxon = "Total")
-
-# 5. Summarize across posterior draws to get mean, SE, and 95% credible intervals
-total_summ <- total_draws %>%
-  group_by(dataset, Type, taxon) %>%
-  summarize(
-    fit   = mean(total),
-    lower = quantile(total, 0.025),
-    upper = quantile(total, 0.975),
-    se    = sd(total),
-    .groups = "drop"
-  )
-
-# 6. (Optional) Combine with taxon-specific summaries from brms::fitted()
-fitted_taxon <- fitted(mod_nb, newdata = newdata, re_formula = NA, summary = TRUE) %>%
-  as_tibble() %>%
-  bind_cols(newdata) %>%
-  rename(
-    fit = Estimate,
-    se = Est.Error,
-    lower = Q2.5,
-    upper = Q97.5
-  )
-
-combined_fitted <- bind_rows(fitted_taxon, total_summ)
-
-ggplot(combined_fitted, aes(x = log10(fit), y = taxon)) +
-  geom_point() +
-  geom_errorbarh(aes(xmin = log10(lower), xmax = log10(upper)), height = 0.2) +
-  facet_grid(Type ~ dataset) +
-  labs(
-    x = expression("log"[10] * " coral density (per m²)"),
-    y = NULL,
-    title = "Predicted coral density by taxon, dataset, and habitat type"
-  ) +
-  theme_minimal() +
-  theme(strip.text = element_text(face = "bold"))
-
+total_NS_summ
 ```
 
-# now test for diffs between surveys within Type/taxa?
+### Survey differences?
 ```{r}
-library(posterior)
+# 1. Sum predicted values across taxa (total coral density per draw × dataset × Type × dir)
+draws_total <- posterior_draws %>%
+  mutate(dataset = as.character(dataset)) %>%
+  group_by(.draw, dataset, Type, dir) %>%
+  summarize(total_epred = sum(.epred), .groups = "drop")
 
-# 1. Clean draws: one row per draw × dataset × taxon × Type
-draws_clean <- draws_long %>%
-  filter(!is.na(taxon), taxon != "Total") %>%
-  select(.draw, dataset, Type, taxon, fit)
-
-# 2. Pairwise comparisons within each .draw × Type × taxon group
-pairwise_diffs <- draws_clean %>%
-  group_by(.draw, Type, taxon) %>%
-  inner_join(draws_clean, by = c(".draw", "Type", "taxon")) %>%
-  filter(dataset.x < dataset.y) %>%
-  mutate(
-    dataset1 = dataset.x,
-    dataset2 = dataset.y,
-    diff = fit.x - fit.y
+# 2. Self-join to compare dataset pairs within each draw × Type × dir
+pairwise_total <- draws_total %>%
+  rename(dataset1 = dataset, epred1 = total_epred) %>%
+  inner_join(
+    draws_total %>% rename(dataset2 = dataset, epred2 = total_epred),
+    by = c(".draw", "Type", "dir")
   ) %>%
-  select(.draw, Type, taxon, dataset1, dataset2, diff) %>%
-  ungroup()
+  filter(dataset1 < dataset2) %>%
+  mutate(diff = epred1 - epred2)
 
-# 3. Summarize posterior differences
-contrast_summary <- pairwise_diffs %>%
-  group_by(Type, taxon, dataset1, dataset2) %>%
+# 3. Summarize posterior contrasts
+summary_total_contrasts <- pairwise_total %>%
+  group_by(Type, dir, dataset1, dataset2) %>%
   summarize(
     mean_diff = mean(diff),
     lower = quantile(diff, 0.025),
     upper = quantile(diff, 0.975),
-    p_nonzero = mean(diff > 0),
+    prob_diff = mean(diff > 0),
     .groups = "drop"
-  ) %>%
-  mutate(
-    p_direction = ifelse(mean_diff > 0, p_nonzero, 1 - p_nonzero),
-    significant = p_direction > 0.95
   )
 
-contrast_summary %>%
-  arrange(Type, taxon, dataset1, dataset2)
-
+# 4. Optional: filter strong differences
+summary_total_contrasts %>%
+  filter(prob_diff < 0.01 | prob_diff > 0.99) %>%
+  arrange(Type, dir)
 ```
 
+## Taxon totals by survey, habitat, direction from channel
+```{r, fig.width = 10, fig.height = 10}
+fitted_taxon <- posterior_draws %>%
+  group_by(dataset, Type, dir, taxon) %>%
+  summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
+            fit_sd = sd(.epred),  # Posterior standard deviation
+            fit_lower = quantile(.epred, 0.025),        # 2.5% quantile (lower CI)
+            fit_upper = quantile(.epred, 0.975))    # 97.5% quantile (upper CI)
 
-```{r garbage?}
-# 1. Fit model (already done)
-mod_nb11 <- glmmTMB(
-  n ~ dataset * Type * taxon + offset(log(transect_area_m2)),
-  data = dfftaxon,
-  family = nbinom2()
-)
-summary(mod_nb11)
-
-newdata <- mod_nb11$frame %>%
-  select(dataset, Type, taxon) %>%
-  distinct() %>%
-  mutate(transect_area_m2 = 1)
-
-preds <- predict(mod_nb11, newdata = newdata, type = "response", se.fit = TRUE)
-
-
-taxon_df <- newdata %>%
-  mutate(
-    fit = preds$fit,
-    se = preds$se.fit,
-    lower = pmax(fit - 1.96 * se, 1e-4),
-    upper = fit + 1.96 * se
-  )
-
-
-
-
-
-# 1. Get model frame with predicted values
-fitted_df <- as_tibble(mod_nb11$frame) %>%
-  mutate(fit_transect = predict(mod_nb11, type = "response")) %>%
-  # Bind in original data to restore area info
-  bind_cols(transect_area_m2 = dfftaxon_trimmed$transect_area_m2) %>%
-  # convert to per m²
-  mutate(fit = fit_transect / transect_area_m2)
-
-# 2. Summarize taxon-specific coral density per m²
-taxon_df <- fitted_df %>%
-  group_by(dataset, Type, taxon) %>%
-  summarize(fit = mean(fit),
-            se = sd(fit) / sqrt(n()),
-            lower = pmax(fit - 1.96 * se, 1e-4),
-            upper = fit + 1.96 * se,
-            .groups = "drop")
-
-# 3. Add total coral density across taxa
-total_df <- taxon_df %>%
-  group_by(dataset, Type) %>%
-  summarize(taxon = "Total",
-            fit = sum(fit),
-            se = sqrt(sum(se^2)),
-            lower = pmax(fit - 1.96 * se, 1e-4),
-            upper = fit + 1.96 * se,
-            .groups = "drop")
-
-# 4. Combine
-combined_df <- bind_rows(taxon_df, total_df)
-
-# 5. Keep only observed taxon combinations
-valid_combos <- dfftaxon %>%
-  group_by(dataset, Type, taxon) %>%
-  summarize(total_n = sum(n), .groups = "drop") %>%
-  filter(total_n > 0)
-
-plot_df <- bind_rows(combined_df %>% filter(taxon == "Total"),
-                     combined_df %>% filter(taxon != "Total") %>%
-           inner_join(valid_combos, by = c("dataset", "Type", "taxon")))
-
-# 6. Plot log10 density
-ggplot(plot_df, aes(x = log10(fit), y = taxon)) +
-  geom_point() +
-  geom_errorbarh(aes(xmin = log10(lower), xmax = log10(upper)), height = 0.2) +
-  facet_grid(Type ~ dataset) +
-  labs(
-    x = expression("log"[10] * " coral density (per m²)"),
-    y = NULL,
-    title = "Coral density by taxon, dataset, and habitat type"
-  ) +
-  theme_minimal() +
-  theme(strip.text = element_text(face = "bold"))
+# Plot
+ggplot(fitted_taxon, aes(y = fit_mean, x = Type, color = dir, shape = dataset,
+                          group = interaction(dataset, dir))) +
+  facet_wrap(taxon ~ ., scales = "free_x") +
+  geom_point(position = position_dodge(width = 0.5)) +
+  geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
+  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
+                position = position_dodge(width = 0.5), lwd = 0.25) +
+  scale_y_log10() +
+  scale_x_discrete(labels = type_labels) +
+  labs(x = "Habitat Type", y = "Density (per m2)")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
+### North-south differences?
 ```{r}
-# Get total counts for each taxon at each site
-dfftaxon <- dff %>% 
-  group_by(dataset, Type, site, transect_num, transect_area_m2, taxon) %>%
-  summarize(n = sum(n)) %>%
-  ungroup()
+# Any N-S differences in taxon abundance within habitat Types/datasets?
+#### Pivot wide so you can calculate N vs S difference per draw
+taxon_NS_diff <- posterior_draws %>%
+  ungroup() %>%
+  select(.draw, dataset, Type, dir, taxon, .epred) %>%
+  pivot_wider(names_from = dir, values_from = .epred) %>%
+  filter(!is.na(N), !is.na(S)) %>%  # ensure both directions exist for the draw
+  mutate(diff = S - N)  # or N - S depending on interpretation
 
-# Fit a Negative Binomial GLM     
-# Note: also tried pscl::zeroinfl and was nearly identical to glm.nb results
-mod_nb <- MASS::glm.nb(n ~ dataset + Type * taxon + offset(log(transect_area_m2)), data = dfftaxon)
-
-# Generate new data only for existing taxon-size class combinations
-newdata_1 <- dfftaxon %>%
-  distinct(dataset, Type, taxon) %>%  
-  mutate(transect_area_m2 = 1)  # Set area to 1 for density predictions on a per m2 basis
-
-# Get predicted values & standard errors (log scale)
-preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
-# newdata_1 <- bind_cols(newdata_1, preds_nb) %>% mutate(fit = exp(fit)) %>%
-#   mutate(taxon = fct_reorder(taxon, fit), class = "Total")  # Reorder taxa by abundance
-
-# Compute both total coral density & taxon-size class-specific densities in one step
-results_nb <- newdata_1 %>%
-  mutate(
-    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
-    fit_se = exp(preds_nb$fit) * preds_nb$se.fit,   # Convert SE using the Delta Method
-    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
-    fit_lower = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
-    fit_upper = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
-  )
-
-# Compute total coral density + confidence intervals
-total_ci_nb <- results_nb %>%
-  group_by(dataset, Type) %>%
-  summarize(
-    total_density = sum(fit),
-    total_se = sqrt(sum(fit_var)),
-    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
-    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
-  )
-
-knitr::kable(total_ci_nb)
-
-# Extract and plot taxon--specific densities
-taxclass_ci_nb <- results_nb %>%
-  dplyr::select(dataset, Type, taxon, fit, fit_se, fit_lower, fit_upper)
-
-# Compute total density per taxon 
-fitted_taxon_nb <- taxclass_ci_nb %>%
+taxon_NS_summ <- taxon_NS_diff %>%
   group_by(dataset, Type, taxon) %>%
   summarize(
-    fit = sum(fit),  # Sum densities across size classes
-    fit_se = sqrt(sum(fit_se^2)),  # Correct SE propagation (variance summation)
-    log_fit = log(fit),  # Log-transform fit for proper CI computation
-    log_se = fit_se / fit,  # Approximate log-scale standard error
-    fit_lower = exp(log_fit - 1.96 * log_se),  # Compute lower CI on log scale
-    fit_upper = exp(log_fit + 1.96 * log_se)   # Compute upper CI on log scale
-  ) %>%
-  ungroup() %>%
-  mutate(taxon = fct_reorder(taxon, fit), class = "Total")  # Reorder taxa by abundance
+    mean_diff = mean(diff),
+    lower_95 = quantile(diff, 0.025),
+    upper_95 = quantile(diff, 0.975),
+    p_gt_0 = mean(diff > 0),
+    p_lt_0 = mean(diff < 0),
+    sig = ifelse(lower_95 > 0 | upper_95 < 0, "yes", "no"),
+    .groups = "drop"
+  )
 
-
-fitted_combined_nb <- bind_rows(taxclass_ci_nb, fitted_taxon_nb) %>%
-  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
-
-# Combine taxclass and taxon totals, and remove taxa/classes not observed in a dataset
-fitted_combined_nb <- taxclass_ci_nb %>% right_join(dff %>% filter(n > 0) %>% distinct(dataset, taxon, Type)) %>%
-  bind_rows(fitted_taxon_nb %>% right_join(dff %>% filter(n > 0) %>% distinct(dataset, taxon, Type))) %>%
-  mutate(taxon = factor(taxon, levels = levels(fitted_taxon_nb$taxon)))
-
-ggplot(fitted_combined_nb, aes(x = taxon, y = fit, color = dataset)) +
-  geom_point(aes(size = class), 
-             position = position_dodge(width = 0.2), alpha = 0.6) +  
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), 
-                width = 0, position = position_dodge(width = 0.2), alpha = 0.6) +  
-  facet_wrap(~Type) +
-  scale_y_log10(limits = c(1e-4, 5)) +  
-  #scale_size_manual(values = c("Total" = 4, ">4cm" = 2.5, "<4cm" = 1)) +  # Larger points for totals
-  #scale_shape_manual(values = c("Total" = 15, ">4cm" = 16, "<4cm" = 16)) +  # Different shape for totals
-  coord_flip() +  
-  labs(y = "Estimated Coral Density (per m²)", x = "Taxon", 
-       color = "Dataset", shape = "Size class", size = "Size class") +  
-  theme_minimal() +  
-  labs(title = "NB Model")
+taxon_NS_summ %>%
+  filter(sig == "yes") %>%
+  mutate(greater = if_else(mean_diff > 0, "N", "S")) %>%
+  group_by(dataset, Type, greater) %>%
+  summarize(taxa = paste(taxon, collapse = ",")) %>%
+  arrange(Type, greater)
 ```
 
-# 4. Total corals in impact zones 
+### Survey differences?
+```{r}
+# Ensure dataset is character so we can do < comparison
+draws_clean <- posterior_draws %>%
+  mutate(dataset = as.character(dataset))
+
+# One self-join to get all unique dataset pairs
+pairwise_contrasts <- draws_clean %>%
+  rename(dataset1 = dataset, epred1 = .epred) %>%
+  inner_join(
+    draws_clean %>% rename(dataset2 = dataset, epred2 = .epred),
+    by = c(".draw", "taxon", "dir", "Type")
+  ) %>%
+  filter(dataset1 < dataset2) %>%  # Avoid duplicates and self-pairs
+  mutate(diff = epred1 - epred2)
+
+# Step: summarize the posterior differences
+summary_contrasts <- pairwise_contrasts %>%
+  group_by(taxon, dir, Type, dataset1, dataset2) %>%
+  summarize(mean_diff = mean(diff),
+            lower = quantile(diff, 0.025),
+            upper = quantile(diff, 0.975),
+            prob_diff = mean(diff > 0),
+            .groups = "drop")
+
+out <- summary_contrasts %>% 
+  filter(prob_diff < 0.01) %>%
+  arrange(taxon, Type, dir)
+out
+```
+
+# Overall taxon differences among surveys
+```{r}
+# Proportion of transect area per dataset × Type × dir
+survey_weights <- dfftaxon %>%
+  group_by(dataset, Type, dir) %>%
+  summarize(area = sum(transect_area_m2), .groups = "drop") %>%
+  group_by(dataset) %>%
+  mutate(weight = area / sum(area)) %>%
+  select(dataset, Type, dir, weight)
+
+
+posterior_weighted <- posterior_draws %>%
+  mutate(dataset = as.character(dataset)) %>%
+  left_join(survey_weights, by = c("dataset", "Type", "dir")) %>%
+  mutate(weighted_epred = .epred * weight)
+
+
+posterior_totals <- posterior_weighted %>%
+  group_by(.draw, dataset, taxon) %>%
+  summarize(total_epred = sum(weighted_epred), .groups = "drop")
+
+
+pairwise_overall <- posterior_totals %>%
+  rename(dataset1 = dataset, epred1 = total_epred) %>%
+  inner_join(
+    posterior_totals %>% rename(dataset2 = dataset, epred2 = total_epred),
+    by = c(".draw", "taxon")
+  ) %>%
+  filter(dataset1 < dataset2) %>%
+  mutate(diff = epred1 - epred2)
+
+summary_overall <- pairwise_overall %>%
+  group_by(taxon, dataset1, dataset2) %>%
+  summarize(mean_diff = mean(diff),
+            lower = quantile(diff, 0.025),
+            upper = quantile(diff, 0.975),
+            prob_diff = mean(diff > 0),
+            .groups = "drop")
+
+
+summary_overall %>%
+  filter(upper < 0 | lower > 0) %>%
+  print(n = nrow(.))
+```
+
+# Total corals in impact zones 
 
 ## 4.1. Calculate area of each habitat type in each impact zone
 ```{r, fig.width = 10, fig.height = 10}
@@ -1481,6 +1124,7 @@ library(ggplot2)
 
 impact_zones_plot <- impact_zones %>%
   mutate(linetype_group = "Impact Zone")
+
 ggplot() +
   # Habitat polygons
   geom_sf(data = polygons_clean, aes(fill = Type), color = "black", size = 0.2, alpha = 0.6) +
@@ -1519,121 +1163,68 @@ area_summary <- habitat_in_zones_proj %>%
   group_by(Type, ImpactZone) %>%
   summarize(total_area_m2 = sum(as.numeric(area_m2)), .groups = "drop")
 
-area_summary2 <- area_summary %>%
-  filter(Type %in% c("Nearshore Ridge Complex", "Artificial", "Inner Reef", "Middle Reef"))
 
-area_summary2[area_summary2$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
+area_summary[area_summary$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
 
-area_summary2 <- area_summary2 %>%
+area_summary <- area_summary %>%
   group_by(Type, ImpactZone) %>%
   summarize(total_area_m2 = sum(total_area_m2))
 ```
 
 ## 4.2. Calculate total corals in each impact zone
 ```{r}
-area_summary2
-fitted_combined_nb
+area_summary <- area_summary %>%
+  mutate(ImpactZone = factor(ImpactZone, 
+    levels = c("Channel", "Side Slopes", "Scenario 2, > 10 cm", "Scenario 2, 5.1-10 cm",
+               "Scenario 4, 1.1-5 cm", "Scenario 4, 0.51-1 cm", "Scenario 4, 0.1-0.5 cm")))
 
-totals <- full_join(fitted_combined_nb, area_summary2, by = "Type") %>%
-  mutate(tot_lower = fit_lower * total_area_m2,
-         tot_upper = fit_upper * total_area_m2) %>%
-  select(dataset, Type, taxon, ImpactZone, tot_lower, tot_upper)
+totals <- left_join(total_abund, area_summary, by = "Type") %>%
+  mutate(tot_estimate = fit_mean * total_area_m2) %>%
+  mutate(Type = factor(Type, levels = type_levels)) %>%
+  select(dataset, Type, ImpactZone, tot_estimate)
 
-res <- totals %>%
-    drop_na(dataset) %>%
-  group_by(dataset, ImpactZone) %>%
-  summarize(totlow = sum(tot_lower),
-            totup = sum(tot_upper)) %>%
-  pivot_wider(names_from = dataset, values_from = c(totlow, totup))
+# Define ordered impact zone levels
+impact_levels <- c("Channel", "Side Slopes", "Scenario 2, > 10 cm", "Scenario 2, 5.1-10 cm",
+                   "Scenario 4, 1.1-5 cm", "Scenario 4, 0.51-1 cm", "Scenario 4, 0.1-0.5 cm")
 
-res2 <- res %>%
-  # Add totals
-  add_row(ImpactZone = "Total",
-    !!!res %>% summarise(across(where(is.numeric), sum, na.rm = TRUE)) %>% as.list()) %>%
-  # Format ranges
-  mutate(across(where(is.numeric), ~ sprintf("%.1e", .))) %>%
-  unite(dca, totlow_dca, totup_dca, sep = " — ") %>%
-  unite(tt21, totlow_tt21, totup_tt21, sep = " — ") %>%
-  unite(tt23, totlow_tt23, totup_tt23, sep = " — ") %>%
-  unite(drm, totlow_drm, totup_drm, sep = " — ")
+# Ensure correct factor order
+totals <- totals %>%
+  mutate(ImpactZone = factor(ImpactZone, levels = impact_levels))
 
-knitr::kable(res2, caption = "Total number of corals in each Impact Zone for the Nearshore Ridge Complex, Inner, and Middle Reefs. Note: DOES NOT INCLUDE Outer Reef.")
+# Cumulative summaries across increasing levels
+cumulative_zones <- seq_along(impact_levels) %>%
+  map_dfr(function(i) {
+    zone_subset <- impact_levels[1:i]
 
-```
-
-
-```{r}
-# What if we join all data across all studies?
-# Fit a Negative Binomial GLM     
-# Note: also tried pscl::zeroinfl and was nearly identical to glm.nb results
-mod_nb <- MASS::glm.nb(n ~ Type * taxon + dataset + offset(log(transect_area_m2)), data = dfftaxon)
-
-# Generate new data only for existing taxon-size class combinations
-newdata_1 <- dfftaxon %>%
-  distinct(dataset, Type, taxon) %>%  
-  mutate(transect_area_m2 = 1)  # Set area to 1 for density predictions on a per m2 basis
-
-# Get predicted values & standard errors (log scale)
-preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
-# newdata_1 <- bind_cols(newdata_1, preds_nb) %>% mutate(fit = exp(fit)) %>%
-#   mutate(taxon = fct_reorder(taxon, fit), class = "Total")  # Reorder taxa by abundance
-
-# Compute both total coral density & taxon-size class-specific densities in one step
-results_nb <- newdata_1 %>%
-  mutate(
-    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
-    fit_se = exp(preds_nb$fit) * preds_nb$se.fit,   # Convert SE using the Delta Method
-    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
-    fit_lower = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
-    fit_upper = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
-  )
-
-# Compute total coral density + confidence intervals
-total_ci_nb <- results_nb %>%
-  group_by(dataset, Type) %>%
-  summarize(
-    total_density = sum(fit),
-    total_se = sqrt(sum(fit_var)),
-    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
-    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
-  )
+    totals %>%
+      drop_na(dataset) %>%
+      filter(ImpactZone %in% zone_subset) %>%
+      group_by(dataset, Type) %>%
+      summarize(tot = sum(tot_estimate), .groups = "drop") %>%
+      pivot_wider(names_from = dataset, values_from = tot) %>%
+      mutate(zone_group = paste0("z", i))
+  })
 
 
 
-avg_density_ci <- total_ci_nb %>%
-  group_by(Type) %>%
-  summarize(
-    # Inverse-variance weights
-    w = 1 / (total_se^2),
-    
-    # Weighted average of density
-    avg_density = sum(total_density * w) / sum(w),
-    
-    # Standard error of the weighted mean
-    se_density = sqrt(1 / sum(w)),
-    
-    # Confidence intervals
-    lower_95CI = avg_density - 1.96 * se_density,
-    upper_95CI = avg_density + 1.96 * se_density,
-    
-    .groups = "drop"
-  )
+cumulative_zones %>%
+  filter(zone_group == "z7") %>%
+  pivot_longer(2:5, names_to = "dataset") %>%
+  mutate(dataset = factor(dataset, levels = dataset_levels)) %>%
+  ggplot(aes(x = Type, y = value, fill = dataset)) +
+  geom_col(position = position_dodge()) +
+  scale_fill_discrete(labels = dataset_labels) +
+  labs(x = "", y = "Total corals", title = "Total corals in all impact zones, by habitat")
 
-tots <- avg_density_ci %>%
-  distinct(Type, avg_density, lower_95CI, upper_95CI) %>%
-  full_join(area_summary2) %>%
-  mutate(totlow = lower_95CI * total_area_m2,
-         totup = upper_95CI * total_area_m2) %>%
-  group_by(ImpactZone) %>%
-  summarize(totlow = sum(totlow),
-            totup = sum(totup))
-
-
-sum(tots$totlow)
-sum(tots$totup)
-
-
-
-
+cumulative_zones %>%
+  filter(zone_group == "z7") %>%
+  pivot_longer(2:5, names_to = "dataset") %>%
+  group_by(dataset) %>%
+  summarize(value = sum(value, na.rm = T)) %>%
+  mutate(dataset = factor(dataset, levels = dataset_levels)) %>%
+  ggplot(aes(x = 1, y = value, fill = dataset)) +
+  geom_col(position = position_dodge()) +
+  scale_fill_discrete(labels = dataset_labels) +
+  labs(x = "", y = "Total corals", title = "Total corals in all impact zones - all habitats")
 ```
 
