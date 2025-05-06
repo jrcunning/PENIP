@@ -579,10 +579,6 @@ final_counts_ag <- final_counts %>%
 write_csv(final_counts_ag, file = "data/processed/drm_2024_counts_ag.csv")
 ```
 
-
-
-
-
 ## Habitat classification polygons
 ```{r habitat_maps, fig.width = 10, fig.height = 10}
 # --- STEP 1: Load KML Polygons ---
@@ -641,18 +637,6 @@ joined_df <- joined %>%
 
 allsitemd <- joined_df
 
-# Visualize habitat classifications
-(polyplot <- polygons_clean %>% 
-  #filter(Type != "Sand") %>%
-  ggplot() +
-  geom_sf(aes(fill = Type), color = "black", size = 0.2, alpha = 0.6) +
-  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-  theme_minimal() +
-  labs(title = "Habitat Polygons Colored by Type", fill = "Type") +
-  theme(legend.position = "right") +
-  xlim(-80.11, -80.079) +
-  ylim(26.0675, 26.11))
-
 # 'Sand' overlaps some of the other polygons instead of just surrounding them...
 # If a point is classified as Sand AND something else, remove Sand...
 multiclass <- allsitemd %>%
@@ -663,67 +647,39 @@ allsitemd_clean <- allsitemd %>%
   group_by(site) %>%
   filter(!(Type == "Sand" & n() > 1)) %>%
   ungroup()
-```
 
-# Filter data
+# Visualize habitat classifications
+polyplot <- polygons_clean %>% 
+  #filter(Type != "Sand") %>%
+  ggplot() +
+  geom_sf(aes(fill = Type), color = "black", size = 0.2, alpha = 0.6) +
+  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  theme_minimal() +
+  labs(title = "Habitat Polygons Colored by Type", fill = "Type") +
+  theme(legend.position = "right") +
+  xlim(-80.11, -80.079) +
+  ylim(26.0675, 26.11)
 
-## By habitat type
-
-```{r}
-# Select sites in Nearshore Ridge Complex, Inner Reef, and Middle Reef, Outer Reef and Aggregated Patch Reef
-selected <- allsitemd_clean %>%
-  filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", 
-                     "Artificial", "Outer Reef", "Aggregated Patch Reef"))
-
-# Plot selected sites
+# Plot all surveyed sites
 polyplot + 
-  geom_point(data = selected, 
+  geom_point(data = allsitemd, 
              aes(x = longitude, y = latitude, shape = dataset), 
              inherit.aes = FALSE, alpha = 0.6) +
-  scale_shape_manual(values = c(2, 3, 4, 5))
-
+  scale_shape_manual(values = c(2, 3, 4, 5)) +
+  labs("All sites - all surveys")
 ```
 
-# Map datasets
-```{r, fig.width = 10, fig.height = 10}
-(dca_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "dca"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2017 — DCA Survey"))
+# Combine and filter data
 
-(tt21_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "tt21"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2021 — Tetra Tech Survey"))
-
-(tt23_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "tt23"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2023 — Tetra Tech Survey"))
-
-(drm_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "drm"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2024 — Shedd Survey"))
-```
-
-
-```{r combine_selected_count_data}
+## Combine surveys datasets
+```{r combine_data}
 # Combine all aggregated count data and filter for selected sites
 df <- bind_rows(.id = "dataset",
   drm = final_counts_ag,
   dca = dca_counts_ag,
   tt23 = tt_counts_ag,
   tt21 = tt21_counts_ag
-) %>%
-  filter(site %in% selected$site) %>%
-  select(dataset, site, transect_num, taxon, class, n) %>%
-  droplevels() %>%
-  left_join(allsitemd_clean)
+)
 
 # Add transect area information
 df <- df %>%
@@ -736,6 +692,32 @@ df <- df %>%
   ))
 ```
 
+TEST IN SHEDD DATA WHETHER NRC SOUTH NEAR VS. FAR FROM CHANNEL ARE SIMILAR/DIFFERENT
+
+## Filter by habitat
+
+```{r select_habitats, fig.width = 10, fig.height = 10}
+# Select sites in Nearshore Ridge Complex, Inner Reef, and Middle Reef, Outer Reef and Aggregated Patch Reef
+selected <- allsitemd_clean %>%
+  filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", 
+                     "Artificial", "Outer Reef", "Aggregated Patch Reef"))
+
+# Plot all selected sites
+polyplot + 
+  geom_point(data = selected, 
+             aes(x = longitude, y = latitude, shape = dataset), 
+             inherit.aes = FALSE, alpha = 0.6) +
+  scale_shape_manual(values = c(2, 3, 4, 5)) +
+  labs("Selected sites - all surveys")
+
+
+# Filter dataset to just selected sites
+dff <- filter(df, site %in% selected$site) %>%
+  select(dataset, site, transect_num, transect_area_m2, taxon, class, n) %>%
+  droplevels() %>%
+  left_join(allsitemd_clean)
+```
+
 Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
 
 'Artificial' is only present in DCA and minorly in TT -- but absent from Shedd.   
@@ -743,11 +725,11 @@ Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
 It is in close spatial proximity to Nearshore Ridge Complex -- can these be combined?
 
 Test for differences in coral density in DCA survey
-```{r}
+```{r artificial_vs_nrc_density}
 # Subset DCA data
 dcadf <- dca_counts_ag %>%
   left_join(allsitemd_clean) %>%
-  filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Artificial"))
+  filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Artificial", "Outer Reef", "Aggregated Patch Reef"))
 
 # Fit a Negative Binomial GLM
 mod_nb <- MASS::glm.nb(n ~ Type, data = dcadf)
@@ -784,7 +766,7 @@ knitr::kable(total_ci_nb)
 Highly overlapping confidence intervals for Artifical and Nearshore Ridge Complex, so no difference in coral density.
 
 Test for differences in community composition in DCA survey
-```{r}
+```{r artificial_vs_nrc_nmds}
 library(vegan)
 
 # 1. Create a wide community matrix: rows = site x Type, columns = taxa
@@ -815,32 +797,59 @@ ggplot(scores_df, aes(x = NMDS1, y = NMDS2, color = Type)) +
 
 High degree of similarity between Artificial and Nearshore Ridge Complex coral communities.
 
-2.2.3. Combine 'Artificial' with 'Nearshore Ridge Complex'
-```{r}
+Combine 'Artificial' with 'Nearshore Ridge Complex'
+```{r combine_artificial_nrc}
 # Based on these results, combine "Artificial" with "Nearshore Ridge Complex"
-df[df$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
+dff[dff$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
 ```
 
-## By coral taxa
+## Filter by coral taxa
 
 Remove lowest abundance coral taxa
 
 These will be problematic for statistical models
 
-```{r}
+```{r filter_low_taxa}
 # Drop taxa with very few observations
-sppcounts <- df %>%
+sppcounts <- dff %>%
   group_by(taxon) %>%
   summarize(total = sum(n), .groups = "drop") %>%
   arrange(total) 
 sppcounts
 
-dff <- df %>%
+dff <- dff %>%
   filter(taxon %in% filter(sppcounts, total >= 5)$taxon) %>%
   mutate(Type = factor(Type, levels = type_levels))
 ```
 
 Taxa with less than 5 total observations were filtered out, which included: HCUC, MANG, PAME, FFRA, OCUL, SCOL
+
+# Map datasets
+```{r plot_maps, fig.width = 10, fig.height = 10}
+(dca_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "dca"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2017 — DCA Survey"))
+
+(tt21_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "tt21"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2021 — Tetra Tech Survey"))
+
+(tt23_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "tt23"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2023 — Tetra Tech Survey"))
+
+(drm_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "drm"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2024 — Shedd Survey"))
+```
 
 
 # Analyze coral density 
@@ -849,7 +858,7 @@ Taxa with less than 5 total observations were filtered out, which included: HCUC
 
 Predictors: dataset, habitat Type, direction from channel, taxon
 
-```{r}
+```{r brms}
 # Get total counts for each taxon at each site
 dfftaxon <- dff %>% 
   group_by(dataset, Type, dir, site, transect_num, transect_area_m2, taxon) %>%
@@ -895,7 +904,7 @@ posterior_draws <- add_epred_draws(mod_nb, newdata = newdata) %>%
 
 ## Totals by survey, habitat, direction
 
-```{r}
+```{r total_density}
 # Compute and plot total coral abundance by dataset, habitat Type, and direction from channel
 total_abund <- posterior_draws %>%
   group_by(.draw, dataset, Type, dir) %>%
@@ -919,7 +928,7 @@ ggplot(total_abund, aes(x = dataset, y = fit_mean, color = dir)) +
 ```
 
 ### North-south differences?
-```{r}
+```{r total_density_ns_diffs}
 # Any N-S differences in total coral abundance?
 total_NS_diff <- posterior_draws %>%
   ungroup() %>%
@@ -932,20 +941,23 @@ total_NS_diff <- posterior_draws %>%
 total_NS_summ <- total_NS_diff %>%
   group_by(dataset, Type) %>%
   summarize(
+    mean_N = mean(N),
+    mean_S = mean(S),
     mean_diff = mean(diff),
     lower_95 = quantile(diff, 0.025),
     upper_95 = quantile(diff, 0.975),
-    p_gt_0 = mean(diff > 0),
-    p_lt_0 = mean(diff < 0),
-    sig = ifelse(lower_95 > 0 | upper_95 < 0, "yes", "no"),
+    p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),  # <-- two-sided p-value
     .groups = "drop"
   )
 
-total_NS_summ
+total_NS_summ %>%
+  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
+  filter(p_adj < 0.01) %>%
+  knitr::kable()
 ```
 
 ### Survey differences?
-```{r}
+```{r total_density_survey_diffs}
 # 1. Sum predicted values across taxa (total coral density per draw × dataset × Type × dir)
 draws_total <- posterior_draws %>%
   mutate(dataset = as.character(dataset)) %>%
@@ -969,18 +981,20 @@ summary_total_contrasts <- pairwise_total %>%
     mean_diff = mean(diff),
     lower = quantile(diff, 0.025),
     upper = quantile(diff, 0.975),
-    prob_diff = mean(diff > 0),
+    p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
     .groups = "drop"
   )
 
-# 4. Optional: filter strong differences
+# 4. Filter significant differences
 summary_total_contrasts %>%
-  filter(prob_diff < 0.01 | prob_diff > 0.99) %>%
-  arrange(Type, dir)
+  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
+  filter(p_adj < 0.01) %>%
+  arrange(Type, dir) %>%
+  knitr::kable()
 ```
 
 ## Taxon totals by survey, habitat, direction from channel
-```{r, fig.width = 10, fig.height = 10}
+```{r taxon_density, fig.width = 10, fig.height = 10}
 fitted_taxon <- posterior_draws %>%
   group_by(dataset, Type, dir, taxon) %>%
   summarize(fit_mean = mean(.epred),  # Posterior mean (expected value)
@@ -1002,7 +1016,7 @@ ggplot(fitted_taxon, aes(y = fit_mean, x = Type, color = dir, shape = dataset,
 ```
 
 ### North-south differences?
-```{r}
+```{r taxon_density_ns_diffs}
 # Any N-S differences in taxon abundance within habitat Types/datasets?
 #### Pivot wide so you can calculate N vs S difference per draw
 taxon_NS_diff <- posterior_draws %>%
@@ -1018,22 +1032,22 @@ taxon_NS_summ <- taxon_NS_diff %>%
     mean_diff = mean(diff),
     lower_95 = quantile(diff, 0.025),
     upper_95 = quantile(diff, 0.975),
-    p_gt_0 = mean(diff > 0),
-    p_lt_0 = mean(diff < 0),
-    sig = ifelse(lower_95 > 0 | upper_95 < 0, "yes", "no"),
+    p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
     .groups = "drop"
   )
 
 taxon_NS_summ %>%
-  filter(sig == "yes") %>%
+  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
+  filter(p_adj < 0.01) %>%
   mutate(greater = if_else(mean_diff > 0, "N", "S")) %>%
   group_by(dataset, Type, greater) %>%
   summarize(taxa = paste(taxon, collapse = ",")) %>%
-  arrange(Type, greater)
+  arrange(Type, greater) %>%
+  knitr::kable()
 ```
 
 ### Survey differences?
-```{r}
+```{r taxon_survey_diffs}
 # Ensure dataset is character so we can do < comparison
 draws_clean <- posterior_draws %>%
   mutate(dataset = as.character(dataset))
@@ -1054,17 +1068,23 @@ summary_contrasts <- pairwise_contrasts %>%
   summarize(mean_diff = mean(diff),
             lower = quantile(diff, 0.025),
             upper = quantile(diff, 0.975),
-            prob_diff = mean(diff > 0),
+            p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
             .groups = "drop")
 
-out <- summary_contrasts %>% 
-  filter(prob_diff < 0.01) %>%
-  arrange(taxon, Type, dir)
-out
+summary_contrasts %>% 
+  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
+  filter(p_adj < 0.01) %>%
+  arrange(taxon, Type, dir) %>%
+  knitr::kable()
 ```
 
-# Overall taxon differences among surveys
-```{r}
+COMBINE N AND S FOR THIS ANALYSIS BASED ON FEW DIFFS DETECTED EARLIER TO GAIN STATISTICAL POWER
+
+TEST IF SCTLD-SUSCEPTIBLE CORALS AGGREGATED SHOW SIG DIFFS ACROSS SURVEYS?
+
+
+## Overall taxon differences among surveys
+```{r taxon_overall_survey_diffs}
 # Proportion of transect area per dataset × Type × dir
 survey_weights <- dfftaxon %>%
   group_by(dataset, Type, dir) %>%
@@ -1099,19 +1119,20 @@ summary_overall <- pairwise_overall %>%
   summarize(mean_diff = mean(diff),
             lower = quantile(diff, 0.025),
             upper = quantile(diff, 0.975),
-            prob_diff = mean(diff > 0),
+            p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
             .groups = "drop")
 
 
 summary_overall %>%
-  filter(upper < 0 | lower > 0) %>%
-  print(n = nrow(.))
+  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
+  filter(p_adj < 0.01) %>%
+  knitr::kable()
 ```
 
 # Total corals in impact zones 
 
-## 4.1. Calculate area of each habitat type in each impact zone
-```{r, fig.width = 10, fig.height = 10}
+## Area of each habitat type in each impact zone
+```{r total_habitat_impactzones, fig.width = 10, fig.height = 10}
 impact_zones <- st_read("data/Impact_zones.kml") %>%
   st_zm(drop = TRUE, what = "ZM") %>%
   st_make_valid() %>%
@@ -1120,7 +1141,6 @@ impact_zones <- st_read("data/Impact_zones.kml") %>%
 impact_zones <- impact_zones %>%
   rename(ImpactZone = Name)  # or whatever column contains zone names
 
-library(ggplot2)
 
 impact_zones_plot <- impact_zones %>%
   mutate(linetype_group = "Impact Zone")
@@ -1171,8 +1191,14 @@ area_summary <- area_summary %>%
   summarize(total_area_m2 = sum(total_area_m2))
 ```
 
-## 4.2. Calculate total corals in each impact zone
-```{r}
+## Total corals in each impact zone
+
+Right now this does NOT differentiate N and S of the channel... This is because no significant differences based on direction were detected within any habitat in any dataset (except TT21 NRC, but this only had 2 sites N of channel, and they were right on the side of the channel...)
+
+
+BREAK DOWN TOTALS BY ADULT AND JUVENILE CORALS
+
+```{r total_impactzones}
 area_summary <- area_summary %>%
   mutate(ImpactZone = factor(ImpactZone, 
     levels = c("Channel", "Side Slopes", "Scenario 2, > 10 cm", "Scenario 2, 5.1-10 cm",
@@ -1207,7 +1233,7 @@ cumulative_zones <- seq_along(impact_levels) %>%
 
 
 
-cumulative_zones %>%
+p1 <- cumulative_zones %>%
   filter(zone_group == "z7") %>%
   pivot_longer(2:5, names_to = "dataset") %>%
   mutate(dataset = factor(dataset, levels = dataset_levels)) %>%
@@ -1216,7 +1242,22 @@ cumulative_zones %>%
   scale_fill_discrete(labels = dataset_labels) +
   labs(x = "", y = "Total corals", title = "Total corals in all impact zones, by habitat")
 
-cumulative_zones %>%
+# count sites per dataset/habitat type
+nsites <- selected %>%
+  count(Type, dataset) %>%
+  complete(Type, dataset, fill = list(n = 0)) %>%
+  mutate(dataset = factor(dataset, levels = dataset_levels))
+
+p1 +  geom_text(
+    data = nsites,
+    aes(x = Type, y = 0, label = n, group = dataset),
+    position = position_dodge(width = 0.9),
+    vjust = -1, size = 3
+  )
+
+
+
+p2 <- cumulative_zones %>%
   filter(zone_group == "z7") %>%
   pivot_longer(2:5, names_to = "dataset") %>%
   group_by(dataset) %>%
@@ -1226,5 +1267,16 @@ cumulative_zones %>%
   geom_col(position = position_dodge()) +
   scale_fill_discrete(labels = dataset_labels) +
   labs(x = "", y = "Total corals", title = "Total corals in all impact zones - all habitats")
+
+nsitest <- nsites %>%
+  group_by(dataset) %>%
+  summarize(n = sum(n))
+
+p2 +  geom_text(
+    data = nsitest,
+    aes(x = 1, y = 0, label = n, group = dataset),
+    position = position_dodge(width = 0.9),
+    vjust = -1, size = 3
+  )
 ```
 

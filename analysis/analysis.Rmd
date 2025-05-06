@@ -241,12 +241,6 @@ allsitemd.f %>%
 
 # Filter coral data for selected sites
 ```{r}
-
-
-
-
-
-
 # ----- FILTER CORAL DATA FOR JUST SELECTED SITES -- 
 # Combine all adult and juvenile count data with site metadata
 allcounts.f <- allcounts %>%
@@ -267,8 +261,6 @@ counts_long <- allcounts.f %>%
     values_to = "count"
   ) %>%
   drop_na(count)  # Drop missing values (taxa not searched for on a given transect, since zeros already assigned above for searched taxa)
-
-#write_csv(counts_long, "counts_long_full.csv")    # make sure NONFILTERED sites(above) to write full data to file
 ```
 
 # Count coral taxa and aggregate
