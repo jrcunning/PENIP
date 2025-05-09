@@ -22,6 +22,7 @@ library(xml2)
 library(tidyverse)
 library(tidybayes)
 library(brms)
+library(vegan)
 ```
 
 ```{r custom}
@@ -385,8 +386,6 @@ tt_counts_ag <- tt_counts_ag %>%
 write_csv(tt_counts_ag, file = "data/processed/tt_counts_ag.csv")
 ```
 
-
-
 ## 2024 Shedd Survey
 
 Shedd site metadata
@@ -692,7 +691,6 @@ df <- df %>%
   ))
 ```
 
-TEST IN SHEDD DATA WHETHER NRC SOUTH NEAR VS. FAR FROM CHANNEL ARE SIMILAR/DIFFERENT
 
 ## Filter by habitat
 
@@ -718,13 +716,90 @@ dff <- filter(df, site %in% selected$site) %>%
   left_join(allsitemd_clean)
 ```
 
-Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
+###### Shedd dataset has some sites in the NRC south that are further from the channel relative to other datasets. Are these similar enough to the NRC south sites that are closer to the channel that they can be reasonably included?
+
+First, look at total coral density between the nearer vs. farther sites
+
+```{r NRCS_density}
+drm_NRCS <- final_counts_ag %>%
+  left_join(allsitemd_clean) %>%
+  filter(Type == "Nearshore Ridge Complex", dir == "S")
+
+drm_NRCS <- drm_NRCS %>%
+  mutate(grp = if_else(latitude > 26.08, "near", "far"))
+
+# Fit a Negative Binomial GLM
+mod_nb <- MASS::glm.nb(n ~ grp, data = drm_NRCS)
+
+# Generate new data only for existing taxon-size class combinations
+newdata_1 <- drm_NRCS %>%
+  distinct(grp)
+
+# Get predicted values & standard errors (log scale)
+preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
+
+# Compute total coral density 
+results_nb <- newdata_1 %>%
+  mutate(
+    fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
+    fit_se = exp(preds_nb$fit) * preds_nb$se.fit,   # Convert SE using the Delta Method
+    fit_var = (fit * preds_nb$se.fit)^2,         # Variance propagation
+    fit_lower = exp(preds_nb$fit - 1.96 * preds_nb$se.fit),  # Lower CI
+    fit_upper = exp(preds_nb$fit + 1.96 * preds_nb$se.fit)   # Upper CI
+  )
+
+# Compute total coral density + confidence intervals
+total_ci_nb <- results_nb %>%
+  group_by(grp) %>%
+  summarize(
+    total_density = sum(fit),
+    total_se = sqrt(sum(fit_var)),
+    lower_95CI = exp(log(total_density) - 1.96 * (total_se / total_density)),
+    upper_95CI = exp(log(total_density) + 1.96 * (total_se / total_density))
+  )
+
+knitr::kable(total_ci_nb)
+
+```
+
+Next, look at community composition between the nearer vs. farther sites
+```{r NRCS_community_composition}
+
+# 1. Create a wide community matrix: rows = site x grp, columns = taxa
+comm_matrix <- drm_NRCS %>%
+  group_by(site, grp, taxon) %>%
+  summarize(total_n = sum(n), .groups = "drop") %>%
+  pivot_wider(names_from = taxon, values_from = total_n, values_fill = 0)
+
+# 2. Extract community matrix and metadata
+comm_data <- comm_matrix %>% select(-site, -grp)
+site_info <- comm_matrix %>% select(site, grp)
+
+# 3. Run NMDS (k = 2 dimensions is standard)
+set.seed(123)  # for reproducibility
+nmds <- metaMDS(comm_data, distance = "bray", k = 2, trymax = 100)
+
+# 4. Prepare data for plotting
+scores_df <- scores(nmds)$sites %>%
+  bind_cols(site_info)
+
+# 5. Plot NMDS with ggplot2
+ggplot(scores_df, aes(x = NMDS1, y = NMDS2, color = grp)) +
+  geom_point(size = 3, alpha = 0.8) +
+  theme_minimal() +
+  labs(title = "NMDS of Coral Community Structure\nby Dist from Channel in NRC South",
+       color = "Dist from channel")
+```
+
+Density and community composition are not different in the NRC S sites that are nearer vs. farther from the channel. So, no need to exclude the farther sites.
+
+
+###### DCA dataset has the most sites in the "Artificial" habitat classification. (Some in other datasets too, but DCA has most). Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
 
 'Artificial' is only present in DCA and minorly in TT -- but absent from Shedd.   
-
 It is in close spatial proximity to Nearshore Ridge Complex -- can these be combined?
 
-Test for differences in coral density in DCA survey
+Test for differences in coral density in DCA survey between habitat types
 ```{r artificial_vs_nrc_density}
 # Subset DCA data
 dcadf <- dca_counts_ag %>%
@@ -1078,7 +1153,7 @@ summary_contrasts %>%
   knitr::kable()
 ```
 
-COMBINE N AND S FOR THIS ANALYSIS BASED ON FEW DIFFS DETECTED EARLIER TO GAIN STATISTICAL POWER
+COMBINE N AND S FOR THIS ANALYSIS BASED ON FEW DIFFS DETECTED EARLIER TO GAIN STATISTICAL POWER?
 
 TEST IF SCTLD-SUSCEPTIBLE CORALS AGGREGATED SHOW SIG DIFFS ACROSS SURVEYS?
 
