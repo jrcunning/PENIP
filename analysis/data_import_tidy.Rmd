@@ -64,7 +64,7 @@ type_labels <- c("NRC", "IR", "MR", "OR", "APR")
 names(type_labels) <- type_levels
 
 # Order survey datasets
-dataset_levels <- c("dca", "tt21", "tt23", "drm24")
+dataset_levels <- c("dca17", "tt21", "tt23", "drm24")
 dataset_labels <- c("2017—DCA", "2021—TT", "2023—TT", "2024—Shedd")
 names(dataset_labels) <- dataset_levels
 ```
@@ -720,8 +720,8 @@ allsitemd <- bind_rows(.id = "dataset",
   nsu11_esa = nsu11_esa_sitemd,
   dca17_esa = dca17_esa_sitemd,
   dca17 = dca17_sitemd,
-  tt23 = tt23_sitemd,
   tt21 = tt21_sitemd,
+  tt23 = tt23_sitemd,
   drm24 = drm24_sitemd
 ) %>%
   mutate(dir = if_else(latitude > 26.093570, "N", "S"))
@@ -756,12 +756,17 @@ allsitemd_clean <- allsitemd %>%
   filter(!(Type == "Sand" & n() > 1)) %>%
   ungroup()
 
+# Add factor if survey was ESA coral species only
+allsitemd_clean <- allsitemd_clean %>%
+  mutate(ESAonly = if_else(dataset %in% c("nsu11_esa", "dca17_esa"), "ESA only", "All corals"))
+
 # Visualize habitat classifications
 polyplot <- polygons_clean %>% 
   #filter(Type != "Sand") %>%
   ggplot() +
   geom_sf(aes(fill = Type), color = "black", size = 0.2, alpha = 0.6) +
   scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  facet_wrap(~ESAonly) +
   theme_minimal() +
   labs(title = "Habitat Polygons Colored by Type", fill = "Type") +
   theme(legend.position = "right") +
@@ -770,11 +775,11 @@ polyplot <- polygons_clean %>%
 
 # Plot all surveyed sites
 polyplot + 
-  geom_point(data = allsitemd, 
+  geom_point(data = allsitemd_clean, 
              aes(x = longitude, y = latitude, shape = dataset), 
              inherit.aes = FALSE, alpha = 0.6) +
-  scale_shape_manual(values = c(2, 3, 4, 5)) +
-  labs("All sites - all surveys")
+  scale_shape_manual(values = c(2, 3, 4, 5, 6, 7)) +
+  labs(title = "All sites - all surveys")
 ```
 
 # Combine and filter data
@@ -810,6 +815,9 @@ df <- df %>%
     dataset == "tt23" ~ 20,     # TT23 belt transects were 20m
     dataset == "drm24" ~ 10,     # DRM belt transects were 10m)
     TRUE ~ transect_area_m2))
+
+# Remove surveys with transect_area_m2 == 0    (a couple of TT21 surveys were all sand)
+df <- df %>% filter(transect_area_m2 > 0)
 ```
 
 
@@ -826,15 +834,14 @@ polyplot +
   geom_point(data = selected, 
              aes(x = longitude, y = latitude, shape = dataset), 
              inherit.aes = FALSE, alpha = 0.6) +
-  scale_shape_manual(values = c(2, 3, 4, 5)) +
-  labs("Selected sites - all surveys")
+  scale_shape_manual(values = c(2, 3, 4, 5, 6, 7)) +
+  facet_wrap(~ESAonly) +
+  labs(title = "Selected sites - all surveys")
 
 
 # Filter dataset to just selected sites
-dff <- filter(df, site %in% selected$site) %>%
-  select(dataset, site, transect_num, transect_area_m2, taxon, class, n) %>%
-  droplevels() %>%
-  left_join(allsitemd_clean)
+dff <- df %>% inner_join(selected)
+
 ```
 
 ###### Shedd dataset has some sites in the NRC south that are further from the channel relative to other datasets. Are these similar enough to the NRC south sites that are closer to the channel that they can be reasonably included?
@@ -842,7 +849,7 @@ dff <- filter(df, site %in% selected$site) %>%
 First, look at total coral density between the nearer vs. farther sites
 
 ```{r NRCS_density}
-drm24_NRCS <- final_counts_ag %>%
+drm24_NRCS <- drm24_counts_ag %>%
   left_join(allsitemd_clean) %>%
   filter(Type == "Nearshore Ridge Complex", dir == "S")
 
@@ -923,7 +930,7 @@ It is in close spatial proximity to Nearshore Ridge Complex -- can these be comb
 Test for differences in coral density in DCA survey between habitat types
 ```{r artificial_vs_nrc_density}
 # Subset DCA data
-dcadf <- dca_counts_ag %>%
+dcadf <- dca17_counts_ag %>%
   left_join(allsitemd_clean) %>%
   filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Artificial", "Outer Reef", "Aggregated Patch Reef"))
 
@@ -1022,11 +1029,23 @@ Taxa with less than 5 total observations were filtered out, which included: HCUC
 
 # Map datasets
 ```{r plot_maps, fig.width = 10, fig.height = 10}
+(nsu11_esa_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "nsu11_esa"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2011 — NSU ESA Survey"))
+
+(dca17_esa_plot <- polyplot + 
+  geom_point(
+    data = filter(selected, dataset == "dca17_esa"),
+    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+  labs(title = "2017 — DCA ESA Survey"))
+
 (dca_plot <- polyplot + 
   geom_point(
-    data = filter(selected, dataset == "dca"),
+    data = filter(selected, dataset == "dca17"),
     aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2017 — DCA Survey"))
+  labs(title = "2017 — DCA RECON Survey"))
 
 (tt21_plot <- polyplot + 
   geom_point(
@@ -1055,8 +1074,13 @@ Taxa with less than 5 total observations were filtered out, which included: HCUC
 Predictors: dataset, habitat Type, direction from channel, taxon
 
 ```{r brms}
+# First, analyze surveys that included ALL corals (exclude ESA ONLY surveys)
+
+dff_alltaxa <- dff %>%
+  filter(!dataset %in% c("nsu11_esa", "dca17_esa"))
+
 # Get total counts for each taxon at each site
-dfftaxon <- dff %>% 
+dfftaxon <- dff_alltaxa %>% 
   group_by(dataset, Type, dir, site, transect_num, transect_area_m2, taxon) %>%
   summarize(n = sum(n)) %>%
   ungroup()
@@ -1076,12 +1100,12 @@ dfftaxon_trimmed <- dfftaxon %>%
 #   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
 #             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
 #             prior(exponential(1), class = "shape")),     # Reasonable prior for NB dispersion
-#   chains = 4,  
-#   cores = 4,  
-#   threads = threading(5),  
-#   iter = 1000, warmup = 500,  
-#   thin = 2,  
-#   control = list(adapt_delta = 0.9, max_treedepth = 12),  
+#   chains = 4,
+#   cores = 4,
+#   threads = threading(5),
+#   iter = 1000, warmup = 500,
+#   thin = 2,
+#   control = list(adapt_delta = 0.9, max_treedepth = 12),
 #   backend = "cmdstanr"
 # )
 # saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
@@ -1355,7 +1379,6 @@ summary_group_diffs %>%
   filter(p_adj < 0.05) %>%
   arrange(taxon_group, Type) %>%
   knitr::kable()
-
 ```
 
 
@@ -1578,3 +1601,4 @@ p2 +  geom_text(
   )
 ```
 
+# ESA SPECIES
