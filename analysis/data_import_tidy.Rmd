@@ -1509,7 +1509,7 @@ Right now this does NOT differentiate N and S of the channel... This is because 
 ```{r total_impactzones}
 # calc total density per dataset per habitat type, averaging across N and S
 # Compute and plot total coral abundance by dataset, habitat Type, and direction from channel
-# Step 1: Sum epred across taxon and class within each habitat Type and direction
+# Step 1: Sum epred across taxon and class within each dataset, habitat Type, and direction
 posterior_dir_totals <- posterior_draws %>%
   group_by(.draw, dataset, Type, dir) %>%
   summarize(dir_total = sum(.epred), .groups = "drop")
@@ -1530,9 +1530,7 @@ total_perType <- posterior_type_totals %>%
     .groups = "drop"
   )
 
-total_perType
-
-
+# Compute total abundances within impact zones
 totals <- left_join(total_perType, area_summary_allzones, by = "Type") %>%
   mutate(tot_estimate = fit_mean * total_area_m2,
          tot_lower = fit_lower * total_area_m2,
@@ -1598,60 +1596,39 @@ p2 +  geom_text(
 BREAK DOWN TOTALS BY ADULT AND JUVENILE CORALS
 
 ```{r}
-# Compute total predicted abundance by taxon/size
-total_abund_taxa <- posterior_draws %>%
-  group_by(.draw, dataset, Type, dir, taxon, class) %>% 
-  summarize(total_epred = sum(.epred), .groups = "drop") %>%
-  group_by(dataset, Type, dir, taxon, class) %>%
+# Compute total predicted abundance by dataset/habitat/taxon/size
+total_dens_taxa <- posterior_draws %>%
+  # Average across direction (pool N/S) within dataset/habitat Type/taxon/class
+  group_by(dataset, Type, taxon, class, .draw) %>%
+  summarize(epred_dir = mean(.epred)) %>%
+  # Summarize posterior draws
+  group_by(dataset, Type,  taxon, class) %>%
   summarize(
-    fit_mean = mean(total_epred),
-    fit_sd = sd(total_epred),
-    fit_lower = quantile(total_epred, 0.025),
-    fit_upper = quantile(total_epred, 0.975),
+    fit_mean = mean(epred_dir),
+    fit_sd = sd(epred_dir),
+    fit_lower = quantile(epred_dir, 0.025),
+    fit_upper = quantile(epred_dir, 0.975),
     .groups = "drop"
   )
 
-totals_taxa <- left_join(total_abund_taxa, area_summary, by = "Type") %>%
+# Compute total abundances in all impact zones
+totals_taxa <- left_join(total_dens_taxa, area_summary_allzones, by = "Type") %>%
   mutate(
     tot_estimate = fit_mean * total_area_m2,
     tot_lower = fit_lower * total_area_m2,
     tot_upper = fit_upper * total_area_m2
   ) %>%
   mutate(Type = factor(Type, levels = type_levels)) %>%
-  select(dataset, Type, ImpactZone, taxon, class, tot_estimate, tot_lower, tot_upper)
-
-cumulative_taxa <- seq_along(impact_levels) %>%
-  map_dfr(function(i) {
-    zone_subset <- impact_levels[1:i]
-
-    totals_taxa %>%
-      drop_na(dataset) %>%
-      filter(ImpactZone %in% zone_subset) %>%
-      group_by(dataset, Type, taxon, class) %>%
-      summarize(
-        tot   = sum(tot_estimate),
-        lower = sum(tot_lower),
-        upper = sum(tot_upper),
-        .groups = "drop"
-      ) %>%
-      mutate(zone_group = paste0("z", i))
-  })
-
-cumulative_taxa_complete <- cumulative_taxa %>%
-  filter(zone_group == "z7") %>%
-  complete(dataset, Type, taxon, class, fill = list(tot = 0, lower = NA, upper = NA))
-
-
-
+  select(dataset, Type, taxon, class, tot_estimate, tot_lower, tot_upper)
 
 
 # Collapse to size class only
-size_totals <- cumulative_taxa_complete %>%
+size_totals <- totals_taxa %>%
   group_by(dataset, class) %>%
   summarize(
-    tot = sum(tot, na.rm = TRUE),
-    lower = sum(lower, na.rm = TRUE),
-    upper = sum(upper, na.rm = TRUE),
+    tot = sum(tot_estimate, na.rm = TRUE),
+    lower = sum(tot_lower, na.rm = TRUE),
+    upper = sum(tot_upper, na.rm = TRUE),
     .groups = "drop"
   )
 
@@ -1664,192 +1641,10 @@ ggplot(size_totals, aes(x = class, y = tot, fill = dataset)) +
        title = "Total corals per size class across datasets") +
   scale_fill_discrete(labels = dataset_labels) +
   theme_minimal()
-
-
 ```
 
-```{r}
-library(waffle)  # devtools::install_github("hrbrmstr/waffle")
 
-# Collapse to total per taxon per dataset
-taxon_totals <- cumulative_taxa_complete %>%
-  group_by(dataset, taxon) %>%
-  summarize(tot = sum(tot, na.rm = TRUE), .groups = "drop")
-
-# Normalize within each dataset for relative abundance
-taxon_props <- taxon_totals %>%
-  group_by(dataset) %>%
-  mutate(prop = tot / sum(tot)) %>%
-  ungroup()
-
-tile_resolution <- 1000  # Each tile = 0.1%
-
-waffle_data_1000 <- taxon_props %>%
-  group_by(dataset, taxon) %>%
-  mutate(n_tiles = round(prop * tile_resolution)) %>%
-  ungroup() %>%
-  uncount(n_tiles) %>%
-  group_by(dataset) %>%
-  mutate(tile_id = row_number()) %>%
-  filter(tile_id <= tile_resolution) %>%  # enforce exactly 1000 tiles
-  mutate(
-    row = (tile_id - 1) %/% 40,  # 40 columns (25 rows)
-    col = (tile_id - 1) %% 40
-  )
-
-ggplot(waffle_data_1000, aes(x = col, y = -row, fill = taxon)) +
-  geom_tile(color = "white", size = 0.1) +
-  facet_wrap(~ dataset) +
-  scale_fill_manual(values = colorRampPalette(RColorBrewer::brewer.pal(8, "Set3"))(length(unique(waffle_data_1000$taxon)))) +
-  coord_equal() +
-  theme_void() +
-  labs(
-    title = "Taxon composition per dataset (each tile = 0.1%)",
-    fill = "Taxon"
-  )
-
-# WAFFLES WITH TOTAL COUNTS RATHER THAN PROPORTIONS
-tile_size <- 5000
-
-tile_data <- taxon_totals %>%
-  mutate(n_tiles = round(tot / tile_size)) %>%
-  filter(n_tiles > 0) %>%
-  uncount(n_tiles) %>%
-  group_by(dataset) %>%
-  mutate(tile_id = row_number()) %>%
-  mutate(
-    row = (tile_id - 1) %/% 40,  # 40 columns wide; ~square layout
-    col = (tile_id - 1) %% 40
-  )
-
-ggplot(tile_data, aes(x = col, y = -row, fill = taxon)) +
-  geom_tile(color = "white", size = 0.1) +
-  facet_grid(~ dataset, scales = "fixed") +
-  scale_fill_manual(
-    values = colorRampPalette(RColorBrewer::brewer.pal(8, "Set3"))(length(unique(tile_data$taxon)))
-  ) +
-  coord_equal() +
-  theme_void() +
-  theme(
-    legend.position = "bottom",
-    legend.box = "horizontal"
-  ) +
-  guides(
-    fill = guide_legend(nrow = 2, byrow = TRUE)  # adjust nrow if needed
-  ) +
-  labs(
-    title = "Absolute coral abundance per dataset (1 tile = 5,000 corals)",
-    fill = "Taxon"
-  )
-
-
-```
-
-waffle plot by taxon and size class
-```{r}
-library(tidyverse)
-library(RColorBrewer)
-library(colorspace)
-
-# STEP 1: Aggregate total coral abundance by dataset, taxon, and class
-tile_base <- cumulative_taxa_complete %>%
-  group_by(dataset, taxon, class) %>%
-  summarize(tot = sum(tot, na.rm = TRUE), .groups = "drop") %>%
-  filter(tot > 0)
-
-# STEP 2: Choose tile size and create tile rows
-tile_size <- 5000  # 1 tile = 5,000 corals
-
-tile_data <- tile_base %>%
-  mutate(n_tiles = round(tot / tile_size)) %>%
-  filter(n_tiles > 0) %>%
-  uncount(n_tiles) %>%
-  group_by(dataset) %>%
-  mutate(tile_id = row_number()) %>%
-  mutate(
-    row = (tile_id - 1) %/% 40,
-    col = (tile_id - 1) %% 40,
-    taxon_class = interaction(taxon, class, sep = "_")  # unique ID for color mapping
-  )
-
-# Step 1: Get taxon list
-taxa <- sort(unique(tile_data$taxon))
-n_taxa <- length(taxa)  # should be 16
-
-# Step 2: Use a palette that supports 16+ visually distinct colors
-base_colors <- colorRampPalette(brewer.pal(12, "Set3"))(n_taxa)
-names(base_colors) <- taxa
-
-# Step 3: Define mild light/dark variation per class
-get_shades <- function(color) {
-  unname(c(lighten(color, 0.03), darken(color, 0.03)))  # now guaranteed clean
-}
-
-class_levels <- sort(unique(tile_data$class))  # e.g., "small", "large"
-
-shade_colors <- map_dfr(seq_along(taxa), function(i) {
-  this_taxon <- taxa[[i]]
-  this_color <- base_colors[[this_taxon]]
-  
-  tibble(
-    taxon = rep(this_taxon, 2),
-    class = class_levels,
-    color = get_shades(this_color)
-  )
-}) %>%
-  mutate(taxon_class = paste(taxon, class, sep = "_"))
-
-
-
-
-# Step 5: Create named vector
-color_vec <- setNames(shade_colors$color, shade_colors$taxon_class)
-
-
-
-
-waffle_plot <- ggplot(tile_data, aes(x = col, y = -row, fill = taxon_class)) +
-  geom_tile(color = "white", size = 0.1) +
-  facet_grid(~ dataset, scales = "fixed") +
-  scale_fill_manual(values = color_vec) +
-  coord_equal() +
-  theme_void() +
-  theme(legend.position = "none") +
-  labs(
-    title = "Absolute coral abundance by taxon and size class (1 tile = 5,000 corals)"
-  )
-
-
-
-
-# Create legend dataframe: one row per taxon × size class
-legend_df <- shade_colors %>%
-  mutate(
-    size_label = ifelse(class == class_levels[1], "Small", "Large"),
-    row = match(taxon, taxa),
-    col = ifelse(size_label == "Large", 1, 2)  # col 1 = large, col 2 = small
-  )
-# Plot the legend using geom_tile
-legend_plot <- ggplot(legend_df, aes(x = col, y = -row, fill = color)) +
-  geom_tile(color = "white", width = 0.9, height = 0.9) +
-  scale_fill_identity() +
-  # Taxon names next to the row
-  geom_text(aes(x = 2.6, label = taxon), hjust = 0, size = 3.5) +
-  # Column labels at the top
-  annotate("text", x = 1, y = 1.5, label = "Large", size = 4.5, fontface = "bold") +
-  annotate("text", x = 2, y = 1.5, label = "Small", size = 4.5, fontface = "bold") +
-  coord_fixed() +
-  theme_void() +
-  theme(
-    plot.margin = margin(10, 10, 10, 10)
-  ) +
-  labs(title = "Taxon and Size Class Legend")
-
-
-waffle_plot + legend_plot + plot_layout(widths = c(4, 1))
-```
-
-# size class represented by different tile size
+# size class represented by dots
 ```{r}
 library(tidyverse)
 library(RColorBrewer)
@@ -1891,36 +1686,6 @@ tile_data <- tile_base %>%
 n_taxa <- length(taxa)
 base_colors <- colorRampPalette(brewer.pal(12, "Set3"))(n_taxa)
 names(base_colors) <- taxa
-
-# STEP 6: Assign tile size by class
-tile_data <- tile_data %>%
-  mutate(
-    tile_width = ifelse(class == "<4cm", 0.85, 0.95),
-    tile_height = ifelse(class == "<4cm", 0.85, 0.95)
-  )
-
-# STEP 7: Plot
-ggplot(tile_data, aes(x = col, y = -row, fill = taxon)) +
-  geom_tile(aes(width = tile_width, height = tile_height), color = "white", linewidth = 0.1) +
-  facet_grid(~ dataset, scales = "fixed") +
-  scale_fill_manual(values = base_colors) +
-  coord_equal() +
-  theme_void() +
-  theme(
-    legend.position = "bottom",
-    legend.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    legend.box = "horizontal"
-  ) +
-  guides(
-    fill = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")
-  ) +
-  labs(
-    title = "Absolute coral abundance by taxon and size class (1 tile = 5,000 corals)",
-    fill = "Taxon",
-    caption = "Smaller tiles = smaller corals (<4cm); larger tiles = >4cm"
-  )
-
 
 
 # STEP 7: Plot
