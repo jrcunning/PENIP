@@ -1431,64 +1431,127 @@ summary_overall %>%
 
 # Total corals in impact zones 
 
-## Area of each habitat type in each impact zone
-```{r total_habitat_impactzones, fig.width = 10, fig.height = 10}
-impact_zones <- st_read("data/Impact_zones.kml") %>%
-  st_zm(drop = TRUE, what = "ZM") %>%
-  st_make_valid() %>%
-  st_transform(st_crs(polygons_clean))
+## Import Scenario 2 impact zones and NMFS consideration areas
+```{r}
+# Impact zone Scenario 2
+# Get all layer names
+layers <- st_layers("data/Impact_zones_Scenario 2.kml")$name
 
-impact_zones <- impact_zones %>%
-  rename(ImpactZone = Name)  # or whatever column contains zone names
+# Initialize a list to store polygon names and geometries
+impact_zones_data <- list()
+
+# Loop through each layer
+for (layer_name in layers) {
+  cat("Reading layer:", layer_name, "\n")
+  
+  # Read the layer
+  layer_data <- st_read("data/Impact_zones_Scenario 2.kml", layer = layer_name, quiet = TRUE)
+  
+  # Extract names and geometries
+  impact_zones_data[[layer_name]] <- data.frame(
+    layer = layer_name,
+    name = layer_data$Name,
+    geometry = st_geometry(layer_data)
+  )
+}
+
+# Combine all data into a single dataframe
+impact_zones_df <- bind_rows(impact_zones_data)
+
+# View the result
+print(impact_zones_df)
+
+# Recreate sf object from dataframe
+impact_zones_sf <- st_sf(impact_zones_df, crs = st_crs(polygons_clean))
+
+# Remove Z dimension
+impact_zones_2d <- st_zm(impact_zones_sf, drop = TRUE, what = "ZM")
+
+# Check validity and fix if needed
+impact_zones_valid <- st_make_valid(impact_zones_2d)
+
+# NMFS Consideration areas
+nmfs_areas <- st_read("data/Scenario2_NMFSConsiderationAreas.kml", quiet = TRUE)
+nmfs_areas_2d <- st_zm(nmfs_areas, drop = TRUE, what = "ZM")
+nmfs_areas_valid <- st_make_valid(nmfs_areas_2d)
 
 
-impact_zones_plot <- impact_zones %>%
-  mutate(linetype_group = "Impact Zone")
 
 ggplot() +
   # Habitat polygons
   geom_sf(data = polygons_clean, aes(fill = Type), color = "black", size = 0.2, alpha = 0.6) +
   
-  # Impact zones with dummy linetype for legend
-  geom_sf(data = impact_zones_plot, aes(linetype = linetype_group), 
-          fill = NA, color = "black", linewidth = 0.6, show.legend = TRUE) +
+  # Impact zones (dashed lines)
+  geom_sf(
+    data = impact_zones_valid,
+    fill = NA,
+    color = "black",
+    linewidth = 0.6,
+    linetype = "dashed"
+  ) +
   
-  # Color scales
+  # NMFS consideration areas (solid lines, different color)
+  geom_sf(
+    data = nmfs_areas_valid,
+    fill = NA,
+    color = "blue",
+    linewidth = 0.8,
+    linetype = "solid"
+  ) +
+  
+  # Color scales and theme
   scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-  scale_linetype_manual(name = "", values = c("Impact Zone" = "dashed")) +
-  
-  # Theme and layout
   theme_minimal() +
-  labs(title = "Habitat Polygons within Impact Zones", fill = "Type") +
+  labs(title = "Habitat, Impact Zones, and NMFS Consideration Areas", fill = "Type") +
   theme(legend.position = "right") +
+  
+  # Coordinate limits
   xlim(-80.11, -80.079) +
   ylim(26.08, 26.11)
 
 
+# Combine scenario 2 impact zones with nmfs consideration areas
+# Instead of selecting name (which is blank), keep the 'layer' column as the zone name
+impact_zones_valid <- impact_zones_valid %>%
+  mutate(name = layer) %>%   # set 'name' to the layer name
+  select(name, geometry)
+nmfs_areas_valid <- nmfs_areas_valid %>%
+  select(name = Name, geometry)
 
 
-# Spatial intersection of habitat polygons with impact zones
-habitat_in_zones <- st_intersection(polygons_clean, impact_zones)
+
+# Combine all zone polygons into a single object
+all_zones <- rbind(impact_zones_valid, nmfs_areas_valid)
+
+unique(all_zones$name)
 
 
-# Use a projected CRS for accurate area (e.g., UTM Zone 17N for South Florida)
+```
+
+
+## Area of each habitat type in each impact zone
+```{r}
+# Intersect with habitat polygons
+habitat_in_zones <- st_intersection(polygons_clean, all_zones)
+
+# Project for accurate area
 habitat_in_zones_proj <- habitat_in_zones %>%
   st_transform(32617) %>%
   mutate(area_m2 = st_area(geometry))
 
-
-# Adjust column names depending on your Impact Zones KML
+# Summarize area by habitat type and zone name
 area_summary <- habitat_in_zones_proj %>%
   st_drop_geometry() %>%
-  group_by(Type, ImpactZone) %>%
+  group_by(Type, name) %>%
   summarize(total_area_m2 = sum(as.numeric(area_m2)), .groups = "drop")
 
-
-area_summary[area_summary$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
-
+# Drop habitat areas/polygons that did not intersect with any of the impact zones/consideration areas
 area_summary <- area_summary %>%
-  group_by(Type, ImpactZone) %>%
-  summarize(total_area_m2 = sum(total_area_m2))
+  filter(name != "")
+
+
+print(area_summary)
+
 ```
 
 ## Total corals in each impact zone
