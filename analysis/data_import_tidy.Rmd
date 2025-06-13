@@ -1433,97 +1433,139 @@ summary_overall %>%
 
 ## Import Scenario 2 impact zones and NMFS consideration areas
 ```{r}
-# Impact zone Scenario 2
-# Get all layer names
-layers <- st_layers("data/Impact_zones_Scenario 2.kml")$name
+# Impact zone Scenario 2 and NMFS consideration areas
+# Define the extraction function once
+extract_placemark_info <- function(kml_file, source_label) {
+  ns <- c(kml = "http://www.opengis.net/kml/2.2")
+  kml <- read_xml(kml_file)
+  placemarks <- xml_find_all(kml, ".//kml:Placemark", ns)
 
-# Initialize a list to store polygon names and geometries
-impact_zones_data <- list()
+  map(placemarks, function(pm) {
+    name <- xml_text(xml_find_first(pm, ".//kml:name", ns))
+    coords_text <- xml_text(xml_find_first(pm, ".//kml:coordinates", ns))
+    folder <- xml_text(xml_find_first(xml_parent(xml_parent(pm)), ".//kml:name", ns))
 
-# Loop through each layer
-for (layer_name in layers) {
-  cat("Reading layer:", layer_name, "\n")
-  
-  # Read the layer
-  layer_data <- st_read("data/Impact_zones_Scenario 2.kml", layer = layer_name, quiet = TRUE)
-  
-  # Extract names and geometries
-  impact_zones_data[[layer_name]] <- data.frame(
-    layer = layer_name,
-    name = layer_data$Name,
-    geometry = st_geometry(layer_data)
-  )
+    coords <- strsplit(trimws(coords_text), "\\s+")[[1]]
+    coords_mat <- do.call(rbind, lapply(coords, function(x) {
+      as.numeric(strsplit(x, ",")[[1]][1:2])
+    }))
+
+    if (nrow(coords_mat) >= 3) {
+      poly <- list(st_polygon(list(coords_mat)))
+      tibble(folder = folder, name = name, geometry = st_sfc(poly, crs = 4326), source = source_label)
+    } else {
+      NULL
+    }
+  }) %>%
+    compact() %>%
+    bind_rows() %>%
+    st_as_sf()
 }
 
-# Combine all data into a single dataframe
-impact_zones_df <- bind_rows(impact_zones_data)
+# File paths
+impact_kml <- "data/Impact_zones_Scenario 2.kml"
+nmfs_kml <- "data/Scenario2_NMFSConsiderationAreas.kml"
 
-# View the result
-print(impact_zones_df)
+# Extract and label
+impact_zones_sf <- extract_placemark_info(impact_kml, "Impact Zone")
+nmfs_sf <- extract_placemark_info(nmfs_kml, "NMFS Consideration Area")
 
-# Recreate sf object from dataframe
-impact_zones_sf <- st_sf(impact_zones_df, crs = st_crs(polygons_clean))
+# Combine
+all_zones_sf <- bind_rows(impact_zones_sf, nmfs_sf)
 
-# Remove Z dimension
-impact_zones_2d <- st_zm(impact_zones_sf, drop = TRUE, what = "ZM")
+# Rename polygons based on zone folder
+all_zones_sf <- all_zones_sf %>%
+  mutate(
+    name = if_else(
+      is.na(name) | name == "",
+      str_remove(str_remove(folder, "^Scenario_2_"), "\\.shp$"),
+      name
+    ),
+    scenario = "Scenario 2 + NMFS Consideration Areas"
+  )
 
-# Check validity and fix if needed
-impact_zones_valid <- st_make_valid(impact_zones_2d)
+# Create new polygon covering full monitoring area, from 1.2 km N to 1.2 km S of the channel
 
-# NMFS Consideration areas
-nmfs_areas <- st_read("data/Scenario2_NMFSConsiderationAreas.kml", quiet = TRUE)
-nmfs_areas_2d <- st_zm(nmfs_areas, drop = TRUE, what = "ZM")
-nmfs_areas_valid <- st_make_valid(nmfs_areas_2d)
+# 1. Extract the 'Channel' polygon
+channel_poly <- all_zones_sf %>%
+  filter(str_detect(tolower(name), "channel"))
+
+# 2. Transform all relevant layers to UTM (meters) for buffering
+utm_crs <- 32617  # UTM Zone 17N — suitable for SE Florida
+
+if (st_is_longlat(channel_poly)) {
+  channel_poly <- st_transform(channel_poly, utm_crs)
+  polygons_clean_m <- st_transform(polygons_clean, utm_crs)
+  all_zones_sf_m <- st_transform(all_zones_sf, utm_crs)
+} else {
+  polygons_clean_m <- polygons_clean
+  all_zones_sf_m <- all_zones_sf
+}
+
+# 3. Get midpoint of channel (north-south)
+bbox_channel <- st_bbox(channel_poly)
+channel_mid_y <- (bbox_channel["ymin"] + bbox_channel["ymax"]) / 2
+
+# 4. Define rectangular box: full E-W extent of reef habitat, ±1.2 km N/S of channel
+ew_range <- st_bbox(polygons_clean_m)[c("xmin", "xmax")]
+ns_range <- c(channel_mid_y - 1200, channel_mid_y + 1200)
+names(ns_range) <- c("ymin", "ymax")
+
+new_box <- st_as_sfc(st_bbox(c(
+  xmin = ew_range[[1]],
+  xmax = ew_range[[2]],
+  ymin = ns_range[[1]],
+  ymax = ns_range[[2]]
+), crs = st_crs(polygons_clean_m)))
+
+# 5. Clip the box to reef habitat
+intersected_box <- st_union(st_intersection(new_box, st_union(polygons_clean_m)))
+
+# 6. Subtract all existing zones (Impact + NMFS) by taking concave hull
+# 6. Create a tight, shrink-wrapped outer boundary around all existing zones
+existing_zone_hull <- all_zones_sf_m %>%
+  st_union() %>%
+  st_buffer(40) %>%     # Buffer OUTWARD 40 meters to close gaps (adjust as needed)
+  st_union() %>%
+  st_buffer(-40)        # Buffer INWARD to return to approximate original size
+
+# 7. Subtract existing zones from monitoring area
+new_zone_geom <- st_difference(intersected_box, existing_zone_hull)
+
+# 8. Build the new polygon row
+new_zone <- st_sf(
+  folder = "Generated",
+  name = "Full Monitoring Area",
+  scenario = "Full Monitoring Area",
+  geometry = st_sfc(new_zone_geom),
+  source = "Impact Zone",
+  crs = st_crs(polygons_clean_m)
+)
+
+# 9. Transform back to match original CRS (likely WGS84)
+if (st_crs(new_zone) != st_crs(all_zones_sf)) {
+  new_zone <- st_transform(new_zone, st_crs(all_zones_sf))
+}
+
+# 10. Add the new zone to the combined zones object
+all_zones_sf <- bind_rows(all_zones_sf, new_zone)
 
 
-
+# Plot all zones
 ggplot() +
-  # Habitat polygons
-  geom_sf(data = polygons_clean, aes(fill = Type), color = "black", size = 0.2, alpha = 0.6) +
+  # Habitat polygons layer
+  geom_sf(data = polygons_clean, color = "black", size = 0.2, alpha = 0.4, linewidth = 0.1) +
   
-  # Impact zones (dashed lines)
-  geom_sf(
-    data = impact_zones_valid,
-    fill = NA,
-    color = "black",
-    linewidth = 0.6,
-    linetype = "dashed"
-  ) +
-  
-  # NMFS consideration areas (solid lines, different color)
-  geom_sf(
-    data = nmfs_areas_valid,
-    fill = NA,
-    color = "blue",
-    linewidth = 0.8,
-    linetype = "solid"
-  ) +
-  
-  # Color scales and theme
-  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-  theme_minimal() +
-  labs(title = "Habitat, Impact Zones, and NMFS Consideration Areas", fill = "Type") +
-  theme(legend.position = "right") +
-  
-  # Coordinate limits
+  # Impact/NMFS zones overlay
+  geom_sf(data = all_zones_sf, aes(color = scenario), fill = NA, linewidth = 0.5, alpha = 0.2) +
+
+  # Map extent
   xlim(-80.11, -80.079) +
-  ylim(26.08, 26.11)
-
-
-# Combine scenario 2 impact zones with nmfs consideration areas
-# Instead of selecting name (which is blank), keep the 'layer' column as the zone name
-impact_zones_valid <- impact_zones_valid %>%
-  mutate(name = layer) %>%   # set 'name' to the layer name
-  select(name, geometry)
-nmfs_areas_valid <- nmfs_areas_valid %>%
-  select(name = Name, geometry)
-
-
-
-# Combine all zone polygons into a single object
-all_zones <- rbind(impact_zones_valid, nmfs_areas_valid)
-
-unique(all_zones$name)
+  ylim(26.08, 26.11) +
+  
+  theme_minimal() +
+  guides(fill = guide_legend(title = "Habitat Type"),
+         color = guide_legend(title = "Zone Type"))
 
 
 ```
@@ -1531,8 +1573,17 @@ unique(all_zones$name)
 
 ## Area of each habitat type in each impact zone
 ```{r}
+# Set order of zone levels
+zone_levels <- c("Channel", "Side Slopes", "Depth_10cm", "Depth_5cm", "Depth_1cm", "Depth_0_5cm", "Depth_0_1cm",
+                 "Nearshore", "North", "East", "South", "Full Monitoring Area")
+
+# Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons
+polygons_filtered <- polygons_clean %>%
+  mutate(Type = if_else(Type == "Artificial", "Nearshore Ridge Complex", Type)) %>%
+  filter(Type %in% type_levels)
+
 # Intersect with habitat polygons
-habitat_in_zones <- st_intersection(polygons_clean, all_zones)
+habitat_in_zones <- st_intersection(polygons_filtered, all_zones_sf)
 
 # Project for accurate area
 habitat_in_zones_proj <- habitat_in_zones %>%
@@ -1542,22 +1593,26 @@ habitat_in_zones_proj <- habitat_in_zones %>%
 # Summarize area by habitat type and zone name
 area_summary <- habitat_in_zones_proj %>%
   st_drop_geometry() %>%
+  mutate(name = factor(name, levels = zone_levels),
+         Type = factor(Type, levels = type_levels)) %>%
   group_by(Type, name) %>%
+  summarize(total_area_m2 = sum(as.numeric(area_m2)), .groups = "drop") %>%
+  arrange(name)
+
+# Print total area of each habitat in each impact zone
+area_summary %>% 
+  pivot_wider(names_from = name, values_from = total_area_m2, names_sort = FALSE)
+
+# Combine for full Scenario2+NMFS, and full monitoring area
+area_summary2 <- habitat_in_zones_proj %>%
+  st_drop_geometry() %>%
+  mutate(Type = factor(Type, levels = type_levels)) %>%
+  group_by(Type, scenario) %>%
   summarize(total_area_m2 = sum(as.numeric(area_m2)), .groups = "drop")
 
-# Drop habitat areas/polygons that did not intersect with any of the impact zones/consideration areas
-area_summary <- area_summary %>%
-  filter(name != "")
+area_summary2 %>% 
+  pivot_wider(names_from = scenario, values_from = total_area_m2)
 
-
-print(area_summary)
-
-
-
-# Total habitat Type area in ALL impact zones
-area_summary_allzones <- area_summary %>%
-  group_by(Type) %>%
-  summarize(total_area_m2 = sum(total_area_m2))
 ```
 
 ## Total corals in each impact zone
@@ -1590,7 +1645,7 @@ total_perType <- posterior_type_totals %>%
   )
 
 # Compute total abundances within impact zones
-totals <- left_join(total_perType, area_summary_allzones, by = "Type") %>%
+totals <- left_join(total_perType, area_summary, by = "Type") %>%
   mutate(tot_estimate = fit_mean * total_area_m2,
          tot_lower = fit_lower * total_area_m2,
          tot_upper = fit_upper * total_area_m2) %>%
@@ -1598,32 +1653,23 @@ totals <- left_join(total_perType, area_summary_allzones, by = "Type") %>%
 
 # Step 2: Add missing combinations as NA rows
 totals <- totals %>%
-  complete(dataset, Type, fill = list(tot_estimate = NA, tot_lower = NA, tot_upper = NA))
+  complete(dataset, Type, fill = list(tot_estimate = NA, tot_lower = NA, tot_upper = NA)) %>%
+  mutate(name = factor(name, levels = zone_levels))
 
 # Step 3: Plot
-p1 <- ggplot(totals, aes(x = Type, y = tot_estimate, fill = dataset)) +
-  geom_col(position = position_dodge(width = 0.9)) +
-  geom_errorbar(aes(ymin = tot_lower, ymax = tot_upper),
-                position = position_dodge(width = 0.9), width = 0.2) +
-  scale_fill_discrete(labels = dataset_labels) +
+p1 <- ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
+  facet_grid(~Type) +
+  geom_col(position = position_stack()) +
+  # geom_errorbar(aes(ymin = tot_lower, ymax = tot_upper),
+  #               position = position_dodge(width = 0.9), width = 0.2) +
+  scale_fill_brewer(palette = "Set3") +
   labs(x = "Habitat Type",
        y = "Total corals",
        title = "Total corals in all impact zones, by habitat") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+p1
 
-# count sites per dataset/habitat type
-nsites <- dff_alltaxa %>%
-  distinct(dataset, site, Type) %>%
-  count(Type, dataset) %>%
-  complete(Type, dataset, fill = list(n = 0)) %>%
-  mutate(dataset = factor(dataset, levels = dataset_levels))
 
-p1 + geom_text(
-    data = nsites,
-    aes(x = Type, y = 0, label = n, group = dataset),
-    position = position_dodge(width = 0.9),
-    vjust = -1, size = 3
-  )
 
 
 
