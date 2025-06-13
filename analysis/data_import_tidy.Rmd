@@ -1067,7 +1067,7 @@ Taxa with less than 5 total observations were filtered out, which included: HCUC
 ```
 
 
-# Analyze coral density 
+# Coral densities - by dataset
 
 ## Fit Bayesian negative binomial model
 
@@ -1075,7 +1075,6 @@ Predictors: dataset, habitat Type, direction from channel, taxon
 
 ```{r brms}
 # First, analyze surveys that included ALL corals (exclude ESA ONLY surveys)
-
 dff_alltaxa <- dff %>%
   filter(!dataset %in% c("nsu11_esa", "dca17_esa"))
 
@@ -1090,6 +1089,8 @@ dfftaxon_trimmed <- dfftaxon %>%
   group_by(dataset, Type, dir, taxon, class) %>%
   filter(any(n > 0)) %>%
   ungroup()
+
+
 
 # SUPER MODEL
 
@@ -1175,6 +1176,8 @@ total_NS_summ %>%
   filter(p_adj < 0.01) %>%
   knitr::kable()
 ```
+
+North-south differences within a habitat type within a survey show almost no differences. TT21 NRC is different N vs. S but barely had any N sites so we can discount that. Otherwise, DCA17 showed a slight N-S difference on the Outer Reef, and TT23 should a slight N-S difference on the NRC. All other habitats in all surveys showed no N-S differences in coral density.
 
 ### Survey differences?
 ```{r total_density_survey_diffs}
@@ -1484,7 +1487,7 @@ all_zones_sf <- all_zones_sf %>%
     scenario = "Scenario 2 + NMFS Consideration Areas"
   )
 
-# Create new polygon covering full monitoring area, from 1.2 km N to 1.2 km S of the channel
+# Create new polygon covering Rest of Monitoring Area, from 1.2 km N to 1.2 km S of the channel
 
 # 1. Extract the 'Channel' polygon
 channel_poly <- all_zones_sf %>%
@@ -1535,8 +1538,8 @@ new_zone_geom <- st_difference(intersected_box, existing_zone_hull)
 # 8. Build the new polygon row
 new_zone <- st_sf(
   folder = "Generated",
-  name = "Full Monitoring Area",
-  scenario = "Full Monitoring Area",
+  name = "Rest of Monitoring Area",
+  scenario = "Rest of Monitoring Area",
   geometry = st_sfc(new_zone_geom),
   source = "Impact Zone",
   crs = st_crs(polygons_clean_m)
@@ -1575,7 +1578,7 @@ ggplot() +
 ```{r}
 # Set order of zone levels
 zone_levels <- c("Channel", "Side Slopes", "Depth_10cm", "Depth_5cm", "Depth_1cm", "Depth_0_5cm", "Depth_0_1cm",
-                 "Nearshore", "North", "East", "South", "Full Monitoring Area")
+                 "Nearshore", "North", "East", "South", "Rest of Monitoring Area")
 
 # Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons
 polygons_filtered <- polygons_clean %>%
@@ -1603,7 +1606,7 @@ area_summary <- habitat_in_zones_proj %>%
 area_summary %>% 
   pivot_wider(names_from = name, values_from = total_area_m2, names_sort = FALSE)
 
-# Combine for full Scenario2+NMFS, and full monitoring area
+# Combine for full Scenario2+NMFS, and Rest of Monitoring Area
 area_summary2 <- habitat_in_zones_proj %>%
   st_drop_geometry() %>%
   mutate(Type = factor(Type, levels = type_levels)) %>%
@@ -1686,509 +1689,284 @@ p2 <- totals %>%
   scale_fill_discrete(labels = dataset_labels) +
   labs(x = "", y = "Total corals", title = "Total corals in all impact zones - all habitats")
 
-nsitest <- nsites %>%
-  group_by(dataset) %>%
-  summarize(n = sum(n))
 
-p2 +  geom_text(
-    data = nsitest,
-    aes(x = 1, y = 0, label = n, group = dataset),
-    position = position_dodge(width = 0.9),
-    vjust = -1, size = 3
-  )
+p2
+
 ```
 
-BREAK DOWN TOTALS BY ADULT AND JUVENILE CORALS
 
+# Coral densities - across datasets, with zero-inflated negbin model
 ```{r}
-# Compute total predicted abundance by dataset/habitat/taxon/size
-total_dens_taxa <- posterior_draws %>%
-  # Average across direction (pool N/S) within dataset/habitat Type/taxon/class
-  group_by(dataset, Type, taxon, class, .draw) %>%
-  summarize(epred_dir = mean(.epred)) %>%
-  # Summarize posterior draws
-  group_by(dataset, Type,  taxon, class) %>%
-  summarize(
-    fit_mean = mean(epred_dir),
-    fit_sd = sd(epred_dir),
-    fit_lower = quantile(epred_dir, 0.025),
-    fit_upper = quantile(epred_dir, 0.975),
-    .groups = "drop"
-  )
+# 🎯 Goal
+# 
+# Estimate: density of taxon × class within each habitat Type
+# ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
+# with zero-inflation that varies per taxon*class
 
-# Compute total abundances in all impact zones
-totals_taxa <- left_join(total_dens_taxa, area_summary_allzones, by = "Type") %>%
-  mutate(
-    tot_estimate = fit_mean * total_area_m2,
-    tot_lower = fit_lower * total_area_m2,
-    tot_upper = fit_upper * total_area_m2
-  ) %>%
-  mutate(Type = factor(Type, levels = type_levels)) %>%
-  select(dataset, Type, taxon, class, tot_estimate, tot_lower, tot_upper)
-
-
-# Collapse to size class only
-size_totals <- totals_taxa %>%
-  group_by(dataset, class) %>%
-  summarize(
-    tot = sum(tot_estimate, na.rm = TRUE),
-    lower = sum(tot_lower, na.rm = TRUE),
-    upper = sum(tot_upper, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# Plot
-ggplot(size_totals, aes(x = class, y = tot, fill = dataset)) +
-  geom_col(position = position_dodge(width = 0.9)) +
-  geom_errorbar(aes(ymin = lower, ymax = upper),
-                position = position_dodge(width = 0.9), width = 0.2) +
-  labs(x = "Size class", y = "Total corals",
-       title = "Total corals per size class across datasets") +
-  scale_fill_discrete(labels = dataset_labels) +
-  theme_minimal()
-```
-
-
-# size class represented by dots
-```{r}
-library(tidyverse)
-library(RColorBrewer)
-library(colorspace)
-
-# STEP 1: Summarize posterior predictions by dataset, Type, dir, taxon, class
-total_abund_taxa <- posterior_draws %>%
-  group_by(.draw, dataset, Type, dir, taxon, class) %>%
-  summarize(total_epred = sum(.epred), .groups = "drop") %>%
-  group_by(dataset, Type, dir, taxon, class) %>%
-  summarize(
-    fit_mean = mean(total_epred),
-    fit_lower = quantile(total_epred, 0.025),
-    fit_upper = quantile(total_epred, 0.975),
-    .groups = "drop"
-  )
-
-# STEP 2: Multiply by habitat area to get total abundance
-totals_taxa <- total_abund_taxa %>%
-  left_join(area_summary, by = "Type") %>%
-  mutate(
-    tot_estimate = fit_mean * total_area_m2,
-    tot_lower = fit_lower * total_area_m2,
-    tot_upper = fit_upper * total_area_m2
-  ) %>%
-  select(dataset, Type, ImpactZone, taxon, class, tot_estimate, tot_lower, tot_upper)
-
-# STEP 3: Sum across cumulative impact zones
-cumulative_taxa <- seq_along(impact_levels) %>%
-  map_dfr(function(i) {
-    totals_taxa %>%
-      filter(ImpactZone %in% impact_levels[1:i]) %>%
-      group_by(dataset, Type, taxon, class) %>%
-      summarize(
-        tot = sum(tot_estimate),
-        lower = sum(tot_lower),
-        upper = sum(tot_upper),
-        .groups = "drop"
-      ) %>%
-      mutate(zone_group = paste0("z", i))
-  })
-
-# STEP 4: Keep only final cumulative total (z7)
-cumulative_taxa_complete <- cumulative_taxa %>%
-  filter(zone_group == paste0("z", length(impact_levels))) %>%
-  complete(dataset, Type, taxon, class, fill = list(tot = 0, lower = NA, upper = NA))
-
-# STEP 5: Create tiles
-tile_size <- 5000
-
-tile_data <- cumulative_taxa_complete %>%
-  mutate(n_tiles = round(tot / tile_size)) %>%
-  filter(n_tiles > 0) %>%
-  uncount(n_tiles) %>%
-  mutate(
-    class = factor(class, levels = c(">4cm", "<4cm")),
-    taxon = factor(taxon),
-    taxon_class = interaction(taxon, class, sep = "_")
-  ) %>%
-  arrange(dataset, taxon, class) %>%
-  group_by(dataset) %>%
-  mutate(
-    tile_id = row_number(),
-    row = (tile_id - 1) %/% 40,
-    col = (tile_id - 1) %% 40
-  )
-
-# STEP 6: Assign base taxon colors
-taxa <- sort(unique(tile_data$taxon))
-n_taxa <- length(taxa)
-base_colors <- colorRampPalette(brewer.pal(12, "Set3"))(n_taxa)
-names(base_colors) <- taxa
-
-# STEP 7: Plot tiles with small white dots for <4cm
-ggplot(tile_data, aes(x = col, y = -row, fill = taxon)) +
-  geom_tile(aes(width = 0.95, height = 0.95), color = "white", linewidth = 0.1) +
-  geom_point(
-    data = tile_data %>% filter(class == "<4cm"),
-    aes(x = col, y = -row),
-    color = "white", shape = 16, size = 0.2, inherit.aes = FALSE
-  ) +
-  facet_grid(~ dataset, scales = "fixed") +
-  scale_fill_manual(values = base_colors) +
-  coord_equal() +
-  theme_void() +
-  theme(
-    legend.position = "bottom",
-    legend.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    legend.box = "horizontal"
-  ) +
-  guides(fill = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +
-  labs(
-    title = "Absolute coral abundance by taxon and size class (1 tile = 5,000 corals)",
-    fill = "Taxon",
-    caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
-  )
-
-```
-
-# AVERAGE ACROSS ALL DATASETS
-```{r}
-# Get posterior draw averages for each taxon/class/habitatType (across all datasets and N/S dir)
-draw_tax_class_Type <- posterior_draws %>%
-  ungroup() %>%
-  select(dataset, Type, dir, taxon, class, .draw, .epred) %>%
-  # Average across directions (pool N/S) within each dataset (and Type, taxon, class, .draw)
-  group_by(dataset, Type, taxon, class, .draw) %>%
-  summarize(dir_avg = mean(.epred), .groups = "drop") %>%
-  # Average across datasets within each Type (and taxon, class,)
-  group_by(.draw, Type, taxon, class) %>%
-  summarize(dataset_avg = mean(dir_avg), .groups = "drop")
-
-# Summarize posterior draws
-total_taxa_class <- draw_tax_class_Type %>%
-  group_by(Type, taxon, class) %>%
-  summarize(
-    fit_mean = mean(dataset_avg),
-    fit_lower = quantile(dataset_avg, 0.025),
-    fit_upper = quantile(dataset_avg, 0.975),
-    .groups = "drop")
-
-# Join area per Type and compute total abundance
-total_abundance_taxa_class <- total_taxa_class %>%
-  left_join(area_summary_allzones, by = "Type") %>%
-  mutate(
-    tot_estimate = fit_mean * total_area_m2,
-    tot_lower    = fit_lower * total_area_m2,
-    tot_upper    = fit_upper * total_area_m2
-  ) %>%
-  select(Type, taxon, class, tot_estimate, tot_lower, tot_upper)
-
-
-library(tidyverse)
-library(RColorBrewer)
-
-# STEP 1: Set tile resolution
-tile_size <- 5000
-
-# STEP 2: Expand cumulative abundance into tiles
-tile_data <- total_abundance_taxa_class %>%
-  mutate(n_tiles = round(tot_estimate / tile_size)) %>%
-  filter(n_tiles > 0) %>%
-  uncount(n_tiles) %>%
-  mutate(
-    class = factor(class, levels = c(">4cm", "<4cm")),
-    taxon = factor(taxon),
-    taxon_class = interaction(taxon, class, sep = "_")
-  ) %>%
-  arrange(taxon, class) %>%
-  mutate(
-    tile_id = row_number(),
-    row = (tile_id - 1) %/% 40,
-    col = (tile_id - 1) %% 40
-  )
-
-# STEP 3: Assign distinct colors per taxon
-taxa <- sort(unique(tile_data$taxon))
-n_taxa <- length(taxa)
-base_colors <- colorRampPalette(brewer.pal(12, "Set3"))(n_taxa)
-names(base_colors) <- taxa
-
-# STEP 4: Plot the waffle
-ggplot(tile_data, aes(x = col, y = -row, fill = taxon)) +
-  # Main tiles
-  geom_tile(aes(width = 0.95, height = 0.95), color = "white", linewidth = 0.1) +
-  
-  # Subtle white dot for small size class
-  geom_point(
-    data = tile_data %>% filter(class == "<4cm"),
-    aes(x = col, y = -row),
-    color = "white", shape = 16, size = 0.2, inherit.aes = FALSE
-  ) +
-
-  scale_fill_manual(values = base_colors) +
-  coord_equal() +
-  theme_void() +
-  theme(
-    legend.position = "bottom",
-    legend.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    legend.box = "horizontal"
-  ) +
-  guides(
-    fill = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")
-  ) +
-  labs(
-    title = "Average coral abundance by taxon and size class across all datasets\n(1 tile = 5,000 corals)",
-    fill = "Taxon",
-    caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
-  )
-
-```
-
-# new model
-```{r, include = F, eval = F}
-# With this formula: ❌ You are not allowing the influence of Type on taxon × class to differ among datasets. In other words: You're assuming that the way taxon/class are distributed across habitat Types is the same in all datasets # i think this is OK
-mod_nb_taxonhabitat <- brm(
-  bf(n ~ dataset * taxon * class + taxon * class * Type +
-         (1 | Type:dir) + (1 | dataset/site) +
-         offset(log(transect_area_m2))),
-  data = dfftaxon_trimmed,
-  family = negbinomial(),
-  prior = c(
-    prior(normal(0, 2), class = "b"),
-    prior(normal(0, 5), class = "Intercept"),
-    prior(exponential(1), class = "shape")
-  ),
-  chains = 4, cores = 4, 
-  threads = threading(5),
-  iter = 1000, warmup = 500,
-  thin = 2,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.95)
-)
+# mod_nb_zinf <- brm(
+#   bf(n ~ taxon * class * Type +
+#         (1 | Type/dataset/site) +     # Allow datasets (and sites) to have different random intercepts across habitat Types
+#         (1 | Type:dir) +  # decide later if we want to keep this
+#         offset(log(transect_area_m2)),
+#      zi ~ taxon * class),
+#   data = dfftaxon_trimmed,
+#   family = zero_inflated_negbinomial(),
+#   prior = c(
+#     prior(normal(0, 2), class = "b"),
+#     prior(normal(0, 5), class = "Intercept"),
+#     prior(exponential(1), class = "shape"),
+#     prior(normal(0, 1), class = "b", dpar = "zi")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 1000, warmup = 500, thin = 2,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.95)
+# )
+# saveRDS(mod_nb_zinf, file = "data/processed/mod_nb_zinf.rds")
+mod_nb_zinf <- readRDS("data/processed/mod_nb_zinf.rds")
 
 
 # 1. Create newdata grid (1 m² for standardization)
 newdata <- dfftaxon_trimmed %>%
-  distinct(dataset, Type, taxon, class) %>%
+  distinct(Type, taxon, class) %>%
   mutate(transect_area_m2 = 1)
 
-# 2. Get fitted values manually by computing summary statistics across all draws
-posterior_draws <- add_epred_draws(mod_nb_taxonhabitat, newdata = newdata, re_formula = NA) %>%
-  mutate(Type = factor(Type, levels = type_levels))
+# Posterior draws of predicted density (n / m²)
+preds <- add_epred_draws(mod_nb_zinf, newdata = newdata, re_formula = NA)    # excludes random effects (gives population-level average)
 
+summary_preds <- preds %>%
+  group_by(taxon, class, Type) %>%
+  mean_qi(.epred, .width = 0.95)
 
+# Calculate total per taxclass per habitat Type and impact zone
+tot1 <- left_join(summary_preds, area_summary, by = "Type") %>%
+  mutate(tot = .epred * total_area_m2,
+         tot_lower = .epred * total_area_m2,
+         tot_upper = .epred * total_area_m2)
 
+# Calculate total per taxclass per impact zone (sum all habitat Types)
+tot2 <- tot1 %>%
+  group_by(taxon, class, name) %>%
+  summarize(tot = sum(tot))
 
+# Calculate total per impact zone (sum all taxon/class)
+tot3 <- tot2 %>%
+  group_by(name) %>%
+  summarize(tot = sum(tot))
 
-# pairwise taxon diffs between datasets / habitats
-
-pairwise_taxon_diffs <- posterior_draws %>%
-  rename(dataset1 = dataset, epred1 = .epred) %>%
-  inner_join(
-    posterior_draws %>% rename(dataset2 = dataset, epred2 = .epred),
-    by = c(".draw", "Type", "taxon", "class")
-  ) %>%
-  filter(dataset1 < dataset2) %>%
-  mutate(diff = epred1 - epred2)
-
-summary_taxon_diffs <- pairwise_taxon_diffs %>%
-  group_by(Type, taxon, class, dataset1, dataset2) %>%
-  summarize(
-    mean_diff = mean(diff),
-    lower = quantile(diff, 0.025),
-    upper = quantile(diff, 0.975),
-    p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
-    .groups = "drop"
-  )
-
-summary_taxon_diffs %>% 
-  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
-  filter(p_adj < 0.01) %>%
-  arrange(taxon, Type) %>%
+tot2 %>%
+  mutate(ESA = if_else(taxon %in% c("ACER", "ORBI"), "ESA", "non-ESA")) %>%
+  group_by(name, ESA) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
+  pivot_wider(names_from = ESA, values_from = tot) %>%
+  janitor::adorn_totals(where = "row") %>%
+  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) %>%
   knitr::kable()
 
 
 
-
-# test sctld susceptibility groups
-
-# susceptibility from Papke et al. 2024
-group_definitions <- tibble(
-  taxon = unique(posterior_draws$taxon),
-  taxon_group = case_when(
-    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA") ~ "high_sus",
-    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
-    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
-    TRUE ~ NA_character_
-  )
-)
-
-draws_grouped <- posterior_draws %>%
-  left_join(group_definitions, by = "taxon") %>%
-  filter(!is.na(taxon_group))  # Remove taxa not assigned to a group
-
-draws_group_sums <- draws_grouped %>%
-  group_by(.draw, dataset, Type, taxon_group, class) %>%
-  summarize(epred = sum(.epred), .groups = "drop") %>%
-  mutate(dataset = as.character(dataset))
-
-pairwise_group_diffs <- draws_group_sums %>%
-  rename(dataset1 = dataset, epred1 = epred) %>%
-  inner_join(
-    draws_group_sums %>% rename(dataset2 = dataset, epred2 = epred),
-    by = c(".draw", "Type", "taxon_group", "class")
-  ) %>%
-  filter(dataset1 < dataset2) %>%  # Avoid redundant pairs and self-comparisons
-  mutate(diff = epred1 - epred2)
-
-summary_group_diffs <- pairwise_group_diffs %>%
-  group_by(Type, taxon_group, class, dataset1, dataset2) %>%
-  summarize(
-    mean_diff = mean(diff),
-    lower = quantile(diff, 0.025),
-    upper = quantile(diff, 0.975),
-    p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
-    .groups = "drop"
-  ) %>%
-  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni"))
-
-summary_group_diffs %>%
-  filter(p_adj < 0.05) %>%
-  arrange(taxon_group, class, Type) %>%
-  knitr::kable()
-
-
-
-
-
-# overal taxon class diffs across surveys weighted by habitat Type
-# Proportion of transect area per dataset × Type × dir
-survey_weights <- dfftaxon %>%
-  group_by(dataset, Type) %>%
-  summarize(area = sum(transect_area_m2), .groups = "drop") %>%
-  group_by(dataset) %>%
-  mutate(weight = area / sum(area)) %>%
-  select(dataset, Type, weight)
-
-
-posterior_weighted <- posterior_draws %>%
-  mutate(dataset = as.character(dataset)) %>%
-  left_join(survey_weights, by = c("dataset", "Type")) %>%
-  mutate(weighted_epred = .epred * weight)
-
-
-posterior_totals <- posterior_weighted %>%
-  group_by(.draw, dataset, taxon, class) %>%
-  summarize(total_epred = sum(weighted_epred), .groups = "drop")
-
-
-pairwise_overall <- posterior_totals %>%
-  rename(dataset1 = dataset, epred1 = total_epred) %>%
-  inner_join(
-    posterior_totals %>% rename(dataset2 = dataset, epred2 = total_epred),
-    by = c(".draw", "taxon")
-  ) %>%
-  filter(dataset1 < dataset2) %>%
-  mutate(diff = epred1 - epred2)
-
-summary_overall <- pairwise_overall %>%
-  group_by(taxon, dataset1, dataset2) %>%
-  summarize(mean_diff = mean(diff),
-            lower = quantile(diff, 0.025),
-            upper = quantile(diff, 0.975),
-            p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
-            .groups = "drop")
-
-
-summary_overall %>%
-  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
-  filter(p_adj < 0.01) %>%
-  knitr::kable()
-
-
-
-
-#####    totals in impact zones
-# Step 1: Sum epred across taxon and class within each dataset and habitat Type
-posterior_totals <- posterior_draws %>%
-  group_by(.draw, dataset, Type) %>%
-  summarize(dir_total = sum(.epred), .groups = "drop")
-
-
-# Step 3: Summarize across posterior draws
-total_perType <- posterior_totals %>%
-  group_by(dataset, Type) %>%
-  summarize(
-    fit_mean = mean(.epred),
-    fit_sd = sd(.epred),
-    fit_lower = quantile(.epred, 0.025),
-    fit_upper = quantile(.epred, 0.975),
-    .groups = "drop"
-  )
-
-totals <- left_join(total_perType, area_summary_allzones, by = "Type") %>%
-  mutate(tot_estimate = fit_mean * total_area_m2,
-         tot_lower = fit_lower * total_area_m2,
-         tot_upper = fit_upper * total_area_m2) %>%
-  mutate(Type = factor(Type, levels = type_levels))
-
-# Step 2: Add missing combinations as NA rows
-totals <- totals %>%
-  complete(dataset, Type, fill = list(tot_estimate = NA, tot_lower = NA, tot_upper = NA))
-
-# Step 3: Plot
-p1 <- ggplot(totals, aes(x = Type, y = tot, fill = dataset)) +
-  geom_col(position = position_dodge(width = 0.9)) +
-  geom_errorbar(aes(ymin = lower, ymax = upper),
-                position = position_dodge(width = 0.9), width = 0.2) +
-  scale_fill_discrete(labels = dataset_labels) +
-  labs(x = "Habitat Type",
-       y = "Total corals",
-       title = "Total corals in all impact zones, by habitat") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-# count sites per dataset/habitat type
-nsites <- dff_alltaxa %>%
-  distinct(dataset, site, Type) %>%
-  count(Type, dataset) %>%
-  complete(Type, dataset, fill = list(n = 0)) %>%
-  mutate(dataset = factor(dataset, levels = dataset_levels))
-
-p1 +  geom_text(
-    data = nsites,
-    aes(x = Type, y = 0, label = n, group = dataset),
-    position = position_dodge(width = 0.9),
-    vjust = -1, size = 3
-  )
-
-
-
-p2 <- totals %>%
-  group_by(dataset) %>%
-  summarize(value = sum(tot, na.rm = T),
-            lower = sum(lower, na.rm = T),
-            upper = sum(upper, na.rm = T)) %>%
-  mutate(dataset = factor(dataset, levels = dataset_levels)) %>%
-  ggplot(aes(x = 1, y = value, fill = dataset)) +
-  geom_col(position = position_dodge()) +
-  geom_errorbar(aes(ymin = lower, ymax = upper),
-                position = position_dodge(width = 0.9), width = 0.2) +
-  scale_fill_discrete(labels = dataset_labels) +
-  labs(x = "", y = "Total corals", title = "Total corals in all impact zones - all habitats")
-
-nsitest <- nsites %>%
-  group_by(dataset) %>%
-  summarize(n = sum(n))
-
-p2 +  geom_text(
-    data = nsitest,
-    aes(x = 1, y = 0, label = n, group = dataset),
-    position = position_dodge(width = 0.9),
-    vjust = -1, size = 3
-  )
-
-
+# Calculate total (sum all impact zones)
+sum(tot3$tot)
 
 ```
+
+```{r, fig.height = 10}
+
+# STEP 1: Aggregate total abundance by taxon + class
+tot4 <- tot2 %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop")
+
+# STEP 2: Set tile resolution
+tile_size <- 5000
+
+# STEP 3: Compute number of tiles per taxon + class
+tile_data <- tot4 %>%
+  mutate(n_tiles = round(tot / tile_size)) %>%
+  filter(n_tiles > 0)
+
+# STEP 4: Order taxa by total abundance (across size classes)
+taxon_order <- tile_data %>%
+  group_by(taxon) %>%
+  summarize(total_tiles = sum(n_tiles), .groups = "drop") %>%
+  arrange(total_tiles) %>%
+  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 40 + 1, default = 0)))
+
+# STEP 5: Expand to individual tiles
+tile_expanded <- tile_data %>%
+  uncount(n_tiles) %>%
+  mutate(class = factor(class, levels = c(">4cm", "<4cm"))) %>%
+  left_join(taxon_order, by = "taxon") %>%
+  group_by(taxon) %>%
+  mutate(
+    tile_id = row_number(),
+    col = (tile_id - 1) %% 40,
+    row = -(taxon_row_start + (tile_id - 1) %/% 40)
+  ) %>%
+  ungroup() %>%
+  mutate(taxon = factor(taxon, levels = taxon_order$taxon))
+
+# STEP 6: Assign distinct shuffled Dark2 colors per taxon
+taxa <- levels(tile_expanded$taxon)
+n_taxa <- length(taxa)
+# Generate color palette (Dark2 can go up to 8, then extended)
+raw_colors <- c("brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black", "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",  "orchid1", "darkturquoise", "darkorange4")
+# Assign names
+base_colors <- setNames(rev(raw_colors), taxa)
+
+# STEP 7: Label positions
+row_labels <- tile_expanded %>%
+  group_by(taxon) %>%
+  summarize(label_y = min(row), label_x_end = max(col), .groups = "drop")
+
+# STEP 8: Taxon totals
+taxon_totals <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(total = sum(tot), .groups = "drop") %>%
+  mutate(total_fmt = format(round(total), big.mark = ","))
+
+row_labels <- row_labels %>%
+  left_join(taxon_totals, by = "taxon")
+
+# STEP 9: Plot
+waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
+  geom_tile(width = 0.95, height = 0.95, color = "white", linewidth = 0.1) +
+
+  # Dot for <4cm
+  geom_point(
+    data = filter(tile_expanded, class == "<4cm"),
+    aes(x = col, y = row),
+    shape = 16, color = "white", size = 0.5, inherit.aes = FALSE
+  ) +
+
+  # Taxon names (left)
+  geom_text(
+    data = row_labels,
+    aes(x = -2, y = label_y, label = taxon),
+    hjust = 1, size = 2.5, inherit.aes = FALSE
+  ) +
+
+  # Totals (right)
+  geom_text(
+    data = row_labels,
+    aes(x = label_x_end, y = label_y, label = total_fmt),
+    hjust = 0, size = 2.5, inherit.aes = FALSE
+  ) +
+
+  scale_fill_manual(values = base_colors, guide = "none") +
+  coord_equal(clip = "off") +  # allow text to overflow plot area
+  theme_void() +
+  theme(
+    plot.margin = margin(t = 10, r = 80, b = 10, l = 80),  # ensure space on both sides
+    axis.text = element_blank()
+  ) +
+  labs(
+    title = "Total abundance within 1.2-km of channel\n(1 tile = 5,000 corals)",
+    caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
+  )
+
+waffle
+
+```
+
+```{r}
+# STEP 1: Aggregate total abundance by taxon + class
+tot4 <- tot2 %>%
+  filter(name != "Rest of Monitoring Area") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop")
+
+# STEP 2: Set tile resolution
+tile_size <- 5000
+
+# STEP 3: Compute number of tiles per taxon + class
+tile_data <- tot4 %>%
+  mutate(n_tiles = round(tot / tile_size)) %>%
+  filter(n_tiles > 0)
+
+# STEP 4: Order taxa by total abundance (across size classes)
+taxon_order <- tile_data %>%
+  group_by(taxon) %>%
+  summarize(total_tiles = sum(n_tiles), .groups = "drop") %>%
+  arrange(total_tiles) %>%
+  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 40 + 1, default = 0)))
+
+# STEP 5: Expand to individual tiles
+tile_expanded <- tile_data %>%
+  uncount(n_tiles) %>%
+  mutate(class = factor(class, levels = c(">4cm", "<4cm"))) %>%
+  left_join(taxon_order, by = "taxon") %>%
+  group_by(taxon) %>%
+  mutate(
+    tile_id = row_number(),
+    col = (tile_id - 1) %% 40,
+    row = -(taxon_row_start + (tile_id - 1) %/% 40)
+  ) %>%
+  ungroup() %>%
+  mutate(taxon = factor(taxon, levels = taxon_order$taxon))
+
+# STEP 6: Assign distinct shuffled Dark2 colors per taxon
+taxa <- levels(tile_expanded$taxon)
+n_taxa <- length(taxa)
+# Generate color palette (Dark2 can go up to 8, then extended)
+raw_colors <- c("brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black", "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",  "orchid1", "darkturquoise", "darkorange4")
+# Assign names
+base_colors <- setNames(rev(raw_colors), taxa)
+
+# STEP 7: Label positions
+row_labels <- tile_expanded %>%
+  group_by(taxon) %>%
+  summarize(label_y = min(row), label_x_end = max(col), .groups = "drop")
+
+# STEP 8: Taxon totals
+taxon_totals <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(total = sum(tot), .groups = "drop") %>%
+  mutate(total_fmt = format(round(total), big.mark = ","))
+
+row_labels <- row_labels %>%
+  left_join(taxon_totals, by = "taxon")
+
+# STEP 9: Plot
+waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
+  geom_tile(width = 0.95, height = 0.95, color = "white", linewidth = 0.1) +
+
+  # Dot for <4cm
+  geom_point(
+    data = filter(tile_expanded, class == "<4cm"),
+    aes(x = col, y = row),
+    shape = 16, color = "white", size = 0.5, inherit.aes = FALSE
+  ) +
+
+  # Taxon names (left)
+  geom_text(
+    data = row_labels,
+    aes(x = -2, y = label_y, label = taxon),
+    hjust = 1, size = 2.5, inherit.aes = FALSE
+  ) +
+
+  # Totals (right)
+  geom_text(
+    data = row_labels,
+    aes(x = label_x_end, y = label_y, label = total_fmt),
+    hjust = 0, size = 2.5, inherit.aes = FALSE
+  ) +
+
+  scale_fill_manual(values = base_colors, guide = "none") +
+  coord_equal(clip = "off") +  # allow text to overflow plot area
+  theme_void() +
+  theme(
+    plot.margin = margin(t = 10, r = 80, b = 10, l = 80),  # ensure space on both sides
+    axis.text = element_blank()
+  ) +
+  labs(
+    title = "Total abundance within Scenario 2 Impact Zones\n(1 tile = 5,000 corals)",
+    caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
+  )
+
+waffle
+
+```
+
 
 # ESA SPECIES
