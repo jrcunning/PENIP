@@ -1094,23 +1094,26 @@ dfftaxon_trimmed <- dfftaxon %>%
 
 # SUPER MODEL
 
-# mod_nb <- brm(
-#   bf(n ~ dataset * Type * dir * taxon *class + offset(log(transect_area_m2))),
-#   family = negbinomial(),
-#   data = dfftaxon_trimmed,
-#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-#             prior(exponential(1), class = "shape")),     # Reasonable prior for NB dispersion
-#   chains = 4,
-#   cores = 4,
-#   threads = threading(5),
-#   iter = 1000, warmup = 500,
-#   thin = 2,
-#   control = list(adapt_delta = 0.9, max_treedepth = 12),
-#   backend = "cmdstanr"
-# )
-# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+mod_nb <- brm(
+  bf(n ~ dataset * taxon * class * Type + offset(log(transect_area_m2)),
+     zi ~ taxon * Type),
+  family = zero_inflated_negbinomial(),
+  data = dfftaxon,    # choose dataset with or without all structural zeros
+  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+            prior(exponential(1), class = "shape")),     # Reasonable prior for NB dispersion
+  chains = 4,
+  cores = 4,
+  threads = threading(5),
+  iter = 400, warmup = 100,    #iter = 1000, warmup = 500,
+  thin = 2,
+  control = list(adapt_delta = 0.9, max_treedepth = 12),
+  backend = "cmdstanr"
+)
+saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
+
+mod_nb
 
 # 1. Create newdata grid (1 m² for standardization)
 newdata <- dfftaxon_trimmed %>%
@@ -1706,10 +1709,10 @@ p2
 # mod_nb_zinf <- brm(
 #   bf(n ~ taxon * class * Type +
 #         (1 | Type/dataset/site) +     # Allow datasets (and sites) to have different random intercepts across habitat Types
-#         (1 | Type:dir) +  # decide later if we want to keep this
+#         #(1 | Type:dir) +  # decide later if we want to keep this
 #         offset(log(transect_area_m2)),
-#      zi ~ taxon * class),
-#   data = dfftaxon_trimmed,
+#      zi ~ taxon * Type),
+#   data = dfftaxon,   # use dataset with all structural zeros present
 #   family = zero_inflated_negbinomial(),
 #   prior = c(
 #     prior(normal(0, 2), class = "b"),
@@ -1743,6 +1746,9 @@ tot1 <- left_join(summary_preds, area_summary, by = "Type") %>%
   mutate(tot = .epred * total_area_m2,
          tot_lower = .epred * total_area_m2,
          tot_upper = .epred * total_area_m2)
+
+tot1 %>%
+  select(taxon, class, Type, n_per_m2 = .epred)
 
 # Calculate total per taxclass per impact zone (sum all habitat Types)
 tot2 <- tot1 %>%
@@ -1968,5 +1974,47 @@ waffle
 
 ```
 
+# Dataset-specific estimates
+```{r}
+newdata_ds <- dfftaxon %>%
+  distinct(Type, dataset, taxon, class) %>%
+  mutate(site = NA,
+         transect_area_m2 = 1)
 
-# ESA SPECIES
+
+preds_ds <- add_epred_draws(
+  mod_nb_zinf,
+  newdata = newdata_ds,
+  re_formula = NULL,
+  allow_new_levels = TRUE  # Ignore unrecognized site levels
+)
+
+
+summary_preds_ds <- preds_ds %>%
+  group_by(taxon, class, Type, dataset) %>%
+  mean_qi(.epred, .width = 0.95)
+
+
+ggplot(summary_preds_ds, aes(x = Type, y = .epred,
+                              color = class, shape = dataset,
+                              group = interaction(dataset, class))) +
+  geom_point(position = position_dodge(width = 0.5), size = 2, alpha = 0.5) +
+  geom_line(alpha = 0.5) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper),
+                position = position_dodge(width = 0.5), width = 0.2, alpha = 0.5) +
+  facet_wrap(~ taxon) +
+  scale_y_log10(limits = c(1e-4, 2)) +
+  labs(x = "Habitat Type", y = "Estimated Density (per m²)",
+       color = "Size Class", shape = "Dataset") +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+dfftaxon %>%
+  filter(taxon == "ACER", Type != "Nearshore Ridge Complex", n > 0)
+
+summary_preds_ds %>%
+  filter(taxon == "ACER", Type != "Nearshore Ridge Complex")
+```
+
+
