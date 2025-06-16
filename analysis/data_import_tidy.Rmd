@@ -64,8 +64,8 @@ type_labels <- c("NRC", "IR", "MR", "OR", "APR")
 names(type_labels) <- type_levels
 
 # Order survey datasets
-dataset_levels <- c("dca17", "tt21", "tt23", "drm24")
-dataset_labels <- c("2017—DCA", "2021—TT", "2023—TT", "2024—Shedd")
+dataset_levels <- c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")
+dataset_labels <- c("2011-NSU-ESA", "2017-DCA-ESA", "2017—DCA", "2021—TT", "2023—TT", "2024—Shedd")
 names(dataset_labels) <- dataset_levels
 ```
 
@@ -86,9 +86,10 @@ nsu11_esa_sitemd <- nsu11_esa0 %>%
 
 
 # ESA coral count data
+## DO NOT KEEP M.FEROX DATA -- ALL OTHER SURVEYS ALL MYCETOPHYLLIA ARE ALICIAE, so cannot combine at 'MYCE' (genus) level
 nsu11_esa_counts <- nsu11_esa0 %>%
   select(site = ident,
-         ACER = a_cervic_1, OANN = m_annula_1, OFAV = m_faveol_1, OFRA = m_franks_1, MFER = m_ferox_1) %>%
+         ACER = a_cervic_1, OANN = m_annula_1, OFAV = m_faveol_1, OFRA = m_franks_1, DSTO = d_stokes_1) %>%
   pivot_longer(-site, names_to = "taxon", values_to = "n") %>%
   # Assume all were >4cm since no sizes are reported
   mutate(class = ">4cm") %>%
@@ -1075,53 +1076,52 @@ Predictors: dataset, habitat Type, direction from channel, taxon
 
 ```{r brms}
 # First, analyze surveys that included ALL corals (exclude ESA ONLY surveys)
-dff_alltaxa <- dff %>%
-  filter(!dataset %in% c("nsu11_esa", "dca17_esa"))
+# dff_alltaxa <- dff %>%
+#   filter(!dataset %in% c("nsu11_esa", "dca17_esa"))
 
 # Get total counts for each taxon at each site
-dfftaxon <- dff_alltaxa %>% 
+dfftaxon <- dff %>% #####dff_alltaxa %>% 
   group_by(dataset, Type, dir, site, transect_num, transect_area_m2, taxon, class) %>%
   summarize(n = sum(n)) %>%
   ungroup()
 
-# Remove any taxa not observed in a given dataset / habitat Type ?????
-dfftaxon_trimmed <- dfftaxon %>%
-  group_by(dataset, Type, dir, taxon, class) %>%
-  filter(any(n > 0)) %>%
-  ungroup()
 
-
-
-# SUPER MODEL
+# SUPER MODEL - FIT ON ALL DATA INCLUDING ALL ZEROS
 
 mod_nb <- brm(
-  bf(n ~ dataset * taxon * class * Type + offset(log(transect_area_m2)),
+  bf(n ~ dataset * taxon * class * Type + taxon:class:Type:dir + (1 | dataset/site) + offset(log(transect_area_m2)),
      zi ~ taxon * Type),
   family = zero_inflated_negbinomial(),
   data = dfftaxon,    # choose dataset with or without all structural zeros
   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-            prior(exponential(1), class = "shape")),     # Reasonable prior for NB dispersion
-  chains = 4,
+            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+            prior(normal(0, 1), class = "b", dpar = "zi")),
+  chains = 4, 
   cores = 4,
   threads = threading(5),
-  iter = 400, warmup = 100,    #iter = 1000, warmup = 500,
+  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
   thin = 2,
-  control = list(adapt_delta = 0.9, max_treedepth = 12),
+  control = list(adapt_delta = 0.85, max_treedepth = 10),
   backend = "cmdstanr"
 )
 saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
 
-mod_nb
 
 # 1. Create newdata grid (1 m² for standardization)
-newdata <- dfftaxon_trimmed %>%
+# Remove any taxa not observed in a given dataset / habitat Type ?????
+dfftaxon_trimmed <- dfftaxon %>%
+  group_by(dataset, Type, dir, taxon, class) %>%
+  filter(any(n > 0)) %>%
+  ungroup()
+newdata <- dfftaxon_trimmed %>%       # USE DATA WITHOUT THE UNOBSERVED CORALS (DATASET/TYPE/DIR/TAXON/CLASS)
   distinct(dataset, Type, dir, taxon, class) %>%
   mutate(transect_area_m2 = 1)
 
 # 2. Get fitted values manually by computing summary statistics across all draws
-posterior_draws <- add_epred_draws(mod_nb, newdata = newdata) %>%
+posterior_draws <- add_epred_draws(mod_nb, newdata = newdata,
+                                   allow_new_levels = TRUE, re_formula = NA) %>%
   mutate(Type = factor(Type, levels = type_levels),
          dataset = factor(dataset, levels = dataset_levels))
 ```
@@ -1153,7 +1153,7 @@ ggplot(total_abund, aes(x = dataset, y = fit_mean, color = dir)) +
 
 ### North-south differences?
 ```{r total_density_ns_diffs}
-# Any N-S differences in total coral abundance?
+# Any N-S differences in total coral abundance within habitat Types?
 total_NS_diff <- posterior_draws %>%
   ungroup() %>%
   group_by(.draw, dataset, Type, dir) %>%
@@ -1180,7 +1180,7 @@ total_NS_summ %>%
   knitr::kable()
 ```
 
-North-south differences within a habitat type within a survey show almost no differences. TT21 NRC is different N vs. S but barely had any N sites so we can discount that. Otherwise, DCA17 showed a slight N-S difference on the Outer Reef, and TT23 should a slight N-S difference on the NRC. All other habitats in all surveys showed no N-S differences in coral density.
+There is a significant difference on the Outer Reef, where there are more corals to the South than to the North -- this was significant in the 2017 DCA, 2021 TT, and 2023 TT surveys.
 
 ### Survey differences?
 ```{r total_density_survey_diffs}
@@ -1211,8 +1211,9 @@ summary_total_contrasts <- pairwise_total %>%
     .groups = "drop"
   )
 
-# 4. Filter significant differences
+# 4. Filter significant differences (exclude ESA-only surveys)
 summary_total_contrasts %>%
+  filter(!str_detect(dataset1, "_esa") & !str_detect(dataset2, "_esa")) %>%
   mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
   filter(p_adj < 0.01) %>%
   arrange(Type, dir) %>%
@@ -1236,9 +1237,12 @@ ggplot(fitted_taxon, aes(y = fit_mean, x = Type, color = dir, shape = dataset,
   geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
   geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
                 position = position_dodge(width = 0.5), lwd = 0.25) +
-  scale_y_log10() +
+  scale_y_log10(limits = c(1e-4, 2)) +
   scale_x_discrete(labels = type_labels) +
   labs(x = "Habitat Type", y = "Density (per m2)")
+
+test <- dfftaxon %>%
+  filter(dataset == "nsu11_esa", taxon == "ACER")
 ```
 
 ### North-south differences?
@@ -1382,6 +1386,7 @@ summary_group_diffs <- pairwise_group_diffs %>%
   mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni"))
 
 summary_group_diffs %>%
+    filter(!str_detect(dataset1, "_esa") & !str_detect(dataset2, "_esa")) %>%
   filter(p_adj < 0.05) %>%
   arrange(taxon_group, class, Type) %>%
   knitr::kable()
@@ -1976,7 +1981,7 @@ waffle
 
 # Dataset-specific estimates
 ```{r}
-newdata_ds <- dfftaxon %>%
+newdata_ds <- dfftaxon_trimmed %>%
   distinct(Type, dataset, taxon, class) %>%
   mutate(site = NA,
          transect_area_m2 = 1)
