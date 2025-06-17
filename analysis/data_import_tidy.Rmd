@@ -653,7 +653,8 @@ all_juv_taxa <- c(juv_only_taxa, juv_both_taxa)
 
 # Step 3: Build search grid per site × transect × team
 search_grid <- drm24_classed %>%
-  distinct(site, transect_num, team) %>%    # if multiple teams in data, remove value for team
+  distinct(site, team) %>%    # if multiple teams in data, remove value for team
+  expand_grid(transect_num = 1:4) %>%  # creates search grid for all transects even if no corals observed (bc absent from drm24_classed)
   mutate(
     searched_taxa_class = pmap(list(transect_num, team), function(transect, team) {
       # Helper: define juv taxa allowed for this transect/team
@@ -688,10 +689,13 @@ counts <- drm24_classed %>%
   group_by(site, transect_num, team, taxon, class) %>%
   summarize(n = n(), .groups = "drop")
 
+counts
+
 # Step 5: Join with grid and fill in zeros where appropriate
 final_counts <- search_grid %>%
   left_join(counts, by = c("site", "transect_num", "team", "taxon", "class")) %>%
   mutate(n = replace_na(n, 0))
+
 
 write_csv(final_counts, file = "data/processed/drm_2024_counts.csv")
 
@@ -711,9 +715,7 @@ write_csv(drm24_counts_ag, file = "data/processed/drm_2024_counts_ag.csv")
 
 
 # Modify DRM2024 dataset to code as one pseudo-transect per site, since all other datasets have only one transect per site. We need the structure to be uniform across datasets for count modeling -- cannot include random effect for site to account for multiple transects per site while all other datasets only have one transect per site, because then there's no variability associated with site and its essentially treated as a fixed effect, which we don't want. Thus, we need to aggregate across transects in the DRM 2024 dataset. But since different taxa were searched for on different numbers of transects we need to do this carefully and have the appropriate total area searched for each taxon for teh pseudo-transect.
-drm24_counts_ag %>% filter(site == "1132", taxon == "MMEA")
-# why only 3 transects and not 4?
-# issues with how these are being counted and assigned explicit zeros or missing values... reevaluate!
+
 ```
 
 ## Habitat maps
