@@ -1854,7 +1854,7 @@ mod_nb_zinf <- brm(
     prior(normal(0, 1), class = "b", dpar = "zi")
   ),
   chains = 4, cores = 4, threads = threading(5),
-  iter = 200, warmup = 50, thin = 2,
+  iter = 1000, warmup = 500, thin = 2,
   backend = "cmdstanr",
   control = list(adapt_delta = 0.95)
 )
@@ -2062,8 +2062,9 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
   )
 
 waffle
-
 ```
+
+
 
 ```{r}
 # STEP 1: Aggregate total abundance by taxon + class
@@ -2164,18 +2165,24 @@ waffle
 
 ```
 
+
+
+
+
+
 # Dataset-specific estimates
 ```{r}
 newdata_ds <- dfftaxon_trimmed %>%        
   distinct(dataset, Type, taxon, class) %>%
-  mutate(transect_area_m2 = 1)
+  mutate(transect_area_m2 = 1,
+         dir = NA)
 
 
 preds_ds <- add_epred_draws(
   mod_nb_zinf,
   newdata = newdata_ds,
   re_formula = NULL,
-  allow_new_levels = TRUE  # Ignore unrecognized site levels
+  allow_new_levels = TRUE 
 )
 
 
@@ -2185,14 +2192,14 @@ summary_preds_ds <- preds_ds %>%
 
 
 ggplot(summary_preds_ds, aes(x = Type, y = .epred,
-                              color = class, shape = dataset,
+                              color = dataset, shape = dataset,
                               group = interaction(dataset, class))) +
   geom_point(position = position_dodge(width = 0.5), size = 2, alpha = 0.5) +
   geom_line(alpha = 0.5) +
   geom_errorbar(aes(ymin = .lower, ymax = .upper),
                 position = position_dodge(width = 0.5), width = 0.2, alpha = 0.5) +
-  facet_wrap(~ taxon) +
-  scale_y_log10()+#limits = c(1e-4, 2)) +
+  facet_wrap(~ taxon + class, scales = "free_y") +
+  #scale_y_log10()+#limits = c(1e-4, 2)) +
   labs(x = "Habitat Type", y = "Estimated Density (per m²)",
        color = "Size Class", shape = "Dataset") +
   theme_minimal(base_size = 12) +
@@ -2201,4 +2208,192 @@ ggplot(summary_preds_ds, aes(x = Type, y = .epred,
 
 ```
 
+
+```{r}
+#TEST FOR DIFFS IN ANY TAXON/CLASS/TYPE GROUP BETWEEN SURVEYS
+
+# 🔁 Step 1: Group by taxon, class, Type
+comparison_results_all <- preds_ds %>%
+  group_by(taxon, class, Type) %>%
+  group_split() %>%
+  map_dfr(function(subgroup) {
+    # Pivot to wide format: one column per dataset
+    sub_wide <- subgroup %>%
+      select(.draw, dataset, .epred) %>%
+      pivot_wider(names_from = dataset, values_from = .epred)
+
+    # Skip if not enough datasets to compare
+    dataset_names <- names(sub_wide)[-1]
+    if (length(dataset_names) < 2) return(NULL)
+
+    # All pairwise comparisons
+    comparisons <- combn(dataset_names, 2, simplify = FALSE)
+
+    # Compute posterior differences
+    map_dfr(comparisons, function(pair) {
+      diff_draws <- sub_wide[[pair[1]]] - sub_wide[[pair[2]]]
+      tibble(
+        taxon = unique(subgroup$taxon),
+        class = unique(subgroup$class),
+        Type = unique(subgroup$Type),
+        dataset1 = pair[1],
+        dataset2 = pair[2],
+        mean_diff = mean(diff_draws),
+        lower = quantile(diff_draws, 0.025),
+        upper = quantile(diff_draws, 0.975),
+        p_gt_0 = mean(diff_draws > 0),
+        p_lt_0 = mean(diff_draws < 0)
+      )
+    })
+  })
+
+
+# 👉 View significant differences (95% CI excludes 0)
+comparison_results_all %>%
+  filter(lower > 0 | upper < 0) %>%
+  arrange(taxon, class, Type, desc(abs(mean_diff))) %>%
+  knitr::kable()
+
+```
+
+```{r}
+# test for diffs in sctld-sus groups
+
+# Step 1: Define taxon groups
+group_definitions <- tibble(
+  taxon = unique(preds_ds$taxon),
+  taxon_group = case_when(
+    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA") ~ "high_sus",
+    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
+    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
+    TRUE ~ NA_character_
+  )
+)
+
+# Step 2: Join taxon groups to posterior draws
+preds_grouped <- preds_ds %>%
+  ungroup() %>%
+  left_join(group_definitions, by = "taxon") %>%
+  filter(!is.na(taxon_group))  # drop any unmatched taxa
+
+# Step 3: Aggregate mean density per group per draw
+group_summaries <- preds_grouped %>%
+  group_by(.draw, taxon_group, dataset, Type, class) %>%
+  summarize(mean_epred = mean(.epred), .groups = "drop")
+
+# Filter to only surveys that surveyed all taxa
+group_summaries <- group_summaries %>%
+  filter(!str_detect(dataset, "_esa"))
+
+# Step 4: Generate pairwise comparisons across datasets
+comparisons <- group_summaries %>%
+  inner_join(group_summaries, by = c(".draw", "taxon_group", "Type", "class"), suffix = c("_A", "_B")) %>%
+  filter(dataset_A != dataset_B) %>%
+  mutate(
+    dataset_pair = paste(dataset_A, "vs", dataset_B),
+    diff = mean_epred_A - mean_epred_B
+  )
+
+# Step 5: Summarize pairwise differences
+comparison_summary <- comparisons %>%
+  group_by(taxon_group, Type, class, dataset_pair) %>%
+  summarize(
+    mean_diff = mean(diff),
+    ci_lower = quantile(diff, 0.025),
+    ci_upper = quantile(diff, 0.975),
+    p_diff_gt0 = mean(diff > 0),
+    p_diff_lt0 = mean(diff < 0),
+    .groups = "drop"
+  )
+
+# View results
+comparison_summary %>%
+  arrange(taxon_group, Type, class, desc(p_diff_gt0)) %>%
+  filter(p_diff_gt0 < 0.1 | p_diff_lt0 < 0.1)
+
+```
+
+Look across all habitat Types?
+```{r}
+
+# 3️⃣ Sum densities across all habitat Types
+group_overall <- preds_grouped %>%
+  group_by(.draw, dataset, taxon_group, class) %>%
+  summarize(overall_density = sum(.epred), .groups = "drop") %>%
+  filter(!str_detect(dataset, "_esa"))
+
+# 4️⃣ Perform pairwise comparisons across datasets
+dataset_pairs <- combn(unique(group_overall$dataset), 2, simplify = FALSE)
+
+comparison_summary <- map_dfr(dataset_pairs, function(pair) {
+  ds1 <- pair[1]
+  ds2 <- pair[2]
+
+  diffs <- group_overall %>%
+    filter(dataset %in% pair) %>%
+    pivot_wider(names_from = dataset, values_from = overall_density) %>%
+    mutate(
+      diff = !!sym(ds1) - !!sym(ds2)
+    ) %>%
+    group_by(taxon_group, class) %>%
+    summarize(
+      dataset_pair = paste(ds1, "vs", ds2),
+      mean_diff = mean(diff, na.rm = TRUE),
+      ci_lower = quantile(diff, 0.025, na.rm = TRUE),
+      ci_upper = quantile(diff, 0.975, na.rm = TRUE),
+      p_diff_gt0 = mean(diff > 0, na.rm = TRUE),
+      p_diff_lt0 = mean(diff < 0, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+  diffs
+})
+
+# 5️⃣ Filter for meaningful differences (optional)
+comparison_summary %>%
+  filter(p_diff_gt0 > 0.9 | p_diff_lt0 > 0.9) %>%
+  arrange(taxon_group, class, desc(abs(mean_diff))) %>%
+  knitr::kable()
+```
+
+# individual taxon x class among datasets? (overall - across all habitat Types)
+```{r}
+# 1️⃣ Summarize posterior draws across all habitat Types for each taxon × class × dataset × draw
+overall_preds_taxon <- preds_ds %>%
+  group_by(.draw, dataset, taxon, class) %>%
+  summarize(overall_density = sum(.epred), .groups = "drop")
+
+# 2️⃣ Get all unique dataset pairs
+dataset_pairs <- combn(unique(overall_preds_taxon$dataset), 2, simplify = FALSE)
+
+# 3️⃣ Pairwise comparisons: For each taxon × class, compare datasets
+comparison_taxon_summary <- map_dfr(dataset_pairs, function(pair) {
+  ds1 <- pair[1]
+  ds2 <- pair[2]
+
+  # Reshape and compute difference
+  diffs <- overall_preds_taxon %>%
+    filter(dataset %in% pair) %>%
+    pivot_wider(names_from = dataset, values_from = overall_density) %>%
+    mutate(diff = !!sym(ds1) - !!sym(ds2)) %>%
+    group_by(taxon, class) %>%
+    summarize(
+      dataset_pair = paste(ds1, "vs", ds2),
+      mean_diff = mean(diff, na.rm = TRUE),
+      ci_lower = quantile(diff, 0.025, na.rm = TRUE),
+      ci_upper = quantile(diff, 0.975, na.rm = TRUE),
+      p_diff_gt0 = mean(diff > 0, na.rm = TRUE),
+      p_diff_lt0 = mean(diff < 0, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+  diffs
+})
+
+# 4️⃣ (Optional) Filter to only show differences with high posterior support
+comparison_taxon_summary %>%
+  filter(p_diff_gt0 > 0.95 | p_diff_lt0 > 0.95) %>%
+  arrange(taxon, class, desc(abs(mean_diff))) %>%
+  knitr::kable()
+```
 
