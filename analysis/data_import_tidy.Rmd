@@ -31,7 +31,7 @@ library(kableExtra)
 taxon_groups <- list(
   PORI = c("PPOR", "PFUR", "PDIV", "PAST", "PORI"),
   ORBI = c("OFAV", "OANN", "OFRA", "ORBI"),
-  FAVI = c("CNAT", "DLAB", "PSTR", "PCLI", "MARE", "FAVI"),
+  #FAVI = c("CNAT", "DLAB", "PSTR", "PCLI", "MARE", "FAVI"),
   AGAR = c("AFRA", "AAGA", "AHUM", "ALAM", "AGAR"),
   MADR = c("MAUR", "MSEN", "MDEC", "MPHA", "MADR"),
   SOLE = c("SHYA", "SBOU", "SOLE"),
@@ -810,22 +810,44 @@ allsitemd_clean <- allsitemd_clean %>%
 polyplot <- polygons_clean %>% 
   #filter(Type != "Sand") %>%
   ggplot() +
-  geom_sf(aes(fill = Type), color = "black", size = 0.2, alpha = 0.6) +
+  geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
   scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-  facet_wrap(~ESAonly) +
-  theme_minimal() +
-  labs(title = "Habitat Polygons Colored by Type", fill = "Type") +
+  theme_minimal(base_size = 8) +
+  labs(fill = "Habitat type", shape = "Survey", x = "", y = "") +
   theme(legend.position = "right") +
-  xlim(-80.11, -80.079) +
-  ylim(26.0675, 26.11)
+  coord_sf(
+    xlim = c(-80.113, -80.078),  # Adjusted to reduce whitespace
+    ylim = c(26.058, 26.112),
+    expand = FALSE
+  ) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
+  scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
+                     labels = scales::number_format(accuracy = 0.01))  # Fewer long ticks
+
 
 # Plot all surveyed sites
-polyplot + 
+fig1 <- polyplot + 
   geom_point(data = allsitemd_clean, 
              aes(x = longitude, y = latitude, shape = dataset), 
-             inherit.aes = FALSE, alpha = 0.6) +
+             inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
+  facet_wrap(~ESAonly, labeller = as_labeller(c(
+     "All corals" = "A. Surveys of all corals",
+     "ESA only" = "B. Surveys of ESA-listed corals"
+  ))) +
   scale_shape_manual(values = c(2, 3, 4, 5, 6, 7)) +
-  labs(title = "All sites - all surveys")
+  theme(
+    strip.text = element_text(hjust = 0, face = "bold", size = 9),#, margin = margin(l = -10)),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.text = element_text(size = 7),
+    legend.title = element_text(size = 8),
+    legend.key.size = unit(0.35, "cm"),         # size of legend boxes
+    legend.spacing.y = unit(0.2, "cm"),         # vertical spacing between legend items
+    legend.margin = margin(t = 2, r = 2, b = 2, l = 2),
+    legend.box.margin = margin(0, 0, 0, 0)
+  )
+fig1 
+ggsave(plot = fig1, filename = "outputs/Fig1.png", width = 170, height = 100, units = "mm", dpi = 300)
 ```
 
 ## Impact Zones
@@ -1316,25 +1338,25 @@ dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, cl
 
 # MODEL - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
 
-# mod_nb <- brm(
-#   bf(n ~ dataset * taxon * class * Type + taxon:class:Type:dir +
-#        offset(log(transect_area_m2)),
-#      zi ~ taxon * Type),
-#   family = zero_inflated_negbinomial(),
-#   data = dfftaxon,    # choose dataset with or without all structural zeros
-#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-#             prior(normal(0, 1), class = "b", dpar = "zi")),
-#   chains = 4,
-#   cores = 4,
-#   threads = threading(5),
-#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-#   thin = 2,
-#   control = list(adapt_delta = 0.85, max_treedepth = 10),
-#   backend = "cmdstanr"
-# )
-# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+mod_nb <- brm(
+  bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
+       offset(log(transect_area_m2)),
+     zi ~ taxon * Type),
+  family = zero_inflated_negbinomial(),
+  data = dfftaxon,    # choose dataset with or without all structural zeros
+  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+            prior(normal(0, 1), class = "b", dpar = "zi")),
+  chains = 4,
+  cores = 4,
+  threads = threading(5),
+  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+  thin = 2,
+  control = list(adapt_delta = 0.85, max_treedepth = 10),
+  backend = "cmdstanr"
+)
+saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
 
 
@@ -1413,12 +1435,15 @@ taxon_NS_summ <- taxon_NS_diff %>%
 # taxon_NS_summ[19,]
 taxon_NS_summ %>%
   mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
-  filter(p_adj < 0.01) %>%
+  filter(p_adj < 0.05) %>%
   mutate(greater = if_else(mean_diff > 0, "N", "S")) %>%
   group_by(dataset, Type, greater) %>%
   summarize(taxa = paste(taxon, class, collapse = ",")) %>%
   arrange(Type, greater) %>%
   knitr::kable()
+
+
+taxon_NS_summ %>% filter(dataset == "dca17", Type == "Nearshore Ridge Complex", taxon == "MCAV", class == "<4cm")
 ```
 
 A minority of taxon × size class × habitat × dataset combinations show a significant north-south effect.
@@ -1426,36 +1451,38 @@ The majority do not. they are dataset/habitat/taxon/size class-specific, and idi
 My goal is not to focus on dir (direction) in the main analyses, but I want to account for it appropriately so it doesn’t confound other effects.
 Let's move direction to a random effect. This approach acknowledges the variability without overfitting. It’s flexible and allows for occasional strong differences without forcing them to be estimated everywhere.
 
-## Model2 - drop direction to RE
+((When I changed FAVI adults to individual taxa and the formula in the first model to taxon:class in the fixed effects instead of taxon * class, the number of N-S differences dropped by a lot. probably because multiple comparisons numbers go up because more taxa.))
+
+## Model2 - drop direction to RE ----- OR DROP DIR COMPLETELY?!
 ```{r}
-# mod_nb2 <- brm(
-#   bf(n ~ dataset * taxon * class * Type + 
-#        (1 | taxon:class:Type:dir) +
-#        offset(log(transect_area_m2)),
-#      zi ~ taxon * Type),
-#   family = zero_inflated_negbinomial(),
-#   data = dfftaxon,    # choose dataset with or without all structural zeros
-#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-#             prior(normal(0, 1), class = "b", dpar = "zi")),
-#   chains = 4,
-#   cores = 4,
-#   threads = threading(5),
-#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-#   thin = 2,
-#   control = list(adapt_delta = 0.85, max_treedepth = 10),
-#   backend = "cmdstanr"
-# )
-#saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
+mod_nb2 <- brm(
+  bf(n ~ dataset * taxon:class * Type +
+       (1 | taxon:class:Type:dir) +
+       offset(log(transect_area_m2)),
+     zi ~ taxon * Type),
+  family = zero_inflated_negbinomial(),
+  data = dfftaxon,    # choose dataset with or without all structural zeros
+  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+            prior(normal(0, 1), class = "b", dpar = "zi")),
+  chains = 4,
+  cores = 4,
+  threads = threading(5),
+  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+  thin = 2,
+  control = list(adapt_delta = 0.85, max_treedepth = 10),
+  backend = "cmdstanr"
+)
+saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
 ```{r}
-loo_dirFE <- loo(mod_nb)
-loo_dirRE <- loo(mod_nb2)
+loo_1 <- loo(mod_nb)
+loo_2 <- loo(mod_nb2)
 
-loo_compare(loo_dirFE, loo_dirRE)
+loo_compare(loo_1, loo_2)
 # means second model with dir as random effect is better
 ```
 
@@ -1601,27 +1628,28 @@ p1
 # ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
 # with zero-inflation that varies per taxon*class
 
-# mod_nb_zinf <- brm(
-#   bf(n ~ taxon * class * Type +
-#         (1 + Type | dataset) +     
-#         (1 | dataset:taxon:class:Type:dir) +
-#         offset(log(transect_area_m2)),
-#      zi ~ taxon * Type),
-#   data = dfftaxon,   # use dataset with all structural zeros present
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     prior(normal(0, 2), class = "b"),
-#     prior(normal(0, 5), class = "Intercept"),
-#     prior(exponential(1), class = "shape"),
-#     prior(normal(0, 1), class = "b", dpar = "zi")
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 1000, warmup = 500, thin = 2,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.95)
-# )
-# saveRDS(mod_nb_zinf, file = "data/processed/mod_nb_zinf.rds")
-mod_nb_zinf <- readRDS("data/processed/mod_nb_zinf.rds")
+mod_nb3 <- brm(
+  bf(n ~ taxon:class * Type +
+        (1 + Type | dataset) +
+        (1 | dataset:taxon:class:Type:dir) +
+        offset(log(transect_area_m2)),
+     zi ~ taxon * Type),
+  data = dfftaxon,   # use dataset with all structural zeros present
+  family = zero_inflated_negbinomial(),
+  prior = c(
+    prior(normal(0, 2), class = "b"),
+    prior(normal(0, 5), class = "Intercept"),
+    prior(exponential(1), class = "shape"),
+    prior(normal(0, 1), class = "b", dpar = "zi")
+  ),
+  chains = 4, cores = 4, threads = threading(5),
+  iter = 200, warmup = 50, thin = 2,
+  backend = "cmdstanr",
+  control = list(adapt_delta = 0.95)
+)
+
+saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 
 
 # 1. Create newdata grid (1 m² for standardization)
@@ -1630,7 +1658,7 @@ newdata <- dfftaxon_trimmed %>%
   mutate(transect_area_m2 = 1)
 
 # Posterior draws of predicted density (n / m²)
-preds <- add_epred_draws(mod_nb_zinf, newdata = newdata, re_formula = NA)    # excludes random effects (gives population-level average)
+preds <- add_epred_draws(mod_nb3, newdata = newdata, re_formula = NA)    # excludes random effects (gives population-level average)
 # Average across all draws
 summary_preds <- preds %>%
   group_by(taxon, class, Type) %>%
@@ -1638,9 +1666,9 @@ summary_preds <- preds %>%
 ```
 
 ```{r}
-loo_dsRE <- loo(mod_nb_zinf)
+loo_3 <- loo(mod_nb3)
 
-loo_compare(loo_dirRE, loo_dsRE)
+loo_compare(loo_2, loo_3)
 
 # Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
 # mod3 also has slightly lower p_loo (good, slightly simpler )
@@ -1659,7 +1687,8 @@ ggplot(summary_preds, aes(x = Type, y = .epred, color = class)) +
   facet_wrap(~taxon) +
   scale_y_log10() +
   scale_x_discrete(labels = type_labels) +
-  labs(x = "Habitat Type", y = "Density (per m2)")
+  labs(x = "Habitat Type", y = "Density (per m2)")+
+  theme_minimal()
 
 #### TABLE
 
@@ -1983,7 +2012,7 @@ waffle
 
 
 # Dataset-specific estimates from Model3
-```{r, include = F, eval = F}
+```{r, include = T, eval = T, fig.width = 10, fig.height = 20}
 newdata_ds <- dfftaxon_trimmed %>%        
   distinct(dataset, Type, taxon, class) %>%
   mutate(transect_area_m2 = 1,
@@ -2021,7 +2050,7 @@ ggplot(summary_preds_ds, aes(x = Type, y = .epred,
 ```
 
 
-```{r, include = F, eval = F}
+```{r, include = T, eval = T}
 #TEST FOR DIFFS IN ANY TAXON/CLASS/TYPE GROUP BETWEEN SURVEYS
 
 # 🔁 Step 1: Group by taxon, class, Type
@@ -2068,7 +2097,7 @@ comparison_results_all %>%
 
 ```
 
-```{r, include = F, eval = F}
+```{r, include = T, eval = T}
 # test for diffs in sctld-sus groups
 
 # Step 1: Define taxon groups
@@ -2126,7 +2155,7 @@ comparison_summary %>%
 ```
 
 Look across all habitat Types?
-```{r, include = F, eval = F}
+```{r, include = T, eval = T}
 
 # 3️⃣ Sum densities across all habitat Types
 group_overall <- preds_grouped %>%
@@ -2169,7 +2198,7 @@ comparison_summary %>%
 ```
 
  individual taxon x class among datasets? (overall - across all habitat Types)
-```{r, include = F, eval = F}
+```{r, include = T, eval = T}
 # 1️⃣ Summarize posterior draws across all habitat Types for each taxon × class × dataset × draw
 overall_preds_taxon <- preds_ds %>%
   group_by(.draw, dataset, taxon, class) %>%
