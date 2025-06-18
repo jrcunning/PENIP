@@ -1637,6 +1637,15 @@ summary_preds <- preds %>%
   mean_qi(.epred, .width = 0.95)
 ```
 
+```{r}
+loo_dsRE <- loo(mod_nb_zinf)
+
+loo_compare(loo_dirRE, loo_dsRE)
+
+# Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
+# mod3 also has slightly lower p_loo (good, slightly simpler )
+```
+
 ### Taxon densities by habitat type and size class
 ```{r, fig.width = 10, fig.height = 10}
 ###############
@@ -1648,7 +1657,9 @@ ggplot(summary_preds, aes(x = Type, y = .epred, color = class)) +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
   geom_line(aes(group = class)) +
   facet_wrap(~taxon) +
-  scale_y_log10()
+  scale_y_log10() +
+  scale_x_discrete(labels = type_labels) +
+  labs(x = "Habitat Type", y = "Density (per m2)")
 
 #### TABLE
 
@@ -1661,23 +1672,21 @@ summary_preds_fmt <- summary_preds %>%
     class = factor(class, levels = class_order),
     Type = factor(Type, levels = type_order),
     mean_ci = case_when(
-      .epred < 0.001 ~ sprintf("%.1e [%.1e–%.1e]", .epred, .lower, .upper),
-      TRUE ~ sprintf("%.4f [%.4f–%.4f]", .epred, .lower, .upper)
+      .epred < 0.001 ~ sprintf("%.1e<br>[%.1e–%.1e]", .epred, .lower, .upper),
+      TRUE ~ sprintf("%.4f<br>[%.4f–%.4f]", .epred, .lower, .upper)
     )
   )
 
 # Step 2: Pivot to have one column per habitat Type
 table_out <- summary_preds_fmt %>%
   select(taxon, class, Type, mean_ci) %>%
-  pivot_wider(
-    names_from = Type,
-    values_from = mean_ci
-  ) %>%
+  pivot_wider(names_from = Type, values_from = mean_ci) %>%
   arrange(taxon, class)
 
 # Step 3: Pretty-print the table
-knitr::kable(table_out) %>%
-  kable_styling(font_size = 8)
+knitr::kable(table_out, format = "html", escape = FALSE,
+             caption = "Density (per m2) of each coral taxon and size class in each habitat type, with 95% C.I.") %>%
+  kable_styling(font_size = 10)
 
 
 ############
@@ -1694,6 +1703,14 @@ tot1 <- left_join(summary_preds, area_summary, by = "Type") %>%
          tot_lower = .epred * total_area_m2,
          tot_upper = .epred * total_area_m2)
 
+tot1 %>%
+  group_by(Type, name) %>%
+  summarize(total_area_m2 = sum(total_area_m2), .groups = "drop") %>%
+  pivot_wider(names_from = name, values_from = total_area_m2) %>%
+  janitor::adorn_totals(where = c("row", "col")) %>%
+  mutate(across(where(is.numeric), ~ formatC(.x, format = "e", digits = 2))) %>%
+  knitr::kable(caption = "Total area (m2) of each habitat type in each impact zone")
+
 # Calculate total per taxclass per impact zone (sum all habitat Types)
 tot2 <- tot1 %>%
   group_by(taxon, class, name) %>%
@@ -1703,7 +1720,7 @@ tot2 <- tot1 %>%
 tot2 %>% ungroup() %>%
   pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
   janitor::adorn_totals(where = c("row", "col")) %>%
-  knitr::kable()
+  knitr::kable(caption = "Total number of colonies of each coral taxon and size class in each impact zone")
 
 
 ```
@@ -1720,9 +1737,9 @@ tot2 %>%
   group_by(name, ESA) %>%
   summarize(tot = sum(tot), .groups = "drop") %>%
   pivot_wider(names_from = ESA, values_from = tot) %>%
-  janitor::adorn_totals(where = "row") %>%
+  janitor::adorn_totals(where = c("row", "col")) %>%
   mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) %>%
-  knitr::kable()
+  knitr::kable(caption = "Total coral colonies in all impact zones")
 
 
 
@@ -1739,19 +1756,34 @@ tot4 <- tot2 %>%
   summarize(tot = sum(tot), .groups = "drop")
 
 # STEP 2: Set tile resolution
-tile_size <- 5000
+# tile_size <- 2500
+# tile_size <- 5000
+tile_size <- 4000
 
 # STEP 3: Compute number of tiles per taxon + class
+tile_totals <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(total_raw = sum(tot), .groups = "drop") %>%
+  mutate(total_tiles = round(total_raw / tile_size))
+
+# Join back to get size-class-specific raw totals
 tile_data <- tot4 %>%
-  mutate(n_tiles = round(tot / tile_size)) %>%
-  filter(n_tiles > 0)
+  left_join(tile_totals, by = "taxon") %>%
+  mutate(
+    prop = tot / total_raw,
+    n_tiles = round(prop * total_tiles)
+  ) %>%
+  filter(n_tiles > 0) %>%
+  arrange(taxon)
+
 
 # STEP 4: Order taxa by total abundance (across size classes)
 taxon_order <- tile_data %>%
   group_by(taxon) %>%
-  summarize(total_tiles = sum(n_tiles), .groups = "drop") %>%
-  arrange(total_tiles) %>%
-  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 40 + 1, default = 0)))
+  summarize(total_n = sum(tot), 
+            total_tiles = sum(n_tiles), .groups = "drop") %>%
+  arrange(total_n) %>%
+  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 25 + 1, default = 0)))
 
 # STEP 5: Expand to individual tiles
 tile_expanded <- tile_data %>%
@@ -1761,8 +1793,8 @@ tile_expanded <- tile_data %>%
   group_by(taxon) %>%
   mutate(
     tile_id = row_number(),
-    col = (tile_id - 1) %% 40,
-    row = -(taxon_row_start + (tile_id - 1) %/% 40)
+    col = (tile_id - 1) %% 25,
+    row = -(taxon_row_start + (tile_id - 1) %/% 25)
   ) %>%
   ungroup() %>%
   mutate(taxon = factor(taxon, levels = taxon_order$taxon))
@@ -1778,7 +1810,7 @@ base_colors <- setNames(rev(raw_colors), taxa)
 # STEP 7: Label positions
 row_labels <- tile_expanded %>%
   group_by(taxon) %>%
-  summarize(label_y = min(row), label_x_end = max(col), .groups = "drop")
+  summarize(label_y = max(row), label_x_end = max(col), .groups = "drop")
 
 # STEP 8: Taxon totals
 taxon_totals <- tot4 %>%
@@ -1839,19 +1871,34 @@ tot4 <- tot2 %>%
   summarize(tot = sum(tot), .groups = "drop")
 
 # STEP 2: Set tile resolution
-tile_size <- 5000
+# tile_size <- 2500
+# tile_size <- 5000
+tile_size <- 4000
 
 # STEP 3: Compute number of tiles per taxon + class
+tile_totals <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(total_raw = sum(tot), .groups = "drop") %>%
+  mutate(total_tiles = round(total_raw / tile_size))
+
+# Join back to get size-class-specific raw totals
 tile_data <- tot4 %>%
-  mutate(n_tiles = round(tot / tile_size)) %>%
-  filter(n_tiles > 0)
+  left_join(tile_totals, by = "taxon") %>%
+  mutate(
+    prop = tot / total_raw,
+    n_tiles = round(prop * total_tiles)
+  ) %>%
+  filter(n_tiles > 0) %>%
+  arrange(taxon)
+
 
 # STEP 4: Order taxa by total abundance (across size classes)
 taxon_order <- tile_data %>%
   group_by(taxon) %>%
-  summarize(total_tiles = sum(n_tiles), .groups = "drop") %>%
-  arrange(total_tiles) %>%
-  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 40 + 1, default = 0)))
+  summarize(total_n = sum(tot), 
+            total_tiles = sum(n_tiles), .groups = "drop") %>%
+  arrange(total_n) %>%
+  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 25 + 1, default = 0)))
 
 # STEP 5: Expand to individual tiles
 tile_expanded <- tile_data %>%
@@ -1861,8 +1908,8 @@ tile_expanded <- tile_data %>%
   group_by(taxon) %>%
   mutate(
     tile_id = row_number(),
-    col = (tile_id - 1) %% 40,
-    row = -(taxon_row_start + (tile_id - 1) %/% 40)
+    col = (tile_id - 1) %% 25,
+    row = -(taxon_row_start + (tile_id - 1) %/% 25)
   ) %>%
   ungroup() %>%
   mutate(taxon = factor(taxon, levels = taxon_order$taxon))
@@ -1878,7 +1925,7 @@ base_colors <- setNames(rev(raw_colors), taxa)
 # STEP 7: Label positions
 row_labels <- tile_expanded %>%
   group_by(taxon) %>%
-  summarize(label_y = min(row), label_x_end = max(col), .groups = "drop")
+  summarize(label_y = max(row), label_x_end = max(col), .groups = "drop")
 
 # STEP 8: Taxon totals
 taxon_totals <- tot4 %>%
@@ -1922,7 +1969,7 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
     axis.text = element_blank()
   ) +
   labs(
-    title = "Total abundance within Scenario 2 Impact Zones\n(1 tile = 5,000 corals)",
+    title = "Total abundance within Scenario 2 impact zones\n(1 tile = 4,000 corals)",
     caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
   )
 
@@ -2121,7 +2168,7 @@ comparison_summary %>%
   knitr::kable()
 ```
 
-# individual taxon x class among datasets? (overall - across all habitat Types)
+ individual taxon x class among datasets? (overall - across all habitat Types)
 ```{r, include = F, eval = F}
 # 1️⃣ Summarize posterior draws across all habitat Types for each taxon × class × dataset × draw
 overall_preds_taxon <- preds_ds %>%
