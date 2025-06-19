@@ -511,12 +511,6 @@ write_csv(tt23_counts_ag, file = "data/processed/tt23_counts_ag.csv")
 
 ## 2024 DRM/Shedd Survey
 
-## Exclude ESA sites?
-```{r}
-
-```
-
-
 Shedd site metadata
 ```{r 2024_shedd_site_metadata}
 # Site metadata
@@ -733,6 +727,12 @@ drm24_counts_agg <- drm24_counts_ag %>%
     transect_area_m2 = sum(transect_area_m2),
     .groups = "drop"
   )
+```
+
+## Exclude 2024 ESA sites?
+```{r}
+drm24_counts_agg <- drm24_counts_agg %>%
+  filter(!site %in% c("3096", "3094"))
 ```
 
 ## Habitat maps
