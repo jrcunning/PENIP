@@ -60,7 +60,7 @@ taxon_lookup_juv <- enframe(taxon_groups_juv, name = "taxon_group", value = "tax
 
 # Order levels of Habitat Types
 type_levels <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef",
-                 "Outer Reef", "Aggregated Patch Reef")
+                 "Outer Reef")
 type_labels <- c("NRC", "IR", "MR", "OR", "APR")
 names(type_labels) <- type_levels
 
@@ -1002,9 +1002,10 @@ ggplot() +
 zone_levels <- c("Channel", "Side Slopes", "Depth_10cm", "Depth_5cm", "Depth_1cm", "Depth_0_5cm", "Depth_0_1cm",
                  "Nearshore", "North", "East", "South", "Rest of Monitoring Area")
 
-# Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons
+# Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons, and that Aggregated Patch Reef is changed to Outer Reef
 polygons_filtered <- polygons_clean %>%
   mutate(Type = if_else(Type == "Artificial", "Nearshore Ridge Complex", Type)) %>%
+  mutate(Type = if_else(Type == "Aggregated Patch Reef", "Outer Reef", Type)) %>%
   filter(Type %in% type_levels)
 
 # Intersect with habitat polygons
@@ -1397,25 +1398,25 @@ dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, cl
 
 # MODEL - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
 
-mod_nb <- brm(
-  bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
-       offset(log(transect_area_m2)),
-     zi ~ taxon * Type),
-  family = zero_inflated_negbinomial(),
-  data = dfftaxon,    # choose dataset with or without all structural zeros
-  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-            prior(normal(0, 1), class = "b", dpar = "zi")),
-  chains = 4,
-  cores = 4,
-  threads = threading(5),
-  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-  thin = 2,
-  control = list(adapt_delta = 0.85, max_treedepth = 10),
-  backend = "cmdstanr"
-)
-saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+# mod_nb <- brm(
+#   bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
+#        offset(log(transect_area_m2)),
+#      zi ~ taxon * Type),
+#   family = zero_inflated_negbinomial(),
+#   data = dfftaxon,    # choose dataset with or without all structural zeros
+#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+#             prior(normal(0, 1), class = "b", dpar = "zi")),
+#   chains = 4,
+#   cores = 4,
+#   threads = threading(5),
+#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+#   thin = 2,
+#   control = list(adapt_delta = 0.85, max_treedepth = 10),
+#   backend = "cmdstanr"
+# )
+# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
 
 
@@ -1514,26 +1515,26 @@ Let's move direction to a random effect. This approach acknowledges the variabil
 
 ## Model2 - drop direction to RE
 ```{r}
-mod_nb2 <- brm(
-  bf(n ~ dataset * taxon:class * Type +
-       (1 | taxon:class:Type:dir) +
-       offset(log(transect_area_m2)),
-     zi ~ taxon * Type),
-  family = zero_inflated_negbinomial(),
-  data = dfftaxon,    # choose dataset with or without all structural zeros
-  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-            prior(normal(0, 1), class = "b", dpar = "zi")),
-  chains = 4,
-  cores = 4,
-  threads = threading(5),
-  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-  thin = 2,
-  control = list(adapt_delta = 0.85, max_treedepth = 10),
-  backend = "cmdstanr"
-)
-saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
+# mod_nb2 <- brm(
+#   bf(n ~ dataset * taxon:class * Type +
+#        (1 | taxon:class:Type:dir) +
+#        offset(log(transect_area_m2)),
+#      zi ~ taxon * Type),
+#   family = zero_inflated_negbinomial(),
+#   data = dfftaxon,    # choose dataset with or without all structural zeros
+#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+#             prior(normal(0, 1), class = "b", dpar = "zi")),
+#   chains = 4,
+#   cores = 4,
+#   threads = threading(5),
+#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+#   thin = 2,
+#   control = list(adapt_delta = 0.85, max_treedepth = 10),
+#   backend = "cmdstanr"
+# )
+# saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
@@ -1687,27 +1688,27 @@ p1
 # ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
 # with zero-inflation that varies per taxon*class
 
-mod_nb3 <- brm(
-  bf(n ~ taxon:class * Type +
-        (1 + Type | dataset) +
-        (1 | dataset:taxon:class:Type:dir) +
-        offset(log(transect_area_m2)),
-     zi ~ taxon * Type),
-  data = dfftaxon,   # use dataset with all structural zeros present
-  family = zero_inflated_negbinomial(),
-  prior = c(
-    prior(normal(0, 2), class = "b"),
-    prior(normal(0, 5), class = "Intercept"),
-    prior(exponential(1), class = "shape"),
-    prior(normal(0, 1), class = "b", dpar = "zi")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 200, warmup = 50, thin = 2,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.95)
-)
-
-saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+# mod_nb3 <- brm(
+#   bf(n ~ taxon:class * Type +
+#         (1 + Type | dataset) +
+#         (1 | dataset:taxon:class:Type:dir) +
+#         offset(log(transect_area_m2)),
+#      zi ~ taxon * Type),
+#   data = dfftaxon,   # use dataset with all structural zeros present
+#   family = zero_inflated_negbinomial(),
+#   prior = c(
+#     prior(normal(0, 2), class = "b"),
+#     prior(normal(0, 5), class = "Intercept"),
+#     prior(exponential(1), class = "shape"),
+#     prior(normal(0, 1), class = "b", dpar = "zi")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 200, warmup = 50, thin = 2,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.95)
+# )
+# 
+# saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
 mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 
 
