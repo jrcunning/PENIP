@@ -24,6 +24,8 @@ library(tidybayes)
 library(brms)
 library(vegan)
 library(kableExtra)
+library(treemapify)
+library(ggrepel)
 ```
 
 ```{r custom}
