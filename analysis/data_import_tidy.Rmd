@@ -1955,6 +1955,116 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
 waffle
 ```
 
+```{r working_treemap}
+# Assign a base color per taxon
+base_colors <- scales::hue_pal()(length(unique(tot4$taxon)))
+names(base_colors) <- unique(tot4$taxon)
+
+set.seed(2)
+base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
+names(base_colors) <- unique(tot4$taxon)
+
+
+# Define shading function
+get_shades <- function(base_col, class, all_classes) {
+  if (length(all_classes) == 2) {
+    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
+    else colorspace::darken(base_col, 0.1)
+  } else {
+    base_col
+  }
+}
+
+# Build taxon_class and corresponding shades
+shade_map <- tot4 %>%
+  distinct(taxon, class) %>%
+  rowwise() %>%
+  mutate(
+    base_col = base_colors[[taxon]],
+    all_classes = list(tot4$class[tot4$taxon == taxon]),
+    shade = get_shades(base_col, class, all_classes),
+    taxon_class = paste(taxon, class, sep = "_")
+  ) %>%
+  ungroup()
+
+# Final color map
+fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
+
+# Add taxon_class to original data
+tot4 <- tot4 %>%
+  mutate(taxon_class = paste(taxon, class, sep = "_"))
+
+# Plot with taxon labels only
+p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
+  geom_treemap(color = NA) +
+  geom_treemap_subgroup_border(colour = "white", size = 1) +
+  # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
+  #                             alpha = 0.8, colour = "black", size = 8) +
+  scale_fill_manual(values = fill_colors) +
+  theme(legend.position = "none")
+
+
+# 5. Get tile layout and attach taxon_class
+tile_layout <- treemapify(tot4, area = "tot", 
+                          fill = "taxon_class", subgroup = "taxon")
+
+# 6. Flag small boxes (aggregate size classes)
+tile_layout_ag <- tile_layout %>%
+  group_by(taxon) %>%
+  summarize(xmin = min(xmin), xmax = max(xmax),
+            ymin = min(ymin), ymax = max(ymax),
+            area = (xmax - xmin) * (ymax - ymin),
+            center_x = (xmin + xmax) / 2,
+            center_y = (ymin + ymax) / 2)
+area_threshold <- 0.001
+internal_labels <- tile_layout_ag %>% 
+  filter(area >= area_threshold)
+external_labels <- tile_layout_ag %>% 
+  filter(area < area_threshold)
+
+# Create labels with taxontotals
+taxtots <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(tot = scales::comma(sum(tot)))
+
+internal_labels <- left_join(internal_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+external_labels <- left_join(external_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+# 7. Final plot
+p + 
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  coord_cartesian(clip = "off") +
+  geom_text(data = internal_labels,
+            aes(x = xmin, y = ymax-0.00001,
+                label = label, size = area), inherit.aes = FALSE,
+            hjust = 0, vjust = 1, lineheight = 0.7,
+            nudge_x = 0.005, nudge_y = -0.005) +
+  scale_size_continuous(range = c(1.1, 15)) +
+  geom_text_repel(data = external_labels,
+             aes(x = center_x, y = center_y, 
+                 label = label), inherit.aes = FALSE,
+             max.overlaps = Inf,
+             xlim = c(1, NA),
+             force = 5,
+             min.segment.length = 0.1,
+             segment.size = 0.2,
+             hjust = 0,
+             size = 1.1) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
+    plot.background = element_rect(fill = "white", color = NA),
+  ) +
+  ggtitle("Total corals within 1.2 km of Port Everglades Channel")
+  
+ggsave(filename = "outputs/Fig3.png", width = 170, height = 130, units = "mm", dpi = 300)
+```
+
 
 
 ```{r, fig.height = 10}
