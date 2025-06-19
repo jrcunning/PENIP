@@ -49,8 +49,8 @@ taxon_lookup <- enframe(taxon_groups, name = "taxon_group", value = "taxon") %>%
 
 # Define juvenile family level taxon groups (following DRM survey convention)
 taxon_groups_juv <- list(
-  MUSS = c("ISIN", "ISOP", "MANG", "MYCE", "SCOL", "MUSS"),
-  FAVI = c("FAVI", "FFRA", "MARE"),
+  MUSS = c("ISIN", "ISOP", "MANG", "MYCE", "SCOL", "MUSS", "MALI", "MFER"),
+  FAVI = c("FAVI", "FFRA", "MARE", "DLAB", "PSTR", "PCLI", "CNAT"),
   MEAN = c("MMEA", "MEAN", "DCYL", "DSTO", "EFAS")
 )
 # Convert to lookup tibble
@@ -127,12 +127,7 @@ dca17_esa_sitemd <- dca17_esa_sitemd0 %>%
 
 
 # Get coral data
-# Appendix C -- does not contain individual sizes
-# dca17_esa0 <- readxl::read_xlsx("data/2017_dca_esa/Appendix C_DCA2017_survey_results_FINAL.xlsx") %>%
-#   janitor::clean_names()
-# dca17_esa0 %>%
-#   select(site = esa_site, ACER = a_cervicornis_n, OFAV = o_faveolata_n, 
-#          area_m2 = habitat_surveyed_m2_based_on_walker_and_klug_2014)
+
 
 # Appendix D -- contains individual colony sizes
 # what is the "NUMBER" column? ignore for now.
@@ -280,6 +275,10 @@ dca17_counts_ag <- dca17_counts_ag %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
 
+
+dca17_counts_ag %>%
+  distinct(taxon, class) %>%
+  arrange(taxon, class)
 
 write_csv(dca17_counts_ag, file = "data/processed/dca_2017_counts_ag.csv")
 ```
@@ -511,6 +510,12 @@ write_csv(tt23_counts_ag, file = "data/processed/tt23_counts_ag.csv")
 ```
 
 ## 2024 DRM/Shedd Survey
+
+## Exclude ESA sites?
+```{r}
+
+```
+
 
 Shedd site metadata
 ```{r 2024_shedd_site_metadata}
@@ -1290,37 +1295,37 @@ Taxa with less than 5 total observations were filtered out, which included: HCUC
 (nsu11_esa_plot <- polyplot + 
   geom_point(
     data = filter(selected, dataset == "nsu11_esa"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2011 — NSU ESA Survey"))
 
 (dca17_esa_plot <- polyplot + 
   geom_point(
     data = filter(selected, dataset == "dca17_esa"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2017 — DCA ESA Survey"))
 
 (dca_plot <- polyplot + 
   geom_point(
     data = filter(selected, dataset == "dca17"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2017 — DCA RECON Survey"))
 
 (tt21_plot <- polyplot + 
   geom_point(
     data = filter(selected, dataset == "tt21"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2021 — Tetra Tech Survey"))
 
 (tt23_plot <- polyplot + 
   geom_point(
     data = filter(selected, dataset == "tt23"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2023 — Tetra Tech Survey"))
 
 (drm24_plot <- polyplot + 
   geom_point(
     data = filter(selected, dataset == "drm24"),
-    aes(x = longitude, y = latitude), pch = 13, inherit.aes = FALSE, alpha = 0.6) +
+    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2024 — Shedd Survey"))
 ```
 
@@ -1400,7 +1405,7 @@ fitted_taxon <- posterior_draws %>%
 # Plot
 ggplot(fitted_taxon, aes(y = fit_mean, x = Type, color = dir, shape = dataset,
                           group = interaction(dataset, dir))) +
-  facet_wrap(taxon ~ ., scales = "free_x") +
+  facet_wrap(taxon ~ .) +
   geom_point(position = position_dodge(width = 0.5)) +
   geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
   geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
@@ -1510,7 +1515,7 @@ fitted_taxon2 <- posterior_draws2 %>%
 # Plot
 ggplot(fitted_taxon2, aes(y = fit_mean, x = Type, shape = dataset,
                           group = interaction(dataset, class), color = class)) +
-  facet_wrap(taxon ~ ., scales = "free_x") +
+  facet_wrap(taxon ~ .) +
   geom_point(position = position_dodge(width = 0.5)) +
   geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
   geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
@@ -1751,7 +1756,7 @@ tot2 %>% ungroup() %>%
   janitor::adorn_totals(where = c("row", "col")) %>%
   knitr::kable(caption = "Total number of colonies of each coral taxon and size class in each impact zone")
 
-
+tot2 %>% filter(taxon == "CNAT")
 ```
 
 ### Total corals in impact zones
@@ -1787,7 +1792,7 @@ tot4 <- tot2 %>%
 # STEP 2: Set tile resolution
 # tile_size <- 2500
 # tile_size <- 5000
-tile_size <- 4000
+tile_size <- 1000
 
 # STEP 3: Compute number of tiles per taxon + class
 tile_totals <- tot4 %>%
@@ -1812,7 +1817,7 @@ taxon_order <- tile_data %>%
   summarize(total_n = sum(tot), 
             total_tiles = sum(n_tiles), .groups = "drop") %>%
   arrange(total_n) %>%
-  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 25 + 1, default = 0)))
+  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 100 + 1, default = 0)))
 
 # STEP 5: Expand to individual tiles
 tile_expanded <- tile_data %>%
@@ -1822,8 +1827,8 @@ tile_expanded <- tile_data %>%
   group_by(taxon) %>%
   mutate(
     tile_id = row_number(),
-    col = (tile_id - 1) %% 25,
-    row = -(taxon_row_start + (tile_id - 1) %/% 25)
+    col = (tile_id - 1) %% 100,
+    row = -(taxon_row_start + (tile_id - 1) %/% 100)
   ) %>%
   ungroup() %>%
   mutate(taxon = factor(taxon, levels = taxon_order$taxon))
@@ -1832,7 +1837,13 @@ tile_expanded <- tile_data %>%
 taxa <- levels(tile_expanded$taxon)
 n_taxa <- length(taxa)
 # Generate color palette (Dark2 can go up to 8, then extended)
-raw_colors <- c("brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black", "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",  "orchid1", "darkturquoise", "darkorange4")
+raw_colors <- c(
+  "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black",
+  "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",
+  "orchid1", "darkturquoise", "darkorange4",
+  "deepskyblue4", "darkolivegreen3", "firebrick3",
+  "mediumvioletred"
+)
 # Assign names
 base_colors <- setNames(rev(raw_colors), taxa)
 
@@ -1883,7 +1894,7 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
     axis.text = element_blank()
   ) +
   labs(
-    title = "Total abundance within 1.2-km of channel\n(1 tile = 5,000 corals)",
+    title = "Total abundance within 1.2-km of channel\n(1 tile = 1,000 corals)",
     caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
   )
 
@@ -1902,7 +1913,7 @@ tot4 <- tot2 %>%
 # STEP 2: Set tile resolution
 # tile_size <- 2500
 # tile_size <- 5000
-tile_size <- 4000
+tile_size <- 1000
 
 # STEP 3: Compute number of tiles per taxon + class
 tile_totals <- tot4 %>%
@@ -1927,7 +1938,7 @@ taxon_order <- tile_data %>%
   summarize(total_n = sum(tot), 
             total_tiles = sum(n_tiles), .groups = "drop") %>%
   arrange(total_n) %>%
-  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 25 + 1, default = 0)))
+  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 100 + 1, default = 0)))
 
 # STEP 5: Expand to individual tiles
 tile_expanded <- tile_data %>%
@@ -1937,19 +1948,13 @@ tile_expanded <- tile_data %>%
   group_by(taxon) %>%
   mutate(
     tile_id = row_number(),
-    col = (tile_id - 1) %% 25,
-    row = -(taxon_row_start + (tile_id - 1) %/% 25)
+    col = (tile_id - 1) %% 100,
+    row = -(taxon_row_start + (tile_id - 1) %/% 100)
   ) %>%
   ungroup() %>%
   mutate(taxon = factor(taxon, levels = taxon_order$taxon))
 
-# STEP 6: Assign distinct shuffled Dark2 colors per taxon
-taxa <- levels(tile_expanded$taxon)
-n_taxa <- length(taxa)
-# Generate color palette (Dark2 can go up to 8, then extended)
-raw_colors <- c("brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black", "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",  "orchid1", "darkturquoise", "darkorange4")
-# Assign names
-base_colors <- setNames(rev(raw_colors), taxa)
+
 
 # STEP 7: Label positions
 row_labels <- tile_expanded %>%
@@ -1998,7 +2003,7 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
     axis.text = element_blank()
   ) +
   labs(
-    title = "Total abundance within Scenario 2 impact zones\n(1 tile = 4,000 corals)",
+    title = "Total abundance within Scenario 2 impact zones\n(1 tile = 1,000 corals)",
     caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
   )
 
