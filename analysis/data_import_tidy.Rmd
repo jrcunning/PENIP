@@ -11,7 +11,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
 ```
 
 # Setup
@@ -407,6 +407,7 @@ write_csv(tt21_counts_ag, file = "data/processed/tt21_counts_ag.csv")
 
 ## 2023 TT Impact Survey
 
+## THESE HAD SAND DISTNACE RECORDED ON TRANSECT - IMPORT AND SUBTRACT
 TT site metadata
 ```{r 2023_tt_site_metadata}
 # Site metadata
@@ -927,13 +928,12 @@ if (st_is_longlat(channel_poly)) {
   all_zones_sf_m <- all_zones_sf
 }
 
-# 3. Get midpoint of channel (north-south)
+# 3. Get bounds of channel (north-south)
 bbox_channel <- st_bbox(channel_poly)
-channel_mid_y <- (bbox_channel["ymin"] + bbox_channel["ymax"]) / 2
 
 # 4. Define rectangular box: full E-W extent of reef habitat, ±1.2 km N/S of channel
 ew_range <- st_bbox(polygons_clean_m)[c("xmin", "xmax")]
-ns_range <- c(channel_mid_y - 1200, channel_mid_y + 1200)
+ns_range <- c(bbox_channel["ymin"] - 1200, bbox_channel["ymax"] + 1200)
 names(ns_range) <- c("ymin", "ymax")
 
 new_box <- st_as_sfc(st_bbox(c(
@@ -1071,8 +1071,9 @@ df <- df %>%
 df <- df %>%
   mutate(transect_area_m2 = case_when(
      # Count-specific areas for nsu11 (since they did tier 1 surveys and tier 2 only if n > 5 for a taxon)
-    dataset == "nsu11_esa" & n >= 5 ~ 600,  
-    dataset == "nsu11_esa" & n < 5 ~ 3600,
+    dataset == "nsu11_esa" & taxon == "ACER" & n >= 5 ~ 600,  
+    dataset == "nsu11_esa" & taxon == "ACER" & n < 5 ~ 3600,
+    dataset == "nsu11_esa" & taxon != "ACER" ~ 600,
     dataset == "dca17_esa" ~ 784,
     dataset == "dca17" ~ 30,     # DCA belt transects were 30m
     dataset == "tt23" ~ 20,     # TT23 belt transects were 20m
@@ -1082,6 +1083,8 @@ df <- df %>%
 # Remove surveys with transect_area_m2 == 0    (a couple of TT21 surveys were all sand)
 df <- df %>% filter(transect_area_m2 > 0)
 ```
+
+
 
 
 ## Filter by habitat
@@ -1107,7 +1110,8 @@ dff <- df %>% inner_join(selected)
 
 ```
 
-###### Shedd dataset has some sites in the NRC south that are further from the channel relative to other datasets. Are these similar enough to the NRC south sites that are closer to the channel that they can be reasonably included?
+
+Shedd dataset has some sites in the NRC south that are further from the channel relative to other datasets. Are these similar enough to the NRC south sites that are closer to the channel that they can be reasonably included?
 
 First, look at total coral density between the nearer vs. farther sites
 
@@ -1185,7 +1189,7 @@ ggplot(scores_df, aes(x = NMDS1, y = NMDS2, color = grp)) +
 Density and community composition are not different in the NRC S sites that are nearer vs. farther from the channel. So, no need to exclude the farther sites.
 
 
-###### DCA dataset has the most sites in the "Artificial" habitat classification. (Some in other datasets too, but DCA has most). Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
+DCA dataset has the most sites in the "Artificial" habitat classification. (Some in other datasets too, but DCA has most). Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
 
 'Artificial' is only present in DCA and minorly in TT -- but absent from Shedd.   
 It is in close spatial proximity to Nearshore Ridge Complex -- can these be combined?
@@ -1269,11 +1273,18 @@ Combine 'Artificial' with 'Nearshore Ridge Complex'
 dff[dff$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
 ```
 
+
+Combine 'Aggregated Patch Reef' with 'Outer Reef', following previous studies (DCA)
+```{r}
+dff[dff$Type == "Aggregated Patch Reef", "Type"] <- "Outer Reef"
+```
+
+
 ## Filter by coral taxa
 
 Remove lowest abundance coral taxa
 
-These will be problematic for statistical models
+These will be problematic for statistical models.
 
 ```{r filter_low_taxa}
 # Drop taxa with very few observations
@@ -1289,6 +1300,49 @@ dff <- dff %>%
 ```
 
 Taxa with less than 5 total observations were filtered out, which included: HCUC, MANG, PAME, FFRA, OCUL, SCOL
+
+## Summarize survey datasets
+```{r}
+# Count number of sites per habitat
+nsites <- dff %>%
+  group_by(dataset, Type) %>%
+  summarize(n = n_distinct(site)) %>%
+  mutate(Type = factor(Type, levels = type_levels)) %>%
+  arrange(Type) %>%
+  pivot_wider(names_from = Type, values_from = n, values_fill = 0) %>%
+  janitor::adorn_totals(where = "col", name = "Total Sites")
+
+# Get area surveyed per transect and total area surveyed
+area_per_site <- dff %>%
+  group_by(dataset) %>%
+  summarise(
+    area_per_site = {
+      r <- range(transect_area_m2)
+      if (r[1] == r[2]) as.character(r[1]) else paste(r, collapse = " — ")})
+
+total_area <- dff %>%
+  group_by(dataset, site) %>%
+  summarize(max_area = max(transect_area_m2)) %>%
+  summarize(total_area = sum(max_area))
+
+# Get total number of corals counted
+total_corals <- dff %>%
+  group_by(dataset) %>%
+  summarize(total_n = sum(n))
+
+survey_summary <- reduce(
+  list(nsites, area_per_site, total_area, total_corals),
+  full_join,
+  by = "dataset"
+) %>%
+  mutate(dataset = factor(dataset, levels = dataset_levels)) %>%
+  arrange(dataset) %>% 
+  janitor::adorn_totals(where = "row")
+
+write_csv(survey_summary, file = "outputs/Table1.csv")
+
+survey_summary %>% knitr::kable()
+```
 
 # Map datasets
 ```{r plot_maps, fig.width = 10, fig.height = 10}
@@ -1330,7 +1384,7 @@ Taxa with less than 5 total observations were filtered out, which included: HCUC
 ```
 
 
-# Coral densities
+# Estimate coral densities
 
 ## Model1 - all fixed effects
 
@@ -1458,7 +1512,7 @@ Let's move direction to a random effect. This approach acknowledges the variabil
 
 ((When I changed FAVI adults to individual taxa and the formula in the first model to taxon:class in the fixed effects instead of taxon * class, the number of N-S differences dropped by a lot. probably because multiple comparisons numbers go up because more taxa.))
 
-## Model2 - drop direction to RE ----- OR DROP DIR COMPLETELY?!
+## Model2 - drop direction to RE
 ```{r}
 mod_nb2 <- brm(
   bf(n ~ dataset * taxon:class * Type +
@@ -1483,7 +1537,7 @@ saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
-```{r}
+```{r, eval = F}
 loo_1 <- loo(mod_nb)
 loo_2 <- loo(mod_nb2)
 
@@ -1670,7 +1724,7 @@ summary_preds <- preds %>%
   mean_qi(.epred, .width = 0.95)
 ```
 
-```{r}
+```{r, eval = F}
 loo_3 <- loo(mod_nb3)
 
 loo_compare(loo_2, loo_3)
@@ -1778,11 +1832,10 @@ tot2 %>%
 
 
 
-
 ```
 
 
-```{r, fig.height = 10}
+```{r, fig.height = 10, fig.width = 5}
 
 # STEP 1: Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
@@ -1903,7 +1956,7 @@ waffle
 
 
 
-```{r}
+```{r, fig.height = 10}
 # STEP 1: Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
   filter(name != "Rest of Monitoring Area") %>%
@@ -2016,7 +2069,7 @@ waffle
 
 
 
-# Dataset-specific estimates from Model3
+### Dataset-specific estimates from Model3
 ```{r, include = T, eval = T, fig.width = 10, fig.height = 20}
 newdata_ds <- dfftaxon_trimmed %>%        
   distinct(dataset, Type, taxon, class) %>%
@@ -2025,7 +2078,7 @@ newdata_ds <- dfftaxon_trimmed %>%
 
 
 preds_ds <- add_epred_draws(
-  mod_nb_zinf,
+  mod_nb3,
   newdata = newdata_ds,
   re_formula = NULL,
   allow_new_levels = TRUE 
@@ -2045,7 +2098,7 @@ ggplot(summary_preds_ds, aes(x = Type, y = .epred,
   geom_errorbar(aes(ymin = .lower, ymax = .upper),
                 position = position_dodge(width = 0.5), width = 0.2, alpha = 0.5) +
   facet_wrap(~ taxon + class, scales = "free_y") +
-  #scale_y_log10()+#limits = c(1e-4, 2)) +
+  scale_y_log10()+#limits = c(1e-4, 2)) +
   labs(x = "Habitat Type", y = "Estimated Density (per m²)",
        color = "Size Class", shape = "Dataset") +
   theme_minimal(base_size = 12) +
@@ -2155,7 +2208,8 @@ comparison_summary <- comparisons %>%
 # View results
 comparison_summary %>%
   arrange(taxon_group, Type, class, desc(p_diff_gt0)) %>%
-  filter(p_diff_gt0 < 0.1 | p_diff_lt0 < 0.1)
+  filter(p_diff_gt0 < 0.1 | p_diff_lt0 < 0.1) %>%
+  knitr::kable()
 
 ```
 
