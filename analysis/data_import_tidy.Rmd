@@ -409,7 +409,6 @@ write_csv(tt21_counts_ag, file = "data/processed/tt21_counts_ag.csv")
 
 ## 2023 TT Impact Survey
 
-## THESE HAD SAND DISTNACE RECORDED ON TRANSECT - IMPORT AND SUBTRACT
 TT site metadata
 ```{r 2023_tt_site_metadata}
 # Site metadata
@@ -730,10 +729,10 @@ drm24_counts_agg <- drm24_counts_ag %>%
     transect_area_m2 = sum(transect_area_m2),
     .groups = "drop"
   )
-```
 
-## Exclude 2024 ESA sites?
-```{r}
+
+
+## Exclude two sites that were selected specifically because of known ACER populations
 drm24_counts_agg <- drm24_counts_agg %>%
   filter(!site %in% c("3096", "3094"))
 ```
@@ -767,6 +766,66 @@ extract_attrs <- function(desc) {
 attrs <- map_dfr(polygons$Description, extract_attrs)
 polygons_clean <- bind_cols(polygons %>% select(-Description), attrs)
 
+
+###### GET RID OF OVERLAPPING SAND POLYGONS
+
+# 1. Set clean CRS and define area of interest (AOI)
+crs_clean <- st_crs(32617)
+
+aoi_bbox <- st_as_sfc(st_bbox(c(xmin = -80.113, xmax = -80.078, ymin = 26.058, ymax = 26.112), crs = 4326))
+aoi_bbox_utm <- st_transform(aoi_bbox, crs = crs_clean)
+
+# 2. Reproject and filter
+polygons_proj <- st_transform(polygons_clean, crs = crs_clean)
+
+sand_polygons <- polygons_proj %>%
+  filter(Type == "Sand") %>%
+  st_intersection(aoi_bbox_utm)
+
+non_sand_polygons <- polygons_proj %>%
+  filter(Type != "Sand") %>%
+  st_intersection(aoi_bbox_utm)
+
+# 3. Clean geometries using WKT rebuild
+sand_geom_clean <- st_sfc(
+  lapply(st_as_text(st_geometry(sand_polygons)), function(wkt) st_as_sfc(wkt)[[1]]),
+  crs = crs_clean
+)
+
+nonsand_union_clean <- st_as_sfc(st_as_text(st_union(st_geometry(non_sand_polygons))), crs = crs_clean)[[1]]
+
+# 4. Subtract all non-sand from sand polygons
+cut_geoms <- lapply(seq_along(sand_geom_clean), function(i) {
+  g <- sand_geom_clean[[i]]
+  g_fixed <- st_buffer(g, 0)
+  tryCatch(
+    st_difference(g_fixed, nonsand_union_clean),
+    error = function(e) {
+      message("Skipping geometry ", i, " due to error: ", e$message)
+      st_geometrycollection()
+    }
+  )
+})
+
+# 5. Rebuild sand_cut sf object and drop empty geometries
+sand_cut <- sand_polygons
+st_geometry(sand_cut) <- st_sfc(cut_geoms, crs = crs_clean)
+sand_cut <- sand_cut[!st_is_empty(sand_cut), ]
+
+# 6. Combine everything
+combined <- bind_rows(sand_cut, non_sand_polygons)
+
+# 7. Reproject to WGS84 for plotting
+polygons_final <- st_transform(combined, crs = 4326)
+
+
+
+
+
+
+
+
+######## MERGE WITH SURVEY SITES
 # --- STEP 3: Prepare Site Coordinate Data ---
 # Get all site coordinates, and assign north and south
 # Combine site metadata
@@ -782,7 +841,7 @@ allsitemd <- bind_rows(.id = "dataset",
 points <- st_as_sf(allsitemd, coords = c("longitude", "latitude"), crs = 4326)
 
 # --- STEP 4: Validate Geometry and Match CRS ---
-polygons_clean <- polygons_clean %>%
+polygons_final <- polygons_final %>%
   st_zm(drop = TRUE, what = "ZM") %>%
   st_make_valid() %>%
   st_transform(st_crs(points))
@@ -790,7 +849,7 @@ polygons_clean <- polygons_clean %>%
 sf_use_s2(FALSE)  # prevent s2 geometry issues
 
 # --- STEP 5: Spatial Join ---
-joined <- st_join(points, polygons_clean, join = st_within)
+joined <- st_join(points, polygons_final, join = st_within)
 
 joined_df <- joined %>%
   mutate(longitude = st_coordinates(.)[,1],
@@ -799,23 +858,27 @@ joined_df <- joined %>%
 
 allsitemd <- joined_df
 
-# 'Sand' overlaps some of the other polygons instead of just surrounding them...
-# If a point is classified as Sand AND something else, remove Sand...
-multiclass <- allsitemd %>%
-  group_by(site) %>%
-  filter(n() > 1)
-
-allsitemd_clean <- allsitemd %>%
-  group_by(site) %>%
-  filter(!(Type == "Sand" & n() > 1)) %>%
-  ungroup()
+##############
+# Not needed anymore because removed overlapping sand polygons VVV
+# # 'Sand' overlaps some of the other polygons instead of just surrounding them...
+# # If a point is classified as Sand AND something else, remove Sand...
+# multiclass <- allsitemd %>%
+#   group_by(dataset, site) %>%
+#   filter(n() > 1) %>%
+#   arrange(site)
+# 
+# allsitemd_clean <- allsitemd %>%
+#   group_by(dataset, site) %>%
+#   filter(!(Type == "Sand" & n() > 1)) %>%
+#   ungroup()
+##############
 
 # Add factor if survey was ESA coral species only
 allsitemd_clean <- allsitemd_clean %>%
   mutate(ESAonly = if_else(dataset %in% c("nsu11_esa", "dca17_esa"), "ESA only", "All corals"))
 
 # Visualize habitat classifications
-polyplot <- polygons_clean %>% 
+polyplot <- polygons_final %>% 
   #filter(Type != "Sand") %>%
   ggplot() +
   geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
