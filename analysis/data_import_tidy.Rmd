@@ -978,22 +978,32 @@ if (st_crs(new_zone) != st_crs(all_zones_sf)) {
 all_zones_sf <- bind_rows(all_zones_sf, new_zone)
 
 
-# Plot all zones
+zone_colors <- RColorBrewer::brewer.pal(12, "Paired")  # Or use "Set3", "Set1", "Dark2", etc.
+names(zone_colors) <- unique(all_zones_sf$name)  # Make sure order matches levels
+
 ggplot() +
-  # Habitat polygons layer
-  geom_sf(data = polygons_clean, color = "black", size = 0.2, alpha = 0.4, linewidth = 0.1) +
-  
-  # Impact/NMFS zones overlay
-  geom_sf(data = all_zones_sf, aes(color = scenario), fill = NA, linewidth = 0.5, alpha = 0.2) +
+  # Habitat polygons (no legend)
+  # geom_sf(data = polygons_clean, aes(fill = Type),
+  #         color = NA, size = 0.1, alpha = 0.25, show.legend = FALSE) +
+  # scale_fill_brewer(palette = "Set3", na.value = "gray80") +
 
-  # Map extent
-  xlim(-80.11, -80.079) +
-  ylim(26.08, 26.11) +
-  
+  ggnewscale::new_scale_fill() +
+
+  # Zones (with 12 manual colors and legend)
+  geom_sf(data = all_zones_sf, aes(fill = name),
+          color = NA, linewidth = 0.5, alpha = 0.6) +
+  scale_fill_manual(values = zone_colors, name = "Zone Type") +
+
   theme_minimal() +
-  guides(fill = guide_legend(title = "Habitat Type"),
-         color = guide_legend(title = "Zone Type"))
-
+  theme(legend.position = "bottom") +
+  coord_sf(
+    xlim = c(-80.113, -80.078),
+    ylim = c(26.075, 26.11),
+    expand = FALSE
+  ) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
+  scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
+                     labels = scales::number_format(accuracy = 0.01))
 
 ```
 
