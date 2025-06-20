@@ -874,7 +874,7 @@ allsitemd <- joined_df
 ##############
 
 # Add factor if survey was ESA coral species only
-allsitemd_clean <- allsitemd_clean %>%
+allsitemd <- allsitemd %>%
   mutate(ESAonly = if_else(dataset %in% c("nsu11_esa", "dca17_esa"), "ESA only", "All corals"))
 
 # Visualize habitat classifications
@@ -898,7 +898,7 @@ polyplot <- polygons_final %>%
 
 # Plot all surveyed sites
 fig1 <- polyplot + 
-  geom_point(data = allsitemd_clean, 
+  geom_point(data = allsitemd, 
              aes(x = longitude, y = latitude, shape = dataset), 
              inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
   facet_wrap(~ESAonly, labeller = as_labeller(c(
@@ -933,25 +933,48 @@ extract_placemark_info <- function(kml_file, source_label) {
 
   map(placemarks, function(pm) {
     name <- xml_text(xml_find_first(pm, ".//kml:name", ns))
-    coords_text <- xml_text(xml_find_first(pm, ".//kml:coordinates", ns))
-    folder <- xml_text(xml_find_first(xml_parent(xml_parent(pm)), ".//kml:name", ns))
 
-    coords <- strsplit(trimws(coords_text), "\\s+")[[1]]
-    coords_mat <- do.call(rbind, lapply(coords, function(x) {
-      as.numeric(strsplit(x, ",")[[1]][1:2])
-    }))
-
-    if (nrow(coords_mat) >= 3) {
-      poly <- list(st_polygon(list(coords_mat)))
-      tibble(folder = folder, name = name, geometry = st_sfc(poly, crs = 4326), source = source_label)
-    } else {
-      NULL
+    # Try to find the folder name, fallback to "Top Level"
+    folder_node <- xml_parent(xml_parent(pm))
+    folder_name <- xml_text(xml_find_first(folder_node, ".//kml:name", ns))
+    if (is.na(folder_name) || folder_name == "") {
+      folder_name <- "Top Level"
     }
+
+    # Get ALL coordinate rings (outer/inner polygons, multi-geometries)
+    coord_nodes <- xml_find_all(pm, ".//kml:coordinates", ns)
+
+    rings <- lapply(coord_nodes, function(cn) {
+      coords_text <- xml_text(cn)
+      coords <- strsplit(trimws(coords_text), "\\s+")[[1]]
+      coords_mat <- do.call(rbind, lapply(coords, function(x) {
+        as.numeric(strsplit(x, ",")[[1]][1:2])
+      }))
+      if (nrow(coords_mat) >= 3) coords_mat else NULL
+    })
+
+    rings <- compact(rings)
+    if (length(rings) == 0) return(NULL)
+
+    # Create polygon or multipolygon depending on number of rings
+    poly_geom <- if (length(rings) == 1) {
+      st_polygon(list(rings[[1]]))
+    } else {
+      st_multipolygon(list(rings))
+    }
+
+    tibble(
+      folder = folder_name,
+      name = name,
+      geometry = st_sfc(poly_geom, crs = 4326),
+      source = source_label
+    )
   }) %>%
     compact() %>%
     bind_rows() %>%
     st_as_sf()
 }
+
 
 # File paths
 impact_kml <- "data/Impact_zones_Scenario 2.kml"
@@ -1014,10 +1037,11 @@ intersected_box <- st_union(st_intersection(new_box, st_union(polygons_clean_m))
 # 6. Subtract all existing zones (Impact + NMFS) by taking concave hull
 # 6. Create a tight, shrink-wrapped outer boundary around all existing zones
 existing_zone_hull <- all_zones_sf_m %>%
+  st_make_valid() %>% 
   st_union() %>%
-  st_buffer(40) %>%     # Buffer OUTWARD 40 meters to close gaps (adjust as needed)
+  st_buffer(20) %>%     # Buffer OUTWARD 40 meters to close gaps (adjust as needed)
   st_union() %>%
-  st_buffer(-40)        # Buffer INWARD to return to approximate original size
+  st_buffer(-20)        # Buffer INWARD to return to approximate original size
 
 # 7. Subtract existing zones from monitoring area
 new_zone_geom <- st_difference(intersected_box, existing_zone_hull)
@@ -1046,9 +1070,9 @@ names(zone_colors) <- unique(all_zones_sf$name)  # Make sure order matches level
 
 ggplot() +
   # Habitat polygons (no legend)
-  # geom_sf(data = polygons_clean, aes(fill = Type),
-  #         color = NA, size = 0.1, alpha = 0.25, show.legend = FALSE) +
-  # scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  geom_sf(data = polygons_clean, aes(fill = Type),
+          color = NA, size = 0.1, alpha = 0.25, show.legend = FALSE) +
+  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
 
   ggnewscale::new_scale_fill() +
 
@@ -1058,7 +1082,7 @@ ggplot() +
   scale_fill_manual(values = zone_colors, name = "Zone Type") +
 
   theme_minimal() +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "none") +
   coord_sf(
     xlim = c(-80.113, -80.078),
     ylim = c(26.075, 26.11),
@@ -1078,11 +1102,14 @@ zone_levels <- c("Channel", "Side Slopes", "Depth_10cm", "Depth_5cm", "Depth_1cm
                  "Nearshore", "North", "East", "South", "Rest of Monitoring Area")
 
 # Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons, and that Aggregated Patch Reef is changed to Outer Reef
-polygons_filtered <- polygons_clean %>%
+polygons_filtered <- polygons_final %>%
   mutate(Type = if_else(Type == "Artificial", "Nearshore Ridge Complex", Type)) %>%
   mutate(Type = if_else(Type == "Aggregated Patch Reef", "Outer Reef", Type)) %>%
   filter(Type %in% type_levels)
 
+# Clean any invalid geometry
+polygons_filtered <- st_make_valid(polygons_filtered)
+all_zones_sf <- st_make_valid(all_zones_sf)
 # Intersect with habitat polygons
 habitat_in_zones <- st_intersection(polygons_filtered, all_zones_sf)
 
@@ -1167,7 +1194,7 @@ df <- df %>% filter(transect_area_m2 > 0)
 
 ```{r select_habitats, fig.width = 10, fig.height = 10}
 # Select sites in Nearshore Ridge Complex, Inner Reef, and Middle Reef, Outer Reef and Aggregated Patch Reef
-selected <- allsitemd_clean %>%
+selected <- allsitemd %>%
   filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", 
                      "Artificial", "Outer Reef", "Aggregated Patch Reef"))
 
@@ -1193,7 +1220,7 @@ First, look at total coral density between the nearer vs. farther sites
 
 ```{r NRCS_density}
 drm24_NRCS <- drm24_counts_ag %>%
-  left_join(allsitemd_clean) %>%
+  left_join(allsitemd) %>%
   filter(Type == "Nearshore Ridge Complex", dir == "S")
 
 drm24_NRCS <- drm24_NRCS %>%
@@ -1274,7 +1301,7 @@ Test for differences in coral density in DCA survey between habitat types
 ```{r artificial_vs_nrc_density}
 # Subset DCA data
 dcadf <- dca17_counts_ag %>%
-  left_join(allsitemd_clean) %>%
+  left_join(allsitemd) %>%
   filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Artificial", "Outer Reef", "Aggregated Patch Reef"))
 
 # Fit a Negative Binomial GLM
