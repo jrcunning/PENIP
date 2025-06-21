@@ -934,16 +934,13 @@ extract_placemark_info <- function(kml_file, source_label) {
   map(placemarks, function(pm) {
     name <- xml_text(xml_find_first(pm, ".//kml:name", ns))
 
-    # Try to find the folder name, fallback to "Top Level"
     folder_node <- xml_parent(xml_parent(pm))
     folder_name <- xml_text(xml_find_first(folder_node, ".//kml:name", ns))
-    if (is.na(folder_name) || folder_name == "") {
-      folder_name <- "Top Level"
-    }
+    if (is.na(folder_name) || folder_name == "") folder_name <- "Top Level"
 
-    # Get ALL coordinate rings (outer/inner polygons, multi-geometries)
     coord_nodes <- xml_find_all(pm, ".//kml:coordinates", ns)
 
+    # Extract all coordinate rings
     rings <- lapply(coord_nodes, function(cn) {
       coords_text <- xml_text(cn)
       coords <- strsplit(trimws(coords_text), "\\s+")[[1]]
@@ -956,17 +953,14 @@ extract_placemark_info <- function(kml_file, source_label) {
     rings <- compact(rings)
     if (length(rings) == 0) return(NULL)
 
-    # Create polygon or multipolygon depending on number of rings
-    poly_geom <- if (length(rings) == 1) {
-      st_polygon(list(rings[[1]]))
-    } else {
-      st_multipolygon(list(rings))
-    }
+    # Group into separate polygon parts based on breaks (every outer ring followed by 0+ inner rings)
+    # For now, assume all are outer rings (no holes), so wrap each as its own polygon
+    multipoly <- st_multipolygon(lapply(rings, function(r) list(r)))
 
     tibble(
       folder = folder_name,
       name = name,
-      geometry = st_sfc(poly_geom, crs = 4326),
+      geometry = st_sfc(multipoly, crs = 4326),
       source = source_label
     )
   }) %>%
@@ -974,6 +968,7 @@ extract_placemark_info <- function(kml_file, source_label) {
     bind_rows() %>%
     st_as_sf()
 }
+
 
 
 # File paths
@@ -995,7 +990,7 @@ all_zones_sf <- all_zones_sf %>%
       str_remove(str_remove(folder, "^Scenario_2_"), "\\.shp$"),
       name
     ),
-    scenario = "Scenario 2 + NMFS Consideration Areas"
+    scenario = if_else(name %in% c("North", "South", "East", "Nearshore"), "NMFS Consideration", "Scenario 2")
   )
 
 # Create new polygon covering Rest of Monitoring Area, from 1.2 km N to 1.2 km S of the channel
@@ -1063,6 +1058,46 @@ if (st_crs(new_zone) != st_crs(all_zones_sf)) {
 
 # 10. Add the new zone to the combined zones object
 all_zones_sf <- bind_rows(all_zones_sf, new_zone)
+all_zones_sf$name <- factor(all_zones_sf$name, levels = zone_levels)
+
+
+
+#### MERGE CONTIGUOUS POLYGONS OF SAME ZONE TYPE/NAME
+
+
+# 1. Ensure individual polygons (not MULTIPOLYGONs)
+zones_split <- all_zones_sf %>%
+  st_cast("POLYGON") %>%
+  mutate(row_id = row_number())  # unique ID to track rows
+
+# 2. Group and merge contiguous polygons with the same name
+zones_merged <- zones_split %>%
+  group_by(name) %>%
+  group_split() %>%
+  map_dfr(function(df) {
+    # Build adjacency graph for touching polygons
+    touch_mat <- st_touches(df)
+    g <- graph_from_adj_list(touch_mat)
+
+    # Find connected components
+    comps <- components(g)$membership
+
+    # Merge by component
+    df %>%
+      mutate(component = comps) %>%
+      group_by(name, component) %>%
+      summarise(
+        geometry = st_union(geometry),
+        scenario = first(scenario),
+        source = first(source),
+        .groups = "drop"
+      )
+  }) %>%
+  select(name, scenario, source, geometry) %>%
+  st_as_sf()
+
+
+
 
 
 zone_colors <- RColorBrewer::brewer.pal(12, "Paired")  # Or use "Set3", "Set1", "Dark2", etc.
@@ -1077,7 +1112,7 @@ ggplot() +
   ggnewscale::new_scale_fill() +
 
   # Zones (with 12 manual colors and legend)
-  geom_sf(data = all_zones_sf, aes(fill = name),
+  geom_sf(data = zones_merged, aes(fill = name),
           color = NA, linewidth = 0.5, alpha = 0.6) +
   scale_fill_manual(values = zone_colors, name = "Zone Type") +
 
@@ -1092,6 +1127,63 @@ ggplot() +
   scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
                      labels = scales::number_format(accuracy = 0.01))
 
+
+ggplot() +
+  # Habitat polygons (no legend)
+  geom_sf(data = polygons_clean, aes(fill = Type),
+          color = NA, size = 0.1, alpha = 0.25, show.legend = FALSE) +
+  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+
+  ggnewscale::new_scale_fill() +
+
+  # Zones (with 12 manual colors and legend)
+  geom_sf(data = zones_merged, aes(fill = scenario),
+          linewidth = 0.1, alpha = 0.3) +
+  #scale_fill_manual(values = zone_colors, name = "Zone Type") +
+
+  theme_minimal() +
+  theme(legend.position = "none") +
+  coord_sf(
+    xlim = c(-80.113, -80.078),
+    ylim = c(26.075, 26.11),
+    expand = FALSE
+  ) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
+  scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
+                     labels = scales::number_format(accuracy = 0.01))
+
+```
+
+
+# try to label zones
+```{r}
+zones_split <- all_zones_sf %>%
+  st_cast("POLYGON") %>%
+  mutate(id = row_number())  # give each piece a unique ID
+centroids <- zones_split %>%
+  st_centroid(of_largest_polygon = FALSE) %>%
+  mutate(X = st_coordinates(.)[,1],
+         Y = st_coordinates(.)[,2])
+zone_labels <- centroids %>%
+  group_by(name) %>%
+  slice_min(order_by = Y, n = 1, with_ties = FALSE) %>%
+  ungroup()
+
+iz_plot + 
+   geom_text_repel(data = zone_labels,
+                  aes(x = X, y = Y, label = name),
+                  size = 3, segment.color = "gray40",
+                  xlim = c(-80.08, -79),
+                  max.overlaps = Inf,
+                  force = 10) +
+  coord_sf(
+    xlim = c(-80.113, -80.078),  # Adjusted to reduce whitespace
+    ylim = c(26.058, 26.112),
+    expand = FALSE, clip = "off"
+  ) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
+  scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
+                     labels = scales::number_format(accuracy = 0.01))  # Fewer long ticks
 ```
 
 
