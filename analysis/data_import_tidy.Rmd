@@ -26,6 +26,8 @@ library(vegan)
 library(kableExtra)
 library(treemapify)
 library(ggrepel)
+library(igraph)
+library(cowplot)
 ```
 
 ```{r custom}
@@ -858,21 +860,6 @@ joined_df <- joined %>%
 
 allsitemd <- joined_df
 
-##############
-# Not needed anymore because removed overlapping sand polygons VVV
-# # 'Sand' overlaps some of the other polygons instead of just surrounding them...
-# # If a point is classified as Sand AND something else, remove Sand...
-# multiclass <- allsitemd %>%
-#   group_by(dataset, site) %>%
-#   filter(n() > 1) %>%
-#   arrange(site)
-# 
-# allsitemd_clean <- allsitemd %>%
-#   group_by(dataset, site) %>%
-#   filter(!(Type == "Sand" & n() > 1)) %>%
-#   ungroup()
-##############
-
 # Add factor if survey was ESA coral species only
 allsitemd <- allsitemd %>%
   mutate(ESAonly = if_else(dataset %in% c("nsu11_esa", "dca17_esa"), "ESA only", "All corals"))
@@ -884,7 +871,7 @@ polyplot <- polygons_final %>%
   geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
   scale_fill_brewer(palette = "Set3", na.value = "gray80") +
   theme_minimal(base_size = 8) +
-  labs(fill = "Habitat type", shape = "Survey", x = "", y = "") +
+  labs(fill = NULL, shape = NULL, x = NULL, y = NULL) +
   theme(legend.position = "right") +
   coord_sf(
     xlim = c(-80.113, -80.078),  # Adjusted to reduce whitespace
@@ -896,33 +883,28 @@ polyplot <- polygons_final %>%
                      labels = scales::number_format(accuracy = 0.01))  # Fewer long ticks
 
 
-# Plot all surveyed sites
-fig1 <- polyplot + 
-  geom_point(data = allsitemd, 
-             aes(x = longitude, y = latitude, shape = dataset), 
+# Plot all coral surveys and ESA coral surveys
+esa_all_plot <- polyplot +
+  geom_point(data = filter(allsitemd, ESAonly == "All corals"),
+             aes(x = longitude, y = latitude, shape = dataset),
              inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
-  facet_wrap(~ESAonly, labeller = as_labeller(c(
-     "All corals" = "A. Surveys of all corals",
-     "ESA only" = "B. Surveys of ESA-listed corals"
-  ))) +
-  scale_shape_manual(values = c(2, 3, 4, 5, 6, 7)) +
-  theme(
-    strip.text = element_text(hjust = 0, face = "bold", size = 9),#, margin = margin(l = -10)),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA),
-    legend.text = element_text(size = 7),
-    legend.title = element_text(size = 8),
-    legend.key.size = unit(0.35, "cm"),         # size of legend boxes
-    legend.spacing.y = unit(0.2, "cm"),         # vertical spacing between legend items
-    legend.margin = margin(t = 2, r = 2, b = 2, l = 2),
-    legend.box.margin = margin(0, 0, 0, 0)
-  )
-fig1 
-ggsave(plot = fig1, filename = "outputs/Fig1.png", width = 170, height = 100, units = "mm", dpi = 300)
+  scale_shape_manual(values = c(2, 3, 4, 5)) +
+  guides(fill = "none", shape = "none") +
+  theme_minimal()
+ 
+esa_esa_plot <- polyplot +
+  geom_point(data = filter(allsitemd, ESAonly == "ESA only"),
+             aes(x = longitude, y = latitude, shape = dataset),
+             inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
+  scale_shape_manual(values = c(1, 6)) +
+  guides(fill = "none", shape = "none") +
+  theme_minimal() #+
+  # theme(plot.title = element_text(hjust = 0, face = "bold", size = 9))
+
+cowplot::plot_grid(esa_all_plot, esa_esa_plot)
 ```
 
 ## Impact Zones
-#### Scenario 2 + NMFS consideration areas
 ```{r}
 # Impact zone Scenario 2 and NMFS consideration areas
 # Define the extraction function once
@@ -1058,6 +1040,8 @@ if (st_crs(new_zone) != st_crs(all_zones_sf)) {
 
 # 10. Add the new zone to the combined zones object
 all_zones_sf <- bind_rows(all_zones_sf, new_zone)
+zone_levels <- c("Channel", "Side Slopes", "Depth_10cm", "Depth_5cm", "Depth_1cm", "Depth_0_5cm", "Depth_0_1cm",
+                 "Nearshore", "North", "East", "South", "Rest of Monitoring Area")
 all_zones_sf$name <- factor(all_zones_sf$name, levels = zone_levels)
 
 
@@ -1162,86 +1146,7 @@ p <- ggplot() +
   scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
                      labels = scales::number_format(accuracy = 0.01))
 
-```
-
-
-### try to label zones
-```{r}
-
-# Step 1: Compute centroids of each polygon
-zone_centroids <- zones_merged %>%
-  st_cast("POLYGON") %>%
-  mutate(centroid = st_centroid(geometry)) %>%
-  mutate(centroid_coords = st_coordinates(centroid))
-
-# Step 2: Get channel Y center (assumes UTM/meter CRS)
-channel_y_center <- channel_poly %>%
-  st_centroid() %>%
-  st_transform(4326) %>%
-  st_coordinates() %>%
-  .[[2]]  # This is latitude in degrees
-
-
-# Step 3: Classify each polygon as north/south or single
-zone_centroids <- zone_centroids %>%
-  mutate(
-    label_group = case_when(
-      name %in% c("North", "South", "East", "Nearshore") ~ "single",
-      st_coordinates(centroid)[, 2] >= channel_y_center ~ "north",
-      TRUE ~ "south"
-    )
-  )
-
-# Step 4: Create manual label position table
-zone_label_positions <- tribble(
-  ~name, ~label_group, ~label_x, ~label_y, ~segment_x, ~segment_y,
-  "Side Slopes", "north", -80.106, 26.096, -80.104, 26.0945,
-  "Depth_10cm", "north", -80.106, 26.0975, -80.1035, 26.0947,
-  "Depth_5cm", "north", -80.106, 26.099, -80.103, 26.0949,
-  "Depth_1cm", "north", -80.106, 26.1005, -80.1028, 26.0957,
-  "Depth_0_5cm", "north", -80.106, 26.102, -80.1026, 26.0968,
-  "Depth_0_1cm", "north", -80.106, 26.1035, -80.1024, 26.098,
-  "Nearshore", "single", -80.107, 26.093, -80.106, 26.0899,
-  "Side Slopes", "south", -80.106, 26.088, -80.104, 26.093,
-  "Depth_10cm", "south", -80.106, 26.0865, -80.1035, 26.09285,
-  "Depth_5cm", "south", -80.106, 26.085, -80.103, 26.0926,
-  "Depth_1cm", "south", -80.106, 26.0835, -80.1028, 26.092,
-  "Depth_0_5cm", "south", -80.106, 26.082, -80.1026, 26.091,
-  "Depth_0_1cm", "south", -80.106, 26.0805, -80.1024, 26.0897,
-  "North", "single", -80.080, 26.097, -80.080, 26.097,
-  "East", "single", -80.0805, 26.094, -80.0805, 26.094,
-  "South", "single", -80.080, 26.091, -80.080, 26.091
-  # Add more as needed
-)
-
-# Step 5: Join label data back to zones
-zone_label_geom <- zone_centroids %>%
-  left_join(zone_label_positions, by = c("name", "label_group"))
-
-# Step 6: Plot
-map_zones <- p +
-  geom_segment(data = zone_label_geom,
-               aes(x = segment_x, y = segment_y,
-                   xend = label_x, yend = label_y),
-               color = "black", linewidth = 0.2) +
-  geom_text(data = zone_label_geom,
-            aes(x = label_x, y = label_y, label = name),
-            size = 3, hjust = 1) +
-  coord_sf(
-    xlim = c(-80.113, -80.078),  # Adjusted to reduce whitespace
-    ylim = c(26.058, 26.112),
-    expand = FALSE
-  ) +
-  labs(x = "", y = "") +
-  scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
-  scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
-                     labels = scales::number_format(accuracy = 0.01))  # Fewer long ticks
-
-
-```
-
-
-```{r}
+# LABEL ZONES
 zone_labels <- tribble(
   ~name,                   ~label_x, ~label_y,
   "Side Slopes",           -80.104,  26.08,
@@ -1250,10 +1155,11 @@ zone_labels <- tribble(
   "Depth_1cm",             -80.101,  26.074,
   "Depth_0_5cm",           -80.100,  26.072,
   "Depth_0_1cm",           -80.099,  26.070,
-  "Nearshore",             -80.107,  26.094,
-  "North",                 -80.080,  26.097,
-  "East",                  -80.0805, 26.094,
-  "South",                 -80.080,  26.091
+  "Nearshore",             -80.106,  26.094,
+  "North",                 -80.0795,  26.097,
+  "East",                  -80.080, 26.094,
+  "South",                 -80.0793,  26.091,
+  "Impact Monitoring Area",       -80.0815, 26.083
 )
 
 zone_segments <- tribble(
@@ -1271,9 +1177,10 @@ zone_segments <- tribble(
   "Depth_0_1cm",           -80.0954,   26.098,
   "Depth_0_1cm",           -80.097,   26.0897,
   "Nearshore",             -80.106,    26.09,
-  "North",                 -80.080,    26.097,
-  "East",                  -80.0805,   26.094,
-  "South",                 -80.080,    26.091
+  "North",                 -80.0795,  26.097,
+  "East",                  -80.080, 26.094,
+  "South",                 -80.0793,  26.091,
+  "Impact Monitoring Area",       -80.0815, 26.083
 )
 
 label_segments <- zone_segments %>%
@@ -1286,7 +1193,7 @@ iz_plot <- p +
                color = "black", linewidth = 0.2) +
   geom_text(data = zone_labels,
             aes(x = label_x, y = label_y, label = name),
-            size = 3, hjust = 1) +
+            size = 2, hjust = 1) +
   coord_sf(
     xlim = c(-80.113, -80.078),
     ylim = c(26.058, 26.112),
@@ -1297,77 +1204,113 @@ iz_plot <- p +
   scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
                      labels = scales::number_format(accuracy = 0.01))
 
-cowplot::plot_grid(fig1, iz_plot, ncol = 2, rel_widths = c(0.67, 0.33))
-
-
-
-
+iz_plot
 ```
 
-### multiplanel superfig
+## Multipanel map figure
 ```{r}
-library(ggplot2)
-library(cowplot)
-library(gtable)
-library(gridExtra)
+# Shared axis limits for all maps
+coord_limits <- coord_sf(
+  xlim = c(-80.113, -80.078),
+  ylim = c(26.058, 26.112),
+  expand = FALSE
+)
 
-# 1. Create the individual ESA facet plots (no legend shown)
-esa_all_plot <- polyplot +
-  geom_point(data = filter(allsitemd, ESAonly == "All corals"),
-             aes(x = longitude, y = latitude, shape = dataset),
-             inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
-  scale_shape_manual(values = c(2, 3, 4, 5, 6, 7)) +
-  guides(fill = "none", shape = "none") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0, face = "bold", size = 9))
+# Apply consistent theme + coordinate limits
+base_theme <- theme_minimal(base_size = 7) +
+  theme(
+    axis.title = element_blank(),
+    axis.text.y = element_text(size = 6),
+    axis.text.x = element_text(size = 6),
+    legend.position = "none",
+    plot.margin = margin(5,0,0,0, unit = "mm"),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.spacing.y = unit(0.05, "cm"),    # reduce vertical space between keys
+    legend.key.height = unit(0.2, "cm"),   # reduce height of each legend key box
+    legend.key.width = unit(0.4, "cm"),
+    legend.text = element_text(margin = margin(0,0,0,0)),  # tighten text spacing
+    legend.title = element_text(margin = margin(0,0,0,0)),
+    legend.margin = margin(1,1,1,0),
+    legend.title.align = 0.5,
+    legend.key = element_blank(),
+    legend.background = element_blank(),
+    legend.box.background = element_rect(color = NA, fill = alpha("white", 0.7))
+  )
 
-esa_esa_plot <- polyplot +
-  geom_point(data = filter(allsitemd, ESAonly == "ESA only"),
-             aes(x = longitude, y = latitude, shape = dataset),
-             inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
-  scale_shape_manual(values = c(2, 3, 4, 5, 6, 7)) +
-  guides(fill = "none", shape = "none") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0, face = "bold", size = 9))
+# 1. Left panel: All corals (keep y-axis)
+esa_all_plot_clean <- esa_all_plot +
+  coord_limits +
+  base_theme +
+  guides(shape = "legend") +
+  theme(legend.position = c(0.75, 0.2))
 
+# 2. Middle panel: ESA corals (remove y-axis)
+esa_esa_plot_clean <- esa_esa_plot +
+  coord_limits +
+  base_theme +
+  guides(shape = "legend") +
+  theme(axis.text.y = element_blank(),
+        legend.position = c(0.25, 0.2))
 
-# 3. Extract the fill legend from polyplot (which includes habitat fill)
+# 3. Right panel: Impact zones (remove y-axis)
+iz_plot_clean <- iz_plot +
+  coord_limits +
+  base_theme +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+# 4. Extract compact fill legend from polyplot
 legend_plot <- polyplot +
   guides(shape = "none", color = "none", fill = guide_legend(nrow = 2)) +
-  theme(legend.position = "bottom")
-
+  base_theme +
+  theme(
+    legend.position = "bottom",
+    legend.key.size = unit(0.3, "cm"),  # Reduce square size
+    legend.text = element_text(size = 6),  # Optional: smaller legend text
+    legend.title = element_text(size = 7)  # Optional: smaller legend title
+  )
 grob <- ggplotGrob(legend_plot)
 fill_legend <- gtable::gtable_filter(grob, "guide-box")
 
-# 4. Arrange the three plots horizontally
-map_row <- cowplot::plot_grid(
-  esa_all_plot, esa_esa_plot, iz_plot,
-  labels = c("A. Surveys of all corals", "B. Surveys of ESA corals", "C. Impact zones"),
-  nrow = 1, align = "h", axis = "tb", rel_widths = c(1, 1, 1),
-  hjust = -0.2 
+# 5. Align the plot panels (so heights match)
+aligned_maps <- cowplot::align_plots(
+  esa_all_plot_clean, esa_esa_plot_clean, iz_plot_clean,
+  align = "hv", axis = "tblr"
 )
 
-# 5. Add the legend underneath
+# 6. Assemble horizontal row of aligned plots
+map_row <- cowplot::plot_grid(
+  plotlist = aligned_maps,
+  labels = c("A. Surveys of all corals", "B. Surveys of ESA corals", "C. Impact zones"),
+  label_size = 8,
+  label_fontface = "bold",
+  label_x = c(-0.2, -0.2, -0.1),
+  label_y = 1,
+  nrow = 1,
+  rel_widths = c(1, 1, 1)
+)
+
+# 7. Add the legend below the row
 final_plot <- cowplot::plot_grid(
   map_row,
   fill_legend,
   ncol = 1,
-  rel_heights = c(1, 0.1)
+  rel_heights = c(1, 0.07)
 )
 
-# 6. Draw it
-final_plot
+# 8. Draw final plot
+ggdraw() + draw_plot(final_plot) +
+  theme(plot.background = element_rect(fill = "white", color = NA))
 
+
+ggsave(filename = "outputs/Fig1.png", width = 170, height = 100, units = "mm", dpi = 300)
 ```
 
 
 
-#### Area of each habitat type in each impact zone
+## Area of each habitat type in each impact zone
 ```{r}
-# Set order of zone levels
-zone_levels <- c("Channel", "Side Slopes", "Depth_10cm", "Depth_5cm", "Depth_1cm", "Depth_0_5cm", "Depth_0_1cm",
-                 "Nearshore", "North", "East", "South", "Rest of Monitoring Area")
-
 # Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons, and that Aggregated Patch Reef is changed to Outer Reef
 polygons_filtered <- polygons_final %>%
   mutate(Type = if_else(Type == "Artificial", "Nearshore Ridge Complex", Type)) %>%
