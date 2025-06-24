@@ -1694,6 +1694,22 @@ survey_summary %>% knitr::kable()
     data = filter(selected, dataset == "drm24"),
     aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2024 — Shedd Survey"))
+
+# One faceted plot
+all_surveys_plot <- polyplot +
+  geom_point(
+    data = selected,
+    aes(x = longitude, y = latitude),
+    pch = 4, alpha = 0.6, inherit.aes = FALSE
+  ) +
+  facet_wrap(~ dataset, ncol = 2) +
+  labs(title = "Survey Site Locations by Dataset") +
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "white", color = NA),
+        panel.background = element_rect(fill = "white", color = NA))
+
+all_surveys_plot
+ggsave(filename = "outputs/FigA1.png", width = 170, height = 220, units = "mm", dpi = 300)
 ```
 
 
@@ -2052,7 +2068,7 @@ loo_compare(loo_2, loo_3)
 # DENSITY OF EACH TAXON x CLASS IN EACH HABITAT TYPE
 
 #### PLOT
-ggplot(summary_preds, aes(x = Type, y = .epred, color = class)) +
+(taxdens <- ggplot(summary_preds, aes(x = Type, y = .epred, color = class)) +
   geom_point() +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
   geom_line(aes(group = class)) +
@@ -2060,7 +2076,31 @@ ggplot(summary_preds, aes(x = Type, y = .epred, color = class)) +
   scale_y_log10() +
   scale_x_discrete(labels = type_labels) +
   labs(x = "Habitat Type", y = "Density (per m2)")+
-  theme_minimal()
+  theme_minimal())
+
+taxdens
+
+taxon_group_df <- bind_rows(lapply(names(taxon_groups_juv), function(group) {
+  tibble(taxon = taxon_groups_juv[[group]], group = group)
+}))
+taxon_group_df <- taxon_group_df %>% filter(taxon != group)
+
+annotation_df <- summary_preds %>%
+  distinct(taxon) %>%
+  left_join(taxon_group_df, by = "taxon") %>%
+  filter(!is.na(group)) %>%
+  mutate(label = paste0("<4cm = ", group),
+         # Choose a y-position (adjust as needed for your scale)
+         x = 2.5,
+         y = 3e-6)  # log10-scale safe low value
+
+fig2 <- taxdens +
+  geom_text(data = annotation_df, aes(x = x, y = y, label = label),
+            inherit.aes = FALSE, hjust = 0.5, size = 2.5, color = "#F8766D") +
+  theme(panel.background = element_rect(fill = "white", color = NA),
+        plot.background = element_rect(fill = "white", color = NA))
+
+ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
 
@@ -2091,6 +2131,8 @@ knitr::kable(table_out, format = "html", escape = FALSE,
 
 
 ############
+write_csv(table_out, file = "outputs/TableA1.csv")
+
 ```
 
 ### Taxon totals in impact zones
@@ -2104,13 +2146,24 @@ tot1 <- left_join(summary_preds, area_summary, by = "Type") %>%
          tot_lower = .epred * total_area_m2,
          tot_upper = .epred * total_area_m2)
 
-tot1 %>%
+taba2 <- tot1 %>%
   group_by(Type, name) %>%
   summarize(total_area_m2 = sum(total_area_m2), .groups = "drop") %>%
   pivot_wider(names_from = name, values_from = total_area_m2) %>%
   janitor::adorn_totals(where = c("row", "col")) %>%
-  mutate(across(where(is.numeric), ~ formatC(.x, format = "e", digits = 2))) %>%
+  mutate(across(where(is.numeric), ~ formatC(.x, format = "e", digits = 2)))
+
+taba2 %>%
   knitr::kable(caption = "Total area (m2) of each habitat type in each impact zone")
+
+# Transpose using first column as rownames
+taba2_flipped <- taba2 %>%
+  column_to_rownames(var = names(taba2)[1]) %>%  # Set first column as rownames
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = names(taba2)[1])      # Move former colnames into a new column
+
+write_csv(taba2_flipped, file = "outputs/TableA2.csv")
 
 # Calculate total per taxclass per impact zone (sum all habitat Types)
 tot2 <- tot1 %>%
@@ -2118,12 +2171,15 @@ tot2 <- tot1 %>%
   summarize(tot = round(sum(tot))) %>%
   arrange(name)
 
-tot2 %>% ungroup() %>%
+tab2 <- tot2 %>% ungroup() %>%
   pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
   janitor::adorn_totals(where = c("row", "col")) %>%
+  mutate(across(where(is.numeric), scales::comma))
+
+tab2 %>%
   knitr::kable(caption = "Total number of colonies of each coral taxon and size class in each impact zone")
 
-tot2 %>% filter(taxon == "CNAT")
+write_csv(tab2, file = "outputs/Table2.csv")
 ```
 
 ### Total corals in impact zones
@@ -2141,13 +2197,9 @@ tot2 %>%
   janitor::adorn_totals(where = c("row", "col")) %>%
   mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
-
-
-
-
 ```
 
-
+### Waffle plot - entire monitoring area
 ```{r, fig.height = 10, fig.width = 5}
 
 # STEP 1: Aggregate total abundance by taxon + class
@@ -2267,6 +2319,7 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
 waffle
 ```
 
+### Treemap plot - entire monitoring area
 ```{r working_treemap}
 # Assign a base color per taxon
 base_colors <- scales::hue_pal()(length(unique(tot4$taxon)))
@@ -2378,7 +2431,7 @@ ggsave(filename = "outputs/Fig3.png", width = 170, height = 130, units = "mm", d
 ```
 
 
-
+### Waffle plot - only Scenario2+NMFS
 ```{r, fig.height = 10}
 # STEP 1: Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
@@ -2487,6 +2540,119 @@ waffle
 
 ```
 
+### Treemap - only Scenario2+NMFS
+```{r}
+
+# 1. Subset and summarize the data
+tot4 <- tot2 %>%
+  filter(!name %in% c("Rest of Monitoring Area", "North", "South", "East", "Nearshore")) %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
+  mutate(taxon = factor(taxon), class = factor(class))
+
+# 2. Assign base colors per taxon
+set.seed(2)
+base_colors <- sample(ggsci::pal_d3("category20")(20), length(unique(tot4$taxon)))
+names(base_colors) <- unique(tot4$taxon)
+
+# 3. Define shading function
+get_shades <- function(base_col, class, all_classes) {
+  if (length(all_classes) == 2) {
+    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
+    else colorspace::darken(base_col, 0.1)
+  } else {
+    base_col
+  }
+}
+
+# 4. Build taxon_class and corresponding shades
+shade_map <- tot4 %>%
+  distinct(taxon, class) %>%
+  rowwise() %>%
+  mutate(
+    base_col = base_colors[[taxon]],
+    all_classes = list(tot4$class[tot4$taxon == taxon]),
+    shade = get_shades(base_col, class, all_classes),
+    taxon_class = paste(taxon, class, sep = "_")
+  ) %>%
+  ungroup()
+
+fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
+
+# 5. Add taxon_class to main data
+tot4 <- tot4 %>%
+  mutate(taxon_class = paste(taxon, class, sep = "_"))
+
+# 6. Treemap base plot
+p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
+  geom_treemap(color = NA) +
+  geom_treemap_subgroup_border(colour = "white", size = 1) +
+  scale_fill_manual(values = fill_colors) +
+  theme(legend.position = "none")
+
+# 7. Layout and labels
+tile_layout <- treemapify(tot4, area = "tot", fill = "taxon_class", subgroup = "taxon")
+
+tile_layout_ag <- tile_layout %>%
+  group_by(taxon) %>%
+  summarize(xmin = min(xmin), xmax = max(xmax),
+            ymin = min(ymin), ymax = max(ymax),
+            area = (xmax - xmin) * (ymax - ymin),
+            center_x = (xmin + xmax) / 2,
+            center_y = (ymin + ymax) / 2)
+
+area_threshold <- 0.001
+
+internal_labels <- tile_layout_ag %>%
+  filter(area >= area_threshold)
+
+external_labels <- tile_layout_ag %>%
+  filter(area < area_threshold)
+
+taxtots <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(tot = scales::comma(sum(tot)))
+
+internal_labels <- left_join(internal_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+external_labels <- left_join(external_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+# 8. Final plot
+final_plot <- p +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  coord_cartesian(clip = "off") +
+  geom_text(data = internal_labels,
+            aes(x = xmin, y = ymax - 0.00001, label = label, size = area),
+            inherit.aes = FALSE,
+            hjust = 0, vjust = 1, lineheight = 0.7,
+            nudge_x = 0.005, nudge_y = -0.005) +
+  scale_size_continuous(range = c(1.1, 15)) +
+  geom_text_repel(data = external_labels,
+                  aes(x = center_x, y = center_y, label = label),
+                  inherit.aes = FALSE,
+                  max.overlaps = Inf,
+                  xlim = c(1, NA),
+                  force = 5,
+                  min.segment.length = 0.1,
+                  segment.size = 0.2,
+                  hjust = 0,
+                  size = 1.1) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
+    plot.background = element_rect(fill = "white", color = NA)
+  ) +
+  ggtitle("Total corals excluding Rest of Monitoring Area")
+
+# 9. Save
+ggsave(filename = "outputs/Fig3_subset.png", plot = final_plot,
+       width = 170, height = 130, units = "mm", dpi = 300)
+
+```
 
 
 
