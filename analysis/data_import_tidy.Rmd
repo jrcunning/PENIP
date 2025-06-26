@@ -61,6 +61,32 @@ taxon_lookup_juv <- enframe(taxon_groups_juv, name = "taxon_group", value = "tax
   unnest(taxon)
 
 
+# Create taxon labels
+taxon_labels <- c(
+  ACER = 'italic("A. cervicornis")',
+  AGAR = 'italic("Agaricia")~spp.',
+  CNAT = 'italic("C. natans")',
+  DLAB = 'italic("D. labyrinthiformis")',
+  DSTO = 'italic("D. stokesii")',
+  EFAS = 'italic("E. fastigiata")',
+  FAVI = '"Faviinae"',
+  MADR = 'italic("Madracis")~spp.',
+  MCAV = 'italic("M. cavernosa")',
+  MEAN = '"Meandrinidae"',
+  MMEA = 'italic("M. meandrites")',
+  MUSS = '"Mussinae"',
+  MYCE = 'italic("Mycetophyllia")~spp.',
+  ORBI = 'italic("Orbicella")~spp.',
+  PCLI = 'italic("P. clivosa")',
+  PORI = 'italic("Porites")~spp.',
+  PSTR = 'italic("P. strigosa")',
+  SIDE = 'italic("Siderastrea")~spp.',
+  SINT = 'italic("S. intersepta")',
+  SOLE = 'italic("Solenastrea")~spp.'
+)
+
+
+
 # Order levels of Habitat Types
 type_levels <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef",
                  "Outer Reef")
@@ -111,28 +137,44 @@ nsu11_esa_counts_ag <- nsu11_esa_counts %>%
 
 ## 2017 DCA ESA Survey
 ```{r}
-library(sf)
+# # 163 sites in this list
+# dca17esaall <- readxl::read_xlsx("data/2017_dca_esa/Appendix C_DCA2017_survey_results_FINAL.xlsx") %>%
+#   janitor::clean_names() %>%
+#   mutate(site = esa_site)
+# library(sf)
+# 
+# # Read KML file
+# dca17_esa_sitemd0 <- st_read("data/2017_dca_esa/Listed_Coral_Survey_2017.kml")
+# # contains 149 sites
+# 
+# 
+# # Extract coordinates and save as CSV
+# dca17_esa_sitemd <- dca17_esa_sitemd0 %>%
+#   mutate(site = Name,
+#          longitude = st_coordinates(.)[, 1],
+#          latitude = st_coordinates(.)[, 2]) %>%
+#   st_drop_geometry() %>%
+#   select(site, longitude, latitude) %>%
+#   as_tibble() %>%
+#   mutate(site = as.character(site))
+# # only has 149 sites.
+# ### MISSING SITES?
+# 
+# setdiff(dca17esaall$site, dca17_esa_sitemd$site)
 
-# Read KML file
-dca17_esa_sitemd0 <- st_read("data/2017_dca_esa/Listed_Coral_Survey_2017.kml")
 
-# Extract coordinates and save as CSV
+# New sitemd
+dca17_esa_sitemd0 <- readxl::read_xlsx("data/2017_dca_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx", 
+                                       sheet = "2017_DCA_ESA survey") %>% janitor::clean_names()
+
 dca17_esa_sitemd <- dca17_esa_sitemd0 %>%
-  mutate(site = Name,
-         longitude = st_coordinates(.)[, 1],
-         latitude = st_coordinates(.)[, 2]) %>%
-  st_drop_geometry() %>%
-  select(site, longitude, latitude) %>%
-  as_tibble() %>%
+  select(site = id, longitude, latitude) %>%
   mutate(site = as.character(site))
-
-
-
 
 # Get coral data
 
 
-# Appendix D -- contains individual colony sizes
+# Appendix D -- contains individual colony sizes for observed corals
 # what is the "NUMBER" column? ignore for now.
 dca17_esa0 <- readxl::read_xlsx("data/2017_dca_esa/Appendix D_ESA_listed_coral_Plotted_Locations.xlsx") %>%
   janitor::clean_names() %>%
@@ -148,6 +190,7 @@ dca17_esa <- dca17_esa0 %>%
 dca17_esa_counts <- dca17_esa %>%
   count(site, taxon, class) %>%
   mutate(site = as.character(site))
+n_distinct(dca17_esa_counts$site)    # 57 sites had counts > 0 (where are zeros recorded?) 
 
 
 # Total area surveyed per site = 784 m2 (crossed 100x4m belt transects with 16m2 overlap)
@@ -175,7 +218,7 @@ all_sites <- dca17_esa_sitemd %>%
 
 # Step 3: Create full site × taxon × class combinations
 full_grid <- expand_grid(
-  site = all_sites$site,
+  site = as.character(all_sites$site),
   all_taxon_class
 )
 
@@ -1794,13 +1837,33 @@ Predictors: dataset, habitat Type, direction from channel, taxon, size class
 # Just get columns we need for modeling
 dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, class, n)
 
+# Number of counts
+nrow(dfftaxon)
+# Number of zeros
+table(dfftaxon$n == 0)
+
+# Overdispersion
+mean_count <- mean(dfftaxon$n)
+var_count <- var(dfftaxon$n)
+var_count / mean_count
+
+# Number of taxa
+n_distinct(dfftaxon$taxon)
+
+# Number of sites
+n_distinct(interaction(dfftaxon$dataset, dfftaxon$site))
+
+# Number of corals
+sum(dfftaxon$n)
+
+
 
 # MODEL - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
 
 mod_nb <- brm(
   bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
        offset(log(transect_area_m2)),
-     zi ~ taxon * Type),
+     zi ~ taxon:class * Type),
   family = zero_inflated_negbinomial(),
   data = dfftaxon,    # choose dataset with or without all structural zeros
   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
@@ -1918,7 +1981,7 @@ mod_nb2 <- brm(
   bf(n ~ dataset * taxon:class * Type +
        (1 | taxon:class:Type:dir) +
        offset(log(transect_area_m2)),
-     zi ~ taxon * Type),
+     zi ~ taxon:class * Type),
   family = zero_inflated_negbinomial(),
   data = dfftaxon,    # choose dataset with or without all structural zeros
   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
@@ -2092,7 +2155,7 @@ mod_nb3 <- brm(
         (1 + Type | dataset) +
         (1 | dataset:taxon:class:Type:dir) +
         offset(log(transect_area_m2)),
-     zi ~ taxon * Type),
+     zi ~ taxon:class * Type),
   data = dfftaxon,   # use dataset with all structural zeros present
   family = zero_inflated_negbinomial(),
   prior = c(
@@ -2102,7 +2165,7 @@ mod_nb3 <- brm(
     prior(normal(0, 1), class = "b", dpar = "zi")
   ),
   chains = 4, cores = 4, threads = threading(5),
-  iter = 1000, warmup = 500, thin = 2,
+  iter = 500, warmup = 100, thin = 2,
   backend = "cmdstanr",
   control = list(adapt_delta = 0.95)
 )
@@ -2127,7 +2190,7 @@ summary_preds <- preds %>%
 ```{r, eval = F}
 loo_3 <- loo(mod_nb3)
 
-loo_compare(loo_2, loo_3)
+loo_compare(loo_3, loo_2, loo_1)
 
 # Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
 # mod3 also has slightly lower p_loo (good, slightly simpler )
@@ -2143,7 +2206,7 @@ loo_compare(loo_2, loo_3)
   geom_point() +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
   geom_line(aes(group = class)) +
-  facet_wrap(~taxon) +
+  facet_wrap(~taxon, labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed))) +
   scale_y_log10() +
   scale_x_discrete(labels = type_labels) +
   labs(x = "Habitat Type", y = "Density (per m2)")+
@@ -2160,7 +2223,10 @@ annotation_df <- summary_preds %>%
   distinct(taxon) %>%
   left_join(taxon_group_df, by = "taxon") %>%
   filter(!is.na(group)) %>%
-  mutate(label = paste0("<4cm = ", group),
+  mutate(group2 = case_when(group == "FAVI" ~ "Faviinae",
+                            group == "MUSS" ~ "Mussinae",
+                            group == "MEAN" ~ "Meandrinidae")) %>%
+  mutate(label = paste0("<4cm = ", group2),
          # Choose a y-position (adjust as needed for your scale)
          x = 2.5,
          y = 3e-6)  # log10-scale safe low value
@@ -2169,8 +2235,10 @@ fig2 <- taxdens +
   geom_text(data = annotation_df, aes(x = x, y = y, label = label),
             inherit.aes = FALSE, hjust = 0.5, size = 2.5, color = "#F8766D") +
   theme(panel.background = element_rect(fill = "white", color = NA),
-        plot.background = element_rect(fill = "white", color = NA))
-
+        plot.background = element_rect(fill = "white", color = NA)) +
+  coord_cartesian(clip = "off") +
+  labs(color = "Size class")
+fig2
 ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
@@ -2205,6 +2273,26 @@ knitr::kable(table_out, format = "html", escape = FALSE,
 write_csv(table_out, file = "outputs/TableA1.csv")
 
 ```
+
+### Total coral density by habitat
+```{r}
+summary_totals <- preds %>%
+  group_by(.draw, Type) %>%
+  summarize(total_epred = sum(.epred), .groups = "drop") %>%
+  group_by(Type) %>%
+  mean_qi(total_epred, .width = 0.95)
+
+ggplot(summary_totals, aes(x = Type, y = total_epred)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
+  #scale_y_log10() +
+  scale_x_discrete(labels = type_labels) +
+  labs(x = "Habitat Type", y = "Total Coral Density (per m²)") +
+  theme_minimal()
+
+
+```
+
 
 ### Taxon totals in impact zones
 ```{r}
