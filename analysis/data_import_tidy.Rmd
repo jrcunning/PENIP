@@ -1797,25 +1797,25 @@ dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, cl
 
 # MODEL - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
 
-# mod_nb <- brm(
-#   bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
-#        offset(log(transect_area_m2)),
-#      zi ~ taxon * Type),
-#   family = zero_inflated_negbinomial(),
-#   data = dfftaxon,    # choose dataset with or without all structural zeros
-#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-#             prior(normal(0, 1), class = "b", dpar = "zi")),
-#   chains = 4,
-#   cores = 4,
-#   threads = threading(5),
-#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-#   thin = 2,
-#   control = list(adapt_delta = 0.85, max_treedepth = 10),
-#   backend = "cmdstanr"
-# )
-# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+mod_nb <- brm(
+  bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
+       offset(log(transect_area_m2)),
+     zi ~ taxon * Type),
+  family = zero_inflated_negbinomial(),
+  data = dfftaxon,    # choose dataset with or without all structural zeros
+  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+            prior(normal(0, 1), class = "b", dpar = "zi")),
+  chains = 4,
+  cores = 4,
+  threads = threading(5),
+  iter = 1000, warmup = 500,    #iter = 1000, warmup = 500,
+  thin = 2,
+  control = list(adapt_delta = 0.85, max_treedepth = 10),
+  backend = "cmdstanr"
+)
+saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
 
 
@@ -1914,26 +1914,26 @@ Let's move direction to a random effect. This approach acknowledges the variabil
 
 ## Model2 - drop direction to RE
 ```{r}
-# mod_nb2 <- brm(
-#   bf(n ~ dataset * taxon:class * Type +
-#        (1 | taxon:class:Type:dir) +
-#        offset(log(transect_area_m2)),
-#      zi ~ taxon * Type),
-#   family = zero_inflated_negbinomial(),
-#   data = dfftaxon,    # choose dataset with or without all structural zeros
-#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-#             prior(normal(0, 1), class = "b", dpar = "zi")),
-#   chains = 4,
-#   cores = 4,
-#   threads = threading(5),
-#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-#   thin = 2,
-#   control = list(adapt_delta = 0.85, max_treedepth = 10),
-#   backend = "cmdstanr"
-# )
-# saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
+mod_nb2 <- brm(
+  bf(n ~ dataset * taxon:class * Type +
+       (1 | taxon:class:Type:dir) +
+       offset(log(transect_area_m2)),
+     zi ~ taxon * Type),
+  family = zero_inflated_negbinomial(),
+  data = dfftaxon,    # choose dataset with or without all structural zeros
+  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+            prior(normal(0, 1), class = "b", dpar = "zi")),
+  chains = 4,
+  cores = 4,
+  threads = threading(5),
+  iter = 1000, warmup = 500,    #iter = 1000, warmup = 500,
+  thin = 2,
+  control = list(adapt_delta = 0.85, max_treedepth = 10),
+  backend = "cmdstanr"
+)
+saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
@@ -2102,7 +2102,7 @@ mod_nb3 <- brm(
     prior(normal(0, 1), class = "b", dpar = "zi")
   ),
   chains = 4, cores = 4, threads = threading(5),
-  iter = 200, warmup = 50, thin = 2,
+  iter = 1000, warmup = 500, thin = 2,
   backend = "cmdstanr",
   control = list(adapt_delta = 0.95)
 )
