@@ -960,7 +960,7 @@ esa_all_plot <- polyplot +
   geom_point(data = filter(allsitemd, ESAonly == "All corals"),
              aes(x = longitude, y = latitude, shape = dataset),
              inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
-  scale_shape_manual(values = c(2, 3, 4, 5)) +
+  scale_shape_manual(values = c(2, 1, 4, 5)) +
   guides(fill = "none", shape = "none") +
   theme_minimal()
  
@@ -968,12 +968,12 @@ esa_esa_plot <- polyplot +
   geom_point(data = filter(allsitemd, ESAonly == "ESA only"),
              aes(x = longitude, y = latitude, shape = dataset),
              inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
-  scale_shape_manual(values = c(1, 6)) +
+  scale_shape_manual(values = c(3, 6)) +
   guides(fill = "none", shape = "none") +
   theme_minimal() #+
   # theme(plot.title = element_text(hjust = 0, face = "bold", size = 9))
 
-cowplot::plot_grid(esa_all_plot, esa_esa_plot)
+# cowplot::plot_grid(esa_all_plot, esa_esa_plot)
 ```
 
 ## Impact Zones
@@ -1482,16 +1482,18 @@ df_completed <- bind_rows(df_base, df_completed_part)
 # Add transect area information
 ## Bring back in DRM24 dataset taxon:class-specific transect areas searched
 df_completed <- df_completed %>% 
-  left_join(distinct(drm24_counts_agg, taxon, class, transect_area_m2), by = c("taxon", "class")) %>%
+  left_join(distinct(drm24_counts_agg, taxon, class, transect_area_m2) %>%
+              mutate(dataset = "drm24"), 
+            by = c("dataset", "taxon", "class")) %>%
   select(-transect_area_m2.x, transect_area_m2 = transect_area_m2.y)
+
 ## ACER and ORBI <4cm didn't get assigned areas because were never observed -- these would have been searched in 20 m2 (T1 and T2)
 df_completed %>% filter(is.na(transect_area_m2), dataset == "drm24") %>%
   distinct(taxon, class)
 df_completed <- df_completed %>%
-  mutate(transect_area_m2 = if_else(
-    dataset == "drm24" & is.na(transect_area_m2),
-    20,
-    transect_area_m2
+  mutate(transect_area_m2 = case_when(
+    dataset == "drm24" & is.na(transect_area_m2) ~ 20,
+    TRUE ~ transect_area_m2
   ))
 
 ## Add transect area information for other datasets
@@ -1538,8 +1540,12 @@ selected <- allsitemd %>%
                      "Artificial", "Outer Reef", "Aggregated Patch Reef"))
 
 # Which sites were excluded?
-anti_join(allsitemd, selected) %>%
-  count(Type)
+excluded <- anti_join(allsitemd, selected) 
+
+excluded %>%
+  count(dataset, Type)
+
+df %>% right_join(excluded) %>% arrange(-n) %>% print(n=100)
 
 # Plot all selected sites
 polyplot + 
