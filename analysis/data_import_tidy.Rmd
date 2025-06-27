@@ -2494,7 +2494,7 @@ waffle
 # Set tile size and max per row
 tile_size <- 1000
 tiles_per_row <- 50
-gap_width <- 5  # space between the two columns
+gap_width <- 3  # space between the two columns
 
 # Split into left (Impact Zones + Consideration Areas) and right (Rest of Monitoring Area)
 left_totals <- tot2 %>%
@@ -2553,16 +2553,25 @@ tile_expanded <- tile_data %>%
   ) %>%
   ungroup()
 
+
+# Compute max tile column per taxon and side
+col_max <- tile_expanded %>%
+  group_by(taxon, side) %>%
+  summarize(
+    label_x = ifelse(side == "left", min(col) - 1, max(col) + 1),
+    .groups = "drop"
+  )
 # Format taxon totals per side
 label_totals <- tile_data %>%
   group_by(taxon, side) %>%
   summarize(total = sum(tot), .groups = "drop") %>%
   left_join(taxon_order, by = "taxon") %>%
+  left_join(col_max, by = c("taxon", "side")) %>%
   mutate(
-    label_x = ifelse(side == "left", -gap_width - tiles_per_row, gap_width + tiles_per_row),
     label_y = taxon_y,
     total_fmt = format(round(total), big.mark = ",")
-  )
+  ) %>%
+  distinct()
 
 # Add taxon labels (centered)
 taxon_labels <- taxon_order %>%
