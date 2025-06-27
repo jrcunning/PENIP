@@ -474,6 +474,10 @@ tt23_sitemd <- tt23_sitemd %>%
 
 # Many sites missing coords in sheet.... whats up with that
 tt23_sitemd <- drop_na(tt23_sitemd, longitude)
+
+
+# missing ten impact site coords
+# missing vertical wall transects
 ```
 
 TT23 coral data
@@ -526,6 +530,7 @@ tt23 <- tt23 %>%
     TRUE ~ taxon
   ))
 sort(unique(tt23$taxon))
+tt23 %>% filter(taxon == "MFER")
 
 # Filter out one coral with unmeasured size
 tt23 %>% filter(is.na(max_width_cm))
@@ -1879,8 +1884,8 @@ mod_nb <- brm(
   chains = 4,
   cores = 4,
   threads = threading(5),
-  iter = 1000, warmup = 500,    #iter = 1000, warmup = 500,
-  thin = 2,
+  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+  thin = 1,
   control = list(adapt_delta = 0.85, max_treedepth = 10),
   backend = "cmdstanr"
 )
@@ -1997,8 +2002,8 @@ mod_nb2 <- brm(
   chains = 4,
   cores = 4,
   threads = threading(5),
-  iter = 1000, warmup = 500,    #iter = 1000, warmup = 500,
-  thin = 2,
+  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+  thin = 1,
   control = list(adapt_delta = 0.85, max_treedepth = 10),
   backend = "cmdstanr"
 )
@@ -2171,7 +2176,7 @@ mod_nb3 <- brm(
     prior(normal(0, 1), class = "b", dpar = "zi")
   ),
   chains = 4, cores = 4, threads = threading(5),
-  iter = 500, warmup = 100, thin = 2,
+  iter = 3000, warmup = 1500, thin = 1,
   backend = "cmdstanr",
   control = list(adapt_delta = 0.95)
 )
@@ -2482,6 +2487,140 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
   )
 
 waffle
+```
+
+### Double waffle - both areas
+```{r}
+# Set tile size and max per row
+tile_size <- 1000
+tiles_per_row <- 50
+gap_width <- 5  # space between the two columns
+
+# Split into left (Impact Zones + Consideration Areas) and right (Rest of Monitoring Area)
+left_totals <- tot2 %>%
+  filter(name != "Rest of Monitoring Area") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
+  mutate(side = "left")  # switched
+
+right_totals <- tot2 %>%
+  filter(name == "Rest of Monitoring Area") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
+  mutate(side = "right")  # switched
+
+combined <- bind_rows(left_totals, right_totals)
+
+# Compute total and tile numbers
+tile_totals <- combined %>%
+  group_by(taxon, side) %>%
+  summarize(total_raw = sum(tot), .groups = "drop") %>%
+  mutate(total_tiles = round(total_raw / tile_size))
+
+tile_data <- combined %>%
+  left_join(tile_totals, by = c("taxon", "side")) %>%
+  mutate(
+    prop = tot / total_raw,
+    n_tiles = round(prop * total_tiles)
+  ) %>%
+  filter(n_tiles > 0)
+
+# Determine total tiles per taxon
+taxon_order <- tile_data %>%
+  group_by(taxon, side) %>%
+  summarize(total_tiles = sum(n_tiles), .groups = "drop") %>%
+  group_by(taxon) %>%
+  filter(total_tiles == max(total_tiles)) %>%
+  ungroup() %>%
+  arrange(total_tiles) %>%  # reversed order here
+  mutate(
+    taxon = factor(taxon, levels = taxon),
+    taxon_y = -cumsum(lag(ceiling(total_tiles / tiles_per_row) + 1, default = 0))
+  ) %>%
+  select(-total_tiles, -side)
+
+# Join in row position
+tile_expanded <- tile_data %>%
+  left_join(taxon_order, by = "taxon") %>%
+  uncount(n_tiles) %>%
+  group_by(taxon, side) %>%
+  mutate(
+    tile_id = row_number(),
+    col_offset = (tile_id - 1) %% tiles_per_row,
+    row_offset = floor((tile_id - 1) / tiles_per_row),
+    col = ifelse(side == "left", -gap_width - col_offset, gap_width + col_offset),
+    row = taxon_y - row_offset
+  ) %>%
+  ungroup()
+
+# Format taxon totals per side
+label_totals <- tile_data %>%
+  group_by(taxon, side) %>%
+  summarize(total = sum(tot), .groups = "drop") %>%
+  left_join(taxon_order, by = "taxon") %>%
+  mutate(
+    label_x = ifelse(side == "left", -gap_width - tiles_per_row, gap_width + tiles_per_row),
+    label_y = taxon_y,
+    total_fmt = format(round(total), big.mark = ",")
+  )
+
+# Add taxon labels (centered)
+taxon_labels <- taxon_order %>%
+  mutate(label = as.character(taxon))
+
+# Assign manual colors
+raw_colors <- c(
+  "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black",
+  "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",
+  "orchid1", "darkturquoise", "darkorange4", "deepskyblue4",
+  "darkolivegreen3", "firebrick3", "mediumvioletred"
+)
+taxa <- levels(taxon_order$taxon)
+base_colors <- setNames(head(raw_colors, length(taxa)), taxa)
+
+# Add area labels for the left and right columns
+area_labels <- tibble(
+  side = c("left", "right"),
+  label = c("Impact Zones + Consideration Areas", "Rest of Monitoring Area"),
+  x = c(-gap_width - tiles_per_row / 2, gap_width + tiles_per_row / 2),
+  y = max(tile_expanded$row) + 3  # place above the topmost tile row
+)
+
+# Final plot
+ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
+  geom_tile(width = 0.95, height = 0.95, color = "white", linewidth = 0.1) +
+  geom_point(
+    data = filter(tile_expanded, class == "<4cm"),
+    aes(x = col, y = row),
+    shape = 16, color = "white", size = 0.5, inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = label_totals,
+    aes(x = label_x, y = label_y, label = total_fmt),
+    size = 2.5, hjust = ifelse(label_totals$side == "left", 1, 0),
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = taxon_labels,
+    aes(x = 0, y = taxon_y, label = taxon),
+    size = 2.5, hjust = 0.5, inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = area_labels,
+    aes(x = x, y = y, label = label),
+    size = 4, fontface = "bold", inherit.aes = FALSE
+  ) +
+  scale_fill_manual(values = base_colors, guide = "none") +
+  coord_equal(clip = "off") +
+  theme_void() +
+  labs(
+   # title = "Coral Abundance by Region (1 tile = 1,000 corals)",
+  ) +
+  theme(
+    plot.margin = margin(10, 80, 10, 80)
+  )
+
+
 ```
 
 ### Treemap plot - entire monitoring area
@@ -2820,6 +2959,10 @@ ggsave(filename = "outputs/Fig3_subset.png", plot = final_plot,
 ```
 
 
+# spatially-explicit ACER analysis?
+```{r}
+
+```
 
 
 
