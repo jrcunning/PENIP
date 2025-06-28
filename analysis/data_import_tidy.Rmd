@@ -1871,25 +1871,25 @@ sum(dfftaxon$n)
 
 # MODEL - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
 
-mod_nb <- brm(
-  bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
-       offset(log(transect_area_m2)),
-     zi ~ taxon:class * Type),
-  family = zero_inflated_negbinomial(),
-  data = dfftaxon,    # choose dataset with or without all structural zeros
-  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-            prior(normal(0, 1), class = "b", dpar = "zi")),
-  chains = 4,
-  cores = 4,
-  threads = threading(5),
-  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-  thin = 1,
-  control = list(adapt_delta = 0.85, max_treedepth = 10),
-  backend = "cmdstanr"
-)
-saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+# mod_nb <- brm(
+#   bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
+#        offset(log(transect_area_m2)),
+#      zi ~ taxon:class * Type),
+#   family = zero_inflated_negbinomial(),
+#   data = dfftaxon,    # choose dataset with or without all structural zeros
+#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+#             prior(normal(0, 1), class = "b", dpar = "zi")),
+#   chains = 4,
+#   cores = 4,
+#   threads = threading(5),
+#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+#   thin = 1,
+#   control = list(adapt_delta = 0.85, max_treedepth = 10),
+#   backend = "cmdstanr"
+# )
+# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
 
 
@@ -1988,26 +1988,26 @@ Let's move direction to a random effect. This approach acknowledges the variabil
 
 ## Model2 - drop direction to RE
 ```{r}
-mod_nb2 <- brm(
-  bf(n ~ dataset * taxon:class * Type +
-       (1 | taxon:class:Type:dir) +
-       offset(log(transect_area_m2)),
-     zi ~ taxon:class * Type),
-  family = zero_inflated_negbinomial(),
-  data = dfftaxon,    # choose dataset with or without all structural zeros
-  prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-            prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-            prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-            prior(normal(0, 1), class = "b", dpar = "zi")),
-  chains = 4,
-  cores = 4,
-  threads = threading(5),
-  iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
-  thin = 1,
-  control = list(adapt_delta = 0.85, max_treedepth = 10),
-  backend = "cmdstanr"
-)
-saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
+# mod_nb2 <- brm(
+#   bf(n ~ dataset * taxon:class * Type +
+#        (1 | taxon:class:Type:dir) +
+#        offset(log(transect_area_m2)),
+#      zi ~ taxon:class * Type),
+#   family = zero_inflated_negbinomial(),
+#   data = dfftaxon,    # choose dataset with or without all structural zeros
+#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
+#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
+#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
+#             prior(normal(0, 1), class = "b", dpar = "zi")),
+#   chains = 4,
+#   cores = 4,
+#   threads = threading(5),
+#   iter = 200, warmup = 50,    #iter = 1000, warmup = 500,
+#   thin = 1,
+#   control = list(adapt_delta = 0.85, max_treedepth = 10),
+#   backend = "cmdstanr"
+# )
+# saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
@@ -2161,27 +2161,27 @@ p1
 # ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
 # with zero-inflation that varies per taxon*class
 
-mod_nb3 <- brm(
-  bf(n ~ taxon:class * Type +
-        (1 + Type | dataset) +
-        (1 | dataset:taxon:class:Type:dir) +
-        offset(log(transect_area_m2)),
-     zi ~ taxon:class * Type),
-  data = dfftaxon,   # use dataset with all structural zeros present
-  family = zero_inflated_negbinomial(),
-  prior = c(
-    prior(normal(0, 2), class = "b"),
-    prior(normal(0, 5), class = "Intercept"),
-    prior(exponential(1), class = "shape"),
-    prior(normal(0, 1), class = "b", dpar = "zi")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 3000, warmup = 1500, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.95)
-)
-
-saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+# mod_nb3 <- brm(
+#   bf(n ~ taxon:class * Type +
+#         (1 + Type | dataset) +
+#         (1 | dataset:taxon:class:Type:dir) +
+#         offset(log(transect_area_m2)),
+#      zi ~ taxon:class * Type),
+#   data = dfftaxon,   # use dataset with all structural zeros present
+#   family = zero_inflated_negbinomial(),
+#   prior = c(
+#     prior(normal(0, 2), class = "b"),
+#     prior(normal(0, 5), class = "Intercept"),
+#     prior(exponential(1), class = "shape"),
+#     prior(normal(0, 1), class = "b", dpar = "zi")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 3000, warmup = 1500, thin = 1,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.95)
+# )
+# 
+# saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
 mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 
 
@@ -2223,7 +2223,6 @@ loo_compare(loo_3, loo_2, loo_1)
   labs(x = "Habitat Type", y = "Density (per m2)")+
   theme_minimal())
 
-taxdens
 
 taxon_group_df <- bind_rows(lapply(names(taxon_groups_juv), function(group) {
   tibble(taxon = taxon_groups_juv[[group]], group = group)
@@ -2249,7 +2248,7 @@ fig2 <- taxdens +
         plot.background = element_rect(fill = "white", color = NA)) +
   coord_cartesian(clip = "off") +
   labs(color = "Size class")
-fig2
+
 ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
@@ -2294,11 +2293,85 @@ summary_totals <- preds %>%
   mean_qi(total_epred, .width = 0.95)
 
 ggplot(summary_totals, aes(x = Type, y = total_epred)) +
-  geom_point() +
+  geom_col() +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
   #scale_y_log10() +
   scale_x_discrete(labels = type_labels) +
   labs(x = "Habitat Type", y = "Total Coral Density (per m²)") +
+  theme_minimal()
+
+# By SiZE CLASS by HABITAT
+# Step 1: Summarize posterior predictions
+summary_by_class <- preds %>%
+  group_by(.draw, Type, class) %>%
+  summarize(total_epred = sum(.epred), .groups = "drop") %>%
+  group_by(Type, class) %>%
+  mean_qi(total_epred, .width = 0.95)
+
+# Optional: Set factor levels for Type and class for better plot order
+# summary_by_class$Type <- factor(summary_by_class$Type, levels = desired_order)
+# summary_by_class$class <- factor(summary_by_class$class, levels = c("<4cm", "≥4cm"))
+
+# Step 2: Plot
+ggplot(summary_by_class, aes(x = Type, y = total_epred, fill = class)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper),
+                position = position_dodge(width = 0.7), width = 0.2) +
+  scale_fill_manual(values = c("<4cm" = "gray70", ">4cm" = "gray40")) +
+  scale_x_discrete(labels = type_labels) +
+  labs(
+    x = "Habitat Type",
+    y = "Total Coral Density (per m²)",
+    fill = "Size Class"
+  ) +
+  theme_minimal()
+
+
+# By SUS GROUP OVERALL
+
+group_definitions <- tibble(
+  taxon = unique(preds$taxon),
+  taxon_group = case_when(
+    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", 
+                 "MMEA", "DLAB", "CNAT", "FAVI", "PSTR", "PCLI") ~ "high_sus",
+    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
+    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
+    TRUE ~ NA_character_
+  )
+)
+# Join susceptibility group definitions
+preds_grouped <- preds %>%
+  left_join(group_definitions, by = "taxon") %>%
+  filter(!is.na(taxon_group))
+
+# Summarize posterior predictions by draw × Type × group
+summary_grouped <- preds_grouped %>%
+  group_by(.draw, Type, taxon_group) %>%
+  summarize(total_epred = sum(.epred), .groups = "drop") %>%
+  group_by(Type, taxon_group) %>%
+  mean_qi(total_epred, .width = 0.95)
+
+# Optional: order groups for plot aesthetics
+summary_grouped$taxon_group <- factor(summary_grouped$taxon_group,
+                                      levels = c("high_sus", "med_sus", "low_sus"))
+
+# Plot
+ggplot(summary_grouped, aes(x = Type, y = total_epred, fill = taxon_group)) +
+  geom_col(position = "dodge") +
+  geom_errorbar(position = "dodge",
+    aes(ymin = .lower, ymax = .upper),
+    color = "black"
+  ) +
+  scale_fill_manual(
+    values = c("high_sus" = "#E31A1C", "med_sus" = "#FDBF6F", "low_sus" = "#6A3D9A"),
+    labels = c("high_sus" = "High", "med_sus" = "Medium", "low_sus" = "Low")
+  ) +
+  scale_x_discrete(labels = type_labels) +
+  labs(
+    x = "Habitat Type",
+    y = "Total Coral Density (per m²)",
+    fill = "Disease Susceptibility"
+  ) +
   theme_minimal()
 
 
@@ -2369,8 +2442,10 @@ tot2 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
 ```
 
-### Waffle plot - entire monitoring area
-```{r, fig.height = 10, fig.width = 5}
+# Waffle plots 
+
+### Entire area
+```{r, fig.height = 8}
 
 # STEP 1: Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
@@ -2475,7 +2550,7 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
   ) +
 
   scale_fill_manual(values = base_colors, guide = "none") +
-  coord_equal(clip = "off") +  # allow text to overflow plot area
+  #coord_equal(clip = "off") +  # allow text to overflow plot area
   theme_void() +
   theme(
     plot.margin = margin(t = 10, r = 80, b = 10, l = 80),  # ensure space on both sides
@@ -2490,7 +2565,7 @@ waffle
 ```
 
 ### Double waffle - both areas
-```{r}
+```{r, fig.height = 8}
 # Set tile size and max per row
 tile_size <- 1000
 tiles_per_row <- 50
@@ -2620,7 +2695,7 @@ ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
     size = 4, fontface = "bold", inherit.aes = FALSE
   ) +
   scale_fill_manual(values = base_colors, guide = "none") +
-  coord_equal(clip = "off") +
+  #coord_equal(clip = "off") +
   theme_void() +
   labs(
    # title = "Coral Abundance by Region (1 tile = 1,000 corals)",
@@ -2632,7 +2707,9 @@ ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
 
 ```
 
-### Treemap plot - entire monitoring area
+# Treemap plots - 
+
+### entire monitoring area
 ```{r working_treemap}
 # Assign a base color per taxon
 base_colors <- scales::hue_pal()(length(unique(tot4$taxon)))
@@ -2744,462 +2821,147 @@ ggsave(filename = "outputs/Fig3.png", width = 170, height = 130, units = "mm", d
 ```
 
 
-### Waffle plot - only Scenario2+NMFS
-```{r, fig.height = 10}
-# STEP 1: Aggregate total abundance by taxon + class
-tot4 <- tot2 %>%
-  filter(name != "Rest of Monitoring Area") %>%
-  group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop")
-
-# STEP 2: Set tile resolution
-# tile_size <- 2500
-# tile_size <- 5000
-tile_size <- 1000
-
-# STEP 3: Compute number of tiles per taxon + class
-tile_totals <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(total_raw = sum(tot), .groups = "drop") %>%
-  mutate(total_tiles = round(total_raw / tile_size))
-
-# Join back to get size-class-specific raw totals
-tile_data <- tot4 %>%
-  left_join(tile_totals, by = "taxon") %>%
-  mutate(
-    prop = tot / total_raw,
-    n_tiles = round(prop * total_tiles)
-  ) %>%
-  filter(n_tiles > 0) %>%
-  arrange(taxon)
 
 
-# STEP 4: Order taxa by total abundance (across size classes)
-taxon_order <- tile_data %>%
-  group_by(taxon) %>%
-  summarize(total_n = sum(tot), 
-            total_tiles = sum(n_tiles), .groups = "drop") %>%
-  arrange(total_n) %>%
-  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 100 + 1, default = 0)))
-
-# STEP 5: Expand to individual tiles
-tile_expanded <- tile_data %>%
-  uncount(n_tiles) %>%
-  mutate(class = factor(class, levels = c(">4cm", "<4cm"))) %>%
-  left_join(taxon_order, by = "taxon") %>%
-  group_by(taxon) %>%
-  mutate(
-    tile_id = row_number(),
-    col = (tile_id - 1) %% 100,
-    row = -(taxon_row_start + (tile_id - 1) %/% 100)
-  ) %>%
-  ungroup() %>%
-  mutate(taxon = factor(taxon, levels = taxon_order$taxon))
-
-
-
-# STEP 7: Label positions
-row_labels <- tile_expanded %>%
-  group_by(taxon) %>%
-  summarize(label_y = max(row), label_x_end = max(col), .groups = "drop")
-
-# STEP 8: Taxon totals
-taxon_totals <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(total = sum(tot), .groups = "drop") %>%
-  mutate(total_fmt = format(round(total), big.mark = ","))
-
-row_labels <- row_labels %>%
-  left_join(taxon_totals, by = "taxon")
-
-# STEP 9: Plot
-waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
-  geom_tile(width = 0.95, height = 0.95, color = "white", linewidth = 0.1) +
-
-  # Dot for <4cm
-  geom_point(
-    data = filter(tile_expanded, class == "<4cm"),
-    aes(x = col, y = row),
-    shape = 16, color = "white", size = 0.5, inherit.aes = FALSE
-  ) +
-
-  # Taxon names (left)
-  geom_text(
-    data = row_labels,
-    aes(x = -2, y = label_y, label = taxon),
-    hjust = 1, size = 2.5, inherit.aes = FALSE
-  ) +
-
-  # Totals (right)
-  geom_text(
-    data = row_labels,
-    aes(x = label_x_end, y = label_y, label = total_fmt),
-    hjust = 0, size = 2.5, inherit.aes = FALSE
-  ) +
-
-  scale_fill_manual(values = base_colors, guide = "none") +
-  coord_equal(clip = "off") +  # allow text to overflow plot area
-  theme_void() +
-  theme(
-    plot.margin = margin(t = 10, r = 80, b = 10, l = 80),  # ensure space on both sides
-    axis.text = element_blank()
-  ) +
-  labs(
-    title = "Total abundance within Scenario 2 impact zones\n(1 tile = 1,000 corals)",
-    caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
-  )
-
-waffle
-
-```
-
-### Treemap - only Scenario2+NMFS
-```{r}
-
-# 1. Subset and summarize the data
-tot4 <- tot2 %>%
-  filter(!name %in% c("Rest of Monitoring Area", "North", "South", "East", "Nearshore")) %>%
-  group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop") %>%
-  mutate(taxon = factor(taxon), class = factor(class))
-
-# 2. Assign base colors per taxon
-set.seed(2)
-base_colors <- sample(ggsci::pal_d3("category20")(20), length(unique(tot4$taxon)))
-names(base_colors) <- unique(tot4$taxon)
-
-# 3. Define shading function
-get_shades <- function(base_col, class, all_classes) {
-  if (length(all_classes) == 2) {
-    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
-    else colorspace::darken(base_col, 0.1)
-  } else {
-    base_col
-  }
-}
-
-# 4. Build taxon_class and corresponding shades
-shade_map <- tot4 %>%
-  distinct(taxon, class) %>%
-  rowwise() %>%
-  mutate(
-    base_col = base_colors[[taxon]],
-    all_classes = list(tot4$class[tot4$taxon == taxon]),
-    shade = get_shades(base_col, class, all_classes),
-    taxon_class = paste(taxon, class, sep = "_")
-  ) %>%
-  ungroup()
-
-fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
-
-# 5. Add taxon_class to main data
-tot4 <- tot4 %>%
-  mutate(taxon_class = paste(taxon, class, sep = "_"))
-
-# 6. Treemap base plot
-p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
-  geom_treemap(color = NA) +
-  geom_treemap_subgroup_border(colour = "white", size = 1) +
-  scale_fill_manual(values = fill_colors) +
-  theme(legend.position = "none")
-
-# 7. Layout and labels
-tile_layout <- treemapify(tot4, area = "tot", fill = "taxon_class", subgroup = "taxon")
-
-tile_layout_ag <- tile_layout %>%
-  group_by(taxon) %>%
-  summarize(xmin = min(xmin), xmax = max(xmax),
-            ymin = min(ymin), ymax = max(ymax),
-            area = (xmax - xmin) * (ymax - ymin),
-            center_x = (xmin + xmax) / 2,
-            center_y = (ymin + ymax) / 2)
-
-area_threshold <- 0.001
-
-internal_labels <- tile_layout_ag %>%
-  filter(area >= area_threshold)
-
-external_labels <- tile_layout_ag %>%
-  filter(area < area_threshold)
-
-taxtots <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(tot = scales::comma(sum(tot)))
-
-internal_labels <- left_join(internal_labels, taxtots) %>%
-  mutate(label = paste0(taxon, "\n", tot))
-
-external_labels <- left_join(external_labels, taxtots) %>%
-  mutate(label = paste0(taxon, "\n", tot))
-
-# 8. Final plot
-final_plot <- p +
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  coord_cartesian(clip = "off") +
-  geom_text(data = internal_labels,
-            aes(x = xmin, y = ymax - 0.00001, label = label, size = area),
-            inherit.aes = FALSE,
-            hjust = 0, vjust = 1, lineheight = 0.7,
-            nudge_x = 0.005, nudge_y = -0.005) +
-  scale_size_continuous(range = c(1.1, 15)) +
-  geom_text_repel(data = external_labels,
-                  aes(x = center_x, y = center_y, label = label),
-                  inherit.aes = FALSE,
-                  max.overlaps = Inf,
-                  xlim = c(1, NA),
-                  force = 5,
-                  min.segment.length = 0.1,
-                  segment.size = 0.2,
-                  hjust = 0,
-                  size = 1.1) +
-  theme_void() +
-  theme(
-    legend.position = "none",
-    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
-    plot.background = element_rect(fill = "white", color = NA)
-  ) +
-  ggtitle("Total corals excluding Rest of Monitoring Area")
-
-# 9. Save
-ggsave(filename = "outputs/Fig3_subset.png", plot = final_plot,
-       width = 170, height = 130, units = "mm", dpi = 300)
-
-```
-
-
-# spatially-explicit ACER analysis?
+########## spatially-explicit ACER analysis?
 ```{r}
 
 ```
 
 
 
-### Dataset-specific estimates from Model3
-```{r, include = T, eval = T, fig.width = 10, fig.height = 20}
-newdata_ds <- dfftaxon_trimmed %>%        
-  distinct(dataset, Type, taxon, class) %>%
-  mutate(transect_area_m2 = 1,
-         dir = NA)
+# Dataset-specific estimates from Model3
 
+## Taxon densities across datasets
+```{r, include = T, eval = T, fig.width = 10, fig.height = 6}
+# Step 1: Create newdata (retain dataset, taxon, class, and Type)
+newdata_taxon <- dfftaxon_trimmed %>%
+  distinct(dataset, taxon, class, Type) %>%
+  mutate(transect_area_m2 = 1, dir = NA)
 
-preds_ds <- add_epred_draws(
+# Step 2: Posterior predictions including group-level effects
+preds_taxon <- add_epred_draws(
   mod_nb3,
-  newdata = newdata_ds,
+  newdata = newdata_taxon,
   re_formula = NULL,
-  allow_new_levels = TRUE 
+  allow_new_levels = TRUE
 )
 
+# Step 3: Average across habitat types per draw, dataset, taxon, class
+preds_avg <- preds_taxon %>%
+  group_by(.draw, dataset, taxon, class) %>%
+  summarize(mean_epred = mean(.epred), .groups = "drop")
 
-summary_preds_ds <- preds_ds %>%
-  group_by(taxon, class, Type, dataset) %>%
-  mean_qi(.epred, .width = 0.95)
+# Step 4: Sum across size classes to get total density per taxon
+preds_total <- preds_avg %>%
+  group_by(.draw, dataset, taxon) %>%
+  summarize(total_epred = sum(mean_epred), .groups = "drop")
 
+# Step 5: Summarize posterior distribution
+summary_taxon_total <- preds_total %>%
+  group_by(dataset, taxon) %>%
+  mean_qi(total_epred, .width = 0.95)
 
-ggplot(summary_preds_ds, aes(x = Type, y = .epred,
-                              color = dataset, shape = dataset,
-                              group = interaction(dataset, class))) +
-  geom_point(position = position_dodge(width = 0.5), size = 2, alpha = 0.5) +
-  geom_line(alpha = 0.5) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper),
-                position = position_dodge(width = 0.5), width = 0.2, alpha = 0.5) +
-  facet_wrap(~ taxon + class, scales = "free_y") +
-  scale_y_log10()+#limits = c(1e-4, 2)) +
-  labs(x = "Habitat Type", y = "Estimated Density (per m²)",
-       color = "Size Class", shape = "Dataset") +
-  theme_minimal(base_size = 12) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Optional: Order datasets
+summary_taxon_total <- summary_taxon_total %>%
+  mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24"))) %>%
+  mutate(year = parse_number(as.character(dataset)))
 
-
-```
-
-
-```{r, include = T, eval = T}
-#TEST FOR DIFFS IN ANY TAXON/CLASS/TYPE GROUP BETWEEN SURVEYS
-
-# 🔁 Step 1: Group by taxon, class, Type
-comparison_results_all <- preds_ds %>%
-  group_by(taxon, class, Type) %>%
-  group_split() %>%
-  map_dfr(function(subgroup) {
-    # Pivot to wide format: one column per dataset
-    sub_wide <- subgroup %>%
-      select(.draw, dataset, .epred) %>%
-      pivot_wider(names_from = dataset, values_from = .epred)
-
-    # Skip if not enough datasets to compare
-    dataset_names <- names(sub_wide)[-1]
-    if (length(dataset_names) < 2) return(NULL)
-
-    # All pairwise comparisons
-    comparisons <- combn(dataset_names, 2, simplify = FALSE)
-
-    # Compute posterior differences
-    map_dfr(comparisons, function(pair) {
-      diff_draws <- sub_wide[[pair[1]]] - sub_wide[[pair[2]]]
-      tibble(
-        taxon = unique(subgroup$taxon),
-        class = unique(subgroup$class),
-        Type = unique(subgroup$Type),
-        dataset1 = pair[1],
-        dataset2 = pair[2],
-        mean_diff = mean(diff_draws),
-        lower = quantile(diff_draws, 0.025),
-        upper = quantile(diff_draws, 0.975),
-        p_gt_0 = mean(diff_draws > 0),
-        p_lt_0 = mean(diff_draws < 0)
-      )
-    })
-  })
-
-
-# 👉 View significant differences (95% CI excludes 0)
-comparison_results_all %>%
-  filter(lower > 0 | upper < 0) %>%
-  arrange(taxon, class, Type, desc(abs(mean_diff))) %>%
-  knitr::kable()
+# Step 6: Plot
+ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
+  geom_line(aes(group = taxon), linewidth = 0.6, color = "gray40") +
+  geom_point(aes(shape = dataset), size = 2.5, color = "black") +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
+  #geom_smooth(method = "loess", se = FALSE, lty = 2) +
+  facet_wrap(~taxon, scales = "free_y") +
+  labs(
+    x = "Year",
+    y = "Total Coral Density (per m²)",
+    title = "Total Coral Density per Taxon Across Datasets"
+  ) +
+  #scale_y_log10()+
+  scale_x_continuous(breaks = seq(11,24,2)) +
+  scale_shape_manual(values = c(1,0,7,2,5,6))+
+  theme_minimal(base_size = 11)
 
 ```
 
-```{r, include = T, eval = T}
-# test for diffs in sctld-sus groups
 
-# Step 1: Define taxon groups
+## Sus-group densities across datasets
+```{r, fig.width = 10, fig.height = 5}
+# Step 1: Define susceptibility groups
 group_definitions <- tibble(
-  taxon = unique(preds_ds$taxon),
-  taxon_group = case_when(
-    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA") ~ "high_sus",
+  taxon = unique(preds$taxon),
+  sus_group = case_when(
+    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA", "DLAB", "CNAT", "PSTR", "PCLI") ~ "high_sus",
     taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
     taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
     TRUE ~ NA_character_
   )
+) %>%
+  mutate(sus_group = factor(sus_group, levels = c("low_sus", "med_sus", "high_sus")))
+
+# Step 2: Create newdata with all combos (retain Type)
+newdata_ds <- dfftaxon_trimmed %>%
+  distinct(dataset, Type, taxon, class) %>%
+  mutate(transect_area_m2 = 1, dir = NA)
+
+# Step 3: Predict densities (posterior draws)
+preds_ds <- add_epred_draws(
+  mod_nb3,
+  newdata = newdata_ds,
+  re_formula = NULL,
+  allow_new_levels = TRUE
 )
 
-# Step 2: Join taxon groups to posterior draws
-preds_grouped <- preds_ds %>%
-  ungroup() %>%
-  left_join(group_definitions, by = "taxon") %>%
-  filter(!is.na(taxon_group))  # drop any unmatched taxa
-
-# Step 3: Aggregate mean density per group per draw
-group_summaries <- preds_grouped %>%
-  group_by(.draw, taxon_group, dataset, Type, class) %>%
+# Step 4: Average across habitat Type per draw, taxon, class, dataset
+preds_avg <- preds_ds %>%
+  group_by(.draw, taxon, class, dataset) %>%
   summarize(mean_epred = mean(.epred), .groups = "drop")
 
-# Filter to only surveys that surveyed all taxa
-group_summaries <- group_summaries %>%
-  filter(!str_detect(dataset, "_esa"))
+# Step 5: Join susceptibility group
+preds_grouped <- preds_avg %>%
+  left_join(group_definitions, by = "taxon") %>%
+  filter(!is.na(sus_group))
 
-# Step 4: Generate pairwise comparisons across datasets
-comparisons <- group_summaries %>%
-  inner_join(group_summaries, by = c(".draw", "taxon_group", "Type", "class"), suffix = c("_A", "_B")) %>%
-  filter(dataset_A != dataset_B) %>%
-  mutate(
-    dataset_pair = paste(dataset_A, "vs", dataset_B),
-    diff = mean_epred_A - mean_epred_B
+# Step 6: Sum total predicted density per susceptibility group (all taxa, class in group)
+summary_sus <- preds_grouped %>%
+  group_by(.draw, sus_group, dataset) %>%
+  summarize(total_density = sum(mean_epred), .groups = "drop") %>%
+  group_by(sus_group, dataset) %>%
+  mean_qi(total_density, .width = 0.95)
+
+# Exclude unwanted datasets and set dataset order
+summary_sus_filtered <- summary_sus %>%
+  filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
+  mutate(dataset = factor(dataset, levels = c("dca17", "tt21", "tt23", "drm24")),
+         year = parse_number(as.character(dataset)))
+
+# Plot
+ggplot(summary_sus_filtered, aes(x = year, y = total_density,
+                                 color = sus_group, shape = dataset, group = sus_group)) +
+  geom_line(linewidth = 0.8) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
+  geom_point(size = 3, fill = "white") +
+  geom_smooth(method = "lm", se = FALSE, lty = 2, color = "black") +
+  ggpubr::stat_cor() +
+  labs(
+    x = "Year",
+    y = "Mean Coral Density (per m²)",
+    color = "Susceptibility Group",
+    shape = "Dataset"
+  ) +
+  #scale_y_log10() +
+  theme_minimal(base_size = 11) +
+  scale_shape_manual(values = c(21,22,24,25)) +
+  facet_wrap(~sus_group, scales = "free") +
+  guides(color = "none") +
+  theme(
+    legend.position = "bottom"
   )
 
-# Step 5: Summarize pairwise differences
-comparison_summary <- comparisons %>%
-  group_by(taxon_group, Type, class, dataset_pair) %>%
-  summarize(
-    mean_diff = mean(diff),
-    ci_lower = quantile(diff, 0.025),
-    ci_upper = quantile(diff, 0.975),
-    p_diff_gt0 = mean(diff > 0),
-    p_diff_lt0 = mean(diff < 0),
-    .groups = "drop"
-  )
 
-# View results
-comparison_summary %>%
-  arrange(taxon_group, Type, class, desc(p_diff_gt0)) %>%
-  filter(p_diff_gt0 < 0.1 | p_diff_lt0 < 0.1) %>%
-  knitr::kable()
 
 ```
 
-Look across all habitat Types?
-```{r, include = T, eval = T}
-
-# 3️⃣ Sum densities across all habitat Types
-group_overall <- preds_grouped %>%
-  group_by(.draw, dataset, taxon_group, class) %>%
-  summarize(overall_density = sum(.epred), .groups = "drop") %>%
-  filter(!str_detect(dataset, "_esa"))
-
-# 4️⃣ Perform pairwise comparisons across datasets
-dataset_pairs <- combn(unique(group_overall$dataset), 2, simplify = FALSE)
-
-comparison_summary <- map_dfr(dataset_pairs, function(pair) {
-  ds1 <- pair[1]
-  ds2 <- pair[2]
-
-  diffs <- group_overall %>%
-    filter(dataset %in% pair) %>%
-    pivot_wider(names_from = dataset, values_from = overall_density) %>%
-    mutate(
-      diff = !!sym(ds1) - !!sym(ds2)
-    ) %>%
-    group_by(taxon_group, class) %>%
-    summarize(
-      dataset_pair = paste(ds1, "vs", ds2),
-      mean_diff = mean(diff, na.rm = TRUE),
-      ci_lower = quantile(diff, 0.025, na.rm = TRUE),
-      ci_upper = quantile(diff, 0.975, na.rm = TRUE),
-      p_diff_gt0 = mean(diff > 0, na.rm = TRUE),
-      p_diff_lt0 = mean(diff < 0, na.rm = TRUE),
-      .groups = "drop"
-    )
-
-  diffs
-})
-
-# 5️⃣ Filter for meaningful differences (optional)
-comparison_summary %>%
-  filter(p_diff_gt0 > 0.9 | p_diff_lt0 > 0.9) %>%
-  arrange(taxon_group, class, desc(abs(mean_diff))) %>%
-  knitr::kable()
-```
-
- individual taxon x class among datasets? (overall - across all habitat Types)
-```{r, include = T, eval = T}
-# 1️⃣ Summarize posterior draws across all habitat Types for each taxon × class × dataset × draw
-overall_preds_taxon <- preds_ds %>%
-  group_by(.draw, dataset, taxon, class) %>%
-  summarize(overall_density = sum(.epred), .groups = "drop")
-
-# 2️⃣ Get all unique dataset pairs
-dataset_pairs <- combn(unique(overall_preds_taxon$dataset), 2, simplify = FALSE)
-
-# 3️⃣ Pairwise comparisons: For each taxon × class, compare datasets
-comparison_taxon_summary <- map_dfr(dataset_pairs, function(pair) {
-  ds1 <- pair[1]
-  ds2 <- pair[2]
-
-  # Reshape and compute difference
-  diffs <- overall_preds_taxon %>%
-    filter(dataset %in% pair) %>%
-    pivot_wider(names_from = dataset, values_from = overall_density) %>%
-    mutate(diff = !!sym(ds1) - !!sym(ds2)) %>%
-    group_by(taxon, class) %>%
-    summarize(
-      dataset_pair = paste(ds1, "vs", ds2),
-      mean_diff = mean(diff, na.rm = TRUE),
-      ci_lower = quantile(diff, 0.025, na.rm = TRUE),
-      ci_upper = quantile(diff, 0.975, na.rm = TRUE),
-      p_diff_gt0 = mean(diff > 0, na.rm = TRUE),
-      p_diff_lt0 = mean(diff < 0, na.rm = TRUE),
-      .groups = "drop"
-    )
-
-  diffs
-})
-
-# 4️⃣ (Optional) Filter to only show differences with high posterior support
-comparison_taxon_summary %>%
-  filter(p_diff_gt0 > 0.95 | p_diff_lt0 > 0.95) %>%
-  arrange(taxon, class, desc(abs(mean_diff))) %>%
-  knitr::kable()
-```
 
