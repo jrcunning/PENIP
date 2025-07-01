@@ -2202,27 +2202,27 @@ p1
 # ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
 # with zero-inflation that varies per taxon*class
 
-mod_nb3 <- brm(
-  bf(n ~ taxon:class * Type +
-        (1 + Type | dataset) +
-        (1 | dataset:taxon:class:Type:dir) +
-        offset(log(transect_area_m2)),
-     zi ~ taxon:class * Type),
-  data = dfftaxon,   # use dataset with all structural zeros present
-  family = zero_inflated_negbinomial(),
-  prior = c(
-    prior(normal(0, 2), class = "b"),
-    prior(normal(0, 5), class = "Intercept"),
-    prior(exponential(1), class = "shape"),
-    prior(normal(0, 1), class = "b", dpar = "zi")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 500, warmup = 100, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.95)
-)
-
-saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+# mod_nb3 <- brm(
+#   bf(n ~ taxon:class * Type +
+#         (1 + Type | dataset) +
+#         (1 | dataset:taxon:class:Type:dir) +
+#         offset(log(transect_area_m2)),
+#      zi ~ taxon:class * Type),
+#   data = dfftaxon,   # use dataset with all structural zeros present
+#   family = zero_inflated_negbinomial(),
+#   prior = c(
+#     prior(normal(0, 2), class = "b"),
+#     prior(normal(0, 5), class = "Intercept"),
+#     prior(exponential(1), class = "shape"),
+#     prior(normal(0, 1), class = "b", dpar = "zi")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 500, warmup = 100, thin = 1,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.95)
+# )
+# 
+# saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
 mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 
 
@@ -2280,6 +2280,9 @@ summary_equal_weighted <- draws_equal_weighted %>%
 loo_3 <- loo(mod_nb3)
 
 loo_compare(loo_3, loo_2, loo_1)
+loo_3
+loo_2
+loo_1
 
 # Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
 # mod3 also has slightly lower p_loo (good, slightly simpler )
@@ -2295,7 +2298,7 @@ loo_compare(loo_3, loo_2, loo_1)
   geom_point(size = 1) +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
   geom_line(aes(group = class)) +
-  facet_wrap(~taxon, labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed)), scales = "free_y") +
+  facet_wrap(~taxon, labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed)), scales = "free_y", ncol = 4) +
   #scale_y_log10() +
   scale_x_discrete(labels = type_labels) +
   labs(x = "Habitat Type", y = "Density (per m2)")+
@@ -2317,7 +2320,7 @@ annotation_df <- summary_equal_weighted %>%
   mutate(label = paste0("<4cm = ", group2),
          # Choose a y-position (adjust as needed for your scale)
          x = 2.5,
-         y = 3e-6)  # log10-scale safe low value
+         y = Inf)  # log10-scale safe low value
 
 fig2 <- taxdens +
   geom_text(data = annotation_df, aes(x = x, y = y, label = label),
@@ -2325,7 +2328,9 @@ fig2 <- taxdens +
   theme(panel.background = element_rect(fill = "white", color = NA),
         plot.background = element_rect(fill = "white", color = NA)) +
   coord_cartesian(clip = "off") +
-  labs(color = "Size class")
+  labs(color = "Size class") +
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = -5, b = 0))  # move legend up)
 fig2
 ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
@@ -2340,8 +2345,8 @@ summary_preds_fmt <- summary_equal_weighted %>%
     class = factor(class, levels = class_order),
     Type = factor(Type, levels = type_order),
     mean_ci = case_when(
-      .epred < 0.001 ~ sprintf("%.1e<br>[%.1e–%.1e]", .epred, .lower, .upper),
-      TRUE ~ sprintf("%.4f<br>[%.4f–%.4f]", .epred, .lower, .upper)
+      n_m2 < 0.001 ~ sprintf("%.1e<br>[%.1e–%.1e]", n_m2, .lower, .upper),
+      TRUE ~ sprintf("%.4f<br>[%.4f–%.4f]", n_m2, .lower, .upper)
     )
   )
 
@@ -2386,23 +2391,54 @@ summary_by_class <- draws_equal_weighted %>%
   group_by(Type, class) %>%
   mean_qi(total_epred, .width = 0.95)
 
-# Optional: Set factor levels for Type and class for better plot order
-# summary_by_class$Type <- factor(summary_by_class$Type, levels = desired_order)
-# summary_by_class$class <- factor(summary_by_class$class, levels = c("<4cm", "≥4cm"))
+# Step 1: Force stacking order: <4cm on top, >4cm on bottom
+summary_stacked <- summary_by_class %>%
+  mutate(class = factor(class, levels = c("<4cm", ">4cm")))  # <4cm will be stacked last = on top
 
-# Step 2: Plot
-ggplot(summary_by_class, aes(x = Type, y = total_epred, fill = class)) +
-  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper),
-                position = position_dodge(width = 0.7), width = 0.2) +
+# Step 2: Compute stacking positions in reverse of factor order
+summary_stacked <- summary_stacked %>%
+  arrange(Type, desc(class)) %>%  # arrange so >4cm is stacked first (bottom)
+  group_by(Type) %>%
+  mutate(
+    stack_ymin = cumsum(lag(total_epred, default = 0)),
+    stack_ymax = stack_ymin + total_epred,
+    err_lower = stack_ymax - (total_epred - .lower),
+    err_upper = stack_ymax + (.upper - total_epred)
+  ) 
+
+# Plot
+ggplot(summary_stacked, aes(x = Type, y = total_epred, fill = class)) +
+  geom_col(position = "stack") +
+  geom_errorbar(
+    aes(ymin = err_lower, ymax = err_upper), linewidth = 0.25,
+    width = 0.1
+  ) +
   scale_fill_manual(values = c("<4cm" = "gray70", ">4cm" = "gray40")) +
-  scale_x_discrete(labels = type_labels) +
+  scale_x_discrete(labels = c(
+    "Nearshore Ridge Complex" = "Nearshore\nRidge Complex",
+    "Inner Reef" = "Inner Reef",
+    "Middle Reef" = "Middle Reef",
+    "Outer Reef" = "Outer Reef"
+  )) +
   labs(
     x = "Habitat Type",
     y = "Total Coral Density (per m²)",
     fill = "Size Class"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    legend.position = "bottom"
+  ) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.background = element_rect(fill = "white", color = NA),
+    legend.box.background = element_rect(fill = "white", color = NA)
+  )
+
+ggsave(filename = "outputs/Fig3.png", width = 80, height = 80, units = "mm", dpi = 300)
+
 
 
 # By SUS GROUP OVERALL
@@ -2642,148 +2678,140 @@ waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
 waffle
 ```
 
-### Double waffle - both areas
-```{r, fig.height = 8}
-# Set tile size and max per row
-tile_size <- 1000
-tiles_per_row <- 50
-gap_width <- 3  # space between the two columns
-
-# Split into left (Impact Zones + Consideration Areas) and right (Rest of Monitoring Area)
-left_totals <- tot2 %>%
+### Scenario2+NMFS
+```{r}
+# STEP 1: Aggregate total abundance by taxon + class
+tot4 <- tot2 %>%
   filter(name != "Rest of Monitoring Area") %>%
   group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop") %>%
-  mutate(side = "left")  # switched
+  summarize(tot = sum(tot), .groups = "drop")
 
-right_totals <- tot2 %>%
-  filter(name == "Rest of Monitoring Area") %>%
-  group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop") %>%
-  mutate(side = "right")  # switched
+# STEP 2: Set tile resolution
+# tile_size <- 2500
+# tile_size <- 5000
+tile_size <- 500
+tiles_per_row <- 50
 
-combined <- bind_rows(left_totals, right_totals)
-
-# Compute total and tile numbers
-tile_totals <- combined %>%
-  group_by(taxon, side) %>%
+# STEP 3: Compute number of tiles per taxon + class
+tile_totals <- tot4 %>%
+  group_by(taxon) %>%
   summarize(total_raw = sum(tot), .groups = "drop") %>%
   mutate(total_tiles = round(total_raw / tile_size))
 
-tile_data <- combined %>%
-  left_join(tile_totals, by = c("taxon", "side")) %>%
+# Join back to get size-class-specific raw totals
+tile_data <- tot4 %>%
+  left_join(tile_totals, by = "taxon") %>%
   mutate(
     prop = tot / total_raw,
     n_tiles = round(prop * total_tiles)
   ) %>%
-  filter(n_tiles > 0)
+  filter(n_tiles > 0) %>%
+  arrange(taxon)
 
-# Determine total tiles per taxon
+
+# STEP 4: Order taxa by total abundance (across size classes)
 taxon_order <- tile_data %>%
-  group_by(taxon, side) %>%
-  summarize(total_tiles = sum(n_tiles), .groups = "drop") %>%
   group_by(taxon) %>%
-  filter(total_tiles == max(total_tiles)) %>%
-  ungroup() %>%
-  arrange(total_tiles) %>%  # reversed order here
-  mutate(
-    taxon = factor(taxon, levels = taxon),
-    taxon_y = -cumsum(lag(ceiling(total_tiles / tiles_per_row) + 1, default = 0))
-  ) %>%
-  select(-total_tiles, -side)
+  summarize(total_n = sum(tot), 
+            total_tiles = sum(n_tiles), .groups = "drop") %>%
+  arrange(total_n) %>%
+  mutate(taxon_row_start = cumsum(lag(total_tiles %/% tiles_per_row + 1, default = 0)))
 
-# Join in row position
+# STEP 5: Expand to individual tiles
 tile_expanded <- tile_data %>%
-  left_join(taxon_order, by = "taxon") %>%
   uncount(n_tiles) %>%
-  group_by(taxon, side) %>%
+  mutate(class = factor(class, levels = c(">4cm", "<4cm"))) %>%
+  left_join(taxon_order, by = "taxon") %>%
+  group_by(taxon) %>%
   mutate(
     tile_id = row_number(),
-    col_offset = (tile_id - 1) %% tiles_per_row,
-    row_offset = floor((tile_id - 1) / tiles_per_row),
-    col = ifelse(side == "left", -gap_width - col_offset, gap_width + col_offset),
-    row = taxon_y - row_offset
+    col = (tile_id - 1) %% tiles_per_row,
+    row = -(taxon_row_start + (tile_id - 1) %/% tiles_per_row)
   ) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(taxon = factor(taxon, levels = taxon_order$taxon))
 
-
-# Compute max tile column per taxon and side
-col_max <- tile_expanded %>%
-  group_by(taxon, side) %>%
-  summarize(
-    label_x = ifelse(side == "left", min(col) - 1, max(col) + 1),
-    .groups = "drop"
-  )
-# Format taxon totals per side
-label_totals <- tile_data %>%
-  group_by(taxon, side) %>%
-  summarize(total = sum(tot), .groups = "drop") %>%
-  left_join(taxon_order, by = "taxon") %>%
-  left_join(col_max, by = c("taxon", "side")) %>%
-  mutate(
-    label_y = taxon_y,
-    total_fmt = format(round(total), big.mark = ",")
-  ) %>%
-  distinct()
-
-# Add taxon labels (centered)
-taxon_labels <- taxon_order %>%
-  mutate(label = as.character(taxon))
-
-# Assign manual colors
+# STEP 6: Assign distinct shuffled Dark2 colors per taxon
+taxa <- levels(tile_expanded$taxon)
+n_taxa <- length(taxa)
+# Generate color palette (Dark2 can go up to 8, then extended)
 raw_colors <- c(
   "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black",
   "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",
-  "orchid1", "darkturquoise", "darkorange4", "deepskyblue4",
-  "darkolivegreen3", "firebrick3", "mediumvioletred"
+  "orchid1", "darkturquoise", "darkorange4",
+  "deepskyblue4", "darkolivegreen3", "firebrick3",
+  "mediumvioletred"
 )
-taxa <- levels(taxon_order$taxon)
-base_colors <- setNames(head(raw_colors, length(taxa)), taxa)
+# Assign names
+base_colors <- setNames(rev(raw_colors), taxa)
 
-# Add area labels for the left and right columns
-area_labels <- tibble(
-  side = c("left", "right"),
-  label = c("Impact Zones + Consideration Areas", "Rest of Monitoring Area"),
-  x = c(-gap_width - tiles_per_row / 2, gap_width + tiles_per_row / 2),
-  y = max(tile_expanded$row) + 3  # place above the topmost tile row
-)
+# STEP 7: Label positions
+row_labels <- tile_expanded %>%
+  group_by(taxon) %>%
+  summarize(label_y = min(row), 
+            label_x_end = max(col)[row == min(row)], 
+            .groups = "drop")
+row_labels <- tile_expanded %>%
+  group_by(taxon) %>%
+  filter(row == min(row)) %>%     # only keep the top row
+  summarize(
+    label_y = unique(row),        # top row
+    label_x_end = max(col),       # rightmost tile in that row
+    .groups = "drop"
+  )
 
-# Final plot
-ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
+# STEP 8: Taxon totals
+taxon_totals <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(total = sum(tot), .groups = "drop") %>%
+  mutate(total_fmt = format(round(total), big.mark = ","))
+
+row_labels <- row_labels %>%
+  left_join(taxon_totals, by = "taxon")
+
+# STEP 9: Plot
+waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
   geom_tile(width = 0.95, height = 0.95, color = "white", linewidth = 0.1) +
+
+  # Dot for <4cm
   geom_point(
     data = filter(tile_expanded, class == "<4cm"),
     aes(x = col, y = row),
-    shape = 16, color = "white", size = 0.5, inherit.aes = FALSE
+    shape = 16, color = "white", size = 0.3, inherit.aes = FALSE
   ) +
+
+  # Taxon names (left)
   geom_text(
-    data = label_totals,
-    aes(x = label_x, y = label_y, label = total_fmt),
-    size = 2.5, hjust = ifelse(label_totals$side == "left", 1, 0),
-    inherit.aes = FALSE
+    data = row_labels,
+    aes(x = -2, y = label_y, label = taxon),
+    hjust = 1, size = 2, inherit.aes = FALSE
   ) +
+
+  # Totals (right)
   geom_text(
-    data = taxon_labels,
-    aes(x = 0, y = taxon_y, label = taxon),
-    size = 2.5, hjust = 0.5, inherit.aes = FALSE
+    data = row_labels,
+    aes(x = label_x_end, y = label_y, label = total_fmt),
+    hjust = -0.1, size = 2, inherit.aes = FALSE
   ) +
-  geom_text(
-    data = area_labels,
-    aes(x = x, y = y, label = label),
-    size = 4, fontface = "bold", inherit.aes = FALSE
-  ) +
+
   scale_fill_manual(values = base_colors, guide = "none") +
-  #coord_equal(clip = "off") +
+  coord_equal(clip = "off") +  # allow text to overflow plot area
   theme_void() +
-  labs(
-   # title = "Coral Abundance by Region (1 tile = 1,000 corals)",
-  ) +
   theme(
-    plot.margin = margin(10, 80, 10, 80)
+    plot.margin = margin(t = 10, r = 80, b = 10, l = 80),  # ensure space on both sides
+    axis.text = element_blank()
+  ) + theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.background = element_rect(fill = "white", color = NA),
+    legend.box.background = element_rect(fill = "white", color = NA)
   )
 
-
+waffle
+ggsave(filename = "outputs/Fig4.png", height = 250, width = 145, units = "mm", dpi = 300)
 ```
+
+
 
 # Treemap plots - 
 
@@ -2925,10 +2953,24 @@ preds_taxon <- add_epred_draws(
   allow_new_levels = TRUE
 )
 
+# are datasets generating fairly comparable estimates for the abundant taxa within habitat types?
+# preds_taxon %>%
+#   filter(taxon %in% c("SIDE", "PORI", "SINT", "MCAV")) %>%
+#   group_by(.draw, taxon, dataset, Type) %>%
+#   summarize(n_m2 = sum(.epred), .groups = "drop") %>%
+#   group_by(taxon, dataset, Type) %>%
+#   mean_qi(n_m2, .width = 0.95) %>%
+#   ggplot(aes(x = dataset, y = n_m2)) +
+#   geom_point() +
+#   geom_errorbar(aes(ymin = .lower, ymax = .upper)) +
+#   facet_grid(taxon~Type, scales = "free_y")
+# yes
+
 # Step 3: Average across habitat types per draw, dataset, taxon, class
 preds_avg <- preds_taxon %>%
   group_by(.draw, dataset, taxon, class) %>%
   summarize(mean_epred = mean(.epred), .groups = "drop")
+
 
 # Step 4: Sum across size classes to get total density per taxon
 preds_total <- preds_avg %>%
