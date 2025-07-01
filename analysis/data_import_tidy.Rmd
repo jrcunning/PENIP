@@ -2238,7 +2238,8 @@ summary_preds <- preds %>%
 
 ```{r}
 # equally weighted estimates across datasets???
-newdata_dataset <- dfftaxon_trimmed %>%
+### dfftaxon or dfftaxon_trimmed???
+newdata_dataset <- dfftaxon %>%
   distinct(dataset, taxon, class, Type, dir) %>%  # include dir
   mutate(transect_area_m2 = 1)
 
@@ -2259,6 +2260,7 @@ summary_equal_weighted <- draws_equal_weighted %>%
 sum(summary_equal_weighted$equal_weighted)
 sum(summary_preds$.epred)
   
+summary_preds <- summary_equal_weighted %>% rename(.epred = equal_weighted)
 ```
 
 ```{r, eval = F}
