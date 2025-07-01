@@ -477,7 +477,32 @@ tt23_sitemd <- drop_na(tt23_sitemd, longitude)
 
 
 # missing ten impact site coords
-# missing vertical wall transects
+
+
+
+# vertical wall transects
+tt23v_sitemd <- readxl::read_xlsx("data/2023_tt_impact/Impact site tracking.xlsx", sheet = "Vertical Wall") %>%
+  janitor::clean_names()
+
+tt23v_sitemd <- tt23v_sitemd %>% 
+  mutate(
+    longitude = (actual_start_x + actual_end_x) / 2,
+    latitude = (actual_start_y + actual_end_y) / 2
+  ) %>%
+  mutate(site = tolower(str_remove_all(name, "[[:space:][:punct:]]"))) %>%
+  select(site, latitude, longitude) %>%
+  drop_na(site)
+
+# change "cpss" transect names to "cpsse" because this is how they are coded in the coral data (etc.)
+tt23v_sitemd <- tt23v_sitemd %>%
+  mutate(site = gsub("cpss", "cpsse", site),
+         site = gsub("lrnw", "lrmnw", site),
+         site = gsub("lrsw", "lrmsw", site))
+
+tt23_sitemd <- bind_rows(
+  tt23_sitemd,
+  tt23v_sitemd
+)
 ```
 
 TT23 coral data
@@ -486,19 +511,23 @@ tt230 <- readxl::read_xlsx("data/2023_tt_impact/Impact Raw Data 05 31 2024.xlsx"
   janitor::clean_names() 
 
 tt23 <- tt230 %>%
-  mutate(transect_name = tolower(transect_name)) %>%
+  mutate(transect_name = tolower(str_remove_all(transect_name, "[[:space:][:punct:]]"))) %>%
   select(site = transect_name, depth_ft_start,
          taxon = id_abbrev, coral_length_cm, coral_width_cm) %>%
   filter(taxon != "Xesto") %>%
   mutate(taxon = toupper(taxon)) %>%
   mutate(across(c(coral_length_cm, coral_width_cm), as.numeric)) %>%
-  mutate(site = factor(site))
+  mutate(site = factor(site, levels = sort(unique(site))))
 
 tt23 <- tt23 %>%
   mutate(max_width_cm = pmax(coral_length_cm, coral_width_cm)) %>%
   select(site, taxon, max_width_cm)
 
-# Filter to only impact survey data (exclude tire reef surveys etc)
+tt23 %>%
+  filter(taxon == "SLAC") %>%
+  print(n = nrow(.))
+
+# Filter to only impact survey and vertical sites (exclude tire reef surveys etc)
 sort(unique(tt23$site))
 sort(unique(tt23_sitemd$site))
 tt23 <- tt23 %>% filter(site %in% tt23_sitemd$site) %>% 
@@ -556,7 +585,7 @@ tt23_counts <- tt23 %>%
 # tt23_sitemd %>% filter(site == "sb1")
 write_csv(tt23_counts, file = "data/processed/tt_2024_counts.csv")
 
-
+tt23_counts %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 
 
 # Aggregate count data based on taxonomic groups defined above
@@ -567,15 +596,19 @@ tt23_counts_ag <- tt23_counts %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
 
+tt23_counts_ag %>% filter(site == "cpsn4") %>% print(n=nrow(.))
+
 # Further aggregate juvenile counts to family (following DRM methods)
-tt23_counts_ag <- tt23_counts_ag %>%
+tt23_counts_ag2 <- tt23_counts_ag %>%
   left_join(taxon_lookup_juv, by = "taxon") %>%
   mutate(
     taxon = if_else(class == "<4cm" & !is.na(taxon_group), taxon_group, taxon)
   ) %>%
   select(-taxon_group) %>%
-  group_by(across(-n)) %>%
+  group_by(site, taxon, class) %>%
   summarize(n = sum(n), .groups = "drop")
+
+tt23_counts_ag2 %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 
 write_csv(tt23_counts_ag, file = "data/processed/tt23_counts_ag.csv")
 
@@ -587,7 +620,9 @@ write_csv(tt23_counts_ag, file = "data/processed/tt23_counts_ag.csv")
 #   filter(total == 0)
 
 
+# BUT CPSN4 HAS SLAC? WHERE IS IT?
 ```
+
 
 ## 2024 DRM/Shedd Survey
 
@@ -1539,6 +1574,8 @@ df_completed %>% filter(is.na(transect_area_m2))
 ```{r select_habitats, fig.width = 10, fig.height = 10}
 allsitemd %>% count(Type)
 
+#### RECLASSIFY VERTICAL TRANSECTS MANUALLY AS A SEPARATE HABITAT TYPE?
+
 # Select sites in Nearshore Ridge Complex, Inner Reef, and Middle Reef, Outer Reef and Aggregated Patch Reef
 selected <- allsitemd %>%
   filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", 
@@ -2161,27 +2198,27 @@ p1
 # ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
 # with zero-inflation that varies per taxon*class
 
-# mod_nb3 <- brm(
-#   bf(n ~ taxon:class * Type +
-#         (1 + Type | dataset) +
-#         (1 | dataset:taxon:class:Type:dir) +
-#         offset(log(transect_area_m2)),
-#      zi ~ taxon:class * Type),
-#   data = dfftaxon,   # use dataset with all structural zeros present
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     prior(normal(0, 2), class = "b"),
-#     prior(normal(0, 5), class = "Intercept"),
-#     prior(exponential(1), class = "shape"),
-#     prior(normal(0, 1), class = "b", dpar = "zi")
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 3000, warmup = 1500, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.95)
-# )
-# 
-# saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+mod_nb3 <- brm(
+  bf(n ~ taxon:class * Type +
+        (1 + Type | dataset) +
+        (1 | dataset:taxon:class:Type:dir) +
+        offset(log(transect_area_m2)),
+     zi ~ taxon:class * Type),
+  data = dfftaxon,   # use dataset with all structural zeros present
+  family = zero_inflated_negbinomial(),
+  prior = c(
+    prior(normal(0, 2), class = "b"),
+    prior(normal(0, 5), class = "Intercept"),
+    prior(exponential(1), class = "shape"),
+    prior(normal(0, 1), class = "b", dpar = "zi")
+  ),
+  chains = 4, cores = 4, threads = threading(5),
+  iter = 500, warmup = 100, thin = 1,
+  backend = "cmdstanr",
+  control = list(adapt_delta = 0.95)
+)
+
+saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
 mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 
 
@@ -2248,7 +2285,7 @@ fig2 <- taxdens +
         plot.background = element_rect(fill = "white", color = NA)) +
   coord_cartesian(clip = "off") +
   labs(color = "Size class")
-
+fig2
 ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
@@ -2716,7 +2753,7 @@ base_colors <- scales::hue_pal()(length(unique(tot4$taxon)))
 names(base_colors) <- unique(tot4$taxon)
 
 set.seed(2)
-base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
+base_colors <- sample(ggsci::pal_d3("category20")(21), 21)
 names(base_colors) <- unique(tot4$taxon)
 
 
