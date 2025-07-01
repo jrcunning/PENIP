@@ -1575,6 +1575,7 @@ df_completed %>% filter(is.na(transect_area_m2))
 allsitemd %>% count(Type)
 
 #### RECLASSIFY VERTICAL TRANSECTS MANUALLY AS A SEPARATE HABITAT TYPE?
+# probably yes. 
 
 # Select sites in Nearshore Ridge Complex, Inner Reef, and Middle Reef, Outer Reef and Aggregated Patch Reef
 selected <- allsitemd %>%
@@ -2233,6 +2234,31 @@ preds <- add_epred_draws(mod_nb3, newdata = newdata, re_formula = NA)    # exclu
 summary_preds <- preds %>%
   group_by(taxon, class, Type) %>%
   mean_qi(.epred, .width = 0.95)
+```
+
+```{r}
+# equally weighted estimates across datasets???
+newdata_dataset <- dfftaxon_trimmed %>%
+  distinct(dataset, taxon, class, Type, dir) %>%  # include dir
+  mutate(transect_area_m2 = 1)
+
+preds_by_dataset <- add_epred_draws(mod_nb3, newdata = newdata_dataset)
+
+draws_dataset_avg <- preds_by_dataset %>%
+  group_by(.draw, taxon, class, Type, dataset, dir) %>%
+  summarize(value = mean(.epred), .groups = "drop")
+
+draws_equal_weighted <- draws_dataset_avg %>%
+  group_by(.draw, taxon, class, Type) %>%
+  summarize(equal_weighted = mean(value), .groups = "drop")
+
+summary_equal_weighted <- draws_equal_weighted %>%
+  group_by(taxon, class, Type) %>%
+  mean_qi(equal_weighted, .width = 0.95)
+
+sum(summary_equal_weighted$equal_weighted)
+sum(summary_preds$.epred)
+  
 ```
 
 ```{r, eval = F}
