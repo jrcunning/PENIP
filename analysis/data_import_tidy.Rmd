@@ -2240,6 +2240,86 @@ mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 ```
 
 ```{r}
+cts <- dfftaxon %>%
+  count(taxon, class)
+#patchiness
+vmr_by_habitat <- dfftaxon %>%
+  filter(!is.na(transect_area_m2), transect_area_m2 > 0) %>%
+  mutate(density = n / transect_area_m2) %>%
+  group_by(taxon, class, Type) %>%
+  summarize(
+    mean_density = mean(density),
+    var_density  = var(density),
+    VMR          = var_density / mean_density,
+    n_sites      = n(),
+    .groups = "drop"
+  )
+
+dfftaxon %>%
+  filter(!is.na(transect_area_m2), transect_area_m2 > 0) %>%
+  mutate(density = n / transect_area_m2) %>%
+  ggplot(aes(x = density, fill = class)) +
+  geom_histogram() +
+  facet_wrap(~taxon, scales = "free_x") +
+  scale_y_log10()
+
+
+
+vmr_by_habitat %>% arrange(-VMR) %>% print(n = nrow(.))
+summary(vmr_by_habitat)
+ggplot(vmr_by_habitat, aes(x = taxon, y = VMR)) +
+  geom_point(aes(shape = Type, color = Type, size = class), alpha = 0.5) +
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+library(tidybayes)
+
+# Create newdata grid for taxon:class:Type
+newdata_zi <- dfftaxon %>%
+  distinct(taxon, class, Type) %>%
+  mutate(transect_area_m2 = 1)
+
+# Posterior draws of zero-inflation probabilities
+zi_preds <- add_linpred_draws(
+  mod_nb3,
+  newdata = newdata_zi,
+  dpar = "zi",
+  transform = TRUE,  # Applies plogis link
+  re_formula = NA    # Use population-level effects
+)
+
+zi_summary <- zi_preds %>%
+  group_by(taxon, class, Type) %>%
+  summarize(
+    zi_mean = mean(zi),
+    zi_lower = quantile(zi, 0.025),
+    zi_upper = quantile(zi, 0.975),
+    .groups = "drop"
+  )
+
+
+vmr_vs_zi <- vmr_by_habitat %>%
+  left_join(zi_summary, by = c("taxon", "class", "Type"))
+
+ggplot(vmr_vs_zi, aes(x = VMR, y = zi_mean)) +
+  geom_point(aes(size = mean_n), alpha = 0.7) +
+  geom_errorbarh(aes(xmin = VMR * 0.95, xmax = VMR * 1.05), height = 0, alpha = 0.3) +
+  geom_errorbar(aes(ymin = zi_lower, ymax = zi_upper), width = 0, alpha = 0.3) +
+  scale_x_log10() +
+  labs(
+    x = "Variance-to-Mean Ratio (VMR, log scale)",
+    y = "Posterior Mean Zero-Inflation Probability",
+    title = "Empirical Patchiness vs. Model-Inferred Zero-Inflation",
+    size = "Mean Density"
+  ) +
+  theme_minimal() +
+  geom_text(aes(label = taxon))
+
+zi_summary %>% arrange(-zi_mean) %>% print(n = nrow(.))
+```
+
+```{r}
 # equally weighted estimates across datasets???
 ### dfftaxon or dfftaxon_trimmed???
 dfftaxon_trimmed2 <- dfftaxon %>%
