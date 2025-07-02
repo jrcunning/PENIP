@@ -1861,21 +1861,24 @@ survey_summary %>% knitr::kable()
     aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
   labs(title = "2024 — Shedd Survey"))
 
+
+
 # One faceted plot
+selected <- selected %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")))
 all_surveys_plot <- polyplot +
   geom_point(
     data = selected,
     aes(x = longitude, y = latitude),
     pch = 4, alpha = 0.6, inherit.aes = FALSE
   ) +
-  facet_wrap(~ dataset, ncol = 2) +
+  facet_wrap(~ dataset, ncol = 6) +
   labs(title = "Survey Site Locations by Dataset") +
   theme(legend.position = "none",
         plot.background = element_rect(fill = "white", color = NA),
         panel.background = element_rect(fill = "white", color = NA))
 
 all_surveys_plot
-ggsave(filename = "outputs/FigA1.png", width = 170, height = 220, units = "mm", dpi = 300)
+ggsave(filename = "outputs/FigA1.png", width = 270, height = 220, units = "mm", dpi = 300)
 ```
 
 
@@ -2636,275 +2639,73 @@ tot2 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
 ```
 
-# Waffle plots 
-
-### Entire area
-```{r, fig.height = 8}
-
-# STEP 1: Aggregate total abundance by taxon + class
-tot4 <- tot2 %>%
-  group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop")
-
-# STEP 2: Set tile resolution
-# tile_size <- 2500
-# tile_size <- 5000
-tile_size <- 1000
-
-# STEP 3: Compute number of tiles per taxon + class
-tile_totals <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(total_raw = sum(tot), .groups = "drop") %>%
-  mutate(total_tiles = round(total_raw / tile_size))
-
-# Join back to get size-class-specific raw totals
-tile_data <- tot4 %>%
-  left_join(tile_totals, by = "taxon") %>%
-  mutate(
-    prop = tot / total_raw,
-    n_tiles = round(prop * total_tiles)
-  ) %>%
-  filter(n_tiles > 0) %>%
-  arrange(taxon)
-
-
-# STEP 4: Order taxa by total abundance (across size classes)
-taxon_order <- tile_data %>%
-  group_by(taxon) %>%
-  summarize(total_n = sum(tot), 
-            total_tiles = sum(n_tiles), .groups = "drop") %>%
-  arrange(total_n) %>%
-  mutate(taxon_row_start = cumsum(lag(total_tiles %/% 100 + 1, default = 0)))
-
-# STEP 5: Expand to individual tiles
-tile_expanded <- tile_data %>%
-  uncount(n_tiles) %>%
-  mutate(class = factor(class, levels = c(">4cm", "<4cm"))) %>%
-  left_join(taxon_order, by = "taxon") %>%
-  group_by(taxon) %>%
-  mutate(
-    tile_id = row_number(),
-    col = (tile_id - 1) %% 100,
-    row = -(taxon_row_start + (tile_id - 1) %/% 100)
-  ) %>%
-  ungroup() %>%
-  mutate(taxon = factor(taxon, levels = taxon_order$taxon))
-
-# STEP 6: Assign distinct shuffled Dark2 colors per taxon
-taxa <- levels(tile_expanded$taxon)
-n_taxa <- length(taxa)
-# Generate color palette (Dark2 can go up to 8, then extended)
-raw_colors <- c(
-  "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black",
-  "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",
-  "orchid1", "darkturquoise", "darkorange4",
-  "deepskyblue4", "darkolivegreen3", "firebrick3",
-  "mediumvioletred"
-)
-# Assign names
-base_colors <- setNames(rev(raw_colors), taxa)
-
-# STEP 7: Label positions
-row_labels <- tile_expanded %>%
-  group_by(taxon) %>%
-  summarize(label_y = max(row), label_x_end = max(col), .groups = "drop")
-
-# STEP 8: Taxon totals
-taxon_totals <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(total = sum(tot), .groups = "drop") %>%
-  mutate(total_fmt = format(round(total), big.mark = ","))
-
-row_labels <- row_labels %>%
-  left_join(taxon_totals, by = "taxon")
-
-# STEP 9: Plot
-waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
-  geom_tile(width = 0.95, height = 0.95, color = "white", linewidth = 0.1) +
-
-  # Dot for <4cm
-  geom_point(
-    data = filter(tile_expanded, class == "<4cm"),
-    aes(x = col, y = row),
-    shape = 16, color = "white", size = 0.5, inherit.aes = FALSE
-  ) +
-
-  # Taxon names (left)
-  geom_text(
-    data = row_labels,
-    aes(x = -2, y = label_y, label = taxon),
-    hjust = 1, size = 2.5, inherit.aes = FALSE
-  ) +
-
-  # Totals (right)
-  geom_text(
-    data = row_labels,
-    aes(x = label_x_end, y = label_y, label = total_fmt),
-    hjust = 0, size = 2.5, inherit.aes = FALSE
-  ) +
-
-  scale_fill_manual(values = base_colors, guide = "none") +
-  #coord_equal(clip = "off") +  # allow text to overflow plot area
-  theme_void() +
-  theme(
-    plot.margin = margin(t = 10, r = 80, b = 10, l = 80),  # ensure space on both sides
-    axis.text = element_blank()
-  ) +
-  labs(
-    title = "Total abundance within 1.2-km of channel\n(1 tile = 1,000 corals)",
-    caption = "White dot = smaller corals (<4cm); solid tiles = >4cm"
-  )
-
-waffle
-```
-
-### Scenario2+NMFS
+# Plot of all
 ```{r}
-# STEP 1: Aggregate total abundance by taxon + class
-tot4 <- tot2 %>%
-  filter(name != "Rest of Monitoring Area") %>%
-  group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop")
-
-# STEP 2: Set tile resolution
-# tile_size <- 2500
-# tile_size <- 5000
-tile_size <- 500
-tiles_per_row <- 50
-
-# STEP 3: Compute number of tiles per taxon + class
-tile_totals <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(total_raw = sum(tot), .groups = "drop") %>%
-  mutate(total_tiles = round(total_raw / tile_size))
-
-# Join back to get size-class-specific raw totals
-tile_data <- tot4 %>%
-  left_join(tile_totals, by = "taxon") %>%
-  mutate(
-    prop = tot / total_raw,
-    n_tiles = round(prop * total_tiles)
-  ) %>%
-  filter(n_tiles > 0) %>%
-  arrange(taxon)
+posterior_type_totals <- draws_dataset_avg %>%
+  group_by(.draw, taxon, class, Type, dataset) %>%
+  summarize(mean_value = mean(value), .groups = "drop") %>%
+  group_by(.draw, dataset, Type) %>%
+  summarize(total_epred = sum(mean_value), .groups = "drop")
 
 
-# STEP 4: Order taxa by total abundance (across size classes)
-taxon_order <- tile_data %>%
-  group_by(taxon) %>%
-  summarize(total_n = sum(tot), 
-            total_tiles = sum(n_tiles), .groups = "drop") %>%
-  arrange(total_n) %>%
-  mutate(taxon_row_start = cumsum(lag(total_tiles %/% tiles_per_row + 1, default = 0)))
-
-# STEP 5: Expand to individual tiles
-tile_expanded <- tile_data %>%
-  uncount(n_tiles) %>%
-  mutate(class = factor(class, levels = c(">4cm", "<4cm"))) %>%
-  left_join(taxon_order, by = "taxon") %>%
-  group_by(taxon) %>%
-  mutate(
-    tile_id = row_number(),
-    col = (tile_id - 1) %% tiles_per_row,
-    row = -(taxon_row_start + (tile_id - 1) %/% tiles_per_row)
-  ) %>%
-  ungroup() %>%
-  mutate(taxon = factor(taxon, levels = taxon_order$taxon))
-
-# STEP 6: Assign distinct shuffled Dark2 colors per taxon
-taxa <- levels(tile_expanded$taxon)
-n_taxa <- length(taxa)
-# Generate color palette (Dark2 can go up to 8, then extended)
-raw_colors <- c(
-  "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00", "black",
-  "gold1", "skyblue2", "maroon", "palegreen2", "#FDBF6F", "gray70",
-  "orchid1", "darkturquoise", "darkorange4",
-  "deepskyblue4", "darkolivegreen3", "firebrick3",
-  "mediumvioletred"
-)
-# Assign names
-base_colors <- setNames(rev(raw_colors), taxa)
-
-# STEP 7: Label positions
-row_labels <- tile_expanded %>%
-  group_by(taxon) %>%
-  summarize(label_y = min(row), 
-            label_x_end = max(col)[row == min(row)], 
-            .groups = "drop")
-row_labels <- tile_expanded %>%
-  group_by(taxon) %>%
-  filter(row == min(row)) %>%     # only keep the top row
+total_perType <- posterior_type_totals %>%
+  group_by(dataset, Type) %>%
   summarize(
-    label_y = unique(row),        # top row
-    label_x_end = max(col),       # rightmost tile in that row
+    fit_mean = mean(total_epred),
+    fit_sd = sd(total_epred),
+    fit_lower = quantile(total_epred, 0.025),
+    fit_upper = quantile(total_epred, 0.975),
     .groups = "drop"
   )
 
-# STEP 8: Taxon totals
-taxon_totals <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(total = sum(tot), .groups = "drop") %>%
-  mutate(total_fmt = format(round(total), big.mark = ","))
+totals <- left_join(total_perType, area_summary, by = "Type") %>%  # area_summary must have Type, total_area_m2, name
+  mutate(
+    tot_estimate = fit_mean * total_area_m2,
+    tot_lower = fit_lower * total_area_m2,
+    tot_upper = fit_upper * total_area_m2,
+    Type = factor(Type, levels = type_levels),
+    name = factor(name, levels = zone_levels)
+  ) %>%
+  complete(dataset, Type, fill = list(tot_estimate = NA, tot_lower = NA, tot_upper = NA))
 
-row_labels <- row_labels %>%
-  left_join(taxon_totals, by = "taxon")
+totals <- totals %>% mutate(dataset = factor(dataset, levels = dataset_levels))
 
-# STEP 9: Plot
-waffle <- ggplot(tile_expanded, aes(x = col, y = row, fill = taxon)) +
-  geom_tile(width = 0.95, height = 0.95, color = "white", linewidth = 0.1) +
-
-  # Dot for <4cm
-  geom_point(
-    data = filter(tile_expanded, class == "<4cm"),
-    aes(x = col, y = row),
-    shape = 16, color = "white", size = 0.3, inherit.aes = FALSE
+ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
+  facet_grid(~Type) +
+  geom_col(position = "stack") +
+  scale_fill_brewer(palette = "Set3") +
+  labs(
+    x = "Survey Dataset",
+    y = "Total Corals (area-scaled)",
+    fill = "Impact Zone",
+    title = "Estimated Total Coral Abundance per Habitat Type and Dataset"
   ) +
-
-  # Taxon names (left)
-  geom_text(
-    data = row_labels,
-    aes(x = -2, y = label_y, label = taxon),
-    hjust = 1, size = 2, inherit.aes = FALSE
-  ) +
-
-  # Totals (right)
-  geom_text(
-    data = row_labels,
-    aes(x = label_x_end, y = label_y, label = total_fmt),
-    hjust = -0.1, size = 2, inherit.aes = FALSE
-  ) +
-
-  scale_fill_manual(values = base_colors, guide = "none") +
-  coord_equal(clip = "off") +  # allow text to overflow plot area
-  theme_void() +
+  theme_classic(base_size = 10) +
   theme(
-    plot.margin = margin(t = 10, r = 80, b = 10, l = 80),  # ensure space on both sides
-    axis.text = element_blank()
-  ) + theme(
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA),
-    legend.background = element_rect(fill = "white", color = NA),
-    legend.box.background = element_rect(fill = "white", color = NA)
+    axis.text.x = element_text(angle = 90, vjust = 0.5),
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold")
   )
 
-waffle
-ggsave(filename = "outputs/Fig4.png", height = 250, width = 145, units = "mm", dpi = 300)
+ggsave(filename = "outputs/FigAX.png")
 ```
 
 
 
 # Treemap plots - 
 
-### entire monitoring area
+### Scenario2+NMFS
 ```{r working_treemap}
-# Assign a base color per taxon
-base_colors <- scales::hue_pal()(length(unique(tot4$taxon)))
-names(base_colors) <- unique(tot4$taxon)
+# STEP 1: Aggregate total abundance by taxon + class
+tot4 <- tot2 %>%
+  filter(name != "Rest of Monitoring Area") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop")
 
+# Assign a base color per taxon
 set.seed(2)
 base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
 names(base_colors) <- unique(tot4$taxon)
-
 
 # Define shading function
 get_shades <- function(base_col, class, all_classes) {
@@ -2984,7 +2785,7 @@ p +
                 label = label, size = area), inherit.aes = FALSE,
             hjust = 0, vjust = 1, lineheight = 0.7,
             nudge_x = 0.005, nudge_y = -0.005) +
-  scale_size_continuous(range = c(1.1, 15)) +
+  scale_size_continuous(range = c(1.5, 15)) +
   geom_text_repel(data = external_labels,
              aes(x = center_x, y = center_y, 
                  label = label), inherit.aes = FALSE,
@@ -2994,16 +2795,132 @@ p +
              min.segment.length = 0.1,
              segment.size = 0.2,
              hjust = 0,
-             size = 1.1) +
+             size = 2) +
   theme_void() +
   theme(
     legend.position = "none",
     plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
     plot.background = element_rect(fill = "white", color = NA),
-  ) +
-  ggtitle("Total corals within 1.2 km of Port Everglades Channel")
+  )
   
-ggsave(filename = "outputs/Fig3.png", width = 170, height = 130, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", dpi = 600)
+
+sum(tot4$tot)
+tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
+```
+
+### Whole area
+```{r working_treemap}
+# STEP 1: Aggregate total abundance by taxon + class
+tot4 <- tot2 %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop")
+
+# Assign a base color per taxon
+set.seed(2)
+base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
+names(base_colors) <- unique(tot4$taxon)
+
+# Define shading function
+get_shades <- function(base_col, class, all_classes) {
+  if (length(all_classes) == 2) {
+    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
+    else colorspace::darken(base_col, 0.1)
+  } else {
+    base_col
+  }
+}
+
+# Build taxon_class and corresponding shades
+shade_map <- tot4 %>%
+  distinct(taxon, class) %>%
+  rowwise() %>%
+  mutate(
+    base_col = base_colors[[taxon]],
+    all_classes = list(tot4$class[tot4$taxon == taxon]),
+    shade = get_shades(base_col, class, all_classes),
+    taxon_class = paste(taxon, class, sep = "_")
+  ) %>%
+  ungroup()
+
+# Final color map
+fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
+
+# Add taxon_class to original data
+tot4 <- tot4 %>%
+  mutate(taxon_class = paste(taxon, class, sep = "_"))
+
+# Plot with taxon labels only
+p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
+  geom_treemap(color = NA) +
+  geom_treemap_subgroup_border(colour = "white", size = 1) +
+  # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
+  #                             alpha = 0.8, colour = "black", size = 8) +
+  scale_fill_manual(values = fill_colors) +
+  theme(legend.position = "none")
+
+
+# 5. Get tile layout and attach taxon_class
+tile_layout <- treemapify(tot4, area = "tot", 
+                          fill = "taxon_class", subgroup = "taxon")
+
+# 6. Flag small boxes (aggregate size classes)
+tile_layout_ag <- tile_layout %>%
+  group_by(taxon) %>%
+  summarize(xmin = min(xmin), xmax = max(xmax),
+            ymin = min(ymin), ymax = max(ymax),
+            area = (xmax - xmin) * (ymax - ymin),
+            center_x = (xmin + xmax) / 2,
+            center_y = (ymin + ymax) / 2)
+area_threshold <- 0.001
+internal_labels <- tile_layout_ag %>% 
+  filter(area >= area_threshold)
+external_labels <- tile_layout_ag %>% 
+  filter(area < area_threshold)
+
+# Create labels with taxontotals
+taxtots <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(tot = scales::comma(sum(tot)))
+
+internal_labels <- left_join(internal_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+external_labels <- left_join(external_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+# 7. Final plot
+p + 
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  coord_cartesian(clip = "off") +
+  geom_text(data = internal_labels,
+            aes(x = xmin, y = ymax-0.00001,
+                label = label, size = area), inherit.aes = FALSE,
+            hjust = 0, vjust = 1, lineheight = 0.7,
+            nudge_x = 0.005, nudge_y = -0.005) +
+  scale_size_continuous(range = c(1.5, 15)) +
+  geom_text_repel(data = external_labels,
+             aes(x = center_x, y = center_y, 
+                 label = label), inherit.aes = FALSE,
+             max.overlaps = Inf,
+             xlim = c(1, NA),
+             force = 5,
+             min.segment.length = 0.1,
+             segment.size = 0.2,
+             hjust = 0,
+             size = 2) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
+    plot.background = element_rect(fill = "white", color = NA),
+  )
+  
+ggsave(filename = "outputs/Fig4b2.png", width = 180, height = 130, units = "mm", dpi = 600)
+
+sum(tot4$tot)
+tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
 ```
 
 
@@ -3138,13 +3055,12 @@ summary_sus_filtered <- summary_sus %>%
          year = parse_number(as.character(dataset)))
 
 # Plot
-ggplot(summary_sus_filtered, aes(x = year, y = total_density,
-                                 color = sus_group, shape = dataset, group = sus_group)) +
-  geom_line(linewidth = 0.8) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
+suschange <- ggplot(summary_sus_filtered, aes(x = year, y = total_density,
+                                 shape = dataset, group = sus_group)) +
+  geom_line(linewidth = 0.5) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.25) +
   geom_point(size = 3, fill = "white") +
-  geom_smooth(method = "lm", se = FALSE, lty = 2, color = "black") +
-  ggpubr::stat_cor() +
+  geom_smooth(method = "lm", se = FALSE) +
   labs(
     x = "Year",
     y = "Mean Coral Density (per m²)",
@@ -3152,16 +3068,55 @@ ggplot(summary_sus_filtered, aes(x = year, y = total_density,
     shape = "Dataset"
   ) +
   #scale_y_log10() +
-  theme_minimal(base_size = 11) +
+  theme_classic(base_size = 11) +
   scale_shape_manual(values = c(21,22,24,25)) +
-  facet_wrap(~sus_group, scales = "free") +
+  facet_wrap(~sus_group, scales = "free",
+               labeller = as_labeller(c(
+    "high_sus" = "High susceptibility",
+    "med_sus" = "Moderate susceptibility",
+    "low_sus" = "Low susceptibility"
+  ))) +
   guides(color = "none") +
   theme(
     legend.position = "bottom"
   )
 
+lm_stats <- summary_sus_filtered %>%
+  group_by(sus_group) %>%
+  do(broom::tidy(lm(total_density ~ year, data = .))) %>%
+  filter(term == "year") %>%  # only keep slope (year) estimates
+  mutate(
+    label = paste0("Slope = ", signif(estimate, 2), 
+                   ", p = ", signif(p.value, 2))
+  )
 
+lm_labels <- summary_sus_filtered %>%
+  group_by(sus_group) %>%
+  summarize(
+    x = min(year),
+    y = max(total_density),
+    .groups = "drop"
+  ) %>%
+  left_join(lm_stats, by = "sus_group")
 
+suschange + 
+  geom_text(
+    data = lm_labels,
+    aes(x = x, y = Inf, label = label),
+    hjust = 0, vjust = 2, size = 3,
+    inherit.aes = FALSE
+  ) +
+  theme(
+    strip.background = element_blank(),  # removes gray background
+    strip.text = element_text(face = "bold")  # optional: makes label text bold
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.margin = margin(t = 0, r = 0, b = 0, l = 0),         # shrink padding inside legend
+    legend.box.margin = margin(t = -5, r = 0, b = 0, l = 0)     # pull legend box closer to plot
+  )
+  
+ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm", dpi = 300)
 ```
 
 
