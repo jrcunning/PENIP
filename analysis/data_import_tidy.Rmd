@@ -2258,9 +2258,10 @@ ggplot(vmr_vs_zi, aes(x = VMR, y = zi_mean)) +
 zi_summary %>% arrange(-zi_mean) %>% print(n = nrow(.))
 ```
 
+
 ```{r}
-# equally weighted estimates across datasets???
-### dfftaxon or dfftaxon_trimmed???
+# fixed version of equally weighting estimates across dataset-averaging? 
+# Step 1: Trim to only taxon–class–habitat combinations where the taxon was observed at least once
 dfftaxon_trimmed2 <- dfftaxon %>%
   semi_join(
     dfftaxon %>%
@@ -2271,31 +2272,33 @@ dfftaxon_trimmed2 <- dfftaxon %>%
     by = c("taxon", "class", "Type")
   )
 
+# Step 2: Create newdata for prediction — includes all unique combinations, setting area = 1 m²
 newdata <- dfftaxon_trimmed2 %>%
-  distinct(dataset, taxon, class, Type, dir) %>%  
+  distinct(dataset, taxon, class, Type, dir) %>%
   mutate(transect_area_m2 = 1)
 
+# Step 3: Get population-level predictions from the model (includes all group-level effects)
 preds <- add_epred_draws(mod_nb3, newdata = newdata, re_formula = NULL)
 
-draws_dataset_avg <- preds %>%
-  group_by(.draw, taxon, class, Type, dataset, dir) %>%
-  summarize(value = mean(.epred), .groups = "drop")
+# Step 4: Average across dirs within each dataset to prevent over-weighting datasets with both N/S
+draws_avg_dir <- preds %>%
+  group_by(.draw, taxon, class, Type, dataset) %>%
+  summarize(n_m2 = mean(.epred), .groups = "drop")
 
-draws_equal_weighted <- draws_dataset_avg %>%
+# Step 5: Average equally across datasets — each dataset contributes one value
+draws_equal_weighted <- draws_avg_dir %>%
   group_by(.draw, taxon, class, Type) %>%
-  summarize(n_m2 = mean(value), .groups = "drop")
+  summarize(n_m2 = mean(n_m2), .groups = "drop")
 
+# Step 6: Summarize posterior draws — mean and 95% credible interval
 summary_equal_weighted <- draws_equal_weighted %>%
   group_by(taxon, class, Type) %>%
   mean_qi(n_m2, .width = 0.95)
 
-# sum(summary_equal_weighted$equal_weighted)
-# sum(summary_preds$.epred)
-#   
-# summary_preds <- summary_equal_weighted %>% rename(.epred = equal_weighted)
 ```
 
-```{r, eval = T}
+
+```{r, eval = F}
 loo_3 <- loo(mod_nb3)
 
 loo_compare(loo_3, loo_2, loo_1)
@@ -2593,9 +2596,9 @@ tot2 %>%
 
 # Plot of all
 ```{r}
-posterior_type_totals <- draws_dataset_avg %>%
+posterior_type_totals <- draws_avg_dir %>%
   group_by(.draw, taxon, class, Type, dataset) %>%
-  summarize(mean_value = mean(value), .groups = "drop") %>%
+  summarize(mean_value = mean(n_m2), .groups = "drop") %>%
   group_by(.draw, dataset, Type) %>%
   summarize(total_epred = sum(mean_value), .groups = "drop")
 
@@ -2971,7 +2974,7 @@ group_definitions <- tibble(
   mutate(sus_group = factor(sus_group, levels = c("low_sus", "med_sus", "high_sus")))
 
 # Step 2: Create newdata with all combos (retain Type)
-newdata_ds <- dfftaxon_trimmed %>%
+newdata_ds <- dfftaxon_trimmed2 %>%
   distinct(dataset, Type, taxon, class) %>%
   mutate(transect_area_m2 = 1, dir = NA)
 
@@ -3071,4 +3074,185 @@ suschange +
 ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm", dpi = 300)
 ```
 
+```{r}
+# TOTAL coral density over time/datasets
+# Step 1: Create newdata with all needed combinations (retain Type)
+newdata_total <- dfftaxon_trimmed2 %>%
+  distinct(dataset, Type, taxon, class) %>%
+  mutate(transect_area_m2 = 1, dir = NA)
+
+# Step 2: Predict densities including group-level effects
+preds_total_ds <- add_epred_draws(
+  mod_nb3,
+  newdata = newdata_total,
+  re_formula = NULL,
+  allow_new_levels = TRUE
+)
+
+# Step 3: Average across habitat Type per draw, taxon, class, dataset
+preds_total_avg <- preds_total_ds %>%
+  group_by(.draw, taxon, class, dataset) %>%
+  summarize(mean_epred = mean(.epred), .groups = "drop")
+
+# Step 4: Sum total predicted density (all taxa and size classes)
+summary_total <- preds_total_avg %>%
+  group_by(.draw, dataset) %>%
+  summarize(total_density = sum(mean_epred), .groups = "drop") %>%
+  group_by(dataset) %>%
+  mean_qi(total_density, .width = 0.95)
+
+# Step 5: Add year and filter datasets if needed
+summary_total_filtered <- summary_total %>%
+  filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
+  mutate(dataset = factor(dataset, levels = c("dca17", "tt21", "tt23", "drm24")),
+         year = parse_number(as.character(dataset)))
+
+# Step 6: Plot
+ggplot(summary_total_filtered, aes(x = year, y = total_density, shape = dataset)) +
+  geom_line(linewidth = 0.5, color = "black", group = 1) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1, linewidth = 0.25) +
+  geom_point(size = 3, fill = "white") +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
+  labs(
+    x = "Year",
+    y = "Total Coral Density (per m²)",
+    title = "Total Coral Density Across Datasets"
+  ) +
+  scale_shape_manual(values = c(21, 22, 24, 25)) +
+  theme_classic(base_size = 11) +
+  theme(legend.position = "bottom")
+
+```
+
+
+```{r}
+# Step 1: Prepare total coral dataset
+summary_total <- preds_total_avg %>%
+  group_by(.draw, dataset) %>%
+  summarize(total_density = sum(mean_epred), .groups = "drop") %>%
+  group_by(dataset) %>%
+  mean_qi(total_density, .width = 0.95) %>%
+  filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
+  mutate(
+    dataset = factor(dataset, levels = c("dca17", "tt21", "tt23", "drm24")),
+    year = parse_number(as.character(dataset)),
+    sus_group = "total"
+  )
+
+# Step 2: Combine with susceptibility summaries
+combined <- bind_rows(
+  summary_total %>% select(dataset, year, total_density, .lower, .upper, sus_group),
+  summary_sus_filtered %>% rename(total_density = total_density)
+)
+
+combined$sus_group <- factor(combined$sus_group,
+                             levels = c("total", "low_sus", "med_sus", "high_sus"))
+
+# Step 3: Compute linear model stats
+lm_stats <- combined %>%
+  group_by(sus_group) %>%
+  do(broom::tidy(lm(total_density ~ year, data = .))) %>%
+  filter(term == "year") %>%
+  mutate(label = paste0("Slope = ", signif(estimate, 2), ", p = ", signif(p.value, 2)))
+
+lm_labels <- combined %>%
+  group_by(sus_group) %>%
+  summarize(
+    x = min(year),
+    y = max(total_density),
+    .groups = "drop"
+  ) %>%
+  left_join(lm_stats, by = "sus_group")
+
+# Step 4: Plot all 4 panels
+changeplot <- ggplot(combined, aes(x = year, y = total_density, shape = dataset)) +
+  geom_line(linewidth = 0.5, aes(group = sus_group), color = "black") +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1, linewidth = 0.25) +
+  geom_point(size = 3, fill = "white") +
+  geom_smooth(
+    aes(group = sus_group),
+    method = "lm",
+    se = FALSE,
+    color = "blue"
+  ) +
+  facet_wrap(~sus_group, scales = "free", nrow = 1,
+             labeller = as_labeller(c(
+               "total" = "All corals",
+               "low_sus" = "Low susceptibility",
+               "med_sus" = "Moderate susceptibility",
+               "high_sus" = "High susceptibility"
+             ))) +
+  labs(
+    x = "Year",
+    y = "Mean Coral Density (per m²)",
+    shape = "Dataset"
+  ) +
+  scale_shape_manual(values = c(21, 22, 24, 25)) +
+  theme_classic(base_size = 11) +
+  geom_text(
+    data = lm_labels,
+    aes(x = x, y = Inf, label = label),
+    hjust = 0, vjust = 2, size = 3,
+    inherit.aes = FALSE
+  ) +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold"),
+    legend.position = "bottom",
+    legend.margin = margin(t = 0, r = 0, b = 0, l = 0),
+    legend.box.margin = margin(t = -5, r = 0, b = 0, l = 0)
+  )
+
+ggsave("outputs/Fig5_all_and_sus.png", width = 180, height = 80, units = "mm", dpi = 300)
+
+
+
+
+
+# Add group label to total coral summary
+summary_total_filtered2 <- summary_total_filtered %>%
+  mutate(sus_group = factor("total", levels = c("total", "low_sus", "med_sus", "high_sus")))
+
+# Combine with susceptibility group data
+summary_combined <- bind_rows(summary_total_filtered2, summary_sus_filtered)
+
+lm_stats_full <- summary_combined %>%
+  group_by(sus_group) %>%
+  do({
+    model <- lm(total_density ~ year, data = .)
+    coef <- coef(model)
+    tibble(intercept = coef[1], slope = coef[2])
+  }) %>%
+  ungroup() %>%
+  mutate(
+    pred_2017 = intercept + slope * 17,
+    pred_2024 = intercept + slope * 24,
+    percent_change = 100 * (pred_2024 - pred_2017) / pred_2017,
+    label = paste0("Trend: +", signif(percent_change, 3), "%")
+  )
+
+# View the results
+lm_stats_full %>% select(sus_group, percent_change, label)
+
+# Define annotation positions per panel
+lm_labels2 <- summary_combined %>%
+  group_by(sus_group) %>%
+  summarize(
+    x = min(year),
+    y = max(total_density),
+    .groups = "drop"
+  ) %>%
+  left_join(lm_stats_full %>% select(sus_group, label), by = "sus_group")
+
+
+changeplot + 
+  geom_text(
+    data = lm_labels2,
+    aes(x = x, y = Inf, label = label),
+    hjust = 0, vjust = 4, size = 3, color = "blue",
+    inherit.aes = FALSE
+  )
+
+ggsave(filename = "outputs/Fig5.png", width = 200, height = 80, units = "mm")
+```
 
