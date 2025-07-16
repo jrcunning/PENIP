@@ -2055,7 +2055,7 @@ Let's move direction to a random effect. This approach acknowledges the variabil
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
-```{r, eval = F}
+```{r, eval = T}
 loo_1 <- loo(mod_nb)
 loo_2 <- loo(mod_nb2)
 
@@ -2141,27 +2141,27 @@ Lots of idiosyncratic diffs between surveys for individual taxon x class groups?
 # ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
 # with zero-inflation that varies per taxon*class
 
-mod_nb3 <- brm(
-  bf(n ~ taxon:class * Type +
-        (1 + Type | dataset) +
-        (1 | dataset:taxon:class:Type:dir) +
-        offset(log(transect_area_m2)),
-     zi ~ taxon:class * Type),
-  data = dfftaxon,   # use dataset with all structural zeros present
-  family = zero_inflated_negbinomial(),
-  prior = c(
-    prior(normal(0, 2), class = "b"),
-    prior(normal(0, 5), class = "Intercept"),
-    prior(exponential(1), class = "shape"),
-    prior(normal(0, 1), class = "b", dpar = "zi")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 1000, warmup = 500, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.95)
-)
-
-saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+# mod_nb3 <- brm(
+#   bf(n ~ taxon:class * Type +
+#         (1 + Type | dataset) +
+#         (1 | dataset:taxon:class:Type:dir) +
+#         offset(log(transect_area_m2)),
+#      zi ~ taxon:class * Type),
+#   data = dfftaxon,   # use dataset with all structural zeros present
+#   family = zero_inflated_negbinomial(),
+#   prior = c(
+#     prior(normal(0, 2), class = "b"),
+#     prior(normal(0, 5), class = "Intercept"),
+#     prior(exponential(1), class = "shape"),
+#     prior(normal(0, 1), class = "b", dpar = "zi")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 1000, warmup = 500, thin = 1,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.95)
+# )
+# 
+# saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
 mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 
 
@@ -2298,7 +2298,7 @@ summary_equal_weighted <- draws_equal_weighted %>%
 ```
 
 
-```{r, eval = F}
+```{r, eval = T}
 loo_3 <- loo(mod_nb3)
 
 loo_compare(loo_3, loo_2, loo_1)
@@ -2328,13 +2328,17 @@ summary_equal_weighted <- summary_equal_weighted %>%
   mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
 
 #### PLOT
-(taxdens <- ggplot(summary_equal_weighted, aes(x = Type, y = n_m2, color = class)) +
-  geom_point(size = 1) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
-  geom_line(aes(group = class)) +
+(taxdens <- ggplot(summary_equal_weighted, aes(x = Type, y = n_m2, shape = class)) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.25,
+                position = position_dodge(width = 0.2)) +
+  geom_line(aes(group = class, linetype = class),
+             position = position_dodge(width = 0.2)) +
+  geom_point(size = 1.5, color = "black", fill = "white",
+              position = position_dodge(width = 0.2)) +
   facet_wrap(~taxon, labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed)), scales = "free_y", ncol = 4) +
-  #scale_y_log10() +
+  scale_shape_manual(values = c(21, 24)) +
   scale_x_discrete(labels = type_labels) +
+  scale_linetype_manual(values = c(2,1)) +
   labs(x = "Habitat Type", y = "Density (per m2)")+
   theme_minimal())
 
@@ -2359,12 +2363,15 @@ annotation_df <- summary_equal_weighted %>%
 
 fig2 <- taxdens +
   geom_text(data = annotation_df, aes(x = x, y = y, label = label),
-            inherit.aes = FALSE, hjust = 0.5, size = 2.5, color = "#F8766D") +
+            inherit.aes = FALSE, hjust = 0.5, size = 2.5, color = "black") +
   theme(panel.background = element_rect(fill = "white", color = NA),
         plot.background = element_rect(fill = "white", color = NA)) +
   coord_cartesian(clip = "off") +
-  labs(color = "Size class") +
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(linetype = "Size class") +
+  labs(shape = "Size class") +
   theme(legend.position = "bottom",
+        legend.key.width = unit(2, "lines"),
         legend.margin = margin(t = -5, b = 0))  # move legend up)
 fig2
 ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
@@ -2406,128 +2413,236 @@ write_csv(table_out, file = "outputs/TableA1.csv")
 ```
 
 ### Total coral density by habitat
+
 ```{r}
-summary_totals <- draws_equal_weighted %>%
+# Summarize posterior draws of total coral density per habitat
+summary_total_density_by_type <- draws_equal_weighted %>%
   group_by(.draw, Type) %>%
-  summarize(total_epred = sum(n_m2), .groups = "drop") %>%
+  summarize(total_density = sum(n_m2), .groups = "drop") %>%
   group_by(Type) %>%
-  mean_qi(total_epred, .width = 0.95)
+  summarize(
+    mean = mean(total_density),
+    lower = quantile(total_density, 0.025),
+    upper = quantile(total_density, 0.975),
+    .groups = "drop"
+  )
 
-ggplot(summary_totals, aes(x = Type, y = total_epred)) +
-  geom_col() +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1) +
-  #scale_y_log10() +
-  scale_x_discrete(labels = type_labels) +
-  labs(x = "Habitat Type", y = "Total Coral Density (per m²)") +
-  theme_minimal()
 
-# By SiZE CLASS by HABITAT
-# Step 1: Summarize posterior predictions
-summary_by_class <- draws_equal_weighted %>%
+ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
+  geom_col(fill = "gray60") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
+  labs(
+    x = "Habitat Type",
+    y = "Total Coral Density (per m²)",
+    title = "Total Coral Density by Habitat"
+  ) +
+  theme_minimal(base_size = 10)
+
+
+
+# ---- BY SIZE CLASS ----
+summary_stacked_class <- draws_equal_weighted %>%
   group_by(.draw, Type, class) %>%
   summarize(total_epred = sum(n_m2), .groups = "drop") %>%
   group_by(Type, class) %>%
-  mean_qi(total_epred, .width = 0.95)
-
-# Step 1: Force stacking order: <4cm on top, >4cm on bottom
-summary_stacked <- summary_by_class %>%
-  mutate(class = factor(class, levels = c("<4cm", ">4cm")))  # <4cm will be stacked last = on top
-
-# Step 2: Compute stacking positions in reverse of factor order
-summary_stacked <- summary_stacked %>%
-  arrange(Type, desc(class)) %>%  # arrange so >4cm is stacked first (bottom)
+  mean_qi(total_epred, .width = 0.95) %>%
+  mutate(class = factor(class, levels = c("<4cm", ">4cm"))) %>%  # new order
+  arrange(Type, desc(class)) %>%
   group_by(Type) %>%
   mutate(
     stack_ymin = cumsum(lag(total_epred, default = 0)),
     stack_ymax = stack_ymin + total_epred,
+    label_y = stack_ymin + total_epred / 2,
+    label = sprintf("%.2f", total_epred),
     err_lower = stack_ymax - (total_epred - .lower),
     err_upper = stack_ymax + (.upper - total_epred)
-  ) 
+  )
 
-# Plot
-ggplot(summary_stacked, aes(x = Type, y = total_epred, fill = class)) +
+plot_class <- ggplot(summary_stacked_class, aes(x = Type, y = total_epred, fill = class)) +
   geom_col(position = "stack") +
-  geom_errorbar(
-    aes(ymin = err_lower, ymax = err_upper), linewidth = 0.25,
-    width = 0.1
+  geom_errorbar(aes(ymin = err_lower, ymax = err_upper), width = 0.1, linewidth = 0.25) +
+  geom_text(aes(y = label_y, label = label), size = 2.5) +
+  scale_fill_manual(values = c("<4cm" = "gray75", ">4cm" = "gray60")) +
+  scale_x_discrete(labels = type_labels) +
+  labs(x = "Habitat Type", y = "Total Coral Density (per m²)", fill = "Size Class") +
+  theme_minimal(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    legend.position = "bottom",
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+# ---- BY SUSCEPTIBILITY GROUP ----
+summary_stacked_sus <- preds_grouped %>%
+  group_by(.draw, Type, taxon_group) %>%
+  summarize(total_epred = sum(n_m2), .groups = "drop") %>%
+  group_by(Type, taxon_group) %>%
+  mean_qi(total_epred, .width = 0.95) %>%
+  mutate(taxon_group = factor(taxon_group, levels = c("med_sus", "low_sus", "high_sus"))) %>%
+  arrange(Type, desc(taxon_group)) %>%
+  group_by(Type) %>%
+  mutate(
+    stack_ymin = cumsum(lag(total_epred, default = 0)),
+    stack_ymax = stack_ymin + total_epred,
+    label_y = stack_ymin + total_epred / 2,
+    label = sprintf("%.2f", total_epred),
+    err_lower = stack_ymax - (total_epred - .lower),
+    err_upper = stack_ymax + (.upper - total_epred)
+  )
+
+plot_sus <- ggplot(summary_stacked_sus, aes(x = Type, y = total_epred, fill = taxon_group)) +
+  geom_col(position = "stack") +
+  geom_errorbar(aes(ymin = err_lower, ymax = err_upper), width = 0.1, linewidth = 0.25) +
+  geom_text(aes(y = label_y, label = label), size = 2.5) +
+  scale_fill_manual(
+    #values = c("high_sus" = "#F46E6E", "med_sus" = "#FDBF6F", "low_sus" = "#A582B9"),
+    values = c("high_sus" = "gray60", "med_sus" = "gray75", "low_sus" = "gray90"),
+    labels = c("high_sus" = "High", "med_sus" = "Medium", "low_sus" = "Low")
   ) +
-  scale_fill_manual(values = c("<4cm" = "gray70", ">4cm" = "gray40")) +
-  scale_x_discrete(labels = c(
-    "Nearshore Ridge Complex" = "Nearshore\nRidge Complex",
-    "Inner Reef" = "Inner Reef",
-    "Middle Reef" = "Middle Reef",
-    "Outer Reef" = "Outer Reef"
-  )) +
+  scale_x_discrete(labels = type_labels) +
+  labs(x = "Habitat Type", y = "Total Coral Density (per m²)", fill = "Disease Susceptibility") +
+  theme_minimal(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    legend.position = "bottom",
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+# ---- Combine using cowplot ----
+combined_plot <- cowplot::plot_grid(
+  plot_class, plot_sus,
+  ncol = 2,
+  labels = c("A", "B"),
+  label_size = 10,
+  align = "hv"
+)
+
+combined_plot
+
+ggsave(filename = "outputs/Fig3.png", width = 180, height = 90, units = "mm", dpi = 300)
+
+```
+
+three panel fig
+```{r}
+type_labels2 <- c("Nearshore\nRidge Complex", "Inner\nReef", "Middle\nReef", "Outer\nReef")
+# ---- TOTAL CORAL DENSITY ----
+summary_total_density_by_type <- draws_equal_weighted %>%
+  group_by(.draw, Type) %>%
+  summarize(total_density = sum(n_m2), .groups = "drop") %>%
+  group_by(Type) %>%
+  summarize(
+    mean = mean(total_density),
+    lower = quantile(total_density, 0.025),
+    upper = quantile(total_density, 0.975),
+    .groups = "drop"
+  )
+
+plot_total <- ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
+  geom_col(fill = "gray60") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 0.25) +
+  scale_x_discrete(labels = type_labels2) +
+  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25)) +
   labs(
     x = "Habitat Type",
-    y = "Total Coral Density (per m²)",
+    y = "Density (per m²)",
+    title = NULL
+  ) +
+  theme_minimal(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+# ---- BY SIZE CLASS ----
+summary_class <- draws_equal_weighted %>%
+  group_by(.draw, Type, class) %>%
+  summarize(total_epred = sum(n_m2), .groups = "drop") %>%
+  group_by(Type, class) %>%
+  mean_qi(total_epred, .width = 0.95) %>%
+  mutate(
+    class = factor(class, levels = c(">4cm", "<4cm")),
+    label = sprintf("%.2f", total_epred)
+  )
+
+plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.8) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper),
+                position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
+  #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
+  scale_fill_manual(values = c(">4cm" = "gray60", "<4cm" = "gray75")) +
+  scale_x_discrete(labels = type_labels2) +
+  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25)) +
+  labs(
+    x = "Habitat Type",
+    y = "",
     fill = "Size Class"
   ) +
   theme_minimal(base_size = 8) +
   theme(
     axis.text.x = element_text(angle = 0, hjust = 0.5),
-    legend.position = "bottom"
-  ) +
-  theme(
+    legend.key.size = unit(4, "mm"),
+    legend.background = element_rect(fill = "white", color = "black"),
+    legend.position = c(0.7, 0.85),
     panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA),
-    legend.background = element_rect(fill = "white", color = NA),
-    legend.box.background = element_rect(fill = "white", color = NA)
+    plot.background = element_rect(fill = "white", color = NA)
   )
 
-ggsave(filename = "outputs/Fig3.png", width = 80, height = 80, units = "mm", dpi = 300)
-
-
-
-# By SUS GROUP OVERALL
-
-group_definitions <- tibble(
-  taxon = unique(draws_equal_weighted$taxon),
-  taxon_group = case_when(
-    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", 
-                 "MMEA", "DLAB", "CNAT", "FAVI", "PSTR", "PCLI") ~ "high_sus",
-    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
-    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
-    TRUE ~ NA_character_
-  )
-)
-# Join susceptibility group definitions
-preds_grouped <- draws_equal_weighted %>%
-  left_join(group_definitions, by = "taxon") %>%
-  filter(!is.na(taxon_group))
-
-# Summarize posterior predictions by draw × Type × group
-summary_grouped <- preds_grouped %>%
+# ---- BY SUSCEPTIBILITY GROUP ----
+summary_sus <- preds_grouped %>%
   group_by(.draw, Type, taxon_group) %>%
   summarize(total_epred = sum(n_m2), .groups = "drop") %>%
   group_by(Type, taxon_group) %>%
-  mean_qi(total_epred, .width = 0.95)
+  mean_qi(total_epred, .width = 0.95) %>%
+  mutate(
+    taxon_group = factor(taxon_group, levels = c("high_sus", "med_sus", "low_sus")),
+    label = sprintf("%.2f", total_epred)
+  )
 
-# Optional: order groups for plot aesthetics
-summary_grouped$taxon_group <- factor(summary_grouped$taxon_group,
-                                      levels = c("high_sus", "med_sus", "low_sus"))
-
-# Plot
-ggplot(summary_grouped, aes(x = Type, y = total_epred, fill = taxon_group)) +
-  geom_col(position = "dodge") +
-  geom_errorbar(position = "dodge",
-    aes(ymin = .lower, ymax = .upper),
-    color = "black"
-  ) +
+plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = taxon_group)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.8) +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper),
+                position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
+  #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
   scale_fill_manual(
-    values = c("high_sus" = "#E31A1C", "med_sus" = "#FDBF6F", "low_sus" = "#6A3D9A"),
+    values = c("high_sus" = "gray60", "med_sus" = "gray75", "low_sus" = "gray90"),
     labels = c("high_sus" = "High", "med_sus" = "Medium", "low_sus" = "Low")
   ) +
-  scale_x_discrete(labels = type_labels) +
+  scale_x_discrete(labels = type_labels2) +
+  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25)) +
   labs(
     x = "Habitat Type",
-    y = "Total Coral Density (per m²)",
-    fill = "Disease Susceptibility"
+    y = "",
+    fill = "SCTLD Susceptibility"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    legend.key.size = unit(4, "mm"),
+    legend.background = element_rect(fill = "white", color = "black"),
+    legend.position = c(0.7, 0.85),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
 
+# ---- Combine using cowplot ----
+combined_plot <- cowplot::plot_grid(
+  plot_total, plot_class, plot_sus,
+  ncol = 3,
+  labels = c("A", "B", "C"),
+  label_size = 10,
+  align = "hv"
+)
 
+combined_plot
+ggsave(filename = "outputs/Fig3b.png", width = 180, height = 80, units = "mm", dpi = 300)
 ```
+
+
+
 
 
 ### Taxon totals in impact zones
@@ -2541,24 +2656,24 @@ tot1 <- left_join(summary_equal_weighted, area_summary, by = "Type") %>%
          tot_lower = n_m2 * total_area_m2,
          tot_upper = n_m2 * total_area_m2)
 
-taba2 <- tot1 %>%
-  group_by(Type, name) %>%
-  summarize(total_area_m2 = sum(total_area_m2), .groups = "drop") %>%
-  pivot_wider(names_from = name, values_from = total_area_m2) %>%
-  janitor::adorn_totals(where = c("row", "col")) %>%
-  mutate(across(where(is.numeric), ~ formatC(.x, format = "e", digits = 2)))
-
-taba2 %>%
-  knitr::kable(caption = "Total area (m2) of each habitat type in each impact zone")
-
-# Transpose using first column as rownames
-taba2_flipped <- taba2 %>%
-  column_to_rownames(var = names(taba2)[1]) %>%  # Set first column as rownames
-  t() %>%
-  as.data.frame() %>%
-  rownames_to_column(var = names(taba2)[1])      # Move former colnames into a new column
-
-write_csv(taba2_flipped, file = "outputs/TableA2.csv")
+# taba2 <- tot1 %>%
+#   group_by(Type, name) %>%
+#   summarize(total_area_m2 = sum(total_area_m2), .groups = "drop") %>%
+#   pivot_wider(names_from = name, values_from = total_area_m2) %>%
+#   janitor::adorn_totals(where = c("row", "col")) %>%
+#   mutate(across(where(is.numeric), ~ formatC(.x, format = "e", digits = 2)))
+# 
+# taba2 %>%
+#   knitr::kable(caption = "Total area (m2) of each habitat type in each impact zone")
+# 
+# # Transpose using first column as rownames
+# taba2_flipped <- taba2 %>%
+#   column_to_rownames(var = names(taba2)[1]) %>%  # Set first column as rownames
+#   t() %>%
+#   as.data.frame() %>%
+#   rownames_to_column(var = names(taba2)[1])      # Move former colnames into a new column
+# 
+# write_csv(taba2_flipped, file = "outputs/TableA2.csv")
 
 # Calculate total per taxclass per impact zone (sum all habitat Types)
 tot2 <- tot1 %>%
@@ -2574,7 +2689,7 @@ tab2 <- tot2 %>% ungroup() %>%
 tab2 %>%
   knitr::kable(caption = "Total number of colonies of each coral taxon and size class in each impact zone")
 
-write_csv(tab2, file = "outputs/Table2.csv")
+write_csv(tab2, file = "outputs/TableA2.csv")
 ```
 
 ### Total corals in impact zones
@@ -2584,14 +2699,21 @@ tot3 <- tot2 %>%
   group_by(name) %>%
   summarize(tot = sum(tot))
 
-tot2 %>%
+tots <- tot2 %>%
   mutate(ESA = if_else(taxon %in% c("ACER", "ORBI"), "ESA", "non-ESA")) %>%
   group_by(name, ESA) %>%
   summarize(tot = sum(tot), .groups = "drop") %>%
   pivot_wider(names_from = ESA, values_from = tot) %>%
-  janitor::adorn_totals(where = c("row", "col")) %>%
-  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) %>%
+  janitor::adorn_totals(where = "col") %>%
+  mutate(cum_ESA = cumsum(ESA),
+         cum_non_ESA = cumsum(`non-ESA`),
+         cum_Total = cumsum(Total)) %>%
+  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
+
+tots %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
+
+tots
 ```
 
 # Plot of all
