@@ -2156,111 +2156,86 @@ Lots of idiosyncratic diffs between surveys for individual taxon x class groups?
 #     prior(normal(0, 1), class = "b", dpar = "zi")
 #   ),
 #   chains = 4, cores = 4, threads = threading(5),
-#   iter = 1000, warmup = 500, thin = 1,
+#   iter = 200, warmup = 50, thin = 1,
 #   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.95)
+#   control = list(adapt_delta = 0.99),
+#   seed = 20240717
 # )
 # 
 # saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
 mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
-
-
-# # 1. Create newdata grid (1 m² for standardization)
-# newdata <- dfftaxon_trimmed %>%
-#   distinct(Type, taxon, class) %>%
-#   mutate(transect_area_m2 = 1)
-# 
-# # Posterior draws of predicted density (n / m²)
-# preds <- add_epred_draws(mod_nb3, newdata = newdata, re_formula = NA)    # excludes random effects (gives population-level average)
-# # Average across all draws
-# summary_preds <- preds %>%
-#   group_by(taxon, class, Type) %>%
-#   mean_qi(.epred, .width = 0.95)
 ```
 
-```{r, eval = F}
-cts <- dfftaxon %>%
-  count(taxon, class)
-#patchiness
-vmr_by_habitat <- dfftaxon %>%
-  filter(!is.na(transect_area_m2), transect_area_m2 > 0) %>%
-  mutate(density = n / transect_area_m2) %>%
-  group_by(taxon, class, Type) %>%
-  summarize(
-    mean_density = mean(density),
-    var_density  = var(density),
-    VMR          = var_density / mean_density,
-    n_sites      = n(),
-    .groups = "drop"
-  )
 
-dfftaxon %>%
-  filter(!is.na(transect_area_m2), transect_area_m2 > 0) %>%
-  mutate(density = n / transect_area_m2) %>%
-  ggplot(aes(x = density, fill = class)) +
-  geom_histogram() +
-  facet_wrap(~taxon, scales = "free_x") +
-  scale_y_log10()
+### Model evaluation and comparisons
+```{r}
+loo_3 <- loo(mod_nb3)
 
+loo_compare(loo_3, loo_2, loo_1)
+loo_3
+loo_2
+loo_1
 
+# Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
+# mod3 also has slightly lower p_loo (good, slightly simpler )
 
-vmr_by_habitat %>% arrange(-VMR) %>% print(n = nrow(.))
-summary(vmr_by_habitat)
-ggplot(vmr_by_habitat, aes(x = taxon, y = VMR)) +
-  geom_point(aes(shape = Type, color = Type, size = class), alpha = 0.5) +
-  scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-library(tidybayes)
-
-# Create newdata grid for taxon:class:Type
-newdata_zi <- dfftaxon %>%
-  distinct(taxon, class, Type) %>%
-  mutate(transect_area_m2 = 1)
-
-# Posterior draws of zero-inflation probabilities
-zi_preds <- add_linpred_draws(
-  mod_nb3,
-  newdata = newdata_zi,
-  dpar = "zi",
-  transform = TRUE,  # Applies plogis link
-  re_formula = NA    # Use population-level effects
-)
-
-zi_summary <- zi_preds %>%
-  group_by(taxon, class, Type) %>%
-  summarize(
-    zi_mean = mean(zi),
-    zi_lower = quantile(zi, 0.025),
-    zi_upper = quantile(zi, 0.975),
-    .groups = "drop"
-  )
-
-
-vmr_vs_zi <- vmr_by_habitat %>%
-  left_join(zi_summary, by = c("taxon", "class", "Type"))
-
-ggplot(vmr_vs_zi, aes(x = VMR, y = zi_mean)) +
-  geom_point(aes(size = mean_n), alpha = 0.7) +
-  geom_errorbarh(aes(xmin = VMR * 0.95, xmax = VMR * 1.05), height = 0, alpha = 0.3) +
-  geom_errorbar(aes(ymin = zi_lower, ymax = zi_upper), width = 0, alpha = 0.3) +
-  scale_x_log10() +
-  labs(
-    x = "Variance-to-Mean Ratio (VMR, log scale)",
-    y = "Posterior Mean Zero-Inflation Probability",
-    title = "Empirical Patchiness vs. Model-Inferred Zero-Inflation",
-    size = "Mean Density"
-  ) +
-  theme_minimal() +
-  geom_text(aes(label = taxon))
-
-zi_summary %>% arrange(-zi_mean) %>% print(n = nrow(.))
+bayes_R2(mod_nb3)     
 ```
 
 
 ```{r}
-# fixed version of equally weighting estimates across dataset-averaging? 
+library(moments)
+# Posterior predictive simulations
+yrep <- posterior_predict(mod_nb3, ndraws = 1000)
+
+# Summary stats for each simulated dataset (one row = one posterior draw)
+sim_summary <- data.frame(
+  mean      = rowMeans(yrep),
+  variance  = apply(yrep, 1, var),
+  zero_prop = rowMeans(yrep == 0),
+  skewness  = apply(yrep, 1, skewness)
+)
+
+# Observed data summaries
+obs_n <- mod_nb3$data$n
+obs_summary <- list(
+  mean      = mean(obs_n),
+  variance  = var(obs_n),
+  zero_prop = mean(obs_n == 0),
+  skewness  = skewness(obs_n)
+)
+
+# Compare observed to simulated
+compare_stat <- function(stat_name) {
+  cat(glue::glue(
+    "\n{stat_name}:\n",
+    "  Observed:     {round(obs_summary[[stat_name]], 2)}\n",
+    "  Simulated:    Median = {round(median(sim_summary[[stat_name]]), 2)}, ",
+    "IQR = ({round(quantile(sim_summary[[stat_name]], 0.25), 2)}, {round(quantile(sim_summary[[stat_name]], 0.75), 2)})\n"
+  ))
+}
+
+# Run comparisons
+compare_stat("mean")
+compare_stat("variance")
+compare_stat("zero_prop")
+compare_stat("skewness")
+
+
+p1 <- pp_check(mod_nb3, type = "stat", stat = "mean", ndraws = 1000)
+p2 <- pp_check(mod_nb3, type = "stat", stat = "var", ndraws = 1000)
+prop_zero <- function(x) mean(x == 0)
+p3 <- pp_check(mod_nb3, type = "stat", stat = "prop_zero", ndraws = 1000)
+p4 <- pp_check(mod_nb3, type = "stat", stat = "skewness", ndraws = 1000)
+
+cowplot::plot_grid(p1, p2, p3, p4, nrow = 2)
+
+ggsave(filename = "outputs/modeleval.png")
+```
+
+### Final density estimates
+```{r}
+# fixed version of equally weighting estimates across datasets
 # Step 1: Trim to only taxon–class–habitat combinations where the taxon was observed at least once
 dfftaxon_trimmed2 <- dfftaxon %>%
   semi_join(
@@ -2294,23 +2269,13 @@ draws_equal_weighted <- draws_avg_dir %>%
 summary_equal_weighted <- draws_equal_weighted %>%
   group_by(taxon, class, Type) %>%
   mean_qi(n_m2, .width = 0.95)
-
 ```
 
+# Results
 
-```{r, eval = T}
-loo_3 <- loo(mod_nb3)
+## Densities
 
-loo_compare(loo_3, loo_2, loo_1)
-loo_3
-loo_2
-loo_1
-
-# Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
-# mod3 also has slightly lower p_loo (good, slightly simpler )
-```
-
-### Taxon densities by habitat type and size class
+### Taxon densities
 ```{r, fig.width = 10, fig.height = 10}
 ###############
 # DENSITY OF EACH TAXON x CLASS IN EACH HABITAT TYPE
@@ -2406,126 +2371,10 @@ knitr::kable(table_out, format = "html", escape = FALSE,
 
 ############
 write_csv(table_out, file = "outputs/TableA1.csv")
-
-
-
-
 ```
 
-### Total coral density by habitat
+### Total densities by size and SCTLD-susceptibility groups
 
-```{r}
-# Summarize posterior draws of total coral density per habitat
-summary_total_density_by_type <- draws_equal_weighted %>%
-  group_by(.draw, Type) %>%
-  summarize(total_density = sum(n_m2), .groups = "drop") %>%
-  group_by(Type) %>%
-  summarize(
-    mean = mean(total_density),
-    lower = quantile(total_density, 0.025),
-    upper = quantile(total_density, 0.975),
-    .groups = "drop"
-  )
-
-
-ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
-  geom_col(fill = "gray60") +
-  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
-  labs(
-    x = "Habitat Type",
-    y = "Total Coral Density (per m²)",
-    title = "Total Coral Density by Habitat"
-  ) +
-  theme_minimal(base_size = 10)
-
-
-
-# ---- BY SIZE CLASS ----
-summary_stacked_class <- draws_equal_weighted %>%
-  group_by(.draw, Type, class) %>%
-  summarize(total_epred = sum(n_m2), .groups = "drop") %>%
-  group_by(Type, class) %>%
-  mean_qi(total_epred, .width = 0.95) %>%
-  mutate(class = factor(class, levels = c("<4cm", ">4cm"))) %>%  # new order
-  arrange(Type, desc(class)) %>%
-  group_by(Type) %>%
-  mutate(
-    stack_ymin = cumsum(lag(total_epred, default = 0)),
-    stack_ymax = stack_ymin + total_epred,
-    label_y = stack_ymin + total_epred / 2,
-    label = sprintf("%.2f", total_epred),
-    err_lower = stack_ymax - (total_epred - .lower),
-    err_upper = stack_ymax + (.upper - total_epred)
-  )
-
-plot_class <- ggplot(summary_stacked_class, aes(x = Type, y = total_epred, fill = class)) +
-  geom_col(position = "stack") +
-  geom_errorbar(aes(ymin = err_lower, ymax = err_upper), width = 0.1, linewidth = 0.25) +
-  geom_text(aes(y = label_y, label = label), size = 2.5) +
-  scale_fill_manual(values = c("<4cm" = "gray75", ">4cm" = "gray60")) +
-  scale_x_discrete(labels = type_labels) +
-  labs(x = "Habitat Type", y = "Total Coral Density (per m²)", fill = "Size Class") +
-  theme_minimal(base_size = 8) +
-  theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5),
-    legend.position = "bottom",
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
-
-# ---- BY SUSCEPTIBILITY GROUP ----
-summary_stacked_sus <- preds_grouped %>%
-  group_by(.draw, Type, taxon_group) %>%
-  summarize(total_epred = sum(n_m2), .groups = "drop") %>%
-  group_by(Type, taxon_group) %>%
-  mean_qi(total_epred, .width = 0.95) %>%
-  mutate(taxon_group = factor(taxon_group, levels = c("med_sus", "low_sus", "high_sus"))) %>%
-  arrange(Type, desc(taxon_group)) %>%
-  group_by(Type) %>%
-  mutate(
-    stack_ymin = cumsum(lag(total_epred, default = 0)),
-    stack_ymax = stack_ymin + total_epred,
-    label_y = stack_ymin + total_epred / 2,
-    label = sprintf("%.2f", total_epred),
-    err_lower = stack_ymax - (total_epred - .lower),
-    err_upper = stack_ymax + (.upper - total_epred)
-  )
-
-plot_sus <- ggplot(summary_stacked_sus, aes(x = Type, y = total_epred, fill = taxon_group)) +
-  geom_col(position = "stack") +
-  geom_errorbar(aes(ymin = err_lower, ymax = err_upper), width = 0.1, linewidth = 0.25) +
-  geom_text(aes(y = label_y, label = label), size = 2.5) +
-  scale_fill_manual(
-    #values = c("high_sus" = "#F46E6E", "med_sus" = "#FDBF6F", "low_sus" = "#A582B9"),
-    values = c("high_sus" = "gray60", "med_sus" = "gray75", "low_sus" = "gray90"),
-    labels = c("high_sus" = "High", "med_sus" = "Medium", "low_sus" = "Low")
-  ) +
-  scale_x_discrete(labels = type_labels) +
-  labs(x = "Habitat Type", y = "Total Coral Density (per m²)", fill = "Disease Susceptibility") +
-  theme_minimal(base_size = 8) +
-  theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5),
-    legend.position = "bottom",
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
-
-# ---- Combine using cowplot ----
-combined_plot <- cowplot::plot_grid(
-  plot_class, plot_sus,
-  ncol = 2,
-  labels = c("A", "B"),
-  label_size = 10,
-  align = "hv"
-)
-
-combined_plot
-
-ggsave(filename = "outputs/Fig3.png", width = 180, height = 90, units = "mm", dpi = 300)
-
-```
-
-three panel fig
 ```{r}
 type_labels2 <- c("Nearshore\nRidge Complex", "Inner\nReef", "Middle\nReef", "Outer\nReef")
 # ---- TOTAL CORAL DENSITY ----
@@ -2564,7 +2413,7 @@ summary_class <- draws_equal_weighted %>%
   group_by(Type, class) %>%
   mean_qi(total_epred, .width = 0.95) %>%
   mutate(
-    class = factor(class, levels = c(">4cm", "<4cm")),
+    class = factor(class, levels = c("<4cm", ">4cm")),
     label = sprintf("%.2f", total_epred)
   )
 
@@ -2592,17 +2441,30 @@ plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)
   )
 
 # ---- BY SUSCEPTIBILITY GROUP ----
-summary_sus <- preds_grouped %>%
-  group_by(.draw, Type, taxon_group) %>%
+# Define susceptibility groups
+group_definitions <- tibble(
+  taxon = unique(preds$taxon),
+  sus_group = case_when(
+    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA", "DLAB", "CNAT", "PSTR", "PCLI") ~ "high_sus",
+    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
+    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
+    TRUE ~ NA_character_
+  )
+) %>%
+  mutate(sus_group = factor(sus_group, levels = c("low_sus", "med_sus", "high_sus")))
+
+summary_sus <- draws_equal_weighted %>%
+  left_join(group_definitions) %>%
+  group_by(.draw, Type, sus_group) %>%
   summarize(total_epred = sum(n_m2), .groups = "drop") %>%
-  group_by(Type, taxon_group) %>%
+  group_by(Type, sus_group) %>%
   mean_qi(total_epred, .width = 0.95) %>%
   mutate(
-    taxon_group = factor(taxon_group, levels = c("high_sus", "med_sus", "low_sus")),
+    taxon_group = factor(sus_group, levels = c("high_sus", "med_sus", "low_sus")),
     label = sprintf("%.2f", total_epred)
   )
 
-plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = taxon_group)) +
+plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)) +
   geom_col(position = position_dodge(width = 0.8), width = 0.8) +
   geom_errorbar(aes(ymin = .lower, ymax = .upper),
                 position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
@@ -2638,17 +2500,14 @@ combined_plot <- cowplot::plot_grid(
 )
 
 combined_plot
-ggsave(filename = "outputs/Fig3b.png", width = 180, height = 80, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
 ```
 
+## Abundances in Impact Zones
 
-
-
-
-### Taxon totals in impact zones
+### Taxon abundances
 ```{r}
 # TOTAL COLONIES IN EACH IMPACT ZONE
-
 
 # Calculate total per taxclass per habitat Type and impact zone
 tot1 <- left_join(summary_equal_weighted, area_summary, by = "Type") %>%
@@ -2692,14 +2551,10 @@ tab2 %>%
 write_csv(tab2, file = "outputs/TableA2.csv")
 ```
 
-### Total corals in impact zones
+### Total abundances
 ```{r}
-# Calculate total per impact zone (sum all taxon/class)
+# Calculate total ESA and non-ESA corals per impact zone
 tot3 <- tot2 %>%
-  group_by(name) %>%
-  summarize(tot = sum(tot))
-
-tots <- tot2 %>%
   mutate(ESA = if_else(taxon %in% c("ACER", "ORBI"), "ESA", "non-ESA")) %>%
   group_by(name, ESA) %>%
   summarize(tot = sum(tot), .groups = "drop") %>%
@@ -2710,13 +2565,18 @@ tots <- tot2 %>%
          cum_Total = cumsum(Total)) %>%
   mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
 
-tots %>%
+tot3 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
 
-tots
+write_csv(tot3, file = "outputs/Table3.csv")
+
+ttt <- tot2 %>% filter(taxon %in% c("ACER", "ORBI")) %>%
+  group_by(taxon) %>%
+  summarize(tot = sum(tot))
+ttt
 ```
 
-# Plot of all
+
 ```{r}
 posterior_type_totals <- draws_avg_dir %>%
   group_by(.draw, taxon, class, Type, dataset) %>%
@@ -2764,14 +2624,12 @@ ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
     strip.text = element_text(face = "bold")
   )
 
-ggsave(filename = "outputs/FigAX.png")
+ggsave(filename = "outputs/FigA2.png")
 ```
 
 
 
-# Treemap plots - 
-
-### Scenario2+NMFS
+### Treemap plot - Scenario2+NMFS
 ```{r working_treemap1}
 # STEP 1: Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
@@ -2780,7 +2638,7 @@ tot4 <- tot2 %>%
   summarize(tot = sum(tot), .groups = "drop")
 
 # Assign a base color per taxon
-set.seed(2)
+set.seed(3)
 base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
 names(base_colors) <- unique(tot4$taxon)
 
@@ -2861,7 +2719,7 @@ p +
             aes(x = xmin, y = ymax-0.00001,
                 label = label, size = area), inherit.aes = FALSE,
             hjust = 0, vjust = 1, lineheight = 0.7,
-            nudge_x = 0.005, nudge_y = -0.005) +
+            nudge_x = 0.001, nudge_y = -0.005) +
   scale_size_continuous(range = c(1.5, 15)) +
   geom_text_repel(data = external_labels,
              aes(x = center_x, y = center_y, 
@@ -2884,9 +2742,11 @@ ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", d
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
+
+tot2 %>% group_by(taxon) %>% summarize(tot = sum(tot)) %>% filter(taxon %in% c("ACER", "ORBI"))
 ```
 
-### Whole area
+### Treemap plot - Full monitoring area
 ```{r working_treemap2}
 # STEP 1: Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
@@ -2894,7 +2754,7 @@ tot4 <- tot2 %>%
   summarize(tot = sum(tot), .groups = "drop")
 
 # Assign a base color per taxon
-set.seed(2)
+set.seed(3)
 base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
 names(base_colors) <- unique(tot4$taxon)
 
@@ -2994,7 +2854,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/Fig4b2.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/FigA3.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
@@ -3010,12 +2870,13 @@ tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
 
 
 
-# Dataset-specific estimates from Model3
+## Temporal trends across datasets
 
-## Taxon densities across datasets
+### Taxon trends
+
 ```{r, include = T, eval = T, fig.width = 10, fig.height = 6}
 # Step 1: Create newdata (retain dataset, taxon, class, and Type)
-newdata_taxon <- dfftaxon_trimmed %>%
+newdata_taxon <- dfftaxon_trimmed2 %>%
   distinct(dataset, taxon, class, Type) %>%
   mutate(transect_area_m2 = 1, dir = NA)
 
@@ -3074,44 +2935,44 @@ ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
     title = "Total Coral Density per Taxon Across Datasets"
   ) +
   #scale_y_log10()+
-  scale_x_continuous(breaks = seq(11,24,2)) +
+  scale_x_continuous(breaks = seq(11,24,4), labels = paste0("'", seq(11,24,4))) +
   scale_shape_manual(values = c(1,0,7,2,5,6))+
-  theme_minimal(base_size = 11)
+  theme_minimal(base_size = 11) +
+  theme(plot.background = element_rect(fill = "white", color = NA),
+        legend.position = "bottom")
 
+ggsave(filename = "outputs/FigA4.png", width = 180, height = 150, units = "mm", dpi = 300)
+
+
+
+mod <- lm(total_epred ~ year * taxon, data = summary_taxon_total %>% filter(year != 11))
+library(emmeans)
+slopes_emm <- emtrends(mod, ~ taxon, var = "year")
+summary(slopes_emm, infer = TRUE)  # Includes estimate, SE, and p-value for each slope
+
+# SIDE has increased over time (2017-2024), but that's the only significant slope
 ```
 
+### Total trends and SCTLD susceptibility
+```{r}
+# TOTAL coral density over time/datasets
 
-## Sus-group densities across datasets
-```{r, fig.width = 10, fig.height = 5}
-# Step 1: Define susceptibility groups
-group_definitions <- tibble(
-  taxon = unique(preds$taxon),
-  sus_group = case_when(
-    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA", "DLAB", "CNAT", "PSTR", "PCLI") ~ "high_sus",
-    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
-    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
-    TRUE ~ NA_character_
-  )
-) %>%
-  mutate(sus_group = factor(sus_group, levels = c("low_sus", "med_sus", "high_sus")))
+# Step 4: Sum total predicted density (all taxa and size classes)
+summary_total <- preds_avg %>%
+  group_by(.draw, dataset) %>%
+  summarize(total_density = sum(mean_epred), .groups = "drop") %>%
+  group_by(dataset) %>%
+  mean_qi(total_density, .width = 0.95)
 
-# Step 2: Create newdata with all combos (retain Type)
-newdata_ds <- dfftaxon_trimmed2 %>%
-  distinct(dataset, Type, taxon, class) %>%
-  mutate(transect_area_m2 = 1, dir = NA)
+# Step 5: Add year and filter datasets if needed
+summary_total_filtered <- summary_total %>%
+  filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
+  mutate(dataset = factor(dataset, levels = c("dca17", "tt21", "tt23", "drm24")),
+         year = parse_number(as.character(dataset)))
 
-# Step 3: Predict densities (posterior draws)
-preds_ds <- add_epred_draws(
-  mod_nb3,
-  newdata = newdata_ds,
-  re_formula = NULL,
-  allow_new_levels = TRUE
-)
 
-# Step 4: Average across habitat Type per draw, taxon, class, dataset
-preds_avg <- preds_ds %>%
-  group_by(.draw, taxon, class, dataset) %>%
-  summarize(mean_epred = mean(.epred), .groups = "drop")
+
+
 
 # Step 5: Join susceptibility group
 preds_grouped <- preds_avg %>%
@@ -3131,160 +2992,49 @@ summary_sus_filtered <- summary_sus %>%
   mutate(dataset = factor(dataset, levels = c("dca17", "tt21", "tt23", "drm24")),
          year = parse_number(as.character(dataset)))
 
-# Plot
-suschange <- ggplot(summary_sus_filtered, aes(x = year, y = total_density,
-                                 shape = dataset, group = sus_group)) +
-  geom_line(linewidth = 0.5) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.25) +
-  geom_point(size = 3, fill = "white") +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(
-    x = "Year",
-    y = "Mean Coral Density (per m²)",
-    color = "Susceptibility Group",
-    shape = "Dataset"
-  ) +
-  #scale_y_log10() +
-  theme_classic(base_size = 11) +
-  scale_shape_manual(values = c(21,22,24,25)) +
-  facet_wrap(~sus_group, scales = "free",
-               labeller = as_labeller(c(
-    "high_sus" = "High susceptibility",
-    "med_sus" = "Moderate susceptibility",
-    "low_sus" = "Low susceptibility"
-  ))) +
-  guides(color = "none") +
-  theme(
-    legend.position = "bottom"
-  )
-
-lm_stats <- summary_sus_filtered %>%
-  group_by(sus_group) %>%
-  do(broom::tidy(lm(total_density ~ year, data = .))) %>%
-  filter(term == "year") %>%  # only keep slope (year) estimates
-  mutate(
-    label = paste0("Slope = ", signif(estimate, 2), 
-                   ", p = ", signif(p.value, 2))
-  )
-
-lm_labels <- summary_sus_filtered %>%
-  group_by(sus_group) %>%
-  summarize(
-    x = min(year),
-    y = max(total_density),
-    .groups = "drop"
-  ) %>%
-  left_join(lm_stats, by = "sus_group")
-
-suschange + 
-  geom_text(
-    data = lm_labels,
-    aes(x = x, y = Inf, label = label),
-    hjust = 0, vjust = 2, size = 3,
-    inherit.aes = FALSE
-  ) +
-  theme(
-    strip.background = element_blank(),  # removes gray background
-    strip.text = element_text(face = "bold")  # optional: makes label text bold
-  ) +
-  theme(
-    legend.position = "bottom",
-    legend.margin = margin(t = 0, r = 0, b = 0, l = 0),         # shrink padding inside legend
-    legend.box.margin = margin(t = -5, r = 0, b = 0, l = 0)     # pull legend box closer to plot
-  )
-  
-ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm", dpi = 300)
-```
-
-```{r}
-# TOTAL coral density over time/datasets
-# Step 1: Create newdata with all needed combinations (retain Type)
-newdata_total <- dfftaxon_trimmed2 %>%
-  distinct(dataset, Type, taxon, class) %>%
-  mutate(transect_area_m2 = 1, dir = NA)
-
-# Step 2: Predict densities including group-level effects
-preds_total_ds <- add_epred_draws(
-  mod_nb3,
-  newdata = newdata_total,
-  re_formula = NULL,
-  allow_new_levels = TRUE
-)
-
-# Step 3: Average across habitat Type per draw, taxon, class, dataset
-preds_total_avg <- preds_total_ds %>%
-  group_by(.draw, taxon, class, dataset) %>%
-  summarize(mean_epred = mean(.epred), .groups = "drop")
-
-# Step 4: Sum total predicted density (all taxa and size classes)
-summary_total <- preds_total_avg %>%
-  group_by(.draw, dataset) %>%
-  summarize(total_density = sum(mean_epred), .groups = "drop") %>%
-  group_by(dataset) %>%
-  mean_qi(total_density, .width = 0.95)
-
-# Step 5: Add year and filter datasets if needed
-summary_total_filtered <- summary_total %>%
-  filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
-  mutate(dataset = factor(dataset, levels = c("dca17", "tt21", "tt23", "drm24")),
-         year = parse_number(as.character(dataset)))
-
-# Step 6: Plot
-ggplot(summary_total_filtered, aes(x = year, y = total_density, shape = dataset)) +
-  geom_line(linewidth = 0.5, color = "black", group = 1) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1, linewidth = 0.25) +
-  geom_point(size = 3, fill = "white") +
-  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
-  labs(
-    x = "Year",
-    y = "Total Coral Density (per m²)",
-    title = "Total Coral Density Across Datasets"
-  ) +
-  scale_shape_manual(values = c(21, 22, 24, 25)) +
-  theme_classic(base_size = 11) +
-  theme(legend.position = "bottom")
-
-```
 
 
-```{r}
-# Step 1: Prepare total coral dataset
-summary_total <- preds_total_avg %>%
-  group_by(.draw, dataset) %>%
-  summarize(total_density = sum(mean_epred), .groups = "drop") %>%
-  group_by(dataset) %>%
-  mean_qi(total_density, .width = 0.95) %>%
-  filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
-  mutate(
-    dataset = factor(dataset, levels = c("dca17", "tt21", "tt23", "drm24")),
-    year = parse_number(as.character(dataset)),
-    sus_group = "total"
-  )
 
-# Step 2: Combine with susceptibility summaries
+# Step 2: Combine total with susceptibility group summaries
 combined <- bind_rows(
-  summary_total %>% select(dataset, year, total_density, .lower, .upper, sus_group),
+  summary_total_filtered %>% select(dataset, year, total_density, .lower, .upper) %>% mutate(sus_group = "total"),
   summary_sus_filtered %>% rename(total_density = total_density)
 )
 
 combined$sus_group <- factor(combined$sus_group,
                              levels = c("total", "low_sus", "med_sus", "high_sus"))
 
-# Step 3: Compute linear model stats
-lm_stats <- combined %>%
-  group_by(sus_group) %>%
-  do(broom::tidy(lm(total_density ~ year, data = .))) %>%
-  filter(term == "year") %>%
-  mutate(label = paste0("Slope = ", signif(estimate, 2), ", p = ", signif(p.value, 2)))
 
-lm_labels <- combined %>%
+
+lm_stats_full <- combined %>%
+  group_by(sus_group) %>%
+  do({
+    model <- lm(total_density ~ year, data = .)
+    coef <- coef(model)
+    slope_pval <- coef(summary(model))["year", "Pr(>|t|)"]
+    tibble(intercept = coef[1], slope = coef[2], pval = slope_pval)
+  })%>%
+  ungroup() %>%
+  mutate(
+    pred_2017 = intercept + slope * 17,
+    pred_2024 = intercept + slope * 24,
+    percent_change = 100 * (pred_2024 - pred_2017) / pred_2017,
+    label = paste0("Trend = +", signif(percent_change, 3), "%", "\np = ", round(pval, 2))
+  )
+
+# View the results
+lm_stats_full %>% select(sus_group, percent_change, label)
+
+# Define annotation positions per panel
+lm_labels2 <- combined %>%
   group_by(sus_group) %>%
   summarize(
     x = min(year),
     y = max(total_density),
     .groups = "drop"
   ) %>%
-  left_join(lm_stats, by = "sus_group")
+  left_join(lm_stats_full %>% select(sus_group, label), by = "sus_group")
+
 
 # Step 4: Plot all 4 panels
 changeplot <- ggplot(combined, aes(x = year, y = total_density, shape = dataset)) +
@@ -3299,10 +3049,10 @@ changeplot <- ggplot(combined, aes(x = year, y = total_density, shape = dataset)
   ) +
   facet_wrap(~sus_group, scales = "free", nrow = 1,
              labeller = as_labeller(c(
-               "total" = "All corals",
-               "low_sus" = "Low susceptibility",
-               "med_sus" = "Moderate susceptibility",
-               "high_sus" = "High susceptibility"
+               "total" = "A. All corals",
+               "low_sus" = "B. Low SCTLD-susc.",
+               "med_sus" = "C. Moderate SCTLD-susc.",
+               "high_sus" = "D. High SCTLD-susc."
              ))) +
   labs(
     x = "Year",
@@ -3310,71 +3060,22 @@ changeplot <- ggplot(combined, aes(x = year, y = total_density, shape = dataset)
     shape = "Dataset"
   ) +
   scale_shape_manual(values = c(21, 22, 24, 25)) +
-  theme_classic(base_size = 11) +
-  geom_text(
-    data = lm_labels,
-    aes(x = x, y = Inf, label = label),
-    hjust = 0, vjust = 2, size = 3,
-    inherit.aes = FALSE
-  ) +
+  theme_classic(base_size = 10) +
   theme(
     strip.background = element_blank(),
-    strip.text = element_text(face = "bold"),
+    strip.text = element_text(hjust = 0, face = "bold", margin = margin(l = -15, b = 10), size = 10),
     legend.position = "bottom",
     legend.margin = margin(t = 0, r = 0, b = 0, l = 0),
     legend.box.margin = margin(t = -5, r = 0, b = 0, l = 0)
-  )
-
-ggsave("outputs/Fig5_all_and_sus.png", width = 180, height = 80, units = "mm", dpi = 300)
-
-
-
-
-
-# Add group label to total coral summary
-summary_total_filtered2 <- summary_total_filtered %>%
-  mutate(sus_group = factor("total", levels = c("total", "low_sus", "med_sus", "high_sus")))
-
-# Combine with susceptibility group data
-summary_combined <- bind_rows(summary_total_filtered2, summary_sus_filtered)
-
-lm_stats_full <- summary_combined %>%
-  group_by(sus_group) %>%
-  do({
-    model <- lm(total_density ~ year, data = .)
-    coef <- coef(model)
-    tibble(intercept = coef[1], slope = coef[2])
-  }) %>%
-  ungroup() %>%
-  mutate(
-    pred_2017 = intercept + slope * 17,
-    pred_2024 = intercept + slope * 24,
-    percent_change = 100 * (pred_2024 - pred_2017) / pred_2017,
-    label = paste0("Trend: +", signif(percent_change, 3), "%")
-  )
-
-# View the results
-lm_stats_full %>% select(sus_group, percent_change, label)
-
-# Define annotation positions per panel
-lm_labels2 <- summary_combined %>%
-  group_by(sus_group) %>%
-  summarize(
-    x = min(year),
-    y = max(total_density),
-    .groups = "drop"
-  ) %>%
-  left_join(lm_stats_full %>% select(sus_group, label), by = "sus_group")
-
-
-changeplot + 
+  ) +
   geom_text(
     data = lm_labels2,
     aes(x = x, y = Inf, label = label),
-    hjust = 0, vjust = 4, size = 3, color = "blue",
+    hjust = 0, vjust = 1.2, size = 3, color = "blue",
     inherit.aes = FALSE
-  )
-
-ggsave(filename = "outputs/Fig5.png", width = 200, height = 80, units = "mm")
+  ) +
+  coord_cartesian(clip = "off")
+changeplot
+ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm")
 ```
 
