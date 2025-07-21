@@ -17,10 +17,10 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FAL
 # Setup
 ```{r libraries}
 # Load packages
+library(MASS)   # for fitdistr
+library(stats)  # for qlogis
 library(sf)
 library(xml2)
-library(tidyverse)
-library(tidybayes)
 library(brms)
 library(vegan)
 library(kableExtra)
@@ -28,6 +28,8 @@ library(treemapify)
 library(ggrepel)
 library(igraph)
 library(cowplot)
+library(tidyverse)
+library(tidybayes)
 ```
 
 ```{r custom}
@@ -1882,19 +1884,28 @@ ggsave(filename = "outputs/FigA1.png", width = 270, height = 220, units = "mm", 
 ```
 
 
-# Estimate coral densities
+# Statistical modeling 
 
-## Model1 - all fixed effects
-
-Predictors: dataset, habitat Type, direction from channel, taxon, size class
-
-```{r brms}
+## Dataset summary
+```{r}
 # Just get columns we need for modeling
 dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, class, n)
 
-# Number of counts
+# Number of observations/counts
 nrow(dfftaxon)
-# Number of zeros
+
+# Number of colonies counted
+sum(dfftaxon$n)
+
+# Number of taxa observed
+n_distinct(dfftaxon$taxon)
+
+# Number of sites surveyed
+n_distinct(interaction(dfftaxon$dataset, dfftaxon$site))
+
+
+
+# Zero-inflation / Number of zeros
 table(dfftaxon$n == 0)
 
 # Overdispersion
@@ -1902,38 +1913,106 @@ mean_count <- mean(dfftaxon$n)
 var_count <- var(dfftaxon$n)
 var_count / mean_count
 
-# Number of taxa
-n_distinct(dfftaxon$taxon)
+# Data are highly zero-inflated and overdispersed -- use zero-inflated negative binomial models. 
 
-# Number of sites
-n_distinct(interaction(dfftaxon$dataset, dfftaxon$site))
+```
 
-# Number of corals
-sum(dfftaxon$n)
+## Generate data-informed priors
+```{r}
+# Generate some data-informed priors to use in ZINB models
+
+# Filter for valid, non-zero counts for count model summaries
+df_pos <- dfftaxon %>%
+  filter(n > 0) %>%
+  mutate(density = n / transect_area_m2,
+         log_density = log(density))
+
+# -- 1. PRIOR FOR INTERCEPT (count model log mean density) --
+summary_log_density <- summary(df_pos$log_density)
+# Output: 
+ #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ # -8.189  -3.401  -2.708  -2.534  -1.609   2.046 
+
+# Prior choice:
+# Center at ~mean or median (e.g., -2.5 ≈ exp(-2.5) ≈ 0.08/m²)
+# SD wide enough to cover most observed log densities
+# => normal(-2.5, 1.5)
+# This covers ~log densities from -6.5 to 1.5 => densities from ~0.0015 to ~4.5
+
+# -- 2. PRIOR FOR FIXED EFFECTS (class = "b") --
+group_effects <- df_pos %>%
+  group_by(taxon, class, Type) %>%
+  summarize(mean_log_density = mean(log_density), .groups = "drop")
+
+sd_group_effects <- sd(group_effects$mean_log_density)
+sd_group_effects
+summary(group_effects$mean_log_density)
+# Example: ~1.0
+
+# Prior choice:
+# Effects likely centered near 0 (mean difference from Intercept)
+# Use a bit wider SD to regularize: normal(0, 2.0)
+
+# -- 3. PRIOR FOR ZERO-INFLATION (logit of zero probability) --
+zi_est <- dfftaxon %>%
+  group_by(taxon, class, Type) %>%
+  summarize(p_zero = mean(n == 0), .groups = "drop") %>%
+  mutate(logit_p_zero = qlogis(pmin(pmax(p_zero, 1e-4), 1 - 1e-4)))
+
+mean_logit_zi <- mean(zi_est$logit_p_zero)
+sd_logit_zi <- sd(zi_est$logit_p_zero)
+# Prior choice:
+# Centered at mean with reasonable spread => normal(1.5, 2.5)
+
+# -- 4. PRIOR FOR SHAPE PARAMETER (dispersion) --
+vmr_summary <- dfftaxon %>%
+  group_by(taxon, class, Type) %>%
+  summarize(mean_n = mean(n), var_n = var(n), .groups = "drop") %>%
+  mutate(vmr = var_n / mean_n,
+         phi_est = ifelse(vmr > 1, mean_n / (vmr - 1), NA),
+         log_phi = log(phi_est))
+
+summary(vmr_summary$log_phi)
+sd(vmr_summary$log_phi, na.rm = T)
 
 
 
-# MODEL - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
 
-# mod_nb <- brm(
-#   bf(n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
-#        offset(log(transect_area_m2)),
-#      zi ~ taxon:class * Type),
-#   family = zero_inflated_negbinomial(),
-#   data = dfftaxon,    # choose dataset with or without all structural zeros
-#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-#             prior(normal(0, 1), class = "b", dpar = "zi")),
-#   chains = 4,
-#   cores = 4,
-#   threads = threading(5),
-#   iter = 1000, warmup = 500,    #iter = 1000, warmup = 500,
-#   thin = 1,
-#   control = list(adapt_delta = 0.85, max_treedepth = 10),
-#   backend = "cmdstanr"
-# )
-# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+```
+
+## Model1 - all fixed effects
+
+Predictors: dataset, habitat Type, direction from channel, taxon, size class
+
+```{r brms}
+# MODEL1 - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
+mod_nb <- brm(
+  bf(
+    n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
+         offset(log(transect_area_m2)),
+    zi ~ taxon:class * Type,
+    shape ~ taxon:class * Type
+  ),
+  data = dfftaxon,
+  family = zero_inflated_negbinomial(),
+  prior = c(
+    # Effects on log density (taxon:class * Type)
+    prior(normal(0, 2), class = "b"),
+    # Centered on global mean log-density
+    prior(normal(-2.5, 1.5), class = "Intercept"),
+    # Informed by logit(p_zero) distribution
+    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+    # Matches empirical shape estimates
+    prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
+  ),
+  chains = 4, cores = 4, threads = threading(5),
+  iter = 200, warmup = 50, thin = 1,
+  backend = "cmdstanr",
+  control = list(adapt_delta = 0.99),
+  seed = 20240717
+)
+
+saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
 
 
@@ -2032,26 +2111,33 @@ Let's move direction to a random effect. This approach acknowledges the variabil
 
 ## Model2 - drop direction to RE
 ```{r}
-# mod_nb2 <- brm(
-#   bf(n ~ dataset * taxon:class * Type +
-#        (1 | taxon:class:Type:dir) +
-#        offset(log(transect_area_m2)),
-#      zi ~ taxon:class * Type),
-#   family = zero_inflated_negbinomial(),
-#   data = dfftaxon,    # choose dataset with or without all structural zeros
-#   prior = c(prior(normal(0, 2), class = "b"),          # Weak prior on coefficients
-#             prior(normal(0, 5), class = "Intercept"),  # Weak prior on intercept
-#             prior(exponential(1), class = "shape"),     # Reasonable prior for NB dispersion
-#             prior(normal(0, 1), class = "b", dpar = "zi")),
-#   chains = 4,
-#   cores = 4,
-#   threads = threading(5),
-#   iter = 1000, warmup = 500,    #iter = 1000, warmup = 500,
-#   thin = 1,
-#   control = list(adapt_delta = 0.85, max_treedepth = 10),
-#   backend = "cmdstanr"
-# )
-# saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
+mod_nb2 <- brm(
+  bf(
+    n ~ dataset * taxon:class * Type +
+         (1 | taxon:class:Type:dir) +
+         offset(log(transect_area_m2)),
+    zi ~ taxon:class * Type,
+    shape ~ taxon:class * Type
+  ),
+  data = dfftaxon,
+  family = zero_inflated_negbinomial(),
+ prior = c(
+    # Effects on log density (taxon:class * Type)
+    prior(normal(0, 2), class = "b"),
+    # Centered on global mean log-density
+    prior(normal(-2.5, 1.5), class = "Intercept"),
+    # Informed by logit(p_zero) distribution
+    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+    # Matches empirical shape estimates
+    prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
+  ),
+  chains = 4, cores = 4, threads = threading(5),
+  iter = 200, warmup = 50, thin = 1,
+  backend = "cmdstanr",
+  control = list(adapt_delta = 0.99),
+  seed = 20240717
+)
+saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
@@ -2141,23 +2227,23 @@ mod_nb3 <- brm(
       (1 + Type | dataset) +
       (1 | dataset:taxon:class:Type:dir) +
       offset(log(transect_area_m2)),
-    zi ~ taxon:class * Type,  
-    shape ~ taxon:class * Type 
+    zi ~ taxon:class * Type,
+    shape ~ taxon:class * Type
   ),
   data = dfftaxon,
   family = zero_inflated_negbinomial(),
-  prior = c(
+ prior = c(
     # Effects on log density (taxon:class * Type)
-    prior(normal(0, 2.5), class = "b"),            
+    prior(normal(0, 2), class = "b"),
     # Centered on global mean log-density
-    prior(normal(-2.5, 2), class = "Intercept"),          
+    prior(normal(-2.5, 1.5), class = "Intercept"),
     # Informed by logit(p_zero) distribution
-    prior(normal(1.5, 2), class = "b", dpar = "zi"),      
+    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
     # Matches empirical shape estimates
-    prior(normal(log(0.5), 1), class = "b", dpar = "shape") 
+    prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
   ),
   chains = 4, cores = 4, threads = threading(5),
-  iter = 500, warmup = 100, thin = 1,
+  iter = 4000, warmup = 1000, thin = 1,
   backend = "cmdstanr",
   control = list(adapt_delta = 0.99),
   seed = 20240717
@@ -2172,6 +2258,7 @@ mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 summary(mod_nb3)  # Rhat should be ~1.00; no divergent transitions
 
 loo_3 <- loo(mod_nb3)
+
 loo_compare(loo_3, loo_2, loo_1)
 loo_3
 loo_2
@@ -2180,13 +2267,12 @@ loo_1
 # Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
 # mod3 also has slightly lower p_loo (good, slightly simpler )
 
-bayes_R2(mod_nb3) 
+bayes_R2(mod_nb)
+bayes_R2(mod_nb2)
+bayes_R2(mod_nb3)
 ```
 
 ```{r}
-library(tidybayes)
-library(dplyr)
-library(ggplot2)
 library(e1071)  # for skewness
 
 # Step 1: Create taxon_class column
@@ -2194,11 +2280,11 @@ dfftaxon <- dfftaxon %>%
   mutate(taxon_class = paste(taxon, class, sep = "_"))
 
 # Step 2: Draw predicted counts
-ppreds <- add_predicted_draws(mod_nb3, newdata = dfftaxon, ndraws = 600)
+ppreds <- add_predicted_draws(mod_nb3, newdata = dfftaxon, ndraws = 300)
 
 # Step 3: Summarize predicted statistics by taxon_class and draw
 pp_stats <- ppreds %>%
-  group_by(taxon_class, .draw) %>%
+  group_by(taxon_class, Type, .draw) %>%
   summarize(
     mean_pred = mean(.prediction),
     sd_pred = sd(.prediction),
@@ -2209,7 +2295,7 @@ pp_stats <- ppreds %>%
 
 # Step 4: Summarize observed statistics
 obs_stats <- dfftaxon %>%
-  group_by(taxon_class) %>%
+  group_by(taxon_class, Type) %>%
   summarize(
     mean_obs = mean(n),
     sd_obs = sd(n),
@@ -2222,7 +2308,7 @@ obs_stats <- dfftaxon %>%
 plot_stat <- function(stat_name, stat_label) {
   ggplot(pp_stats, aes_string(x = "taxon_class", y = paste0(stat_name, "_pred"))) +
     stat_halfeye(fill = "skyblue", alpha = 0.6) +
-    #facet_wrap(~Type) +
+    facet_wrap(~Type) +
     geom_point(data = obs_stats, aes_string(y = paste0(stat_name, "_obs")), color = "red", size = 2) +
     labs(
       y = stat_label,
@@ -2245,14 +2331,14 @@ plot_stat("skew", "Skewness")
 
 ```{r}
 
-pp_check(mod_nb3_shape_by_taxon, type = "stat_grouped", group = "taxon", stat = "mean", ndraws = 600)
-pp_check(mod_nb3_shape_by_taxon, type = "stat_grouped", group = "taxon", stat = "sd", ndraws = 600)
+pp_check(mod_nb3, type = "stat_grouped", group = "taxon", stat = "mean", ndraws = 600)
+pp_check(mod_nb3, type = "stat_grouped", group = "taxon", stat = "sd", ndraws = 600)
 prop_zero <- function(x) mean(x == 0)
-pp_check(mod_nb3_shape_by_taxon, type = "stat_grouped", group = "taxon", stat = "prop_zero", ndraws = 600)
+pp_check(mod_nb3, type = "stat_grouped", group = "taxon", stat = "prop_zero", ndraws = 600)
 
 library(moments)
 # Posterior predictive simulations
-yrep <- posterior_predict(mod_nb3_shape_by_taxon, ndraws = 600)
+yrep <- posterior_predict(mod_nb3, ndraws = 600)
 
 # Summary stats for each simulated dataset (one row = one posterior draw)
 sim_summary <- data.frame(
@@ -2319,7 +2405,7 @@ newdata <- dfftaxon_trimmed2 %>%
   mutate(transect_area_m2 = 1)
 
 # Step 3: Get population-level predictions from the model (includes all group-level effects)
-preds <- add_epred_draws(mod_nb3_shape_by_taxon, newdata = newdata, re_formula = NULL)
+preds <- add_epred_draws(mod_nb3, newdata = newdata, re_formula = NULL)
 
 # Step 4: Average across dirs within each dataset to prevent over-weighting datasets with both N/S
 draws_avg_dir <- preds %>%
