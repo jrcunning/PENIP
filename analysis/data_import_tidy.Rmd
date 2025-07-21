@@ -2135,74 +2135,43 @@ Lots of idiosyncratic diffs between surveys for individual taxon x class groups?
 
 ## Model3 - drop dataset to RE
 ```{r}
-# 🎯 Goal
-# 
-# Estimate: density of taxon × class within each habitat Type
-# ...averaging over datasets, but not letting datasets with more transects in a given habitat dominate unfairly.
-# with zero-inflation that varies per taxon*class
-
 mod_nb3 <- brm(
-  bf(n ~ taxon:class * Type +
-        (1 + Type | dataset) +
-        (1 | dataset:taxon:class:Type:dir) +
-        offset(log(transect_area_m2)),
-     zi ~ taxon:class * Type),     
-  data = dfftaxon,   # use dataset with all structural zeros present
-  family = zero_inflated_negbinomial(),
-  prior = c(
-    prior(normal(0, 2), class = "b"),
-    prior(normal(0, 5), class = "Intercept"),
-    prior(exponential(1), class = "shape"),
-    prior(normal(0, 1), class = "b", dpar = "zi")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 200, warmup = 50, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.99),
-  seed = 20240717
-)
-# 
-# saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
-mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
-```
-
-```{r}
-mod_nb3_shape_by_taxon <- brm(
   bf(
     n ~ taxon:class * Type +
       (1 + Type | dataset) +
       (1 | dataset:taxon:class:Type:dir) +
       offset(log(transect_area_m2)),
-    zi ~ taxon:class * Type,  #*Type      # your current ZI structure
-    shape ~ taxon:class * Type #noType              # varying shape by taxon
+    zi ~ taxon:class * Type,  
+    shape ~ taxon:class * Type 
   ),
   data = dfftaxon,
   family = zero_inflated_negbinomial(),
   prior = c(
-    prior(normal(0, 2), class = "b"),
-    prior(normal(0, 5), class = "Intercept"),
-    prior(normal(0, 1), class = "b", dpar = "zi"),
-    prior(normal(0, 1), class = "b", dpar = "shape")  # prior for varying shape
+    # Effects on log density (taxon:class * Type)
+    prior(normal(0, 2.5), class = "b"),            
+    # Centered on global mean log-density
+    prior(normal(-2.5, 2), class = "Intercept"),          
+    # Informed by logit(p_zero) distribution
+    prior(normal(1.5, 2), class = "b", dpar = "zi"),      
+    # Matches empirical shape estimates
+    prior(normal(log(0.5), 1), class = "b", dpar = "shape") 
   ),
   chains = 4, cores = 4, threads = threading(5),
-  iter = 200, warmup = 50, thin = 1,
+  iter = 500, warmup = 100, thin = 1,
   backend = "cmdstanr",
   control = list(adapt_delta = 0.99),
   seed = 20240717
 )
-
+saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 ```
 
 
 ### Model evaluation and comparisons
 ```{r}
 summary(mod_nb3)  # Rhat should be ~1.00; no divergent transitions
-rhat(mod_nb3)
 
-loo_3_orig <- loo(mod_nb3_orig)
-loo_3 <- loo(mod_nb3_shape_by_taxon)
-loo_compare(loo_3_orig, loo_3)
-
+loo_3 <- loo(mod_nb3)
 loo_compare(loo_3, loo_2, loo_1)
 loo_3
 loo_2
@@ -2211,9 +2180,7 @@ loo_1
 # Predictive performance similar between the two models (mod3 slightly better) -- can choose dataset as random (mod3) based on interpretability
 # mod3 also has slightly lower p_loo (good, slightly simpler )
 
-bayes_R2(mod_nb3)   
-bayes_R2(mod_nb3_shape_by_taxon_plusType) 
-bayes_R2(mod_nb3_shape_by_taxon)
+bayes_R2(mod_nb3) 
 ```
 
 ```{r}
@@ -2227,11 +2194,11 @@ dfftaxon <- dfftaxon %>%
   mutate(taxon_class = paste(taxon, class, sep = "_"))
 
 # Step 2: Draw predicted counts
-ppreds <- add_predicted_draws(mod_nb3_shape_by_taxon, newdata = dfftaxon, ndraws = 600)
+ppreds <- add_predicted_draws(mod_nb3, newdata = dfftaxon, ndraws = 600)
 
 # Step 3: Summarize predicted statistics by taxon_class and draw
 pp_stats <- ppreds %>%
-  group_by(taxon_class, Type, .draw) %>%
+  group_by(taxon_class, .draw) %>%
   summarize(
     mean_pred = mean(.prediction),
     sd_pred = sd(.prediction),
@@ -2242,7 +2209,7 @@ pp_stats <- ppreds %>%
 
 # Step 4: Summarize observed statistics
 obs_stats <- dfftaxon %>%
-  group_by(taxon_class, Type) %>%
+  group_by(taxon_class) %>%
   summarize(
     mean_obs = mean(n),
     sd_obs = sd(n),
@@ -2255,7 +2222,7 @@ obs_stats <- dfftaxon %>%
 plot_stat <- function(stat_name, stat_label) {
   ggplot(pp_stats, aes_string(x = "taxon_class", y = paste0(stat_name, "_pred"))) +
     stat_halfeye(fill = "skyblue", alpha = 0.6) +
-    facet_wrap(~Type) +
+    #facet_wrap(~Type) +
     geom_point(data = obs_stats, aes_string(y = paste0(stat_name, "_obs")), color = "red", size = 2) +
     labs(
       y = stat_label,
@@ -2599,7 +2566,7 @@ combined_plot <- cowplot::plot_grid(
 )
 
 combined_plot
-ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig3new.png", width = 180, height = 80, units = "mm", dpi = 300)
 ```
 
 ## Abundances in Impact Zones
@@ -2837,7 +2804,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/Fig4new.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
