@@ -139,32 +139,6 @@ nsu11_esa_counts_ag <- nsu11_esa_counts %>%
 
 ## 2017 DCA ESA Survey
 ```{r}
-# # 163 sites in this list
-# dca17esaall <- readxl::read_xlsx("data/2017_dca_esa/Appendix C_DCA2017_survey_results_FINAL.xlsx") %>%
-#   janitor::clean_names() %>%
-#   mutate(site = esa_site)
-# library(sf)
-# 
-# # Read KML file
-# dca17_esa_sitemd0 <- st_read("data/2017_dca_esa/Listed_Coral_Survey_2017.kml")
-# # contains 149 sites
-# 
-# 
-# # Extract coordinates and save as CSV
-# dca17_esa_sitemd <- dca17_esa_sitemd0 %>%
-#   mutate(site = Name,
-#          longitude = st_coordinates(.)[, 1],
-#          latitude = st_coordinates(.)[, 2]) %>%
-#   st_drop_geometry() %>%
-#   select(site, longitude, latitude) %>%
-#   as_tibble() %>%
-#   mutate(site = as.character(site))
-# # only has 149 sites.
-# ### MISSING SITES?
-# 
-# setdiff(dca17esaall$site, dca17_esa_sitemd$site)
-
-
 # New sitemd
 dca17_esa_sitemd0 <- readxl::read_xlsx("data/2017_dca_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx", 
                                        sheet = "2017_DCA_ESA survey") %>% janitor::clean_names()
@@ -264,10 +238,10 @@ dca170 <- readxl::read_xlsx("data/2017_dca_recon/Compiled_DCA_RECON_Belt_data.xl
   janitor::clean_names()
 
 dca17 <- dca170 %>%
-  select(1:18) %>%
+  dplyr::select(1:18) %>%
   rename(site = site_name) %>%
   mutate(site = factor(site)) %>%
-  select(site, taxon = coral_species, max_width_cm = max_size_cm)
+  dplyr::select(site, taxon = coral_species, max_width_cm = max_size_cm)
 
 # Adjust/corrects species IDs
 sort(unique(dca17$taxon))
@@ -311,6 +285,11 @@ dca17_counts_ag <- dca17_counts %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
 
+dca17_counts_ag %>%
+  filter(taxon == "DSTO") %>%
+  group_by(class) %>%
+  summarize(tot = sum(n))
+# 100% of observed DSTO were >4cm
 
 
 # Further aggregate juvenile counts to family (following DRM methods)
@@ -440,9 +419,15 @@ write_csv(tt21_counts, file = "data/processed/tt_2021_counts.csv")
 tt21_counts_ag <- tt21_counts %>%
   left_join(taxon_lookup, by = "taxon") %>%
   mutate(taxon = coalesce(taxon_group, taxon)) %>%
-  select(-taxon_group) %>%
+  dplyr::select(-taxon_group) %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
+
+tt21_counts_ag %>%
+  filter(taxon == "DSTO") %>%
+  group_by(class) %>%
+  summarize(tot = sum(n))
+## 18/22 DSTO are >4cm
 
 # Further aggregate juvenile counts to family (following DRM methods)
 tt21_counts_ag <- tt21_counts_ag %>%
@@ -594,11 +579,16 @@ tt23_counts %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 tt23_counts_ag <- tt23_counts %>%
   left_join(taxon_lookup, by = "taxon") %>%
   mutate(taxon = coalesce(taxon_group, taxon)) %>%
-  select(-taxon_group) %>%
+  dplyr::select(-taxon_group) %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
 
 tt23_counts_ag %>% filter(site == "cpsn4") %>% print(n=nrow(.))
+
+tt23_counts_ag %>%
+  filter(taxon == "DSTO") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(n))
 
 # Further aggregate juvenile counts to family (following DRM methods)
 tt23_counts_ag2 <- tt23_counts_ag %>%
@@ -1480,6 +1470,16 @@ df <- bind_rows(.id = "dataset",
   tt23 = tt23_counts_ag2,
   drm24 = drm24_counts_agg     # use data aggregated to 1 pseudo-transect - already has transect_area_m2
 )
+
+# Justify decision to class all NSU observations (ACER/DSTO/ORBI) as >4cm
+df %>%
+  filter(taxon %in% c("ORBI", "ACER", "DSTO"), dataset != "nsu11_esa") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(n))
+### In all other datasets, percent of all observed colonies that were >4cm:
+### ACER: 3629 / (3629 + 12) = 99.7%
+### DSTO: 169 (100%) but these were already switched to MEAN
+### ORBI: 70/(70+4) = 94.6%
 ```
 
 ## Filter out rare taxa
@@ -1784,6 +1784,9 @@ dff <- dff %>% mutate(Type = factor(Type, levels = type_levels))
 
 ## Summarize survey datasets
 ```{r}
+
+
+
 # Count number of sites per habitat
 nsites <- dff %>%
   group_by(dataset, Type) %>%
@@ -1881,8 +1884,117 @@ all_surveys_plot <- polyplot +
 
 all_surveys_plot
 ggsave(filename = "outputs/FigA1.png", width = 270, height = 220, units = "mm", dpi = 300)
+
+
+
+
+pp2 <- all_surveys_plot + facet_wrap(~ dataset, ncol = 3) + labs(title = NULL)
+
+newfig1 <- cowplot::plot_grid(pp2, iz_plot_clean, nrow = 1, align = "h", axis = "tb", rel_widths =c(0.57, 0.43))
+
+ggsave(filename = "outputs/Fig1new.png", width = 160, height = 120, units = "mm", dpi = 300)
 ```
 
+# new multipanel map fig
+```{r}
+# Define shared coordinate limits
+coord_limits <- coord_sf(
+  xlim = c(-80.113, -80.078),
+  ylim = c(26.058, 26.112),
+  expand = FALSE,
+  datum = NA  # avoid graticule
+)
+
+# Simplified base theme for clean layout
+base_theme <- theme_minimal(base_size = 8) +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = margin(t = 12, r = 5, b = 5, l = 5),
+  )
+
+# Left panel: faceted survey locations
+pp2 <- ggplot(polygons_final) +
+  geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
+  geom_point(
+    data = selected,
+    aes(x = longitude, y = latitude),
+    pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
+  ) +
+  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  facet_wrap(~ dataset, ncol = 3,
+               labeller = as_labeller(c(
+    "nsu11_esa" = "2011 – NSU ESA Survey",
+    "dca17_esa" = "2017 – DCA ESA Survey",
+    "dca17"     = "2017 – DCA Recon Survey",
+    "tt21"      = "2021 – Tetra Tech Survey",
+    "tt23"      = "2023 – Tetra Tech Survey",
+    "drm24"     = "2024 – Shedd Survey"
+  ))) +
+  coord_limits +
+  labs(title = NULL, fill = NULL) +
+  base_theme +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 6),
+    panel.spacing = unit(0.5, "lines")
+  )
+
+# Right panel: impact zones
+iz_plot_clean <- p +
+  geom_segment(data = label_segments,
+               aes(x = segment_x, y = segment_y,
+                   xend = label_x, yend = label_y),
+               color = "black", linewidth = 0.2) +
+  geom_text(data = zone_labels,
+            aes(x = label_x, y = label_y, label = name),
+            size = 2, hjust = 1) +
+  coord_limits +
+  base_theme +
+  theme(legend.position = "none")
+
+# Combine with cowplot
+final_fig <- plot_grid(
+  pp2,
+  iz_plot_clean,
+  nrow = 1,
+  align = "hv",
+  axis = "tb",
+  labels = c("A. Surveyed sites", "B. Impact Zones"), hjust = 0, label_size = 11,
+  rel_widths = c(0.59, 0.41)  # adjust until panel areas are visually aligned
+)
+
+final_fig
+
+# 4. Extract compact fill legend from polyplot
+legend_plot <- polyplot +
+  guides(shape = "none", color = "none", fill = guide_legend(nrow = 2)) +
+  base_theme +
+  theme(
+    legend.position = "bottom",
+    legend.key.size = unit(0.3, "cm"),  # Reduce square size
+    legend.text = element_text(size = 6),  # Optional: smaller legend text
+    legend.title = element_text(size = 7)  # Optional: smaller legend title
+  )
+grob <- ggplotGrob(legend_plot)
+fill_legend <- gtable::gtable_filter(grob, "guide-box")
+
+final_final_fig <- plot_grid(final_fig, fill_legend, ncol = 1, rel_heights = c(0.92, 0.08))
+
+# Save output
+ggsave(
+  filename = "outputs/Fig1new.png",
+  plot = final_final_fig,
+  width = 160,
+  height = 120,
+  units = "mm",
+  dpi = 300,
+  bg = "white"
+)
+
+```
 
 # Statistical modeling 
 
