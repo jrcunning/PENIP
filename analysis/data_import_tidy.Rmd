@@ -3231,3 +3231,48 @@ changeplot
 ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm")
 ```
 
+#
+```{r}
+# Summarize raw densities per row
+dfftaxon_with_density <- dfftaxon %>%
+  mutate(density = n / transect_area_m2)
+
+# Average density per taxon-class-Type group
+raw_density_summary <- dfftaxon %>%
+  mutate(density = n / transect_area_m2) %>%
+  group_by(taxon, class, Type) %>%
+  summarize(
+    raw_density_mean = mean(density, na.rm = TRUE),
+    raw_density_sd   = sd(density, na.rm = TRUE),
+    raw_density_n    = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    raw_density_se = raw_density_sd / sqrt(raw_density_n),
+    t_crit = qt(0.975, df = raw_density_n - 1),
+    raw_density_lower = raw_density_mean - t_crit * raw_density_se,
+    raw_density_upper = raw_density_mean + t_crit * raw_density_se
+  )
+
+all <- raw_density_summary %>% left_join(summary_equal_weighted)
+
+ggplot(all, aes(x = Type)) +
+  geom_point(aes(y = raw_density_mean, shape = class, size = class), 
+             position = position_nudge(x = -0.1), color = "blue") +
+  geom_errorbar(aes(ymin = raw_density_lower, ymax = raw_density_upper), 
+                position = position_nudge(x = -0.1), color = "blue", width = 0) +
+  geom_point(aes(y = n_m2, shape = class, size = class), 
+             position = position_nudge(x = 0.1), color = "black") +
+  geom_errorbar(aes(ymin = .lower, ymax = .upper), 
+                position = position_nudge(x = 0.1), color = "black", width = 0) +
+  facet_wrap(~taxon, scales = "free") +
+  scale_y_continuous(limits = c(0, NA))
+```
+
+```{r}
+
+area_summary %>%
+  group_by(name) %>%
+  summarize(total_area_m2 = sum(total_area_m2))
+```
+
