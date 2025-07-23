@@ -1253,6 +1253,7 @@ p <- ggplot() +
 # LABEL ZONES
 zone_labels <- tribble(
   ~name,                   ~label_x, ~label_y,
+  "Channel",               -80.085,  26.0938,
   "Side Slopes",           -80.104,  26.08,
   "Depth_10cm",            -80.103,  26.078,
   "Depth_5cm",             -80.102,  26.076,
@@ -1260,30 +1261,31 @@ zone_labels <- tribble(
   "Depth_0_5cm",           -80.100,  26.072,
   "Depth_0_1cm",           -80.099,  26.070,
   "Nearshore",             -80.106,  26.094,
-  "North",                 -80.0795,  26.097,
-  "East",                  -80.080, 26.094,
-  "South",                 -80.0793,  26.091,
+  "North",                 -80.0794,  26.097,
+  "East",                  -80.080, 26.0938,
+  "South",                 -80.0791,  26.091,
   "Impact Monitoring Area",       -80.0815, 26.083
 )
 
 zone_segments <- tribble(
   ~name,                   ~segment_x, ~segment_y,
+  "Channel",               -80.085,  26.0938,
   "Side Slopes",           -80.102,    26.0945,
-  "Side Slopes",           -80.1025,    26.093,
-  "Depth_10cm",            -80.101,   26.0947,
-  "Depth_10cm",            -80.1015,   26.09285,
-  "Depth_5cm",             -80.100,    26.0949,
-  "Depth_5cm",             -80.1005,    26.0926,
-  "Depth_1cm",             -80.0985,   26.0957,
+  "Side Slopes",           -80.1027,    26.093,
+  "Depth_10cm",            -80.1007,   26.0947,
+  "Depth_10cm",            -80.1014,   26.09285,
+  "Depth_5cm",             -80.0995,    26.0949,
+  "Depth_5cm",             -80.1003,    26.0926,
+  "Depth_1cm",             -80.0983,   26.0957,
   "Depth_1cm",             -80.0992,   26.092,
   "Depth_0_5cm",           -80.097,   26.0968,
-  "Depth_0_5cm",           -80.098,   26.091,
+  "Depth_0_5cm",           -80.0981,   26.091,
   "Depth_0_1cm",           -80.0954,   26.098,
   "Depth_0_1cm",           -80.097,   26.0897,
   "Nearshore",             -80.106,    26.09,
-  "North",                 -80.0795,  26.097,
-  "East",                  -80.080, 26.094,
-  "South",                 -80.0793,  26.091,
+  "North",                 -80.0794,  26.097,
+  "East",                  -80.080, 26.0938,
+  "South",                 -80.0791,  26.091,
   "Impact Monitoring Area",       -80.0815, 26.083
 )
 
@@ -1892,10 +1894,10 @@ pp2 <- all_surveys_plot + facet_wrap(~ dataset, ncol = 3) + labs(title = NULL)
 
 newfig1 <- cowplot::plot_grid(pp2, iz_plot_clean, nrow = 1, align = "h", axis = "tb", rel_widths =c(0.57, 0.43))
 
-ggsave(filename = "outputs/Fig1new.png", width = 160, height = 120, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig1.png", width = 160, height = 120, units = "mm", dpi = 300)
 ```
 
-# new multipanel map fig
+## New multipanel map fig
 ```{r}
 # Define shared coordinate limits
 coord_limits <- coord_sf(
@@ -1985,7 +1987,7 @@ final_final_fig <- plot_grid(final_fig, fill_legend, ncol = 1, rel_heights = c(0
 
 # Save output
 ggsave(
-  filename = "outputs/Fig1new.png",
+  filename = "outputs/Fig1.png",
   plot = final_final_fig,
   width = 160,
   height = 120,
@@ -2098,33 +2100,33 @@ Predictors: dataset, habitat Type, direction from channel, taxon, size class
 
 ```{r brms}
 # MODEL1 - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
-mod_nb <- brm(
-  bf(
-    n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
-         offset(log(transect_area_m2)),
-    zi ~ taxon:class * Type,
-    shape ~ taxon:class * Type
-  ),
-  data = dfftaxon,
-  family = zero_inflated_negbinomial(),
-  prior = c(
-    # Effects on log density (taxon:class * Type)
-    prior(normal(0, 2), class = "b"),
-    # Centered on global mean log-density
-    prior(normal(-2.5, 1.5), class = "Intercept"),
-    # Informed by logit(p_zero) distribution
-    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-    # Matches empirical shape estimates
-    prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 200, warmup = 50, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.99),
-  seed = 20240717
-)
-
-saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
+# mod_nb <- brm(
+#   bf(
+#     n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
+#          offset(log(transect_area_m2)),
+#     zi ~ taxon:class * Type,
+#     shape ~ taxon:class * Type
+#   ),
+#   data = dfftaxon,
+#   family = zero_inflated_negbinomial(),
+#   prior = c(
+#     # Effects on log density (taxon:class * Type)
+#     prior(normal(0, 2), class = "b"),
+#     # Centered on global mean log-density
+#     prior(normal(-2.5, 1.5), class = "Intercept"),
+#     # Informed by logit(p_zero) distribution
+#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+#     # Matches empirical shape estimates
+#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 200, warmup = 50, thin = 1,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.99),
+#   seed = 20240717
+# )
+# 
+# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
 mod_nb <- readRDS("data/processed/mod_nb.rds")
 
 
@@ -2223,33 +2225,33 @@ Let's move direction to a random effect. This approach acknowledges the variabil
 
 ## Model2 - drop direction to RE
 ```{r}
-mod_nb2 <- brm(
-  bf(
-    n ~ dataset * taxon:class * Type +
-         (1 | taxon:class:Type:dir) +
-         offset(log(transect_area_m2)),
-    zi ~ taxon:class * Type,
-    shape ~ taxon:class * Type
-  ),
-  data = dfftaxon,
-  family = zero_inflated_negbinomial(),
- prior = c(
-    # Effects on log density (taxon:class * Type)
-    prior(normal(0, 2), class = "b"),
-    # Centered on global mean log-density
-    prior(normal(-2.5, 1.5), class = "Intercept"),
-    # Informed by logit(p_zero) distribution
-    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-    # Matches empirical shape estimates
-    prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 200, warmup = 50, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.99),
-  seed = 20240717
-)
-saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
+# mod_nb2 <- brm(
+#   bf(
+#     n ~ dataset * taxon:class * Type +
+#          (1 | taxon:class:Type:dir) +
+#          offset(log(transect_area_m2)),
+#     zi ~ taxon:class * Type,
+#     shape ~ taxon:class * Type
+#   ),
+#   data = dfftaxon,
+#   family = zero_inflated_negbinomial(),
+#  prior = c(
+#     # Effects on log density (taxon:class * Type)
+#     prior(normal(0, 2), class = "b"),
+#     # Centered on global mean log-density
+#     prior(normal(-2.5, 1.5), class = "Intercept"),
+#     # Informed by logit(p_zero) distribution
+#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+#     # Matches empirical shape estimates
+#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 200, warmup = 50, thin = 1,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.99),
+#   seed = 20240717
+# )
+# saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
 mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
 ```
 
@@ -2333,34 +2335,34 @@ Lots of idiosyncratic diffs between surveys for individual taxon x class groups?
 
 ## Model3 - drop dataset to RE
 ```{r}
-mod_nb3 <- brm(
-  bf(
-    n ~ taxon:class * Type +
-      (1 + Type | dataset) +
-      (1 | dataset:taxon:class:Type:dir) +
-      offset(log(transect_area_m2)),
-    zi ~ taxon:class * Type,
-    shape ~ taxon:class * Type
-  ),
-  data = dfftaxon,
-  family = zero_inflated_negbinomial(),
- prior = c(
-    # Effects on log density (taxon:class * Type)
-    prior(normal(0, 2), class = "b"),
-    # Centered on global mean log-density
-    prior(normal(-2.5, 1.5), class = "Intercept"),
-    # Informed by logit(p_zero) distribution
-    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-    # Matches empirical shape estimates
-    prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 4000, warmup = 1000, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.99),
-  seed = 20240717
-)
-saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
+# mod_nb3 <- brm(
+#   bf(
+#     n ~ taxon:class * Type +
+#       (1 + Type | dataset) +
+#       (1 | dataset:taxon:class:Type:dir) +
+#       offset(log(transect_area_m2)),
+#     zi ~ taxon:class * Type,
+#     shape ~ taxon:class * Type
+#   ),
+#   data = dfftaxon,
+#   family = zero_inflated_negbinomial(),
+#  prior = c(
+#     # Effects on log density (taxon:class * Type)
+#     prior(normal(0, 2), class = "b"),
+#     # Centered on global mean log-density
+#     prior(normal(-2.5, 1.5), class = "Intercept"),
+#     # Informed by logit(p_zero) distribution
+#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+#     # Matches empirical shape estimates
+#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 4000, warmup = 1000, thin = 1,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.99),
+#   seed = 20240717
+# )
+# saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
 mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
 ```
 
@@ -2603,7 +2605,7 @@ fig2 <- taxdens +
         legend.key.width = unit(2, "lines"),
         legend.margin = margin(t = -5, b = 0))  # move legend up)
 fig2
-ggsave(filename = "outputs/Fig2new.png", width = 170, height = 170, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
 
@@ -2764,7 +2766,7 @@ combined_plot <- cowplot::plot_grid(
 )
 
 combined_plot
-ggsave(filename = "outputs/Fig3new.png", width = 180, height = 80, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
 ```
 
 ## Abundances in Impact Zones
@@ -3002,7 +3004,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/Fig4new.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
