@@ -2390,11 +2390,20 @@ bayes_R2(mod_nb3)
 library(e1071)  # for skewness
 
 # Step 1: Create taxon_class column
-dfftaxon <- dfftaxon %>%
+# Step 1: Trim to only taxon–class–habitat combinations where the taxon was observed at least once
+dfftaxon_trimmed2 <- dfftaxon %>%
+  semi_join(
+    dfftaxon %>%
+      group_by(taxon, class, Type) %>%
+      filter(any(n > 0)) %>%
+      ungroup() %>%
+      distinct(taxon, class, Type),
+    by = c("taxon", "class", "Type")
+  ) %>%
   mutate(taxon_class = paste(taxon, class, sep = "_"))
 
 # Step 2: Draw predicted counts
-ppreds <- add_predicted_draws(mod_nb3, newdata = dfftaxon, ndraws = 300)
+ppreds <- add_predicted_draws(mod_nb3, newdata = dfftaxon_trimmed2, ndraws = 1000)
 
 # Step 3: Summarize predicted statistics by taxon_class and draw
 pp_stats <- ppreds %>%
@@ -2408,7 +2417,7 @@ pp_stats <- ppreds %>%
   )
 
 # Step 4: Summarize observed statistics
-obs_stats <- dfftaxon %>%
+obs_stats <- dfftaxon_trimmed2 %>%
   group_by(taxon_class, Type) %>%
   summarize(
     mean_obs = mean(n),
@@ -2417,6 +2426,7 @@ obs_stats <- dfftaxon %>%
     skew_obs = e1071::skewness(n),
     .groups = "drop"
   )
+
 
 # Step 5: Plot function
 plot_stat <- function(stat_name, stat_label) {
