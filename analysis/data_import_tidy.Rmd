@@ -1255,15 +1255,15 @@ zone_labels <- tribble(
   ~name,                   ~label_x, ~label_y,
   "Channel",               -80.085,  26.0938,
   "Side Slopes",           -80.104,  26.08,
-  "Depth_10cm",            -80.103,  26.078,
-  "Depth_5cm",             -80.102,  26.076,
-  "Depth_1cm",             -80.101,  26.074,
-  "Depth_0_5cm",           -80.100,  26.072,
-  "Depth_0_1cm",           -80.099,  26.070,
+  "10 cm",            -80.103,  26.078,
+  "5 cm",             -80.102,  26.076,
+  "1 cm",             -80.101,  26.074,
+  "0.5 cm",           -80.100,  26.072,
+  "0.1 cm",           -80.099,  26.070,
   "Nearshore",             -80.106,  26.094,
   "North",                 -80.0794,  26.097,
   "East",                  -80.080, 26.0938,
-  "South",                 -80.0791,  26.091,
+  "South",                 -80.0792,  26.091,
   "Impact Monitoring Area",       -80.0815, 26.083
 )
 
@@ -1272,20 +1272,20 @@ zone_segments <- tribble(
   "Channel",               -80.085,  26.0938,
   "Side Slopes",           -80.102,    26.0945,
   "Side Slopes",           -80.1027,    26.093,
-  "Depth_10cm",            -80.1007,   26.0947,
-  "Depth_10cm",            -80.1014,   26.09285,
-  "Depth_5cm",             -80.0995,    26.0949,
-  "Depth_5cm",             -80.1003,    26.0926,
-  "Depth_1cm",             -80.0983,   26.0957,
-  "Depth_1cm",             -80.0992,   26.092,
-  "Depth_0_5cm",           -80.097,   26.0968,
-  "Depth_0_5cm",           -80.0981,   26.091,
-  "Depth_0_1cm",           -80.0954,   26.098,
-  "Depth_0_1cm",           -80.097,   26.0897,
+  "10 cm",            -80.1007,   26.0947,
+  "10 cm",            -80.1014,   26.09285,
+  "5 cm",             -80.0995,    26.0949,
+  "5 cm",             -80.1003,    26.0926,
+  "1 cm",             -80.0983,   26.0957,
+  "1 cm",             -80.0992,   26.092,
+  "0.5 cm",           -80.097,   26.0968,
+  "0.5 cm",           -80.0981,   26.091,
+  "0.1 cm",           -80.0954,   26.098,
+  "0.1 cm",           -80.097,   26.0897,
   "Nearshore",             -80.106,    26.09,
   "North",                 -80.0794,  26.097,
   "East",                  -80.080, 26.0938,
-  "South",                 -80.0791,  26.091,
+  "South",                 -80.0792,  26.091,
   "Impact Monitoring Area",       -80.0815, 26.083
 )
 
@@ -1901,10 +1901,10 @@ ggsave(filename = "outputs/Fig1.png", width = 160, height = 120, units = "mm", d
 ```{r}
 # Define shared coordinate limits
 coord_limits <- coord_sf(
-  xlim = c(-80.113, -80.078),
+  xlim = c(-80.1116, -80.078),
   ylim = c(26.058, 26.112),
-  expand = FALSE,
-  datum = NA  # avoid graticule
+  expand = FALSE#, clip = "off"#,
+  #datum = NA  # avoid graticule
 )
 
 # Simplified base theme for clean layout
@@ -1912,8 +1912,8 @@ base_theme <- theme_minimal(base_size = 8) +
   theme(
     axis.title = element_blank(),
     axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    panel.grid = element_blank(),
+    #axis.ticks = element_blank(),
+    #panel.grid = element_blank(),
     plot.margin = margin(t = 12, r = 5, b = 5, l = 5),
   )
 
@@ -1957,6 +1957,31 @@ iz_plot_clean <- p +
   base_theme +
   theme(legend.position = "none")
 
+# Set y tick positions and labels manually
+y_breaks <- c(26.06, 26.07, 26.08, 26.11)  # adjust to match your plot extent
+x_right_label <- -80.08  # just outside your xlim max
+
+right_axis_labels <- tibble(
+  x = x_right_label,
+  y = y_breaks,
+  label = scales::number(y_breaks, accuracy = 0.01)
+)
+
+x_breaks <- c(-80.09, -80.10, -80.11)
+y_bottom_label <- 26.06 
+bottom_axis_labels <- tibble(x = x_breaks, y = y_bottom_label,
+                             label = scales::number(x_breaks, accuracy = 0.01))
+
+iz_plot_clean <- iz_plot_clean + 
+  geom_text(data = right_axis_labels,
+            aes(x = x, y = y, label = label),
+            size = 2, hjust = 1, vjust = 0, fontface = "italic", color = "gray") +
+  geom_text(data = bottom_axis_labels,
+            aes(x = x, y = y, label = label),
+            size = 2, hjust = 0, vjust = 1, fontface = "italic", color = "gray")
+
+
+
 # Combine with cowplot
 final_fig <- plot_grid(
   pp2,
@@ -1964,7 +1989,7 @@ final_fig <- plot_grid(
   nrow = 1,
   align = "hv",
   axis = "tb",
-  labels = c("A. Surveyed sites", "B. Impact Zones"), hjust = 0, label_size = 11,
+  labels = c("A. Coral survey sites", "B. Impact zones"), hjust = 0, label_size = 11,
   rel_widths = c(0.59, 0.41)  # adjust until panel areas are visually aligned
 )
 
@@ -2552,8 +2577,8 @@ taxorder <- summary_equal_weighted %>%
   group_by(taxon, Type) %>%
   summarize(totdens = sum(n_m2)) %>%
   group_by(taxon) %>%
-  summarize(meandens = mean(totdens)) %>%
-  mutate(taxon = fct_reorder(taxon, -meandens))
+  summarize(maxdens = max(totdens)) %>%
+  mutate(taxon = fct_reorder(taxon, -maxdens))
 
 summary_equal_weighted <- summary_equal_weighted %>%
   mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
