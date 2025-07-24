@@ -97,7 +97,7 @@ names(type_labels) <- type_levels
 
 # Order survey datasets
 dataset_levels <- c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")
-dataset_labels <- c("2011-NSU-ESA", "2017-DCA-ESA", "2017—DCA", "2021—TT", "2023—TT", "2024—Shedd")
+dataset_labels <- c("2011 / NSU ESA", "2017 / DCA ESA", "2017 / DCA Recon", "2021 / Tetra Tech", "2023 / Tetra Tech", "2024 / Shedd")
 names(dataset_labels) <- dataset_levels
 ```
 
@@ -1809,7 +1809,7 @@ area_per_site <- dff %>%
 total_area <- dff %>%
   group_by(dataset, site) %>%
   summarize(max_area = max(transect_area_m2)) %>%
-  summarize(total_area = sum(max_area))
+  summarize(total_area = round(sum(max_area), 0))
 
 # Get total number of corals counted
 total_corals <- dff %>%
@@ -1823,7 +1823,8 @@ survey_summary <- reduce(
 ) %>%
   mutate(dataset = factor(dataset, levels = dataset_levels)) %>%
   arrange(dataset) %>% 
-  janitor::adorn_totals(where = "row")
+  janitor::adorn_totals(where = "row") %>%
+  mutate(dataset2 = c(dataset_labels, "Total"))
 
 write_csv(survey_summary, file = "outputs/Table1.csv")
 
