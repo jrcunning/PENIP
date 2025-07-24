@@ -2747,12 +2747,12 @@ group_definitions <- tibble(
   taxon = unique(preds$taxon),
   sus_group = case_when(
     taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA", "DLAB", "CNAT", "PSTR", "PCLI") ~ "high_sus",
-    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "med_sus",
+    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "mod_sus",
     taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
     TRUE ~ NA_character_
   )
 ) %>%
-  mutate(sus_group = factor(sus_group, levels = c("low_sus", "med_sus", "high_sus")))
+  mutate(sus_group = factor(sus_group, levels = c("low_sus", "mod_sus", "high_sus")))
 
 summary_sus <- draws_equal_weighted %>%
   left_join(group_definitions) %>%
@@ -2761,7 +2761,7 @@ summary_sus <- draws_equal_weighted %>%
   group_by(Type, sus_group) %>%
   mean_qi(total_epred, .width = 0.95) %>%
   mutate(
-    taxon_group = factor(sus_group, levels = c("high_sus", "med_sus", "low_sus")),
+    taxon_group = factor(sus_group, levels = c("high_sus", "mod_sus", "low_sus")),
     label = sprintf("%.2f", total_epred)
   )
 
@@ -2771,8 +2771,8 @@ plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)
                 position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
   #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
   scale_fill_manual(
-    values = c("high_sus" = "gray60", "med_sus" = "gray75", "low_sus" = "gray90"),
-    labels = c("high_sus" = "High", "med_sus" = "Medium", "low_sus" = "Low")
+    values = c("high_sus" = "gray60", "mod_sus" = "gray75", "low_sus" = "gray90"),
+    labels = c("high_sus" = "High", "mod_sus" = "Moderate", "low_sus" = "Low")
   ) +
   scale_x_discrete(labels = type_labels2) +
   scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25)) +
@@ -2976,8 +2976,8 @@ tot4 <- tot4 %>%
 
 # Plot with taxon labels only
 p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
-  geom_treemap(color = NA) +
-  geom_treemap_subgroup_border(colour = "white", size = 1) +
+  geom_treemap(color = NA, layout = "srow") +
+  geom_treemap_subgroup_border(colour = "white", size = 1, layout = "srow") +
   # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
   #                             alpha = 0.8, colour = "black", size = 8) +
   scale_fill_manual(values = fill_colors) +
@@ -2985,7 +2985,7 @@ p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
 
 
 # 5. Get tile layout and attach taxon_class
-tile_layout <- treemapify(tot4, area = "tot", 
+tile_layout <- treemapify(tot4, area = "tot", layout = "srow",
                           fill = "taxon_class", subgroup = "taxon")
 
 # 6. Flag small boxes (aggregate size classes)
