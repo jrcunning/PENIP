@@ -1930,8 +1930,8 @@ all_surveys_plot <- polyplot +
         plot.background = element_rect(fill = "white", color = NA),
         panel.background = element_rect(fill = "white", color = NA))
 
-all_surveys_plot
-ggsave(filename = "outputs/FigA1.png", width = 270, height = 220, units = "mm", dpi = 300)
+# all_surveys_plot
+# ggsave(filename = "outputs/FigA1.png", width = 270, height = 220, units = "mm", dpi = 300)
 
 
 
@@ -2952,16 +2952,16 @@ densities <- summary_equal_weighted_new
 # DENSITY OF EACH TAXON x CLASS IN EACH HABITAT TYPE
 
 # Order taxa by overall abundance for plotting
-# taxorder <- densities %>%
-#   complete(taxon, class, Type, fill = list(n_m2 = 0)) %>%
-#   group_by(taxon, Type) %>%
-#   summarize(totdens = sum(n_m2)) %>%
-#   group_by(taxon) %>%
-#   summarize(maxdens = max(totdens)) %>%
-#   mutate(taxon = fct_reorder(taxon, -maxdens))
-# 
-# densities <- densities %>%
-#   mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
+taxorder <- densities %>%
+  complete(taxon, class, Type, fill = list(n_m2 = 0)) %>%
+  group_by(taxon, Type) %>%
+  summarize(totdens = sum(n_m2)) %>%
+  group_by(taxon) %>%
+  summarize(maxdens = max(totdens)) %>%
+  mutate(taxon = fct_reorder(taxon, -maxdens))
+
+densities <- densities %>%
+  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
 
 #### PLOT
 (taxdens <- ggplot(densities, aes(x = Type, y = n_m2, shape = class)) +
@@ -3010,7 +3010,7 @@ fig2 <- taxdens +
         legend.key.width = unit(2, "lines"),
         legend.margin = margin(t = -5, b = 0))  # move legend up)
 fig2
-ggsave(filename = "outputs/Fig2new.png", width = 170, height = 170, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
 
@@ -3171,7 +3171,7 @@ combined_plot <- cowplot::plot_grid(
 )
 
 combined_plot
-ggsave(filename = "outputs/Fig3new.png", width = 180, height = 80, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
 ```
 
 ## Abundances in Impact Zones
@@ -3251,9 +3251,9 @@ ttt
 
 
 ```{r}
-posterior_type_totals <- draws_avg_dir %>%
+posterior_type_totals <- preds %>%
   group_by(.draw, taxon, class, Type, dataset) %>%
-  summarize(mean_value = mean(n_m2), .groups = "drop") %>%
+  summarize(mean_value = mean(.epred), .groups = "drop") %>%
   group_by(.draw, dataset, Type) %>%
   summarize(total_epred = sum(mean_value), .groups = "drop")
 
@@ -3297,7 +3297,7 @@ ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
     strip.text = element_text(face = "bold")
   )
 
-ggsave(filename = "outputs/FigA2new.png")
+ggsave(filename = "outputs/FigA1.png")
 ```
 
 
@@ -3411,7 +3411,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/Fig4new.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
@@ -3527,7 +3527,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/FigA3new.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/FigA2.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
@@ -3564,13 +3564,51 @@ summary_taxon_total <- preds_total %>%
   group_by(dataset, taxon) %>%
   mean_qi(total_epred, .width = 0.95)
 
+# # Taxon trend tests
+taxon_draw_lms <- preds_total %>%
+  mutate(year = parse_number(as.character(dataset))) %>%
+  filter(year >= 17) %>%      # exclude 2011 survey from trend analysis
+  group_by(taxon, .draw) %>%
+  summarise(
+    intercept = coef(lm(total_epred ~ year))[1],
+    slope = coef(lm(total_epred ~ year))[2],
+    .groups = "drop"
+  ) 
+
+# 1. Generate predictions for each draw, taxon, and year (17–24)
+taxon_trend_preds <- taxon_draw_lms %>%
+  crossing(year = 17:24) %>%                     # add year range
+  mutate(pred_density = intercept + slope * year)
+
+# 2. Summarize across draws for ribbons (mean + 95% CI)
+taxon_trend_summary <- taxon_trend_preds %>%
+  group_by(taxon, year) %>%
+  mean_qi(pred_density, .width = 0.95)
+
+taxon_percent_change_draws <- taxon_draw_lms %>%
+  mutate(
+    pred_2017 = intercept + slope * 17,
+    pred_2024 = intercept + slope * 24,
+    percent_change = 100 * (pred_2024 - pred_2017) / pred_2017
+  )
+
+
+taxon_percent_change_summary <- taxon_percent_change_draws %>%
+  group_by(taxon) %>%
+  mean_qi(percent_change, .width = 0.95) %>%
+  mutate(label = case_when(sign(.lower) != sign(.upper) ~ "No change",
+                           TRUE ~ paste0("+", round(percent_change), "% [", round(.lower), "–", round(.upper), "]")))
+
+
+
+
 # Optional: Order datasets
 summary_taxon_total <- summary_taxon_total %>%
   mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24"))) %>%
   mutate(year = parse_number(as.character(dataset)))
 
 # Step 6: Plot
-figA4 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
+figA3 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
   geom_line(aes(group = taxon), linewidth = 0.6, color = "gray40") +
   geom_point(aes(shape = dataset), size = 2.5, color = "black") +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.2) +
@@ -3580,35 +3618,40 @@ figA4 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
   #   method = "lm", se = FALSE, color = "blue", linewidth = 0.5,
   #   aes(x = year, y = total_epred), inherit.aes = FALSE
   # ) +
-  facet_wrap(~taxon, scales = "free_y") +
+  facet_wrap(~taxon, scales = "free_y", ncol = 4,
+             labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed))) +
   labs(
     x = "Year",
-    y = "Total Coral Density (per m²)",
-    title = "Total Coral Density per Taxon Across Datasets"
+    y = "Total Density (per m²)"#,
+    #title = "Total Coral Density per Taxon Across Datasets"
   ) +
   #scale_y_log10()+
   scale_x_continuous(breaks = seq(11,24,4), labels = paste0("'", seq(11,24,4))) +
   scale_shape_manual(values = c(1,0,7,2,5,6))+
   theme_minimal(base_size = 11) +
   theme(plot.background = element_rect(fill = "white", color = NA),
-        legend.position = "bottom")
+        legend.position = "bottom") +
+  geom_text(data = taxon_percent_change_summary, 
+            aes(x = Inf, y = Inf, label = label), 
+            inherit.aes = FALSE, color = "blue", size = 3, hjust = 1, vjust = 1) +
+  scale_y_continuous(limits = c(0, NA)) +
+  geom_ribbon(
+    data = taxon_trend_summary,
+    aes(x = year, ymin = .lower, ymax = .upper), inherit.aes = FALSE,
+    alpha = 0.2
+  ) +
+  geom_line(
+    data = taxon_trend_summary,
+    aes(x = year, y = pred_density), color = "blue", inherit.aes = FALSE,
+    linewidth = 1, alpha = 0.8
+  ) 
 
-ggsave(filename = "outputs/FigA4new.png", width = 180, height = 150, units = "mm", dpi = 300)
+ggsave(filename = "outputs/FigA3.png", width = 180, height = 220, units = "mm", dpi = 300)
 
 
-
-mod <- lm(total_epred ~ year * taxon, data = summary_taxon_total %>% filter(year != 11))
-library(emmeans)
-slopes_emm <- emtrends(mod, ~ taxon, var = "year")
-summary(slopes_emm, infer = TRUE)  # Includes estimate, SE, and p-value for each slope
-
-# SIDE has increased over time (2017-2024), but that's the only significant slope
-
-
-figA4 %+% filter(summary_taxon_total, taxon %in% c("ACER", "ORBI")) +labs(title = "")
 ```
 
-### Total trends and SCTLD susceptibility
+### Total trends and SCTLD groups
 ```{r}
 # TOTAL coral density over time/datasets
 # Filter out unwanted datasets
@@ -3660,6 +3703,18 @@ draw_lms <- combined_totals %>%
     slope = coef(lm(total_density ~ year))[2],
     .groups = "drop"
   ) 
+
+# 1. Generate predictions for each draw, sus_group, and year (17–24)
+sus_trend_preds <- draw_lms %>%
+  crossing(year = 17:24) %>%
+  mutate(pred_density = intercept + slope * year)%>%
+  mutate(sus_group = factor(sus_group, levels = c("total", "low_sus", "mod_sus", "high_sus")))
+
+# 2. Summarize across draws for ribbons
+sus_trend_summary <- sus_trend_preds %>%
+  group_by(sus_group, year) %>%
+  mean_qi(pred_density, .width = 0.95)%>%
+  mutate(sus_group = factor(sus_group, levels = c("total", "low_sus", "mod_sus", "high_sus")))
 
 percent_change_draws <- draw_lms %>%
   mutate(
@@ -3755,7 +3810,7 @@ changeplot <- ggplot(combined_with_limits, aes(x = year, y = total_density, shap
   geom_line(linewidth = 0.5, aes(group = sus_group), color = "black") +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1, linewidth = 0.25) +
   geom_point(size = 3, fill = "white") +
-  geom_smooth(aes(group = sus_group), method = "lm", se = FALSE, color = "blue") +
+  #geom_smooth(aes(group = sus_group), method = "lm", se = FALSE, color = "blue") +
   # geom_hline(data = y_limits, aes(yintercept = ymin)) +
   # geom_hline(data = y_limits, aes(yintercept = ymax)) +
   facet_wrap(~sus_group, scales = "free", nrow = 1,
@@ -3791,20 +3846,28 @@ changeplot <- ggplot(combined_with_limits, aes(x = year, y = total_density, shap
 
 
 
-changeplot
-ggsave(filename = "outputs/Fig5new.png", width = 180, height = 80, units = "mm")
+changeplot +
+  geom_ribbon(
+    data = sus_trend_summary,
+    aes(x = year, ymin = .lower, ymax = .upper), inherit.aes = FALSE,
+    alpha = 0.2
+  ) +
+  geom_line(
+    data = sus_trend_summary,
+    aes(x = year, y = pred_density), color = "blue", inherit.aes = FALSE,
+    linewidth = 1
+  )
+
+ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm")
 ```
 
-#
-```{r}
-# Summarize raw densities per row
-dfftaxon_with_density <- dfftaxon %>%
-  mutate(density = n / transect_area_m2)
 
-# Average density per taxon-class-Type group
+```{r, include = F, eval = F}
+
+# Average density per dataset-taxon-class-Type group
 raw_density_summary <- dfftaxon %>%
   mutate(density = n / transect_area_m2) %>%
-  group_by(taxon, class, Type) %>%
+  group_by(dataset, taxon, class, Type) %>%
   summarize(
     raw_density_mean = mean(density, na.rm = TRUE),
     raw_density_sd   = sd(density, na.rm = TRUE),
@@ -3814,82 +3877,30 @@ raw_density_summary <- dfftaxon %>%
   mutate(
     raw_density_se = raw_density_sd / sqrt(raw_density_n),
     t_crit = qt(0.975, df = raw_density_n - 1),
-    raw_density_lower = raw_density_mean - t_crit * raw_density_se,
+    raw_density_lower = pmax(0, raw_density_mean - t_crit * raw_density_se),
     raw_density_upper = raw_density_mean + t_crit * raw_density_se
   )
 
 all <- raw_density_summary %>% left_join(densities)
 
 ggplot(all, aes(x = Type)) +
-  geom_point(aes(y = raw_density_mean, shape = class, size = class), 
-             position = position_nudge(x = -0.1), color = "blue") +
-  geom_errorbar(aes(ymin = raw_density_lower, ymax = raw_density_upper), 
-                position = position_nudge(x = -0.1), color = "blue", width = 0) +
-  geom_point(aes(y = n_m2, shape = class, size = class), 
-             position = position_nudge(x = 0.1), color = "black") +
+  geom_point(aes(y = raw_density_mean, shape = dataset, group = dataset), size = 2,
+             position = position_dodge(width = 0.6), color = "blue", alpha = 0.5) +
+  geom_errorbar(aes(ymin = raw_density_lower, ymax = raw_density_upper, group = dataset), 
+                position = position_dodge(width = 0.6), color = "blue", width = 0, alpha = 0.5) +
+  geom_point(aes(y = n_m2), pch = 1, size = 3,
+             color = "black", alpha = 0.5) +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), 
-                position = position_nudge(x = 0.1), color = "black", width = 0) +
-  facet_wrap(~taxon, scales = "free") +
-  scale_size_manual(values = c(2,4)) +
-  scale_y_continuous(limits = c(0, NA))
+                color = "black", width = 0, alpha = 0.5) +
+  facet_wrap(~interaction(taxon,class), scales = "free") +
+  scale_y_continuous(limits = c(0, NA)) +
+  coord_cartesian(clip = "off")
 ```
 
 ```{r}
-
 area_summary %>%
   group_by(name) %>%
   summarize(total_area_m2 = sum(total_area_m2))
 ```
 
-
-
-
-
-# new analysis over time?
-```{r}
-# 1. Filter datasets
-preds_filtered <- preds %>%
-  filter(!dataset %in% c("nsu11_esa", "dca17_esa"))
-
-# 2. Map dataset to year
-dataset_year <- tibble(
-  dataset = c("dca17", "tt21", "tt23", "drm24"),
-  year    = c(17, 21, 23, 24)
-)
-
-preds_filtered <- preds_filtered %>%
-  left_join(dataset_year, by = "dataset")
-
-# 3. Average across habitat types first
-preds_avg <- preds_filtered %>%
-  group_by(.draw, dataset, year, taxon, class) %>%
-  summarise(mean_epred = mean(.epred), .groups = "drop")
-
-# 4. Add susceptibility groups
-preds_grouped <- preds_avg %>%
-  left_join(group_definitions, by = "taxon") %>%
-  filter(!is.na(sus_group))
-
-# 5. Sum densities by susceptibility group
-preds_sus <- preds_grouped %>%
-  group_by(.draw, dataset, year, sus_group) %>%
-  summarise(density = sum(mean_epred), .groups = "drop")
-
-# 6. Summarize posterior distributions
-preds_summary <- preds_sus %>%
-  group_by(dataset, year, sus_group) %>%
-  mean_qi(density, .width = 0.95)
-
-
-# 6. Optionally test for temporal trends using linear regression on posterior draws
-trend_tests <- preds_sus %>%
-  group_by(sus_group, .draw) %>%
-  summarise(
-    slope = coef(lm(density ~ year))[2],
-    .groups = "drop"
-  ) %>%
-  group_by(sus_group) %>%
-  mean_qi(slope, .width = 0.95)  # posterior slope estimate
-
-```
 
