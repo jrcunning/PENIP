@@ -2604,7 +2604,6 @@ mod_nb3.4 <- readRDS("data/processed/mod_nb3.4.rds")
 
 ### Model evaluation and comparisons
 ```{r}
-
 # Convergence check
 summary(mod_nb3.4)  # confirm Rhat ≈ 1.00, no divergences
 
@@ -2845,65 +2844,16 @@ ppp_summary_grouped <- bind_rows(ppp_mean, ppp_sd, ppp_zero, ppp_skew) %>%
   pivot_wider(names_from = statistic, values_from = ppp)
 
 ppp_summary_grouped
-
+dfftaxontotals <- dfftaxon %>%
+  unite("taxon_class", taxon, class) %>%
+  group_by(taxon_class, Type) %>%
+  summarize(ntotal = sum(n),
+            nsites = sum(n > 0)) %>%
+  right_join(ppp_summary_grouped)
 ```
 
 
 ### Final density estimates
-```{r}
-# # fixed version of equally weighting estimates across datasets
-# # Step 1: Trim to only taxon–class–habitat combinations where the taxon was observed at least once
-# dfftaxon_trimmed2 <- dfftaxon %>%
-#   semi_join(
-#     dfftaxon %>%
-#       group_by(taxon, class, Type) %>%
-#       filter(any(n > 0)) %>%
-#       ungroup() %>%
-#       distinct(taxon, class, Type),
-#     by = c("taxon", "class", "Type")
-#   )
-# 
-# # Step 2: Create newdata for prediction — includes all unique combinations, setting area = 1 m²
-# newdata <- dfftaxon_trimmed2 %>%
-#   distinct(dataset, taxon, class, Type, dir, site) %>%
-#   mutate(transect_area_m2 = 1)
-# 
-# # Step 3: Get population-level predictions from the model (includes all group-level effects)
-# preds <- add_epred_draws(mod_nb3.4, newdata = newdata, re_formula = NULL)
-# 
-# # Step 4: Average across dirs within each dataset to prevent over-weighting datasets with both N/S
-# draws_avg_dir <- preds %>%
-#   group_by(.draw, taxon, class, Type, dataset) %>%
-#   summarize(n_m2 = mean(.epred), .groups = "drop")
-# 
-# # Step 5: Average equally across datasets — each dataset contributes one value
-# draws_equal_weighted <- draws_avg_dir %>%
-#   group_by(.draw, taxon, class, Type) %>%
-#   summarize(n_m2 = mean(n_m2), .groups = "drop")
-# 
-# # Step 6: Summarize posterior draws — mean and 95% credible interval
-# summary_equal_weighted_orig <- draws_equal_weighted %>%
-#   group_by(taxon, class, Type) %>%
-#   mean_qi(n_m2, .width = 0.95)
-```
-
-### Final density estimations -- modified approach
-
-```{r}
-# # Same newdata
-# preds_hier <- add_epred_draws(
-#   mod_nb3.4,
-#   newdata = newdata,
-#   re_formula = NA  # includes all dataset REs (marginalized site & dir automatically)
-# )
-# 
-# # Directly summarize posterior draws (no equal weighting applied)
-# summary_hier <- preds_hier %>%
-#   group_by(taxon, class, Type) %>%
-#   mean_qi(.epred, .width = 0.95) %>%
-#   rename(n_m2 = .epred)
-```
-
 ```{r}
 # Step 1: Trim to taxon–class–Type combinations with at least one observation
 dfftaxon_trimmed2 <- dfftaxon %>%
@@ -3064,7 +3014,7 @@ plot_total <- ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
   geom_col(fill = "gray60") +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 0.25) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25)) +
+  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "Density (per m²)",
@@ -3095,7 +3045,7 @@ plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)
   #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
   scale_fill_manual(values = c(">4cm" = "gray60", "<4cm" = "gray75")) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25)) +
+  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
@@ -3105,8 +3055,8 @@ plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)
   theme(
     axis.text.x = element_text(angle = 0, hjust = 0.5),
     legend.key.size = unit(4, "mm"),
-    legend.background = element_rect(fill = "white", color = "black"),
-    legend.position = c(0.7, 0.85),
+    legend.background = element_rect(fill = "white", color = "black", linewidth = 0.25),
+    legend.position = c(0.75, 0.85),
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   )
@@ -3145,18 +3095,18 @@ plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)
     labels = c("high_sus" = "High", "mod_sus" = "Moderate", "low_sus" = "Low")
   ) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25)) +
+  scale_y_continuous(limits = c(0, 2.6), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.6, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
-    fill = "SCTLD Susceptibility"
+    fill = "SCTLD\nSusceptibility"
   ) +
   theme_minimal(base_size = 8) +
   theme(
     axis.text.x = element_text(angle = 0, hjust = 0.5),
     legend.key.size = unit(4, "mm"),
-    legend.background = element_rect(fill = "white", color = "black"),
-    legend.position = c(0.7, 0.85),
+    legend.background = element_rect(fill = "white", color = "black", linewidth = 0.25),
+    legend.position = c(0.75, 0.85),
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   )
@@ -3172,6 +3122,14 @@ combined_plot <- cowplot::plot_grid(
 
 combined_plot
 ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
+
+
+
+# diversity?
+summary_equal_weighted_new %>% 
+  filter(n_m2 > 0) %>% 
+  group_by(Type) %>% 
+  summarize(diversity = n_distinct(taxon), .groups = "drop")
 ```
 
 ## Abundances in Impact Zones
