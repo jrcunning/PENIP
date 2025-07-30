@@ -485,7 +485,7 @@ tt23_sitemd <- drop_na(tt23_sitemd, longitude)
 tt23v_sitemd <- readxl::read_xlsx("data/2023_tt_impact/Impact site tracking.xlsx", sheet = "Vertical Wall") %>%
   janitor::clean_names()
 
-tt23v_sitemd <- tt23v_sitemd %>% 
+tt23v_sitemd <- tt23v_sitemd %>%
   mutate(
     longitude = (actual_start_x + actual_end_x) / 2,
     latitude = (actual_start_y + actual_end_y) / 2
@@ -572,7 +572,6 @@ write_csv(tt23, file = "data/processed/tt_2024_long.csv")
 
 
 
-
 # Count
 # Add explicit zeros for any taxon/size class missing at any site
 tt23_counts <- tt23 %>%
@@ -584,7 +583,7 @@ tt23_counts <- tt23 %>%
 
 # tt23_counts %>% filter(site == "sb1")
 # tt23_sitemd %>% filter(site == "sb1")
-write_csv(tt23_counts, file = "data/processed/tt_2024_counts.csv")
+write_csv(tt23_counts, file = "data/processed/tt_2023_counts.csv")
 
 tt23_counts %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 
@@ -1604,18 +1603,25 @@ df_completed <- df_completed %>%
 ## Other datasets had fixed transect areas
 df_completed <- df_completed %>%
   mutate(transect_area_m2 = case_when(
-     # Count-specific areas for nsu11 (since they did tier 1 surveys and tier 2 only if n > 5 for a taxon)
+     # Count-specific areas for nsu11 (since they did tier 1 surveys and tier 2 only if n > 5 for ACER)
     dataset == "nsu11_esa" & taxon == "ACER" & n >= 5 ~ 600,  
     dataset == "nsu11_esa" & taxon == "ACER" & n < 5 ~ 3600,
-    dataset == "nsu11_esa" & taxon != "ACER" ~ 600,
+    dataset == "nsu11_esa" & taxon != "ACER" ~ 3600,
     dataset == "dca17_esa" ~ 784,
     dataset == "dca17" ~ 30,     # DCA belt transects were 30m
-    dataset == "tt23" ~ 20,     # TT23 belt transects were 20m
+    dataset == "tt23" & site %in% tt23v_sitemd$site ~ 10,  # vertical wall sites
+    dataset == "tt23" ~ 20,                                # all other tt23 sites
     TRUE ~ transect_area_m2))
 
 
 # check that everything has transect_area_m2
 df_completed %>% filter(is.na(transect_area_m2))
+
+df_completed %>%
+  distinct(dataset, site, transect_area_m2)
+
+df_completed %>%
+  filter(dataset == "nsu11_esa", site == "1")
 ```
 
 
@@ -2567,37 +2573,37 @@ Lots of idiosyncratic diffs between surveys for individual taxon x class groups?
 #   seed = 20240717
 # )
 
-# mod_nb3.4 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +                     # temporal/dataset intercept
-#       (1 | dataset:site) +                       # site nested within dataset
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.5, 1.5), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(2), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 200, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# saveRDS(mod_nb3.4, file = "data/processed/mod_nb3.4.rds")
+mod_nb3.4 <- brm(
+  bf(
+    n ~ taxon:class * Type +
+      (1 + Type | dataset) +                     # temporal/dataset intercept
+      (1 | dataset:site) +                       # site nested within dataset
+      (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
+      offset(log(transect_area_m2)),
+    zi ~ taxon:class * Type,
+    shape ~ taxon:class
+  ),
+  data = dfftaxon,
+  family = zero_inflated_negbinomial(),
+  prior = c(
+    # Effects on log density (taxon:class * Type)
+    prior(normal(0, 2), class = "b"),
+    # Centered on global mean log-density
+    prior(normal(-2.5, 1.5), class = "Intercept"),
+    # Informed by logit(p_zero) distribution
+    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+    # Matches empirical shape estimates
+    prior(normal(-0.6, 0.75), class = "b", dpar = "shape"),
+    # Regularize random effects to prevent overfitting (important for PPP)
+    prior(exponential(2), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
+  ),
+  chains = 4, cores = 4, threads = threading(5),
+  iter = 200, warmup = 50, thin = 1,
+  backend = "cmdstanr",
+  control = list(adapt_delta = 0.99),
+  seed = 20240717
+)
+saveRDS(mod_nb3.4, file = "data/processed/mod_nb3.4.rds")
 mod_nb3.4 <- readRDS("data/processed/mod_nb3.4.rds")
 ```
 
@@ -2629,6 +2635,58 @@ loo_compare(loo_3.4, loo_2, loo_1)  # higher ELPD = better
 
 ### Posterior predictive checks
 ```{r}
+library(dplyr)
+library(tidyr)
+
+# 1. Posterior predictive counts (subset to 1000 draws)
+ppc_counts <- posterior_predict(
+  mod_nb3.4,
+  newdata = dfftaxon_trimmed2,
+  ndraws = 1000
+)
+
+# 2. Convert to long format (fix row index)
+ppc_counts_long <- as.data.frame(ppc_counts) %>%
+  tibble::rownames_to_column("draw") %>%
+  pivot_longer(-draw, names_to = "row", values_to = "pred_count") %>%
+  mutate(
+    draw = as.integer(draw),
+    row = as.integer(gsub("[^0-9]", "", row))  # extract numeric index
+  )
+
+# 3. Join with transect areas
+ppc_densities <- ppc_counts_long %>%
+  left_join(
+    dfftaxon_trimmed2 %>% mutate(row = dplyr::row_number()),
+    by = "row"
+  ) %>%
+  mutate(density = pred_count / transect_area_m2)
+
+# 4. Summarize extreme values globally
+ppc_density_summary <- ppc_densities %>%
+  summarise(
+    q95 = quantile(density, 0.95, na.rm = TRUE),
+    q99 = quantile(density, 0.99, na.rm = TRUE),
+    max_density = max(density, na.rm = TRUE)
+  )
+
+# 5. Summarize by taxon and class
+ppc_density_by_taxon <- ppc_densities %>%
+  group_by(taxon, class, dataset) %>%
+  summarise(
+    q95 = quantile(density, 0.95, na.rm = TRUE),
+    q99 = quantile(density, 0.99, na.rm = TRUE),
+    max_density = max(density, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ppc_density_summary
+ppc_density_by_taxon
+
+
+```
+
+```{r}
 library(moments)
 # 1. GLOBAL POSTERIOR PREDICTIVE PLOTS ------------------------------------
 # Extract observed data and predicted draws
@@ -2636,10 +2694,10 @@ area <- mod_nb3.4$data$transect_area_m2
 
 y <- mod_nb3.4$data$n / area
 set.seed(124)
-yrep  <- posterior_predict(mod_nb3.4)
+yrep  <- posterior_predict(mod_nb3.4, ndraws = 1000)
 yrep <- sweep(yrep, 2, area, FUN = "/")
 set.seed(124)
-mu    <- posterior_epred(mod_nb3.4)  # matrix: draws x observations
+mu    <- posterior_epred(mod_nb3.4, ndraws = 1000)  # matrix: draws x observations
 mu   <- sweep(mu,   2, area, FUN = "/")
 
 
@@ -3121,7 +3179,7 @@ combined_plot <- cowplot::plot_grid(
 )
 
 combined_plot
-ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig3new.png", width = 180, height = 80, units = "mm", dpi = 300)
 
 
 
@@ -3369,7 +3427,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/Fig4new.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
@@ -3604,7 +3662,7 @@ figA3 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
     linewidth = 1, alpha = 0.8
   ) 
 
-ggsave(filename = "outputs/FigA3.png", width = 180, height = 220, units = "mm", dpi = 300)
+ggsave(filename = "outputs/FigA3new.png", width = 180, height = 220, units = "mm", dpi = 300)
 
 
 ```
