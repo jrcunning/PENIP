@@ -1,8 +1,8 @@
 dataset,Nearshore Ridge Complex,Inner Reef,Middle Reef,Outer Reef,Total Sites,area_per_site,total_area,total_n,dataset2
-nsu11_esa,85,94,83,111,373,600 — 3600,1255800,11871,2011 / NSU ESA
+nsu11_esa,85,94,83,111,373,3600,1342800,11871,2011 / NSU ESA
 dca17_esa,92,17,21,25,155,784,121520,3620,2017 / DCA ESA
 dca17,62,22,26,85,195,30,5850,9489,2017 / DCA Recon
 tt21,7,6,5,17,35,3.9 — 784,24314,2172,2021 / Tetra Tech
-tt23,81,19,34,38,172,20,3440,5691,2023 / Tetra Tech
+tt23,81,19,34,38,172,10 — 20,3180,5691,2023 / Tetra Tech
 drm24,25,15,6,0,46,20 — 40,1840,2559,2024 / Shedd
-Total,352,173,175,276,976,-,1412764,35402,Total
+Total,352,173,175,276,976,-,1499504,35402,Total
