@@ -3353,22 +3353,6 @@ taxon_trend_slope_anno <- taxon_trend_slopes %>%
   mutate(label = paste0(sign, signif(slope*7, 1), " [", signif(.lower*7, 1), ",", signif(.upper*7, 1), "]")) %>%
   mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
 
-# taxon_percent_change_draws <- taxon_draw_lms %>%
-#   mutate(
-#     pred_2017 = intercept + slope * 17,
-#     pred_2024 = intercept + slope * 24,
-#     percent_change = 100 * (pred_2024 - pred_2017) / pred_2017
-#   )
-# 
-# 
-# taxon_percent_change_summary <- taxon_percent_change_draws %>%
-#   group_by(taxon) %>%
-#   mean_qi(percent_change, .width = 0.95) %>%
-#   mutate(label = case_when(sign(.lower) != sign(.upper) ~ "No change",
-#                            TRUE ~ paste0("+", round(percent_change), "% [", round(.lower), "–", round(.upper), "]")))
-
-
-
 
 # Optional: Order datasets
 summary_taxon_total <- summary_taxon_total %>%
@@ -3381,12 +3365,6 @@ figA4 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
   geom_line(aes(group = taxon), linewidth = 0.6, color = "gray40") +
   geom_point(aes(shape = dataset), size = 2.5, color = "black") +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.2) +
-  # Add trendlines only for years 17–24
-  # geom_smooth(
-  #   data = subset(summary_taxon_total, year >= 17 & year <= 24),
-  #   method = "lm", se = FALSE, color = "blue", linewidth = 0.5,
-  #   aes(x = year, y = total_epred), inherit.aes = FALSE
-  # ) +
   facet_wrap(~taxon, scales = "free_y", ncol = 4,
              labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed))) +
   labs(
@@ -3394,7 +3372,6 @@ figA4 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
     y = "Total Density (per m²)"#,
     #title = "Total Coral Density per Taxon Across Datasets"
   ) +
-  #scale_y_log10()+
   scale_x_continuous(breaks = seq(11,24,4), labels = paste0("'", seq(11,24,4))) +
   scale_shape_manual(values = c(1,0,7,2,5,6))+
   theme_minimal(base_size = 11) +
@@ -3426,8 +3403,7 @@ dfftaxon %>% filter(taxon == "ACER") %>% group_by(dataset) %>% summarize(totn = 
 
 
 
-library(ggplot2)
-library(dplyr)
+# PLOT SLOPES / CHANGE OVER TIME
 
 # Prepare data: order taxa by slope
 taxon_trend_slopes <- taxon_trend_slopes %>%
@@ -3631,31 +3607,12 @@ summary_total <- preds_avg_filtered %>%
   group_by(dataset, year) %>%
   mean_qi(total_density, .width = 0.95)
 
-# Step 5: Join susceptibility group
-preds_grouped <- preds_avg_filtered %>%
-  left_join(group_definitions, by = "taxon") %>%
-  filter(!is.na(sus_group))
-
-# Step 6: Sum total predicted density per susceptibility group (all taxa, class in group)
-group_totals_filtered <- preds_grouped %>%
-  group_by(.draw, sus_group, dataset, year) %>%
-  summarize(total_density = sum(mean_epred), .groups = "drop")
-
-summary_sus <- group_totals_filtered %>%
-  group_by(sus_group, dataset, year) %>%
-  mean_qi(total_density, .width = 0.95)
-
 
 
 
 # Test for trends over time (within draws!)
-combined_totals <- bind_rows(
-  totals_filtered %>% select(.draw, dataset, year, total_density) %>% mutate(sus_group = "total"),
-  group_totals_filtered %>% rename(total_density = total_density)
-)
-
-draw_lms <- combined_totals %>%
-  group_by(sus_group, .draw) %>%
+draw_lms <- totals_filtered %>%
+  group_by(.draw) %>%
   summarise(
     intercept = coef(lm(total_density ~ year))[1],
     slope = coef(lm(total_density ~ year))[2],
@@ -3663,16 +3620,14 @@ draw_lms <- combined_totals %>%
   ) 
 
 # 1. Generate predictions for each draw, sus_group, and year (17–24)
-sus_trend_preds <- draw_lms %>%
+trend_preds <- draw_lms %>%
   crossing(year = 17:24) %>%
-  mutate(pred_density = intercept + slope * year)%>%
-  mutate(sus_group = factor(sus_group, levels = c("total", "low_sus", "mod_sus", "high_sus")))
+  mutate(pred_density = intercept + slope * year)
 
 # 2. Summarize across draws for ribbons
-sus_trend_summary <- sus_trend_preds %>%
-  group_by(sus_group, year) %>%
-  mean_qi(pred_density, .width = 0.95)%>%
-  mutate(sus_group = factor(sus_group, levels = c("total", "low_sus", "mod_sus", "high_sus")))
+trend_summary <- trend_preds %>%
+  group_by(year) %>%
+  mean_qi(pred_density, .width = 0.95)
 
 percent_change_draws <- draw_lms %>%
   mutate(
@@ -3683,7 +3638,6 @@ percent_change_draws <- draw_lms %>%
 
 # Summarize percent change with credible intervals
 percent_change_summary <- percent_change_draws %>%
-  group_by(sus_group) %>%
   mean_qi(percent_change, .width = 0.95) %>%
   mutate(label = case_when(sign(.lower) != sign(.upper) ~ "No change",
                            TRUE ~ paste0("+", round(percent_change, 1), "% [", round(.lower, 1), "–", round(.upper, 1), "]")))
@@ -3692,92 +3646,26 @@ percent_change_summary <- percent_change_draws %>%
   
   
 # Step 2: Combine total with susceptibility group summaries
-combined <- bind_rows(
-  summary_total %>% select(dataset, year, total_density, .lower, .upper) %>% mutate(sus_group = "total"),
-  summary_sus %>% rename(total_density = total_density)
-)
-
-combined$sus_group <- factor(combined$sus_group,
-                             levels = c("total", "low_sus", "mod_sus", "high_sus"))
-  
 
 
 # Define annotation positions per panel
-lm_labels2 <- combined %>%
-  group_by(sus_group) %>%
+lm_labels2 <- summary_total %>%
   summarize(
     x = min(year),
     y = max(total_density),
     .groups = "drop"
   ) %>%
-  left_join(percent_change_summary %>% select(sus_group, label), by = "sus_group") %>%
-  mutate(sus_group = factor(sus_group, levels = c("total", "low_sus", "mod_sus", "high_sus")))
+  bind_cols(percent_change_summary)
 
-# # Step 4: Plot all 4 panels
-# changeplot <- ggplot(combined, aes(x = year, y = total_density, shape = dataset)) +
-#   geom_line(linewidth = 0.5, aes(group = sus_group), color = "black") +
-#   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1, linewidth = 0.25) +
-#   geom_point(size = 3, fill = "white") +
-#   geom_smooth(
-#     aes(group = sus_group),
-#     method = "lm",
-#     se = FALSE,
-#     color = "blue"
-#   ) +
-#   facet_wrap(~sus_group, scales = "free", nrow = 1,
-#              labeller = as_labeller(c(
-#                "total" = "A. All corals",
-#                "low_sus" = "B. Low SCTLD-susc.",
-#                "mod_sus" = "C. Moderate SCTLD-susc.",
-#                "high_sus" = "D. High SCTLD-susc."
-#              ))) +
-#   labs(
-#     x = "Year",
-#     y = "Mean Coral Density (per m²)",
-#     shape = "Dataset"
-#   ) +
-#   scale_shape_manual(values = c(21, 22, 24, 25)) +
-#   theme_classic(base_size = 10) +
-#   theme(
-#     strip.background = element_blank(),
-#     strip.text = element_text(hjust = 0, face = "bold", margin = margin(l = -15, b = 10), size = 10),
-#     legend.position = "bottom",
-#     legend.margin = margin(t = 0, r = 0, b = 0, l = 0),
-#     legend.box.margin = margin(t = -5, r = 0, b = 0, l = 0)
-#   ) +
-#   geom_text(
-#     data = lm_labels2,
-#     aes(x = x, y = Inf, label = label),
-#     hjust = 0, vjust = 1.2, size = 3, color = "blue",
-#     inherit.aes = FALSE
-#   ) +
-#   coord_cartesian(clip = "off")
 
-# 1. Compute panel-specific y-axis limits
-y_limits <- combined %>%
-  group_by(sus_group) %>%
-  summarize(ymin = total_density[year == 17] * 0.72) %>%
-  mutate(ymax = 2.85 * ymin)
 
-# 2. Join limits back to the plotting data
-combined_with_limits <- combined %>%
-  left_join(y_limits, by = "sus_group")
+
 
 # 3. Plot with geom_blank to enforce limits
-changeplot <- ggplot(combined_with_limits, aes(x = year, y = total_density, shape = dataset)) +
-  geom_line(linewidth = 0.5, aes(group = sus_group), color = "black") +
+ggplot(summary_total, aes(x = year, y = total_density)) +
+  geom_line(linewidth = 0.5, color = "black") +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0.1, linewidth = 0.25) +
-  geom_point(size = 3, fill = "white") +
-  #geom_smooth(aes(group = sus_group), method = "lm", se = FALSE, color = "blue") +
-  # geom_hline(data = y_limits, aes(yintercept = ymin)) +
-  # geom_hline(data = y_limits, aes(yintercept = ymax)) +
-  facet_wrap(~sus_group, scales = "free", nrow = 1,
-             labeller = as_labeller(c(
-               "total" = "A. All corals",
-               "low_sus" = "B. Low SCTLD-susc.",
-               "mod_sus" = "C. Moderate SCTLD-susc.",
-               "high_sus" = "D. High SCTLD-susc."
-             ))) +
+  geom_point(aes(shape = dataset), size = 3, fill = "white") +
   labs(
     x = "Year",
     y = "Mean Coral Density (per m²)",
@@ -3798,20 +3686,13 @@ changeplot <- ggplot(combined_with_limits, aes(x = year, y = total_density, shap
     hjust = 0, vjust = 1.2, size = 3, color = "blue",
     inherit.aes = FALSE
   ) +
-  geom_blank(aes(y = ymin)) +        # enforce ymin
-  geom_blank(aes(y = ymax)) +        # enforce ymax
-  coord_cartesian(clip = "off")
-
-
-
-changeplot +
   geom_ribbon(
-    data = sus_trend_summary,
+    data = trend_summary,
     aes(x = year, ymin = .lower, ymax = .upper), inherit.aes = FALSE,
     alpha = 0.2
   ) +
   geom_line(
-    data = sus_trend_summary,
+    data = trend_summary,
     aes(x = year, y = pred_density), color = "blue", inherit.aes = FALSE,
     linewidth = 1
   )
