@@ -1875,13 +1875,32 @@ dff[dff$Type == "Aggregated Patch Reef", "Type"] <- "Outer Reef"
 dff <- dff %>% mutate(Type = factor(Type, levels = type_levels))
 ```
 
-
-
-## Summarize survey datasets
+Remove cervicornis (zeros) from tt23 dataset?
 ```{r}
+dstax <- dff %>%
+  filter(!dataset %in% c("nsu11_esa", "dca17_esa")) %>%
+  filter(n > 0) %>%
+  distinct(dataset, taxon)
+
+dstax %>%
+  count(dataset) %>%
+  print(n = nrow(.))
+
+dstax %>%
+  count(taxon)
+
+# CNAT not observed in TT21 (super rare)
+# ACER not observed in TT23 (known habitat distribution was NOT SURVEYED)
+
+## remove ACER from tt23 dff
+dff <- dff %>%
+  filter(!(taxon == "ACER" & dataset == "tt23"))
+```
 
 
 
+# Summarize data
+```{r}
 # Count number of sites per habitat
 nsites <- dff %>%
   group_by(dataset, Type) %>%
@@ -1922,77 +1941,44 @@ survey_summary <- reduce(
 write_csv(survey_summary, file = "outputs/Table1.csv")
 
 survey_summary %>% knitr::kable()
+
+
+
+
+# Summarize count data
+# Just get columns we need for modeling
+dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, class, n)
+
+# Number of observations/counts
+nrow(dfftaxon)
+
+# Number of colonies counted
+sum(dfftaxon$n)
+
+# Number of taxa observed
+n_distinct(dfftaxon$taxon)
+
+# Number of sites surveyed
+n_distinct(interaction(dfftaxon$dataset, dfftaxon$site))
+
+
+
+# Zero-inflation / Number of zeros
+table(dfftaxon$n == 0)
+
+# Overdispersion
+mean_count <- mean(dfftaxon$n)
+var_count <- var(dfftaxon$n)
+var_count / mean_count
+
+# Data are highly zero-inflated and overdispersed -- use zero-inflated negative binomial models. 
+
 ```
 
-# Map datasets
+# Map surveys & impact zones
 ```{r plot_maps, fig.width = 10, fig.height = 10}
-(nsu11_esa_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "nsu11_esa"),
-    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2011 — NSU ESA Survey"))
-
-(dca17_esa_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "dca17_esa"),
-    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2017 — DCA ESA Survey"))
-
-(dca_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "dca17"),
-    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2017 — DCA RECON Survey"))
-
-(tt21_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "tt21"),
-    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2021 — Tetra Tech Survey"))
-
-(tt23_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "tt23"),
-    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2023 — Tetra Tech Survey"))
-
-(drm24_plot <- polyplot + 
-  geom_point(
-    data = filter(selected, dataset == "drm24"),
-    aes(x = longitude, y = latitude), pch = 4, inherit.aes = FALSE, alpha = 0.6) +
-  labs(title = "2024 — Shedd Survey"))
-
-
-
-# One faceted plot
-selected <- selected %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")))
-all_surveys_plot <- polyplot +
-  geom_point(
-    data = selected,
-    aes(x = longitude, y = latitude),
-    pch = 4, alpha = 0.6, inherit.aes = FALSE
-  ) +
-  facet_wrap(~ dataset, ncol = 6) +
-  labs(title = "Survey Site Locations by Dataset") +
-  theme(legend.position = "none",
-        plot.background = element_rect(fill = "white", color = NA),
-        panel.background = element_rect(fill = "white", color = NA))
-
-# all_surveys_plot
-# ggsave(filename = "outputs/FigA1.png", width = 270, height = 220, units = "mm", dpi = 300)
-
-
-
-
-pp2 <- all_surveys_plot + facet_wrap(~ dataset, ncol = 3) + labs(title = NULL)
-
-newfig1 <- cowplot::plot_grid(pp2, iz_plot_clean, nrow = 1, align = "h", axis = "tb", rel_widths =c(0.57, 0.43))
-
-ggsave(filename = "outputs/Fig1.png", width = 160, height = 120, units = "mm", dpi = 300)
-```
-
 ## New multipanel map fig
-```{r}
+
 # Define shared coordinate limits
 coord_limits <- coord_sf(
   xlim = c(-80.1116, -80.078),
@@ -2010,6 +1996,9 @@ base_theme <- theme_minimal(base_size = 8) +
     #panel.grid = element_blank(),
     plot.margin = margin(t = 12, r = 5, b = 5, l = 5),
   )
+
+# Reorder survey datasets
+selected <- selected %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")))
 
 # Left panel: faceted survey locations
 pp2 <- ggplot(polygons_final) +
@@ -2119,37 +2108,6 @@ ggsave(
 
 # Statistical modeling 
 
-## Dataset summary
-```{r}
-# Just get columns we need for modeling
-dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, class, n)
-
-# Number of observations/counts
-nrow(dfftaxon)
-
-# Number of colonies counted
-sum(dfftaxon$n)
-
-# Number of taxa observed
-n_distinct(dfftaxon$taxon)
-
-# Number of sites surveyed
-n_distinct(interaction(dfftaxon$dataset, dfftaxon$site))
-
-
-
-# Zero-inflation / Number of zeros
-table(dfftaxon$n == 0)
-
-# Overdispersion
-mean_count <- mean(dfftaxon$n)
-var_count <- var(dfftaxon$n)
-var_count / mean_count
-
-# Data are highly zero-inflated and overdispersed -- use zero-inflated negative binomial models. 
-
-```
-
 ## Generate data-informed priors
 ```{r}
 # Generate some data-informed priors to use in ZINB models
@@ -2162,6 +2120,7 @@ df_pos <- dfftaxon %>%
 
 # -- 1. PRIOR FOR INTERCEPT (count model log mean density) --
 summary_log_density <- summary(df_pos$log_density)
+summary_log_density
 # Output: 
  #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
  # -8.189  -3.401  -2.708  -2.534  -1.609   2.046 
@@ -2249,467 +2208,9 @@ summary(vmr_summary_f$log_phi)
 sd(vmr_summary_f$log_phi, na.rm = TRUE)
 ```
 
-## Model1 - all fixed effects
-
-Predictors: dataset, habitat Type, direction from channel, taxon, size class
-
-```{r brms}
-# MODEL1 - FIT ON ALL DATA INCLUDING ALL STRUCTURAL ZEROS
-# mod_nb <- brm(
-#   bf(
-#     n ~ dataset * taxon:class * Type + taxon:class:Type:dir +
-#          (1 | dataset:site) +                       # site nested within dataset
-#          offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.5, 1.5), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(2), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# 
-# saveRDS(mod_nb, file = "data/processed/mod_nb.rds")
-mod_nb <- readRDS("data/processed/mod_nb.rds")
-
-
-# 1. Create newdata grid (1 m² for standardization)
-# Remove any taxa not observed in a given dataset / habitat Type 
-dfftaxon_trimmed <- dfftaxon %>%
-  group_by(dataset, Type, dir, taxon, class) %>%
-  filter(any(n > 0)) %>%
-  ungroup()
-newdata <- dfftaxon_trimmed %>%       # USE DATA WITHOUT THE UNOBSERVED CORALS (DATASET/TYPE/DIR/TAXON/CLASS)
-  distinct(dataset, Type, dir, taxon, class) %>%
-  mutate(transect_area_m2 = 1)
-
-# 2. Get fitted values manually by computing summary statistics across all draws
-posterior_draws <- add_epred_draws(mod_nb, newdata = newdata,
-                                   allow_new_levels = TRUE, re_formula = NA) %>%
-  mutate(Type = factor(Type, levels = type_levels),
-         dataset = factor(dataset, levels = dataset_levels))
-```
-
-
-### Taxon densities by dataset, habitat, and direction from channel
-```{r taxon_density, fig.width = 10, fig.height = 10}
-fitted_taxon <- posterior_draws %>%
-  # Sum across size classes within taxa
-  group_by(dataset, Type, dir, taxon, .draw) %>%
-  summarise(
-    epred_sum = sum(.epred),  # 👈 sum size classes
-    .groups = "drop"
-  ) %>%
-  # Average across draws
-  group_by(dataset, Type, dir, taxon) %>%
-  summarise(
-    fit_mean = mean(epred_sum),
-    fit_sd = sd(epred_sum),
-    fit_lower = quantile(epred_sum, 0.025),
-    fit_upper = quantile(epred_sum, 0.975),
-    .groups = "drop"
-  )
-
-# Plot
-ggplot(fitted_taxon, aes(y = fit_mean, x = Type, color = dir, shape = dataset,
-                          group = interaction(dataset, dir))) +
-  facet_wrap(taxon ~ ., scales = "free") +
-  geom_point(position = position_dodge(width = 0.5)) +
-  geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
-                position = position_dodge(width = 0.5), lwd = 0.25) +
-  scale_y_log10()+#limits = c(1e-4, 2)) +
-  scale_x_discrete(labels = type_labels) +
-  labs(x = "Habitat Type", y = "Density (per m2)")
-```
-
-### North-south differences
-```{r taxon_density_ns_diffs}
-# Any N-S differences in taxon abundance within habitat Types/datasets?
-#### Pivot wide so you can calculate N vs S difference per draw
-taxon_NS_diff <- posterior_draws %>%
-  ungroup() %>%
-  select(.draw, dataset, Type, dir, taxon, class, .epred) %>%
-  pivot_wider(names_from = dir, values_from = .epred) %>%
-  filter(!is.na(N), !is.na(S)) %>%  # ensure both directions exist for the draw
-  mutate(diff = S - N)  # or N - S depending on interpretation
-
-taxon_NS_summ <- taxon_NS_diff %>%
-  group_by(dataset, Type, taxon, class) %>%
-  summarize(
-    mean_diff = mean(diff),
-    lower_95 = quantile(diff, 0.025),
-    upper_95 = quantile(diff, 0.975),
-    p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
-    .groups = "drop"
-  )
-
-#table(p.adjust(taxon_NS_summ$p_two_sided, method = "holm") < 0.05)
-# taxon_NS_summ[19,]
-taxon_NS_summ %>%
-  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
-  filter(p_adj < 0.01) %>%
-  mutate(greater = if_else(mean_diff > 0, "N", "S")) %>%
-  group_by(dataset, Type, greater) %>%
-  summarize(taxa = paste(taxon, class, collapse = ",")) %>%
-  arrange(Type, greater) %>%
-  knitr::kable()
-
-
-taxon_NS_summ %>% filter(dataset == "dca17", Type == "Nearshore Ridge Complex", taxon == "MCAV", class == "<4cm")
-```
-
-A minority of taxon × size class × habitat × dataset combinations show a significant north-south effect.
-The majority do not. they are dataset/habitat/taxon/size class-specific, and idiosyncratic.
-My goal is not to focus on dir (direction) in the main analyses, but I want to account for it appropriately so it doesn’t confound other effects.
-Let's move direction to a random effect. This approach acknowledges the variability without overfitting. It’s flexible and allows for occasional strong differences without forcing them to be estimated everywhere.
-
-((When I changed FAVI adults to individual taxa and the formula in the first model to taxon:class in the fixed effects instead of taxon * class, the number of N-S differences dropped by a lot. probably because multiple comparisons numbers go up because more taxa.))
-
-## Model2 - drop direction to RE
+## Fit model
 ```{r}
-# mod_nb2 <- brm(
-#   bf(
-#     n ~ dataset * taxon:class * Type +
-#          (1 | dataset:site) +                       # site nested within dataset
-#          (1 | taxon:class:Type:dir) +
-#          offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.5, 1.5), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(2), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# saveRDS(mod_nb2, file = "data/processed/mod_nb2.rds")
-mod_nb2 <- readRDS("data/processed/mod_nb2.rds")
-```
 
-```{r, eval = T}
-loo_1 <- loo(mod_nb)
-loo_2 <- loo(mod_nb2)
-
-loo_compare(loo_1, loo_2)
-# means second model with dir as random effect is better
-```
-
-### Taxon densities by dataset, habitat, and size class
-```{r, fig.width = 10, fig.height = 10}
-newdata2 <- dfftaxon_trimmed %>%       # USE DATA WITHOUT THE UNOBSERVED CORALS (DATASET/TYPE/DIR/TAXON/CLASS)
-  distinct(dataset, Type, taxon, class) %>%
-  mutate(transect_area_m2 = 1)
-# 2. Get fitted values manually by computing summary statistics across all draws
-posterior_draws2 <- add_epred_draws(mod_nb2, newdata = newdata2,
-                                   allow_new_levels = TRUE, re_formula = NA) %>%
-  mutate(Type = factor(Type, levels = type_levels),
-         dataset = factor(dataset, levels = dataset_levels))
-
-fitted_taxon2 <- posterior_draws2 %>%
-  group_by(dataset, Type, taxon, class) %>%
-  summarise(
-    fit_mean = mean(.epred),
-    fit_sd = sd(.epred),
-    fit_lower = quantile(.epred, 0.025),
-    fit_upper = quantile(.epred, 0.975),
-    .groups = "drop"
-  )
-
-# Plot
-ggplot(fitted_taxon2, aes(y = fit_mean, x = Type, shape = dataset,
-                          group = interaction(dataset, class), color = class)) +
-  facet_wrap(taxon ~ ., scales = "free") +
-  geom_point(position = position_dodge(width = 0.5)) +
-  geom_line(position = position_dodge(width = 0.5), alpha = 0.5) +
-  geom_errorbar(aes(ymin = fit_lower, ymax = fit_upper), width = 0,
-                position = position_dodge(width = 0.5), lwd = 0.25) +
-  scale_y_log10()+#limits = c(1e-4, 2)) +
-  scale_x_discrete(labels = type_labels) +
-  labs(x = "Habitat Type", y = "Density (per m2)")
-```
-
-
-### Dataset/survey differences
-```{r taxon_survey_diffs}
-# Ensure dataset is character so we can do < comparison
-draws_clean <- posterior_draws2 %>%
-  mutate(dataset = as.character(dataset))
-
-# One self-join to get all unique dataset pairs
-pairwise_contrasts <- draws_clean %>%
-  rename(dataset1 = dataset, epred1 = .epred) %>%
-  inner_join(
-    draws_clean %>% rename(dataset2 = dataset, epred2 = .epred),
-    by = c(".draw", "taxon", "class", "Type")
-  ) %>%
-  filter(dataset1 < dataset2) %>%  # Avoid duplicates and self-pairs
-  mutate(diff = epred1 - epred2)
-
-# Step: summarize the posterior differences
-summary_contrasts <- pairwise_contrasts %>%
-  group_by(taxon, class, Type, dataset1, dataset2) %>%
-  summarize(mean_diff = mean(diff),
-            lower = quantile(diff, 0.025),
-            upper = quantile(diff, 0.975),
-            p_two_sided = 2 * min(mean(diff > 0), mean(diff < 0)),
-            .groups = "drop")
-
-summary_contrasts %>% 
-  mutate(p_adj = p.adjust(p_two_sided, method = "bonferroni")) %>%
-  filter(p_adj < 0.01) %>%
-  arrange(taxon, Type) %>%
-  knitr::kable()
-```
-
-Lots of idiosyncratic diffs between surveys for individual taxon x class groups? Reflects diff sites? No super clear patterns.
-
-
-## Model3 - drop dataset to RE
-```{r}
-# mod_nb3.0 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +
-#       (1 | dataset:taxon:class:Type:dir) +
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.5, 1.5), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# # saveRDS(mod_nb3, file = "data/processed/mod_nb3.rds")
-# # mod_nb3 <- readRDS("data/processed/mod_nb3.rds")
-# 
-# mod_nb3.1 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 | dataset) +                            # temporal/dataset intercept
-#       (1 | dataset:site) +                       # site nested within dataset
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.5, 1.5), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# 
-# mod_nb3.2 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +                     # temporal/dataset intercept
-#       (1 | dataset:site) +                       # site nested within dataset
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.5, 1.5), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape")
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# 
-# mod_nb3.3 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 | dataset) +                       # dataset intercept (temporal effect)
-#       (1 | dataset:site) +                  # site nested within dataset
-#       (1 | taxon:class:Type:dir) +          # direction effect shared across datasets
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.5, 1.5), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.6, 0.75), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(2), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-
-# mod_nb3.4 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 | dataset) +                     # temporal/dataset intercept, varies by habitat
-#       (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class * Type
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.8, 1.8), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.9, 1), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(2), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# saveRDS(mod_nb3.4, file = "data/processed/mod_nb3.4.rds")
-# mod_nb3.4 <- readRDS("data/processed/mod_nb3.4.rds")
-# 
-# mod_nb3.5 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
-#       (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class * Type
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.8, 1.8), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.9, 1), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(2), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# 
-# 
-# mod_nb3.6 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
-#       (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class * Type
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.8, 1.8), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.9, 1), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(3), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
 
 # mod_nb3.7 <- brm(
 #   bf(
@@ -2736,7 +2237,7 @@ Lots of idiosyncratic diffs between surveys for individual taxon x class groups?
 #     prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
 #   ),
 #   chains = 4, cores = 4, threads = threading(5),
-#   iter = 1000, warmup = 500, thin = 1,
+#   iter = 100, warmup = 50, thin = 1,
 #   backend = "cmdstanr",
 #   control = list(adapt_delta = 0.99),
 #   seed = 20240717
@@ -2748,14 +2249,14 @@ mod_nb3.7 <- readRDS("data/processed/mod_nb3.7.rds")
 ```
 
 
-### Model evaluation and comparisons
+### Model evaluation
 ```{r}
 # Convergence check
-summary(mod_nb3.7)  # confirm Rhat ≈ 1.00, no divergences
+#summary(mod_nb3.7)  # confirm Rhat ≈ 1.00, no divergences
 
 # R² comparison
-bayes_R2(mod_nb)
-bayes_R2(mod_nb2)
+#bayes_R2(mod_nb)
+#bayes_R2(mod_nb2)
 # bayes_R2(mod_nb3.0)
 # bayes_R2(mod_nb3.1)
 # bayes_R2(mod_nb3.2)
@@ -2771,66 +2272,14 @@ bayes_R2(mod_nb3.7)
 # loo_3.1 <- loo(mod_nb3.1)
 # loo_3.2 <- loo(mod_nb3.2)
 # loo_3.3 <- loo(mod_nb3.3)
-loo_3.4 <- loo(mod_nb3.4)
+#loo_3.4 <- loo(mod_nb3.4)
 #loo_compare(loo_3.0, loo_3.1, loo_3.2, loo_3.3, loo_3.4)
 
-loo_compare(loo_3.4, loo_2, loo_1)  # higher ELPD = better
+#loo_compare(loo_3.4, loo_2, loo_1)  # higher ELPD = better
 ```
 
 ### Posterior predictive checks
-```{r}
-# library(dplyr)
-# library(tidyr)
-# 
-# # 1. Posterior predictive counts (subset to 1000 draws)
-# ppc_counts <- posterior_predict(
-#   mod_nb3.4,
-#   newdata = dfftaxon_trimmed,
-#   ndraws = 200
-# )
-# 
-# # 2. Convert to long format (fix row index)
-# ppc_counts_long <- as.data.frame(ppc_counts) %>%
-#   tibble::rownames_to_column("draw") %>%
-#   pivot_longer(-draw, names_to = "row", values_to = "pred_count") %>%
-#   mutate(
-#     draw = as.integer(draw),
-#     row = as.integer(gsub("[^0-9]", "", row))  # extract numeric index
-#   )
-# 
-# # 3. Join with transect areas
-# ppc_densities <- ppc_counts_long %>%
-#   left_join(
-#     dfftaxon_trimmed %>% mutate(row = dplyr::row_number()),
-#     by = "row"
-#   ) %>%
-#   mutate(density = pred_count / transect_area_m2)
-# 
-# # 4. Summarize extreme values globally
-# ppc_density_summary <- ppc_densities %>%
-#   summarise(
-#     q95 = quantile(density, 0.95, na.rm = TRUE),
-#     q99 = quantile(density, 0.99, na.rm = TRUE),
-#     max_density = max(density, na.rm = TRUE)
-#   )
-# 
-# # 5. Summarize by taxon and class
-# ppc_density_by_taxon <- ppc_densities %>%
-#   group_by(taxon, class, dataset) %>%
-#   summarise(
-#     q95 = quantile(density, 0.95, na.rm = TRUE),
-#     q99 = quantile(density, 0.99, na.rm = TRUE),
-#     max_density = max(density, na.rm = TRUE),
-#     .groups = "drop"
-#   )
-# 
-# ppc_density_summary
-# ppc_density_by_taxon
-# 
-
-```
-
-### Global posterior predictive checks
+#### Global PPP
 ```{r}
 library(moments)
 # 1. GLOBAL POSTERIOR PREDICTIVE PLOTS ------------------------------------
@@ -2899,7 +2348,7 @@ plot_list <- map(stat_names, function(stat) {
 plot_grid(plotlist = plot_list, ncol = 1)
 ```
 
-### Grouped posterior predictive checks
+#### Grouped PPP
 ```{r}
 # 2. GROUPED POSTERIOR PREDICTIVE PLOTS ------------------------------------
 
@@ -3047,18 +2496,11 @@ ppp_summary_grouped <- bind_rows(ppp_mean, ppp_sd, ppp_zero, ppp_skew) %>%
   pivot_wider(names_from = statistic, values_from = ppp)
 
 ppp_summary_grouped %>% print(n = nrow(.))
-dfftaxontotals <- dfftaxon %>%
-  unite("taxon_class", taxon, class) %>%
-  group_by(taxon_class, Type) %>%
-  summarize(ntotal = sum(n),
-            nsites = sum(n > 0)) %>%
-  right_join(ppp_summary_grouped)
 ```
 
 
 ### Final density estimates
 
-#### Equal weighting datasets
 ```{r}
 # Equal weighting datasets
 # Step 1: Trim to taxon–class–Type combinations with at least one observation
@@ -3073,7 +2515,7 @@ dfftaxon_trimmed2 <- dfftaxon %>%
   )
 
 # Step 2: Create newdata for prediction — dataset level only (site & dir not needed)
-newdata <- dfftaxon_trimmed2 %>%
+newdata <- dfftaxon %>% #dfftaxon_trimmed2 %>%
   distinct(dataset, taxon, class, Type) %>%
   mutate(transect_area_m2 = 1)
 
@@ -3098,68 +2540,6 @@ summary_equal_weighted_new <- draws_equal_weighted %>%
 ```
 
 
-
-#### model-driven approach
-```{r}
-# Create newdata for all taxon-class-habitat combinations observed
-newdata <- dfftaxon %>%
-  distinct(taxon, class, Type) %>%
-  mutate(transect_area_m2 = 1)
-
-# Predict from the model - fixed effects only!
-preds_model_based <- add_epred_draws(
-  mod_nb3.7,
-  newdata = newdata,
-  re_formula = NA  # fixed effects only
-)
-
-# Summarize directly without manual weighting
-summary_model_based <- preds_model_based %>%
-  group_by(taxon, class, Type) %>%
-  mean_qi(.epred, .width = 0.95) %>%
-  rename(n_m2 = .epred)
-
-```
-
-### chatgpt's best way?
-```{r}
-# Step 1: Create newdata grid
-# Include all taxon-class-Type combinations that were observed at least once
-newdata <- dfftaxon %>%
-  semi_join(
-    dfftaxon %>%
-      group_by(taxon, class, Type) %>%
-      filter(any(n > 0)) %>%
-      ungroup() %>%
-      distinct(taxon, class, Type),
-    by = c("taxon", "class", "Type")
-  ) %>%
-  distinct(taxon, class, Type) %>%
-  mutate(
-    transect_area_m2 = 1,   # standardize to 1 m²
-    dataset = NA_character_ # allows full partial pooling across datasets
-  )
-
-# Step 2: Generate posterior expected densities
-preds <- add_epred_draws(
-  mod_nb3.7,
-  newdata = newdata,
-  re_formula = NULL,             # include ALL random effects
-  allow_new_levels = TRUE        # needed for new dataset levels (partial pooling)
-)
-
-# Step 3: Summarize posterior predictions
-summary_densities <- preds %>%
-  group_by(taxon, class, Type) %>%
-  mean_qi(.epred, .width = 0.95) %>%   # posterior mean + 95% credible interval
-  rename(n_m2 = .epred)
-
-# Final table: density per taxon × class × habitat (per m²)
-summary_densities
-
-```
-
-
 # Results
 
 ## Densities
@@ -3169,7 +2549,7 @@ summary_densities
 densities <- summary_equal_weighted_new
 # densities <- summary_model_based
 # densities <- summary_densities
-densities <- summary_weighted
+#densities <- summary_weighted
 ###############
 # DENSITY OF EACH TAXON x CLASS IN EACH HABITAT TYPE
 
@@ -3266,7 +2646,7 @@ knitr::kable(table_out, format = "html", escape = FALSE,
 write_csv(table_out, file = "outputs/TableA1.csv")
 ```
 
-### Total densities by size and SCTLD-susceptibility groups
+### Combined densities by size and SCTLD-susceptibility
 
 ```{r}
 type_labels2 <- c("Nearshore\nRidge Complex", "Inner\nReef", "Middle\nReef", "Outer\nReef")
@@ -3286,7 +2666,7 @@ plot_total <- ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
   geom_col(fill = "gray60") +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 0.25) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.9), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "Density (per m²)",
@@ -3317,7 +2697,7 @@ plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)
   #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
   scale_fill_manual(values = c(">4cm" = "gray60", "<4cm" = "gray75")) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.9), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
@@ -3367,7 +2747,7 @@ plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)
     labels = c("high_sus" = "High", "mod_sus" = "Moderate", "low_sus" = "Low")
   ) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.9), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
@@ -3394,19 +2774,11 @@ combined_plot <- cowplot::plot_grid(
 
 combined_plot
 ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
-
-
-
-# diversity?
-summary_equal_weighted_new %>% 
-  filter(n_m2 > 0) %>% 
-  group_by(Type) %>% 
-  summarize(diversity = n_distinct(taxon), .groups = "drop")
 ```
 
-## Abundances in Impact Zones
+## Totals in Impact Zones
 
-### Taxon abundances
+### Taxon totals
 ```{r}
 # TOTAL COLONIES IN EACH IMPACT ZONE
 
@@ -3452,7 +2824,7 @@ tab2 %>%
 write_csv(tab2, file = "outputs/TableA2.csv")
 ```
 
-### Total abundances
+### Combined totals
 ```{r}
 # Calculate total ESA and non-ESA corals per impact zone
 tot3 <- tot2 %>%
@@ -3585,7 +2957,7 @@ p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
 
 
 # 5. Get tile layout and attach taxon_class
-tile_layout <- treemapify(tot4, area = "tot", #layout = "srow",
+tile_layout <- treemapify(tot4, area = "tot",#, layout = "srow",
                           fill = "taxon_class", subgroup = "taxon")
 
 # 6. Flag small boxes (aggregate size classes)
@@ -3633,7 +3005,7 @@ p +
              min.segment.length = 0.1,
              segment.size = 0.2,
              hjust = 0,
-             size = 2) +
+             size = 1.8) +
   theme_void() +
   theme(
     legend.position = "none",
@@ -3764,16 +3136,7 @@ tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
 ```
 
 
-
-
-########## spatially-explicit ACER analysis?
-```{r}
-
-```
-
-
-
-## Temporal trends across datasets
+## Temporal trends
 
 ### Taxon trends
 
@@ -3960,7 +3323,7 @@ signed_pseudo_log_inv <- function(x, scale = 1000) {
 }
 
 # Transform slopes
-scale_factor <- 500
+scale_factor <- 10000
 taxon_trend_slopes <- taxon_trend_slopes %>%
   mutate(
     slope_trans = signed_pseudo_log(slope, scale = scale_factor),
@@ -3971,7 +3334,7 @@ taxon_trend_slopes <- taxon_trend_slopes %>%
 
 # Tick marks (original scale)
 ticks <- c(-0.5, -0.2, -0.1, -0.05, -0.02, -0.01, -0.005, -0.002, -0.001,
-            -0.0001, 0, 0.0001,
+            -0.0005, -0.0002, -0.0001, 0, 0.0001, 0.0002, 0.0005,
             0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5)
 
 # Plot
@@ -4009,7 +3372,7 @@ newdata <- dfftaxon %>%
 # - Dataset RE included
 # - Site & dir RE marginalized automatically
 preds <- add_epred_draws(
-  mod_nb3.6,
+  mod_nb3.7,
   newdata = newdata,
   re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
 )
@@ -4107,13 +3470,8 @@ ggplot(summary_taxon_total, aes(x = year, y = mean_epred)) +
     linewidth = 1, alpha = 0.8
   ) 
 
-ggsave(filename = "outputs/FigA3new4.png", width = 180, height = 220, units = "mm", dpi = 300)
+ggsave(filename = "outputs/FigA4.png", width = 180, height = 220, units = "mm", dpi = 300)
 
-
-
-dfftaxon %>% filter(taxon == "PORI") %>% group_by(dataset) %>% summarize(totn = sum(n), totarea = sum(transect_area_m2)) %>% mutate(dens = totn / totarea)
-
-dfftaxon %>% filter(taxon == "ACER") %>% group_by(dataset) %>% summarize(totn = sum(n), totarea = sum(transect_area_m2)) %>% mutate(dens = totn / totarea)
 ```
 
 
@@ -4324,10 +3682,10 @@ changeplot +
     linewidth = 1
   )
 
-ggsave(filename = "outputs/Fig5new.png", width = 180, height = 80, units = "mm")
+ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm")
 ```
 
-
+# Raw vs. modeled densities
 ```{r, include = F, eval = F}
 
 # Average density per dataset-taxon-class-Type group
@@ -4347,27 +3705,106 @@ raw_density_summary <- dfftaxon %>%
     raw_density_upper = raw_density_mean + t_crit * raw_density_se
   )
 
-all <- raw_density_summary %>% left_join(densities)
+all <- raw_density_summary %>% left_join(densities) %>%
+  mutate(taxon_class = paste(taxon, class))
 
-ggplot(all, aes(x = Type)) +
-  geom_point(aes(y = raw_density_mean, shape = dataset, group = dataset, color = dataset), size = 2,
-             position = position_dodge(width = 0.6), alpha = 0.5) +
-  geom_errorbar(aes(ymin = raw_density_lower, ymax = raw_density_upper, group = dataset, color = dataset), 
-                position = position_dodge(width = 0.6), width = 0, alpha = 0.5) +
-  geom_point(aes(y = n_m2), pch = 1, size = 3,
-             color = "black", alpha = 0.5) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper), 
-                color = "black", width = 0, alpha = 0.5) +
-  facet_wrap(taxon ~ class, scales = "free", nrow = 4) +
-  scale_y_continuous(limits = c(0, NA)) +
-  coord_cartesian(clip = "off")
+all_long <- all %>%
+  select(dataset, taxon, class, Type, raw_density_mean, raw_density_lower, raw_density_upper,
+         n_m2, .lower, .upper, taxon_class) %>%
+  pivot_longer(
+    cols = c(raw_density_mean, n_m2),
+    names_to = "source",
+    values_to = "density"
+  ) %>%
+  mutate(
+    lower = ifelse(source == "raw_density_mean", raw_density_lower, .lower),
+    upper = ifelse(source == "raw_density_mean", raw_density_upper, .upper),
+    source = ifelse(source == "raw_density_mean", dataset, "modeled")
+  )
+
+raw_vs_mod <- ggplot(all_long, aes(x = Type, y = density)) +
+  geom_point(
+    aes(shape = source, color = source),
+    size = 2,
+    position = position_dodge(width = 0.75),
+    alpha = 0.5
+  ) +
+  geom_errorbar(
+    aes(ymin = lower, ymax = upper, color = source),
+    position = position_dodge(width = 0.75),
+    width = 0,
+    alpha = 0.5
+  ) +
+  facet_wrap(~ taxon_class, scales = "free", ncol = 5) +
+  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0))) +
+  coord_cartesian(clip = "off") +
+  scale_x_discrete(labels = c("NRC", "IR", "MR", "OR")) +
+  scale_color_manual(
+    name = "",
+    values = c(
+      "nsu11_esa" = "#1b9e77",
+      "dca17_esa" = "#d95f02",
+      "dca17"     = "#7570b3",
+      "tt21"      = "#e7298a",
+      "tt23"      = "#66a61e",
+      "drm24"     = "#e6ab02",
+      "modeled"   = "black"
+    ),
+    breaks = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24", "modeled"),
+    labels = c(
+      "nsu11_esa" = "2011 – NSU ESA Survey",
+      "dca17_esa" = "2017 – DCA ESA Survey",
+      "dca17"     = "2017 – DCA Recon Survey",
+      "tt21"      = "2021 – Tetra Tech Survey",
+      "tt23"      = "2023 – Tetra Tech Survey",
+      "drm24"     = "2024 – Shedd Survey",
+      "modeled"   = "Modeled density"
+    )
+  ) +
+  scale_shape_manual(
+    name = "",
+    values = c(
+      "nsu11_esa" = 15,
+      "dca17_esa" = 16,
+      "dca17"     = 17,
+      "tt21"      = 18,
+      "tt23"      = 3,
+      "drm24"     = 4,
+      "modeled"   = 5
+    ),
+    breaks = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24", "modeled"),
+    labels = c(
+      "nsu11_esa" = "2011 – NSU ESA Survey",
+      "dca17_esa" = "2017 – DCA ESA Survey",
+      "dca17"     = "2017 – DCA Recon Survey",
+      "tt21"      = "2021 – Tetra Tech Survey",
+      "tt23"      = "2023 – Tetra Tech Survey",
+      "drm24"     = "2024 – Shedd Survey",
+      "modeled"   = "Modeled density"
+    )
+  ) +
+  guides(
+    color = guide_legend(order = 1),
+    shape = guide_legend(order = 1)
+  )
+
+
+figA6 <- raw_vs_mod + theme_minimal() +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom", 
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.2),
+    axis.ticks = element_line(color = "black", linewidth = 0.2),
+    axis.ticks.length = unit(2, "pt"),
+    axis.line = element_blank() # keep ticks but don't draw duplicate axis lines
+  )
+
+ggsave(filename = "outputs/FigA6.png", width = 190, height = 250, units = "mm")
+
+
 ```
-
-```{r}
-area_summary %>%
-  group_by(name) %>%
-  summarize(total_area_m2 = sum(total_area_m2))
-```
-
 
 
