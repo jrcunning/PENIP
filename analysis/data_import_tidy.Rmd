@@ -1875,7 +1875,7 @@ dff[dff$Type == "Aggregated Patch Reef", "Type"] <- "Outer Reef"
 dff <- dff %>% mutate(Type = factor(Type, levels = type_levels))
 ```
 
-Remove cervicornis (zeros) from tt23 dataset?
+Remove ACER (zeros) from tt23 dataset?
 ```{r}
 dstax <- dff %>%
   filter(!dataset %in% c("nsu11_esa", "dca17_esa")) %>%
@@ -2212,44 +2212,44 @@ sd(vmr_summary_f$log_phi, na.rm = TRUE)
 ```{r}
 
 
-# mod_nb3.7 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
-#       (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class * Type
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.8, 1.8), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.9, 1), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 100, warmup = 50, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
+mod_nb3.7 <- brm(
+  bf(
+    n ~ taxon:class * Type +
+      (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
+      (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
+      (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
+      offset(log(transect_area_m2)),
+    zi ~ taxon:class * Type,
+    shape ~ taxon:class * Type
+  ),
+  data = dfftaxon,
+  family = zero_inflated_negbinomial(),
+  prior = c(
+    # Effects on log density (taxon:class * Type)
+    prior(normal(0, 2), class = "b"),
+    # Centered on global mean log-density
+    prior(normal(-2.8, 1.8), class = "Intercept"),
+    # Informed by logit(p_zero) distribution
+    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+    # Matches empirical shape estimates
+    prior(normal(-0.9, 1), class = "b", dpar = "shape"),
+    # Regularize random effects to prevent overfitting (important for PPP)
+    prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
+  ),
+  chains = 4, cores = 4, threads = threading(5),
+  iter = 4000, warmup = 2000, thin = 1,
+  backend = "cmdstanr",
+  control = list(adapt_delta = 0.99),
+  seed = 20240717
+)
+saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
 mod_nb3.7 <- readRDS("data/processed/mod_nb3.7.rds")
 
 
 ```
 
 
-### Model evaluation
+## Model evaluation
 ```{r}
 # Convergence check
 #summary(mod_nb3.7)  # confirm Rhat ≈ 1.00, no divergences
@@ -2504,18 +2504,18 @@ ppp_summary_grouped %>% print(n = nrow(.))
 ```{r}
 # Equal weighting datasets
 # Step 1: Trim to taxon–class–Type combinations with at least one observation
-dfftaxon_trimmed2 <- dfftaxon %>%
-  semi_join(
-    dfftaxon %>%
-      group_by(taxon, class, Type) %>%
-      filter(any(n > 0)) %>%
-      ungroup() %>%
-      distinct(taxon, class, Type),
-    by = c("taxon", "class", "Type")
-  )
+# dfftaxon_trimmed2 <- dfftaxon %>%
+#   semi_join(
+#     dfftaxon %>%
+#       group_by(taxon, class, Type) %>%
+#       filter(any(n > 0)) %>%
+#       ungroup() %>%
+#       distinct(taxon, class, Type),
+#     by = c("taxon", "class", "Type")
+#   )
 
 # Step 2: Create newdata for prediction — dataset level only (site & dir not needed)
-newdata <- dfftaxon %>% #dfftaxon_trimmed2 %>%
+newdata <- dfftaxon %>% 
   distinct(dataset, taxon, class, Type) %>%
   mutate(transect_area_m2 = 1)
 
@@ -2624,11 +2624,15 @@ summary_preds_fmt <- densities %>%
   mutate(
     class = factor(class, levels = class_order),
     Type = factor(Type, levels = type_order),
-    mean_ci = case_when(
-      n_m2 < 0.001 ~ sprintf("%.1e<br>[%.1e–%.1e]", n_m2, .lower, .upper),
-      TRUE ~ sprintf("%.4f<br>[%.4f–%.4f]", n_m2, .lower, .upper)
+    mean_ci = sprintf(
+      "%s [%s-%s]",  # en-dash
+      formatC(n_m2, format = "fg", digits = 2, flag = "#"),
+      formatC(.lower, format = "fg", digits = 2, flag = "#"),
+      formatC(.upper, format = "fg", digits = 2, flag = "#")
     )
   )
+
+
 
 # Step 2: Pivot to have one column per habitat Type
 table_out <- summary_preds_fmt %>%
@@ -2636,14 +2640,130 @@ table_out <- summary_preds_fmt %>%
   pivot_wider(names_from = Type, values_from = mean_ci) %>%
   arrange(taxon, class)
 
-# Step 3: Pretty-print the table
-knitr::kable(table_out, format = "html", escape = FALSE,
-             caption = "Density (per m2) of each coral taxon and size class in each habitat type, with 95% C.I.") %>%
-  kable_styling(font_size = 10)
-
 
 ############
 write_csv(table_out, file = "outputs/TableA1.csv")
+```
+
+### Raw vs. modeled taxon densities
+
+```{r}
+
+# Average density per dataset-taxon-class-Type group
+raw_density_summary <- dfftaxon %>%
+  mutate(density = n / transect_area_m2) %>%
+  group_by(dataset, taxon, class, Type) %>%
+  summarize(
+    raw_density_mean = mean(density, na.rm = TRUE),
+    raw_density_sd   = sd(density, na.rm = TRUE),
+    raw_density_n    = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    raw_density_se = raw_density_sd / sqrt(raw_density_n),
+    t_crit = qt(0.975, df = raw_density_n - 1),
+    raw_density_lower = pmax(0, raw_density_mean - t_crit * raw_density_se),
+    raw_density_upper = raw_density_mean + t_crit * raw_density_se
+  )
+
+all <- raw_density_summary %>% left_join(densities) %>%
+  mutate(taxon_class = paste(taxon, class))
+
+all_long <- all %>%
+  select(dataset, taxon, class, Type, raw_density_mean, raw_density_lower, raw_density_upper,
+         n_m2, .lower, .upper, taxon_class) %>%
+  pivot_longer(
+    cols = c(raw_density_mean, n_m2),
+    names_to = "source",
+    values_to = "density"
+  ) %>%
+  mutate(
+    lower = ifelse(source == "raw_density_mean", raw_density_lower, .lower),
+    upper = ifelse(source == "raw_density_mean", raw_density_upper, .upper),
+    source = ifelse(source == "raw_density_mean", dataset, "modeled")
+  )
+
+raw_vs_mod <- ggplot(all_long, aes(x = Type, y = density)) +
+  geom_point(
+    aes(shape = source, color = source),
+    size = 2,
+    position = position_dodge(width = 0.75),
+    alpha = 0.5
+  ) +
+  geom_errorbar(
+    aes(ymin = lower, ymax = upper, color = source),
+    position = position_dodge(width = 0.75),
+    width = 0,
+    alpha = 0.5
+  ) +
+  facet_wrap(~ taxon_class, scales = "free", ncol = 5) +
+  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0))) +
+  coord_cartesian(clip = "off") +
+  scale_x_discrete(labels = c("NRC", "IR", "MR", "OR")) +
+  scale_color_manual(
+    name = "",
+    values = c(
+      "nsu11_esa" = "#1b9e77",
+      "dca17_esa" = "#d95f02",
+      "dca17"     = "#7570b3",
+      "tt21"      = "#e7298a",
+      "tt23"      = "#66a61e",
+      "drm24"     = "#e6ab02",
+      "modeled"   = "black"
+    ),
+    breaks = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24", "modeled"),
+    labels = c(
+      "nsu11_esa" = "2011 – NSU ESA Survey",
+      "dca17_esa" = "2017 – DCA ESA Survey",
+      "dca17"     = "2017 – DCA Recon Survey",
+      "tt21"      = "2021 – Tetra Tech Survey",
+      "tt23"      = "2023 – Tetra Tech Survey",
+      "drm24"     = "2024 – Shedd Survey",
+      "modeled"   = "Modeled density"
+    )
+  ) +
+  scale_shape_manual(
+    name = "",
+    values = c(
+      "nsu11_esa" = 15,
+      "dca17_esa" = 16,
+      "dca17"     = 17,
+      "tt21"      = 18,
+      "tt23"      = 3,
+      "drm24"     = 4,
+      "modeled"   = 5
+    ),
+    breaks = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24", "modeled"),
+    labels = c(
+      "nsu11_esa" = "2011 – NSU ESA Survey",
+      "dca17_esa" = "2017 – DCA ESA Survey",
+      "dca17"     = "2017 – DCA Recon Survey",
+      "tt21"      = "2021 – Tetra Tech Survey",
+      "tt23"      = "2023 – Tetra Tech Survey",
+      "drm24"     = "2024 – Shedd Survey",
+      "modeled"   = "Modeled density"
+    )
+  ) +
+  guides(
+    color = guide_legend(order = 1),
+    shape = guide_legend(order = 1)
+  )
+
+
+figA6 <- raw_vs_mod + theme_minimal() +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom", 
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.2),
+    axis.ticks = element_line(color = "black", linewidth = 0.2),
+    axis.ticks.length = unit(2, "pt"),
+    axis.line = element_blank() # keep ticks but don't draw duplicate axis lines
+  )
+
+ggsave(filename = "outputs/FigA1.png", width = 190, height = 250, units = "mm")
 ```
 
 ### Combined densities by size and SCTLD-susceptibility
@@ -2666,7 +2786,7 @@ plot_total <- ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
   geom_col(fill = "gray60") +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 0.25) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.9), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.75), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "Density (per m²)",
@@ -2697,7 +2817,7 @@ plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)
   #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
   scale_fill_manual(values = c(">4cm" = "gray60", "<4cm" = "gray75")) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.9), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.75), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
@@ -2747,7 +2867,7 @@ plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)
     labels = c("high_sus" = "High", "mod_sus" = "Moderate", "low_sus" = "Low")
   ) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.9), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.75), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
@@ -2774,6 +2894,19 @@ combined_plot <- cowplot::plot_grid(
 
 combined_plot
 ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
+
+
+
+summary_combined <- bind_rows(
+  summary_class %>% transmute(Type, group = as.character(class), mean = total_epred, lower = .lower, upper = .upper),
+  summary_sus   %>% transmute(Type, group = as.character(sus_group), mean = total_epred, lower = .lower, upper = .upper),
+  summary_total_density_by_type %>% transmute(Type, group = "all_corals", mean, lower, upper)
+) %>%
+  mutate(mean_ci = sprintf("%.2f [%.2f-%.2f]", mean, lower, upper)) %>%
+  select(Type, group, mean_ci) %>%
+  arrange(Type, group)
+
+write_csv(summary_combined, file = "outputs/TableA2.csv")
 ```
 
 ## Totals in Impact Zones
@@ -2899,7 +3032,7 @@ ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
     strip.text = element_text(face = "bold")
   )
 
-ggsave(filename = "outputs/FigA1.png")
+ggsave(filename = "outputs/FigA2.png")
 ```
 
 
@@ -3129,7 +3262,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/FigA2.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/FigA3.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
@@ -3151,19 +3284,14 @@ newdata <- dfftaxon %>%
            fill = list(transect_area_m2 = 1)) %>%
   ungroup()
 
-robust <- dfftaxon %>%
-  group_by(dataset, taxon, class) %>%
-  summarise(sites_with_obs = n_distinct(site[n > 0]), .groups = "drop") %>%
-  filter(sites_with_obs > 1)
 
-newdata2 <- newdata %>% right_join(robust)
 
 # Step 3: Get predictions from the model
 # - Dataset RE included
 # - Site & dir RE marginalized automatically
 preds <- add_epred_draws(
   mod_nb3.7,
-  newdata = newdata2,
+  newdata = newdata,
   re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
 )
 
@@ -3183,6 +3311,8 @@ summary_taxon_total <- preds_total %>%
   mean_qi(total_epred, .width = 0.95)
 
 # # Taxon trend tests
+##### only robustly sampled taxa
+
 taxon_draw_lms <- preds_total %>%
   mutate(year = parse_number(as.character(dataset))) %>%
   filter(year >= 17) %>%      # exclude 2011 survey from trend analysis
@@ -3207,11 +3337,21 @@ taxon_trend_slopes <- taxon_draw_lms %>%
   group_by(taxon) %>%
   mean_qi(slope, .width = 0.95)
 
+# Filter to just significant trends
+taxon_trend_slopes_sig <- taxon_trend_slopes %>%
+  filter(sign(.lower) == sign(.upper))
+
+# Filter to just significant trends
+taxon_trend_summary_sig <- taxon_trend_summary %>% 
+  filter(taxon %in% taxon_trend_slopes_sig$taxon) %>%
+  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
+
 
 taxon_trend_slope_anno <- taxon_trend_slopes %>%
   drop_na(slope) %>%
   mutate(sign = ifelse(slope > 0, "+", "")) %>%
-  mutate(label = paste0(sign, signif(slope*7, 1), " [", signif(.lower*7, 1), ",", signif(.upper*7, 1), "]"))
+  mutate(label = paste0(sign, signif(slope*7, 1), " [", signif(.lower*7, 1), ",", signif(.upper*7, 1), "]")) %>%
+  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
 
 # taxon_percent_change_draws <- taxon_draw_lms %>%
 #   mutate(
@@ -3233,10 +3373,11 @@ taxon_trend_slope_anno <- taxon_trend_slopes %>%
 # Optional: Order datasets
 summary_taxon_total <- summary_taxon_total %>%
   mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24"))) %>%
-  mutate(year = parse_number(as.character(dataset)))
+  mutate(year = parse_number(as.character(dataset))) %>%
+  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
 
 # Step 6: Plot
-figA3 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
+figA4 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
   geom_line(aes(group = taxon), linewidth = 0.6, color = "gray40") +
   geom_point(aes(shape = dataset), size = 2.5, color = "black") +
   geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.2) +
@@ -3264,17 +3405,17 @@ figA3 <- ggplot(summary_taxon_total, aes(x = year, y = total_epred)) +
             inherit.aes = FALSE, color = "blue", size = 3, hjust = 1, vjust = 1) +
   scale_y_continuous(limits = c(0, NA)) +
   geom_ribbon(
-    data = taxon_trend_summary,
+    data = taxon_trend_summary_sig,
     aes(x = year, ymin = .lower, ymax = .upper), inherit.aes = FALSE,
     alpha = 0.2
   ) +
   geom_line(
-    data = taxon_trend_summary,
+    data = taxon_trend_summary_sig,
     aes(x = year, y = pred_density), color = "blue", inherit.aes = FALSE,
     linewidth = 1, alpha = 0.8
   ) 
-figA3
-ggsave(filename = "outputs/FigA3new4.png", width = 180, height = 220, units = "mm", dpi = 300)
+figA4
+ggsave(filename = "outputs/FigA4.png", width = 170, height = 190, units = "mm", dpi = 300)
 
 
 
@@ -3293,34 +3434,13 @@ taxon_trend_slopes <- taxon_trend_slopes %>%
   drop_na(slope) %>%
   mutate(taxon = fct_reorder(taxon, slope))
 
-# Plot slopes with 95% CI
-ggplot(taxon_trend_slopes, aes(x = slope, y = taxon)) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +  # reference line at 0
-  geom_errorbarh(aes(xmin = .lower, xmax = .upper), height = 0.3, color = "black") +
-  geom_point(aes(color = slope > 0), size = 3) +                      # color positive/negative slopes
-  scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "red")) +
-  labs(
-    x = "Slope (density change per year)",
-    y = "Taxon",
-    title = "Taxon-specific temporal slopes with 95% credible intervals"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "none")
 
-
-library(dplyr)
-library(ggplot2)
-library(forcats)
-library(scales)
 
 # Custom signed log-like transform
 signed_pseudo_log <- function(x, scale = 1000) {
   sign(x) * log1p(abs(x) * scale)
 }
 
-signed_pseudo_log_inv <- function(x, scale = 1000) {
-  sign(x) * (exp(abs(x)) - 1) / scale
-}
 
 # Transform slopes
 scale_factor <- 10000
@@ -3334,8 +3454,19 @@ taxon_trend_slopes <- taxon_trend_slopes %>%
 
 # Tick marks (original scale)
 ticks <- c(-0.5, -0.2, -0.1, -0.05, -0.02, -0.01, -0.005, -0.002, -0.001,
-            -0.0005, -0.0002, -0.0001, 0, 0.0001, 0.0002, 0.0005,
+            -0.0005, -0.0002, -0.0001, 0.0, 0.0001, 0.0002, 0.0005,
             0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5)
+# Custom function to format tick labels
+format_ticks <- function(x) {
+  sapply(x, function(v) {
+    if (v == 0) {
+      "0"
+    } else {
+      sub("\\.?0+$", "", format(v, scientific = FALSE, trim = TRUE))
+    }
+  })
+}
+
 
 # Plot
 ggplot(taxon_trend_slopes, aes(x = slope_trans, y = taxon)) +
@@ -3344,15 +3475,18 @@ ggplot(taxon_trend_slopes, aes(x = slope_trans, y = taxon)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "gray40") +
   scale_x_continuous(
     breaks = signed_pseudo_log(ticks, scale = scale_factor),      # positions in transformed space
-    minor_breaks = NULL,
-    labels = ticks                                                # labels in original space
+    minor_breaks = NULL, 
+    labels = format_ticks(ticks)       # labels in original space
   ) +
   labs(
-    x = "Slope (original scale, pseudo-log transformed axis)",
-    y = "Taxon"
+    x = "Change in density (colonies m-2) 2017-2024",
+    y = ""
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        plot.background = element_rect(fill = "white", color = NA))
 
+ggsave(filename = "outputs/FigA5.png", width = 100, height = 100, units = "mm", dpi = 300)
 ```
 
 ### Taxon trends with size classes
@@ -3470,7 +3604,7 @@ ggplot(summary_taxon_total, aes(x = year, y = mean_epred)) +
     linewidth = 1, alpha = 0.8
   ) 
 
-ggsave(filename = "outputs/FigA4.png", width = 180, height = 220, units = "mm", dpi = 300)
+ggsave(filename = "outputs/FigA4.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 ```
 
@@ -3685,126 +3819,6 @@ changeplot +
 ggsave(filename = "outputs/Fig5.png", width = 180, height = 80, units = "mm")
 ```
 
-# Raw vs. modeled densities
-```{r, include = F, eval = F}
 
-# Average density per dataset-taxon-class-Type group
-raw_density_summary <- dfftaxon %>%
-  mutate(density = n / transect_area_m2) %>%
-  group_by(dataset, taxon, class, Type) %>%
-  summarize(
-    raw_density_mean = mean(density, na.rm = TRUE),
-    raw_density_sd   = sd(density, na.rm = TRUE),
-    raw_density_n    = n(),
-    .groups = "drop"
-  ) %>%
-  mutate(
-    raw_density_se = raw_density_sd / sqrt(raw_density_n),
-    t_crit = qt(0.975, df = raw_density_n - 1),
-    raw_density_lower = pmax(0, raw_density_mean - t_crit * raw_density_se),
-    raw_density_upper = raw_density_mean + t_crit * raw_density_se
-  )
-
-all <- raw_density_summary %>% left_join(densities) %>%
-  mutate(taxon_class = paste(taxon, class))
-
-all_long <- all %>%
-  select(dataset, taxon, class, Type, raw_density_mean, raw_density_lower, raw_density_upper,
-         n_m2, .lower, .upper, taxon_class) %>%
-  pivot_longer(
-    cols = c(raw_density_mean, n_m2),
-    names_to = "source",
-    values_to = "density"
-  ) %>%
-  mutate(
-    lower = ifelse(source == "raw_density_mean", raw_density_lower, .lower),
-    upper = ifelse(source == "raw_density_mean", raw_density_upper, .upper),
-    source = ifelse(source == "raw_density_mean", dataset, "modeled")
-  )
-
-raw_vs_mod <- ggplot(all_long, aes(x = Type, y = density)) +
-  geom_point(
-    aes(shape = source, color = source),
-    size = 2,
-    position = position_dodge(width = 0.75),
-    alpha = 0.5
-  ) +
-  geom_errorbar(
-    aes(ymin = lower, ymax = upper, color = source),
-    position = position_dodge(width = 0.75),
-    width = 0,
-    alpha = 0.5
-  ) +
-  facet_wrap(~ taxon_class, scales = "free", ncol = 5) +
-  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0))) +
-  coord_cartesian(clip = "off") +
-  scale_x_discrete(labels = c("NRC", "IR", "MR", "OR")) +
-  scale_color_manual(
-    name = "",
-    values = c(
-      "nsu11_esa" = "#1b9e77",
-      "dca17_esa" = "#d95f02",
-      "dca17"     = "#7570b3",
-      "tt21"      = "#e7298a",
-      "tt23"      = "#66a61e",
-      "drm24"     = "#e6ab02",
-      "modeled"   = "black"
-    ),
-    breaks = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24", "modeled"),
-    labels = c(
-      "nsu11_esa" = "2011 – NSU ESA Survey",
-      "dca17_esa" = "2017 – DCA ESA Survey",
-      "dca17"     = "2017 – DCA Recon Survey",
-      "tt21"      = "2021 – Tetra Tech Survey",
-      "tt23"      = "2023 – Tetra Tech Survey",
-      "drm24"     = "2024 – Shedd Survey",
-      "modeled"   = "Modeled density"
-    )
-  ) +
-  scale_shape_manual(
-    name = "",
-    values = c(
-      "nsu11_esa" = 15,
-      "dca17_esa" = 16,
-      "dca17"     = 17,
-      "tt21"      = 18,
-      "tt23"      = 3,
-      "drm24"     = 4,
-      "modeled"   = 5
-    ),
-    breaks = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24", "modeled"),
-    labels = c(
-      "nsu11_esa" = "2011 – NSU ESA Survey",
-      "dca17_esa" = "2017 – DCA ESA Survey",
-      "dca17"     = "2017 – DCA Recon Survey",
-      "tt21"      = "2021 – Tetra Tech Survey",
-      "tt23"      = "2023 – Tetra Tech Survey",
-      "drm24"     = "2024 – Shedd Survey",
-      "modeled"   = "Modeled density"
-    )
-  ) +
-  guides(
-    color = guide_legend(order = 1),
-    shape = guide_legend(order = 1)
-  )
-
-
-figA6 <- raw_vs_mod + theme_minimal() +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom", 
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA),
-    panel.grid = element_blank(),
-    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.2),
-    axis.ticks = element_line(color = "black", linewidth = 0.2),
-    axis.ticks.length = unit(2, "pt"),
-    axis.line = element_blank() # keep ticks but don't draw duplicate axis lines
-  )
-
-ggsave(filename = "outputs/FigA6.png", width = 190, height = 250, units = "mm")
-
-
-```
 
 
