@@ -3406,8 +3406,9 @@ dfftaxon %>% filter(taxon == "ACER") %>% group_by(dataset) %>% summarize(totn = 
 # PLOT SLOPES / CHANGE OVER TIME
 
 # Prepare data: order taxa by slope
-taxon_trend_slopes <- taxon_trend_slopes %>%
+taxon_trend_slopes2 <- taxon_trend_slopes %>%
   drop_na(slope) %>%
+  mutate(across(c(slope, .lower, .upper), ~ . * 7)) %>%
   mutate(taxon = fct_reorder(taxon, slope))
 
 
@@ -3419,8 +3420,8 @@ signed_pseudo_log <- function(x, scale = 1000) {
 
 
 # Transform slopes
-scale_factor <- 10000
-taxon_trend_slopes <- taxon_trend_slopes %>%
+scale_factor <- 2500
+taxon_trend_slopes2<- taxon_trend_slopes2 %>%
   mutate(
     slope_trans = signed_pseudo_log(slope, scale = scale_factor),
     lower_trans = signed_pseudo_log(.lower, scale = scale_factor),
@@ -3430,7 +3431,7 @@ taxon_trend_slopes <- taxon_trend_slopes %>%
 
 # Tick marks (original scale)
 ticks <- c(-0.5, -0.2, -0.1, -0.05, -0.02, -0.01, -0.005, -0.002, -0.001,
-            -0.0005, -0.0002, -0.0001, 0.0, 0.0001, 0.0002, 0.0005,
+            -0.0005, -0.0001, 0.0, 0.0001, 0.0005,
             0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5)
 # Custom function to format tick labels
 format_ticks <- function(x) {
@@ -3445,7 +3446,7 @@ format_ticks <- function(x) {
 
 
 # Plot
-ggplot(taxon_trend_slopes, aes(x = slope_trans, y = taxon)) +
+ggplot(taxon_trend_slopes2, aes(x = slope_trans, y = taxon)) +
   geom_point() +
   geom_errorbarh(aes(xmin = lower_trans, xmax = upper_trans), height = 0.2) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "gray40") +
@@ -3629,18 +3630,18 @@ trend_summary <- trend_preds %>%
   group_by(year) %>%
   mean_qi(pred_density, .width = 0.95)
 
-percent_change_draws <- draw_lms %>%
+pred_change_draws <- draw_lms %>%
   mutate(
     pred_2017 = intercept + slope * 17,
     pred_2024 = intercept + slope * 24,
-    percent_change = 100 * (pred_2024 - pred_2017) / pred_2017
+    pred_change = pred_2024 - pred_2017
   )
 
 # Summarize percent change with credible intervals
-percent_change_summary <- percent_change_draws %>%
-  mean_qi(percent_change, .width = 0.95) %>%
+pred_change_summary <- pred_change_draws %>%
+  mean_qi(pred_change, .width = 0.95) %>%
   mutate(label = case_when(sign(.lower) != sign(.upper) ~ "No change",
-                           TRUE ~ paste0("+", round(percent_change, 1), "% [", round(.lower, 1), "–", round(.upper, 1), "]")))
+                           TRUE ~ paste0("+", signif(pred_change, 2), " [", signif(.lower, 2), "–", signif(.upper, 2), "]")))
 
 
   
@@ -3655,7 +3656,7 @@ lm_labels2 <- summary_total %>%
     y = max(total_density),
     .groups = "drop"
   ) %>%
-  bind_cols(percent_change_summary)
+  bind_cols(pred_change_summary)
 
 
 
