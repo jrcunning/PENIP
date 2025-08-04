@@ -309,7 +309,7 @@ dca17 <- dca17 %>%
   filter(!taxon %in% c("CORAL", "Cup Coral"))
 
 # Write long data to file
-write_csv(dca17, file = "data/processed/dca_2017_long.csv")
+#write_csv(dca17, file = "data/processed/dca_2017_long.csv")
 
 
 # Convert to count data
@@ -321,7 +321,7 @@ dca17_counts <- dca17 %>%
   # # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
   filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
 
-write_csv(dca17_counts, file = "data/processed/dca_2017_counts.csv")
+#write_csv(dca17_counts, file = "data/processed/dca_2017_counts.csv")
 
 # Aggregate count data based on taxonomic groups defined above
 dca17_counts_ag <- dca17_counts %>%
@@ -353,7 +353,7 @@ dca17_counts_ag %>%
   distinct(taxon, class) %>%
   arrange(taxon, class)
 
-write_csv(dca17_counts_ag, file = "data/processed/dca_2017_counts_ag.csv")
+#write_csv(dca17_counts_ag, file = "data/processed/dca_2017_counts_ag.csv")
 ```
 
 ## 2021 TT Recon & ESA Survey
@@ -453,7 +453,7 @@ tt21 <- tt21 %>%
 sort(unique(tt21$taxon))
 
 # Write long data to file
-write_csv(tt21, file = "data/processed/tt_2021_long.csv")
+#write_csv(tt21, file = "data/processed/tt_2021_long.csv")
 
 
 
@@ -468,7 +468,7 @@ tt21_counts <- tt21 %>%
   # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
   filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
 
-write_csv(tt21_counts, file = "data/processed/tt_2021_counts.csv")
+#write_csv(tt21_counts, file = "data/processed/tt_2021_counts.csv")
 
 
 
@@ -500,7 +500,7 @@ tt21_counts_ag <- tt21_counts_ag %>%
 # Exclude data from sites that were recorded as 100% sand
 tt21_counts_ag <- tt21_counts_ag %>% filter(site %in% tt21_sitemd$site)
 
-write_csv(tt21_counts_ag, file = "data/processed/tt21_counts_ag.csv")
+#write_csv(tt21_counts_ag, file = "data/processed/tt21_counts_ag.csv")
 
 
 ```
@@ -613,7 +613,7 @@ tt23 %>% filter(is.na(max_width_cm))
 tt23 <- tt23 %>% filter(!is.na(max_width_cm))
 
 # Write long data to file
-write_csv(tt23, file = "data/processed/tt_2024_long.csv")
+#write_csv(tt23, file = "data/processed/tt_2024_long.csv")
 
 
 
@@ -629,7 +629,7 @@ tt23_counts <- tt23 %>%
 
 # tt23_counts %>% filter(site == "sb1")
 # tt23_sitemd %>% filter(site == "sb1")
-write_csv(tt23_counts, file = "data/processed/tt_2023_counts.csv")
+#write_csv(tt23_counts, file = "data/processed/tt_2023_counts.csv")
 
 tt23_counts %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 
@@ -661,7 +661,7 @@ tt23_counts_ag2 <- tt23_counts_ag %>%
 
 tt23_counts_ag2 %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 
-write_csv(tt23_counts_ag2, file = "data/processed/tt23_counts_ag.csv")
+#write_csv(tt23_counts_ag2, file = "data/processed/tt23_counts_ag.csv")
 
 
 # n_distinct(tt23_counts_ag$site)
@@ -776,6 +776,11 @@ t1t2juv_long_updated <- t1t2juv_long %>%
   select(-drm_site_id)
 
 
+
+
+
+
+
 # Combine all data
 drm24_long <- bind_rows(adults_long, juv_long, t1t2juv_long_updated) %>%
   mutate(team = "Shedd Aquarium")
@@ -783,7 +788,7 @@ drm24_long <- bind_rows(adults_long, juv_long, t1t2juv_long_updated) %>%
 # Check species names
 sort(unique(drm24_long$taxon))
 
-write_csv(drm24_long, file = "data/processed/drm_2024_long.csv")
+#write_csv(drm24_long, file = "data/processed/drm_2024_long.csv")
 
 
 # COUNT based on rules
@@ -860,7 +865,7 @@ final_counts <- search_grid %>%
   mutate(n = replace_na(n, 0))
 
 
-write_csv(final_counts, file = "data/processed/drm_2024_counts.csv")
+#write_csv(final_counts, file = "data/processed/drm_2024_counts.csv")
 
 
 
@@ -874,7 +879,7 @@ drm24_counts_ag <- final_counts %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
 
-write_csv(drm24_counts_ag, file = "data/processed/drm_2024_counts_ag.csv")
+#write_csv(drm24_counts_ag, file = "data/processed/drm_2024_counts_ag.csv")
 
 
 # Modify DRM2024 dataset to code as one pseudo-transect per site, since all other datasets have only one transect per site. We need the structure to be uniform across datasets for count modeling -- cannot include random effect for site to account for multiple transects per site while all other datasets only have one transect per site, because then there's no variability associated with site and its essentially treated as a fixed effect, which we don't want. Thus, we need to aggregate across transects in the DRM 2024 dataset. But since different taxa were searched for on different numbers of transects we need to do this carefully and have the appropriate total area searched for each taxon for teh pseudo-transect.
@@ -894,18 +899,59 @@ drm24_counts_agg <- drm24_counts_ag %>%
 
 
 
+
+
+# drm24_counts_agg %>% 
+#   filter(site %in% c("2112", "1127", "2115", "3096", "3079", "3094"), taxon %in% c("ACER", "ORBI"))
+
+# add counts of ACER and OFAV from t3t4 bonus data
+t3t4bonus <- read_csv("data/2024_shedd_drm/T3_T4_bonus_data.csv") %>%
+  janitor::clean_names() %>%
+  mutate(
+    site = as.character(site),
+    site = replace_na(site, "NA")
+  )
+
+t3t4bonus <- t3t4bonus %>% 
+  left_join(penipsites %>% select(site, drm_site_id), by = "site") %>%
+  mutate(site = as.character(drm_site_id)) %>%
+  select(site, transect, acer, orbi = ofav) %>%
+  mutate(acer = as.numeric(acer)) %>%
+  pivot_longer(c(acer, orbi), names_to = "taxon", values_to = "n") %>%
+  mutate(taxon = toupper(taxon), class = ">4cm") %>%
+  group_by(site, taxon, class) %>%
+  summarize(n = sum(n),
+            transect_area_m2 = 10 * n()) %>%
+  ungroup()
+
+
+# add t3t4 bonus acer/ofav counts to the rest of the data
+drm24_counts_combined <- bind_rows(
+  drm24_counts_agg,
+  t3t4bonus
+) %>%
+  group_by(site, taxon, class) %>%
+  summarise(
+    n = sum(n, na.rm = TRUE),
+    transect_area_m2 = sum(transect_area_m2, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+
+
 ## Exclude two sites that were selected specifically because of known ACER populations
-drm24_counts_agg <- drm24_counts_agg %>%
+drm24_counts_combined <- drm24_counts_combined %>%
   filter(!site %in% c("3096", "3094"))
 
 # Update metadata
-drm24_sitemd <- drm24_sitemd %>% filter(site %in% unique(drm24_counts_agg$site))
+drm24_sitemd <- drm24_sitemd %>% filter(site %in% unique(drm24_counts_combined$site))
+
 ```
 
 ## Habitat maps
 ```{r habitat_maps, fig.width = 10, fig.height = 10}
 # --- STEP 1: Load KML Polygons ---
-polygons <- st_read("data/Habitat classifications.kml")  # update path as needed
+polygons <- st_read("data/spatial/Habitat classifications.kml")  # update path as needed
 
 # --- STEP 2: Extract Attributes from HTML Description ---
 extract_attrs <- function(desc) {
@@ -1117,8 +1163,8 @@ extract_placemark_info <- function(kml_file, source_label) {
 
 
 # File paths
-impact_kml <- "data/Impact_zones_Scenario 2.kml"
-nmfs_kml <- "data/Scenario2_NMFSConsiderationAreas.kml"
+impact_kml <- "data/spatial/Impact_zones_Scenario 2.kml"
+nmfs_kml <- "data/spatial/Scenario2_NMFSConsiderationAreas.kml"
 
 # Extract and label
 impact_zones_sf <- extract_placemark_info(impact_kml, "Impact Zone")
@@ -1637,7 +1683,7 @@ df <- bind_rows(.id = "dataset",
   dca17 = dca17_counts_ag,
   tt21 = tt21_counts_ag,
   tt23 = tt23_counts_ag2,
-  drm24 = drm24_counts_agg     # use data aggregated to 1 pseudo-transect - already has transect_area_m2
+  drm24 = drm24_counts_combined     # use data aggregated to 1 pseudo-transect - already has transect_area_m2
 )
 
 # Justify decision to class all NSU observations (ACER/DSTO/ORBI) as >4cm
@@ -1696,7 +1742,7 @@ df_completed <- bind_rows(df_base, df_completed_part)
 # Add transect area information
 ## Bring back in DRM24 dataset taxon:class-specific transect areas searched
 df_completed <- df_completed %>% 
-  left_join(distinct(drm24_counts_agg, taxon, class, transect_area_m2) %>%
+  left_join(distinct(drm24_counts_combined, taxon, class, transect_area_m2) %>%
               mutate(dataset = "drm24"), 
             by = c("dataset", "taxon", "class")) %>%
   select(-transect_area_m2.x, transect_area_m2 = transect_area_m2.y)
@@ -2059,6 +2105,7 @@ survey_summary %>% knitr::kable()
 # Summarize count data
 # Just get columns we need for modeling
 dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, class, n)
+write_csv(dfftaxon, file = "data/processed/all_coral_counts_processed.csv")
 
 # Number of observations/counts
 nrow(dfftaxon)
@@ -2084,6 +2131,8 @@ var_count / mean_count
 
 # Data are highly zero-inflated and overdispersed -- use zero-inflated negative binomial models. 
 
+
+dfftaxon %>% filter(taxon == "ORBI", dataset == "drm24", n > 0)
 ```
 
 # Map surveys & impact zones
@@ -2341,44 +2390,44 @@ sd(vmr_summary_f$log_phi, na.rm = TRUE)
 
 ## Fit model
 ```{r}
-# mod_nb3.7 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
-#       (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class * Type
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.8, 1.8), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.9, 1), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 4000, warmup = 2000, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
+mod_nb3.7 <- brm(
+  bf(
+    n ~ taxon:class * Type +
+      (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
+      (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
+      (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
+      offset(log(transect_area_m2)),
+    zi ~ taxon:class * Type,
+    shape ~ taxon:class * Type
+  ),
+  data = dfftaxon,
+  family = zero_inflated_negbinomial(),
+  prior = c(
+    # Effects on log density (taxon:class * Type)
+    prior(normal(0, 2), class = "b"),
+    # Centered on global mean log-density
+    prior(normal(-2.8, 1.8), class = "Intercept"),
+    # Informed by logit(p_zero) distribution
+    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+    # Matches empirical shape estimates
+    prior(normal(-0.9, 1), class = "b", dpar = "shape"),
+    # Regularize random effects to prevent overfitting (important for PPP)
+    prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
+  ),
+  chains = 4, cores = 4, threads = threading(5),
+  iter = 100, warmup = 50, thin = 1,
+  backend = "cmdstanr",
+  control = list(adapt_delta = 0.99),
+  seed = 20240717
+)
+saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
 mod_nb3.7 <- readRDS("data/processed/mod_nb3.7.rds")
 
 ```
 
 
 ## Model evaluation
-```{r}
+```{r, eval = F}
 # Convergence check
 #summary(mod_nb3.7)  # confirm Rhat ≈ 1.00, no divergences
 
@@ -2388,7 +2437,7 @@ bayes_R2(mod_nb3.7)
 
 ### Posterior predictive checks
 #### Global PPP
-```{r}
+```{r, eval = F}
 
 # 1. GLOBAL POSTERIOR PREDICTIVE PLOTS ------------------------------------
 # Extract observed data and predicted draws
@@ -2396,10 +2445,10 @@ area <- mod_nb3.7$data$transect_area_m2
 
 y <- mod_nb3.7$data$n / area
 set.seed(124)
-yrep  <- posterior_predict(mod_nb3.7, ndraws = 1000)
+yrep  <- posterior_predict(mod_nb3.7, ndraws = 100)
 yrep <- sweep(yrep, 2, area, FUN = "/")
 set.seed(124)
-mu    <- posterior_epred(mod_nb3.7, ndraws = 1000)  # matrix: draws x observations
+mu    <- posterior_epred(mod_nb3.7, ndraws = 100)  # matrix: draws x observations
 mu   <- sweep(mu,   2, area, FUN = "/")
 
 
@@ -2457,7 +2506,7 @@ plot_grid(plotlist = plot_list, ncol = 1)
 ```
 
 #### Grouped PPP
-```{r}
+```{r, eval = F}
 # 2. GROUPED POSTERIOR PREDICTIVE PLOTS ------------------------------------
 
 # Step 1: Create taxon_class column
@@ -2465,7 +2514,7 @@ dfftaxon <- dfftaxon %>%
   mutate(taxon_class = paste(taxon, class, sep = "_"))
 
 # Step 2: Draw predicted counts
-ppreds <- add_predicted_draws(mod_nb3.7, newdata = dfftaxon, ndraws = 1000) %>%
+ppreds <- add_predicted_draws(mod_nb3.7, newdata = dfftaxon, ndraws = 100) %>%
   mutate(.prediction = .prediction / transect_area_m2)    # CONVERT TO DENSITY
 
 
@@ -2692,7 +2741,7 @@ fig2 <- taxdens +
         legend.key.width = unit(2, "lines"),
         legend.margin = margin(t = -5, b = 0))  # move legend up)
 fig2
-ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig2new.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
 
@@ -3043,7 +3092,7 @@ tab2 <- tot2 %>% ungroup() %>%
 tab2 %>%
   knitr::kable(caption = "Total number of colonies of each coral taxon and size class in each impact zone")
 
-write_csv(tab2, file = "outputs/TableA2.csv")
+write_csv(tab2, file = "outputs/TableA3.csv")
 ```
 
 ### Combined totals
@@ -3065,7 +3114,7 @@ tot3 <- tot2 %>%
 tot3 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
 
-write_csv(tot3, file = "outputs/Table3.csv")
+write_csv(tot3, file = "outputs/Table2.csv")
 
 ttt <- tot2 %>% filter(taxon %in% c("ACER", "ORBI")) %>%
   group_by(taxon) %>%
@@ -3075,53 +3124,53 @@ ttt
 
 
 ```{r}
-posterior_type_totals <- preds %>%
-  group_by(.draw, taxon, class, Type, dataset) %>%
-  summarize(mean_value = mean(.epred), .groups = "drop") %>%
-  group_by(.draw, dataset, Type) %>%
-  summarize(total_epred = sum(mean_value), .groups = "drop")
-
-
-total_perType <- posterior_type_totals %>%
-  group_by(dataset, Type) %>%
-  summarize(
-    fit_mean = mean(total_epred),
-    fit_sd = sd(total_epred),
-    fit_lower = quantile(total_epred, 0.025),
-    fit_upper = quantile(total_epred, 0.975),
-    .groups = "drop"
-  )
-
-totals <- left_join(total_perType, area_summary, by = "Type") %>%  # area_summary must have Type, total_area_m2, name
-  mutate(
-    tot_estimate = fit_mean * total_area_m2,
-    tot_lower = fit_lower * total_area_m2,
-    tot_upper = fit_upper * total_area_m2,
-    Type = factor(Type, levels = type_levels),
-    name = factor(name, levels = zone_levels)
-  ) %>%
-  complete(dataset, Type, fill = list(tot_estimate = NA, tot_lower = NA, tot_upper = NA))
-
-totals <- totals %>% mutate(dataset = factor(dataset, levels = dataset_levels))
-
-ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
-  facet_grid(~Type) +
-  geom_col(position = "stack") +
-  scale_fill_brewer(palette = "Set3") +
-  labs(
-    x = "Survey Dataset",
-    y = "Total Corals (area-scaled)",
-    fill = "Impact Zone",
-    title = "Estimated Total Coral Abundance per Habitat Type and Dataset"
-  ) +
-  theme_classic(base_size = 10) +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5),
-    strip.background = element_blank(),
-    strip.text = element_text(face = "bold")
-  )
-
-ggsave(filename = "outputs/FigA2.png")
+# posterior_type_totals <- preds %>%
+#   group_by(.draw, taxon, class, Type, dataset) %>%
+#   summarize(mean_value = mean(.epred), .groups = "drop") %>%
+#   group_by(.draw, dataset, Type) %>%
+#   summarize(total_epred = sum(mean_value), .groups = "drop")
+# 
+# 
+# total_perType <- posterior_type_totals %>%
+#   group_by(dataset, Type) %>%
+#   summarize(
+#     fit_mean = mean(total_epred),
+#     fit_sd = sd(total_epred),
+#     fit_lower = quantile(total_epred, 0.025),
+#     fit_upper = quantile(total_epred, 0.975),
+#     .groups = "drop"
+#   )
+# 
+# totals <- left_join(total_perType, area_summary, by = "Type") %>%  # area_summary must have Type, total_area_m2, name
+#   mutate(
+#     tot_estimate = fit_mean * total_area_m2,
+#     tot_lower = fit_lower * total_area_m2,
+#     tot_upper = fit_upper * total_area_m2,
+#     Type = factor(Type, levels = type_levels),
+#     name = factor(name, levels = zone_levels)
+#   ) %>%
+#   complete(dataset, Type, fill = list(tot_estimate = NA, tot_lower = NA, tot_upper = NA))
+# 
+# totals <- totals %>% mutate(dataset = factor(dataset, levels = dataset_levels))
+# 
+# ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
+#   facet_grid(~Type) +
+#   geom_col(position = "stack") +
+#   scale_fill_brewer(palette = "Set3") +
+#   labs(
+#     x = "Survey Dataset",
+#     y = "Total Corals (area-scaled)",
+#     fill = "Impact Zone",
+#     title = "Estimated Total Coral Abundance per Habitat Type and Dataset"
+#   ) +
+#   theme_classic(base_size = 10) +
+#   theme(
+#     axis.text.x = element_text(angle = 90, vjust = 0.5),
+#     strip.background = element_blank(),
+#     strip.text = element_text(face = "bold")
+#   )
+# 
+# ggsave(filename = "outputs/FigA2.png")
 ```
 
 
@@ -3353,7 +3402,7 @@ p +
     plot.background = element_rect(fill = "white", color = NA),
   )
   
-ggsave(filename = "outputs/FigA3.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/FigA2.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 sum(tot4$tot)
 tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
@@ -3375,7 +3424,7 @@ newdata <- dfftaxon %>%
 # Step 1: Predictions (same as before)
 preds <- add_epred_draws(
   mod_nb3.7,
-  ndraws = 1000,
+  ndraws = 100,
   newdata = newdata,
   re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
 )
