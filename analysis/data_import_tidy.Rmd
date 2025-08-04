@@ -1360,7 +1360,7 @@ iz_plot <- p +
             aes(x = label_x, y = label_y, label = name),
             size = 2, hjust = 1) +
   coord_sf(
-    xlim = c(-80.113, -80.078),
+    xlim = c(-80.113, -80.077),
     ylim = c(26.058, 26.112),
     expand = FALSE
   ) +
@@ -1370,6 +1370,114 @@ iz_plot <- p +
                      labels = scales::number_format(accuracy = 0.01))
 
 iz_plot
+
+###### SCALE BAR
+
+# Distances (m) for ticks
+tick_offsets <- c(300, 600, 1200)
+
+# X position for the scale bar (longitude)
+x_lon <- -80.077
+
+# 1. Convert X-position to UTM (using midpoint latitude just for reference)
+x_pos_utm <- st_transform(
+  st_sfc(st_point(c(x_lon, (bbox_channel["ymin"] + bbox_channel["ymax"]) / 2 / 111320)), crs = 4326),
+  32617
+) %>%
+  st_coordinates() %>%
+  .[,"X"]
+
+# 2. Create tick positions in UTM
+ticks_utm <- data.frame(
+  x = rep(x_pos_utm, 2 * length(tick_offsets) + 2),
+  y = c(
+    bbox_channel["ymin"] - rev(tick_offsets),  # ticks below ymin
+    bbox_channel["ymin"],                      # ymin tick
+    bbox_channel["ymax"],                      # ymax tick
+    bbox_channel["ymax"] + tick_offsets        # ticks above ymax
+  ),
+  dist_m = c(
+    -rev(tick_offsets),
+    0,
+    0,
+    tick_offsets
+  )
+)
+
+# 3. Convert tick positions to WGS84 (lat/lon)
+ticks_latlon <- st_as_sf(ticks_utm, coords = c("x", "y"), crs = 32617) %>%
+  st_transform(4326) %>%
+  st_coordinates() %>%
+  as.data.frame() %>%
+  mutate(dist_m = ticks_utm$dist_m)
+
+# 4. Convert ymin and ymax to lat/lon for the two scale bar segments
+bbox_channel_latlon <- st_as_sf(
+  data.frame(
+    x = rep(x_pos_utm, 2),
+    y = c(bbox_channel["ymin"], bbox_channel["ymax"])
+  ),
+  coords = c("x", "y"),
+  crs = 32617
+) %>%
+  st_transform(4326) %>%
+  st_coordinates()
+
+ymin_lat <- bbox_channel_latlon[1, "Y"]
+ymax_lat <- bbox_channel_latlon[2, "Y"]
+
+# 5. Two scale bar segments: from ymin down and ymax up
+scale_lines <- data.frame(
+  x = c(x_lon, x_lon),
+  xend = c(x_lon, x_lon),
+  y = c(ymax_lat, ymin_lat),
+  yend = c(max(ticks_latlon$Y), min(ticks_latlon$Y))
+)
+
+# 6. Tick marks (short horizontal segments)
+tick_length <- 0.0005
+ticks_segments <- data.frame(
+  x = x_lon - tick_length,
+  xend = x_lon + tick_length,
+  y = ticks_latlon$Y,
+  yend = ticks_latlon$Y
+)
+
+# 7. Tick labels
+tick_labels <- data.frame(
+  x = x_lon - 0.0004,
+  y = ticks_latlon$Y,
+  label = ifelse(
+    ticks_latlon$dist_m == 0,
+    "",
+    paste0(abs(ticks_latlon$dist_m), "m")
+  )
+)
+
+# 8. Add to plot
+iz_plot +
+  geom_segment(
+    data = scale_lines,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    inherit.aes = FALSE,
+    color = "black",
+    linewidth = 0.4
+  ) +
+  geom_segment(
+    data = ticks_segments,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    color = "black",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    data = tick_labels,
+    aes(x = x, y = y, label = label),
+    hjust = 1,
+    vjust = c(rep(1.5, 4), rep(-0.5, 4)),
+    size = 1.5
+  )
+
+
 ```
 
 ## Multipanel map figure
@@ -1469,7 +1577,7 @@ ggdraw() + draw_plot(final_plot) +
   theme(plot.background = element_rect(fill = "white", color = NA))
 
 
-ggsave(filename = "outputs/Fig1.png", width = 170, height = 100, units = "mm", dpi = 300)
+# ggsave(filename = "outputs/Fig1.png", width = 170, height = 100, units = "mm", dpi = 300)
 ```
 
 
@@ -2039,9 +2147,29 @@ iz_plot_clean <- p +
   geom_text(data = zone_labels,
             aes(x = label_x, y = label_y, label = name),
             size = 2, hjust = 1) +
-  coord_limits +
+  coord_sf(xlim = c(-80.1116, -80.077), ylim = c(26.058, 26.112), expand = FALSE) +
   base_theme +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+    geom_segment(
+    data = scale_lines,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    inherit.aes = FALSE,
+    color = "black",
+    linewidth = 0.4
+  ) +
+  geom_segment(
+    data = ticks_segments,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    color = "black",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    data = tick_labels,
+    aes(x = x, y = y, label = label),
+    hjust = 1,
+    vjust = c(rep(1.5, 4), rep(-0.5, 4)),
+    size = 1.5
+  )
 
 # Set y tick positions and labels manually
 y_breaks <- c(26.06, 26.07, 26.08, 26.11)  # adjust to match your plot extent
@@ -2511,7 +2639,9 @@ taxorder <- densities %>%
   mutate(taxon = fct_reorder(taxon, -maxdens))
 
 densities <- densities %>%
-  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)))
+  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)),
+         class = factor(class, levels = c("<4cm", "All", ">4cm")))
+levels(as.factor(densities$class))
 
 #### PLOT
 taxdens <- ggplot(densities, aes(x = Type, y = n_m2, color = class)) +
@@ -2524,7 +2654,8 @@ taxdens <- ggplot(densities, aes(x = Type, y = n_m2, color = class)) +
   facet_wrap(~taxon, labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed)), scales = "free_y", ncol = 4) +
   scale_x_discrete(labels = type_labels) +
   scale_color_manual(values = c("<4cm" = "#d95f02", ">4cm" = "#1b9e77", "All" = "#7570b3"),
-                     labels = c("<4cm", "≥4cm", "All")) +
+                     labels = c("<4cm", "≥4cm", "All"),
+                     breaks = c("<4cm", ">4cm", "All")) +
   labs(
   x = "Habitat Type",
   y = bquote("Density (colonies m"^-2*")")) +
@@ -3091,12 +3222,14 @@ p +
              aes(x = center_x, y = center_y, 
                  label = label), inherit.aes = FALSE,
              max.overlaps = Inf,
+             box.padding = 0.18,
              xlim = c(1, NA),
-             force = 5,
+             force = 3,
+             lineheight = 0.7,
              min.segment.length = 0.1,
              segment.size = 0.2,
              hjust = 0,
-             size = 1.8) +
+             size = 1.7) +
   theme_void() +
   theme(
     legend.position = "none",
