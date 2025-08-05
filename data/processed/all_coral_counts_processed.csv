@@ -7411,7 +7411,7 @@ drm24,Inner Reef,N,1124,40,MMEA,>4cm,1
 drm24,Inner Reef,N,1124,40,MUSS,<4cm,1
 drm24,Inner Reef,N,1124,40,MYCE,>4cm,0
 drm24,Inner Reef,N,1124,20,ORBI,<4cm,0
-drm24,Inner Reef,N,1124,20,ORBI,>4cm,0
+drm24,Inner Reef,N,1124,40,ORBI,>4cm,0
 drm24,Inner Reef,N,1124,40,PCLI,>4cm,0
 drm24,Inner Reef,N,1124,20,PORI,<4cm,0
 drm24,Inner Reef,N,1124,20,PORI,>4cm,1
@@ -7440,7 +7440,7 @@ drm24,Nearshore Ridge Complex,N,1127,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,1127,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,1127,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,1127,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,1127,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,1127,40,ORBI,>4cm,1
 drm24,Nearshore Ridge Complex,N,1127,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,N,1127,20,PORI,<4cm,3
 drm24,Nearshore Ridge Complex,N,1127,20,PORI,>4cm,5
@@ -7469,7 +7469,7 @@ drm24,Nearshore Ridge Complex,N,1128,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,1128,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,1128,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,1128,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,1128,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,1128,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,1128,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,N,1128,20,PORI,<4cm,5
 drm24,Nearshore Ridge Complex,N,1128,20,PORI,>4cm,3
@@ -7498,7 +7498,7 @@ drm24,Nearshore Ridge Complex,S,1130,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1130,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1130,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1130,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1130,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1130,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1130,40,PCLI,>4cm,1
 drm24,Nearshore Ridge Complex,S,1130,20,PORI,<4cm,1
 drm24,Nearshore Ridge Complex,S,1130,20,PORI,>4cm,2
@@ -7527,7 +7527,7 @@ drm24,Nearshore Ridge Complex,S,1131,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1131,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1131,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1131,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1131,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1131,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1131,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1131,20,PORI,<4cm,0
 drm24,Nearshore Ridge Complex,S,1131,20,PORI,>4cm,2
@@ -7556,7 +7556,7 @@ drm24,Nearshore Ridge Complex,S,1132,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1132,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1132,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1132,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1132,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1132,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1132,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1132,20,PORI,<4cm,6
 drm24,Nearshore Ridge Complex,S,1132,20,PORI,>4cm,6
@@ -7585,7 +7585,7 @@ drm24,Inner Reef,S,1133,40,MMEA,>4cm,1
 drm24,Inner Reef,S,1133,40,MUSS,<4cm,0
 drm24,Inner Reef,S,1133,40,MYCE,>4cm,0
 drm24,Inner Reef,S,1133,20,ORBI,<4cm,0
-drm24,Inner Reef,S,1133,20,ORBI,>4cm,2
+drm24,Inner Reef,S,1133,40,ORBI,>4cm,2
 drm24,Inner Reef,S,1133,40,PCLI,>4cm,0
 drm24,Inner Reef,S,1133,20,PORI,<4cm,0
 drm24,Inner Reef,S,1133,20,PORI,>4cm,12
@@ -7614,7 +7614,7 @@ drm24,Nearshore Ridge Complex,S,1134,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1134,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1134,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1134,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1134,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1134,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1134,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1134,20,PORI,<4cm,3
 drm24,Nearshore Ridge Complex,S,1134,20,PORI,>4cm,4
@@ -7643,7 +7643,7 @@ drm24,Nearshore Ridge Complex,S,1137,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1137,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1137,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1137,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1137,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1137,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1137,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1137,20,PORI,<4cm,2
 drm24,Nearshore Ridge Complex,S,1137,20,PORI,>4cm,1
@@ -7672,7 +7672,7 @@ drm24,Nearshore Ridge Complex,S,1138,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1138,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1138,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1138,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1138,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1138,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1138,40,PCLI,>4cm,1
 drm24,Nearshore Ridge Complex,S,1138,20,PORI,<4cm,2
 drm24,Nearshore Ridge Complex,S,1138,20,PORI,>4cm,0
@@ -7701,7 +7701,7 @@ drm24,Nearshore Ridge Complex,S,1139,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1139,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1139,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1139,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1139,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1139,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1139,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1139,20,PORI,<4cm,24
 drm24,Nearshore Ridge Complex,S,1139,20,PORI,>4cm,15
@@ -7730,7 +7730,7 @@ drm24,Nearshore Ridge Complex,S,1141,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,1141,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,1141,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,1141,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,1141,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,1141,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,1141,40,PCLI,>4cm,5
 drm24,Nearshore Ridge Complex,S,1141,20,PORI,<4cm,16
 drm24,Nearshore Ridge Complex,S,1141,20,PORI,>4cm,18
@@ -7759,7 +7759,7 @@ drm24,Nearshore Ridge Complex,N,2111,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,2111,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,2111,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,2111,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,2111,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,2111,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,2111,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,N,2111,20,PORI,<4cm,27
 drm24,Nearshore Ridge Complex,N,2111,20,PORI,>4cm,19
@@ -7788,7 +7788,7 @@ drm24,Nearshore Ridge Complex,N,2112,40,MMEA,>4cm,1
 drm24,Nearshore Ridge Complex,N,2112,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,2112,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,2112,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,2112,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,2112,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,2112,40,PCLI,>4cm,1
 drm24,Nearshore Ridge Complex,N,2112,20,PORI,<4cm,3
 drm24,Nearshore Ridge Complex,N,2112,20,PORI,>4cm,15
@@ -7817,7 +7817,7 @@ drm24,Inner Reef,S,2115,40,MMEA,>4cm,1
 drm24,Inner Reef,S,2115,40,MUSS,<4cm,0
 drm24,Inner Reef,S,2115,40,MYCE,>4cm,0
 drm24,Inner Reef,S,2115,20,ORBI,<4cm,0
-drm24,Inner Reef,S,2115,20,ORBI,>4cm,1
+drm24,Inner Reef,S,2115,40,ORBI,>4cm,2
 drm24,Inner Reef,S,2115,40,PCLI,>4cm,0
 drm24,Inner Reef,S,2115,20,PORI,<4cm,11
 drm24,Inner Reef,S,2115,20,PORI,>4cm,18
@@ -7846,7 +7846,7 @@ drm24,Nearshore Ridge Complex,S,2116,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,2116,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,2116,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,2116,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,2116,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,2116,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,2116,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,2116,20,PORI,<4cm,0
 drm24,Nearshore Ridge Complex,S,2116,20,PORI,>4cm,8
@@ -7875,7 +7875,7 @@ drm24,Nearshore Ridge Complex,S,2117,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,2117,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,2117,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,2117,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,2117,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,2117,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,2117,40,PCLI,>4cm,1
 drm24,Nearshore Ridge Complex,S,2117,20,PORI,<4cm,8
 drm24,Nearshore Ridge Complex,S,2117,20,PORI,>4cm,7
@@ -7904,7 +7904,7 @@ drm24,Inner Reef,S,2120,40,MMEA,>4cm,0
 drm24,Inner Reef,S,2120,40,MUSS,<4cm,0
 drm24,Inner Reef,S,2120,40,MYCE,>4cm,0
 drm24,Inner Reef,S,2120,20,ORBI,<4cm,0
-drm24,Inner Reef,S,2120,20,ORBI,>4cm,0
+drm24,Inner Reef,S,2120,40,ORBI,>4cm,0
 drm24,Inner Reef,S,2120,40,PCLI,>4cm,0
 drm24,Inner Reef,S,2120,20,PORI,<4cm,2
 drm24,Inner Reef,S,2120,20,PORI,>4cm,5
@@ -7933,7 +7933,7 @@ drm24,Nearshore Ridge Complex,N,3068,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,3068,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,3068,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,3068,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,3068,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,3068,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3068,40,PCLI,>4cm,1
 drm24,Nearshore Ridge Complex,N,3068,20,PORI,<4cm,0
 drm24,Nearshore Ridge Complex,N,3068,20,PORI,>4cm,0
@@ -7962,7 +7962,7 @@ drm24,Nearshore Ridge Complex,N,3069,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,3069,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,3069,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,3069,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,3069,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,3069,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3069,40,PCLI,>4cm,1
 drm24,Nearshore Ridge Complex,N,3069,20,PORI,<4cm,0
 drm24,Nearshore Ridge Complex,N,3069,20,PORI,>4cm,1
@@ -7991,7 +7991,7 @@ drm24,Nearshore Ridge Complex,N,3070,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,3070,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,3070,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,3070,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,3070,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,3070,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3070,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3070,20,PORI,<4cm,1
 drm24,Nearshore Ridge Complex,N,3070,20,PORI,>4cm,4
@@ -8020,7 +8020,7 @@ drm24,Inner Reef,N,3071,40,MMEA,>4cm,0
 drm24,Inner Reef,N,3071,40,MUSS,<4cm,0
 drm24,Inner Reef,N,3071,40,MYCE,>4cm,0
 drm24,Inner Reef,N,3071,20,ORBI,<4cm,0
-drm24,Inner Reef,N,3071,20,ORBI,>4cm,0
+drm24,Inner Reef,N,3071,40,ORBI,>4cm,0
 drm24,Inner Reef,N,3071,40,PCLI,>4cm,0
 drm24,Inner Reef,N,3071,20,PORI,<4cm,2
 drm24,Inner Reef,N,3071,20,PORI,>4cm,17
@@ -8049,7 +8049,7 @@ drm24,Nearshore Ridge Complex,N,3072,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,3072,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,3072,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,3072,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,3072,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,3072,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3072,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3072,20,PORI,<4cm,1
 drm24,Nearshore Ridge Complex,N,3072,20,PORI,>4cm,0
@@ -8078,7 +8078,7 @@ drm24,Inner Reef,N,3073,40,MMEA,>4cm,0
 drm24,Inner Reef,N,3073,40,MUSS,<4cm,0
 drm24,Inner Reef,N,3073,40,MYCE,>4cm,0
 drm24,Inner Reef,N,3073,20,ORBI,<4cm,0
-drm24,Inner Reef,N,3073,20,ORBI,>4cm,0
+drm24,Inner Reef,N,3073,40,ORBI,>4cm,0
 drm24,Inner Reef,N,3073,40,PCLI,>4cm,0
 drm24,Inner Reef,N,3073,20,PORI,<4cm,0
 drm24,Inner Reef,N,3073,20,PORI,>4cm,4
@@ -8107,7 +8107,7 @@ drm24,Inner Reef,N,3074,40,MMEA,>4cm,0
 drm24,Inner Reef,N,3074,40,MUSS,<4cm,0
 drm24,Inner Reef,N,3074,40,MYCE,>4cm,0
 drm24,Inner Reef,N,3074,20,ORBI,<4cm,0
-drm24,Inner Reef,N,3074,20,ORBI,>4cm,0
+drm24,Inner Reef,N,3074,40,ORBI,>4cm,0
 drm24,Inner Reef,N,3074,40,PCLI,>4cm,0
 drm24,Inner Reef,N,3074,20,PORI,<4cm,1
 drm24,Inner Reef,N,3074,20,PORI,>4cm,0
@@ -8136,7 +8136,7 @@ drm24,Inner Reef,N,3075,40,MMEA,>4cm,0
 drm24,Inner Reef,N,3075,40,MUSS,<4cm,0
 drm24,Inner Reef,N,3075,40,MYCE,>4cm,0
 drm24,Inner Reef,N,3075,20,ORBI,<4cm,0
-drm24,Inner Reef,N,3075,20,ORBI,>4cm,0
+drm24,Inner Reef,N,3075,40,ORBI,>4cm,0
 drm24,Inner Reef,N,3075,40,PCLI,>4cm,0
 drm24,Inner Reef,N,3075,20,PORI,<4cm,0
 drm24,Inner Reef,N,3075,20,PORI,>4cm,2
@@ -8165,7 +8165,7 @@ drm24,Nearshore Ridge Complex,S,3076,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,3076,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,3076,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,3076,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,3076,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,3076,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3076,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3076,20,PORI,<4cm,2
 drm24,Nearshore Ridge Complex,S,3076,20,PORI,>4cm,1
@@ -8194,7 +8194,7 @@ drm24,Nearshore Ridge Complex,S,3077,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,3077,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,3077,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,3077,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,3077,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,3077,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3077,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3077,20,PORI,<4cm,1
 drm24,Nearshore Ridge Complex,S,3077,20,PORI,>4cm,0
@@ -8223,7 +8223,7 @@ drm24,Nearshore Ridge Complex,S,3078,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,3078,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,3078,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,3078,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,3078,20,ORBI,>4cm,1
+drm24,Nearshore Ridge Complex,S,3078,40,ORBI,>4cm,1
 drm24,Nearshore Ridge Complex,S,3078,40,PCLI,>4cm,1
 drm24,Nearshore Ridge Complex,S,3078,20,PORI,<4cm,0
 drm24,Nearshore Ridge Complex,S,3078,20,PORI,>4cm,1
@@ -8252,7 +8252,7 @@ drm24,Nearshore Ridge Complex,S,3079,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,3079,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,3079,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,3079,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,3079,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,3079,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3079,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3079,20,PORI,<4cm,4
 drm24,Nearshore Ridge Complex,S,3079,20,PORI,>4cm,5
@@ -8281,7 +8281,7 @@ drm24,Nearshore Ridge Complex,S,3080,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,3080,40,MUSS,<4cm,6
 drm24,Nearshore Ridge Complex,S,3080,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,3080,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,3080,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,3080,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3080,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3080,20,PORI,<4cm,2
 drm24,Nearshore Ridge Complex,S,3080,20,PORI,>4cm,0
@@ -8310,7 +8310,7 @@ drm24,Nearshore Ridge Complex,S,3081,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,S,3081,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,S,3081,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,S,3081,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,S,3081,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,S,3081,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3081,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,S,3081,20,PORI,<4cm,0
 drm24,Nearshore Ridge Complex,S,3081,20,PORI,>4cm,2
@@ -8339,7 +8339,7 @@ drm24,Inner Reef,S,3082,40,MMEA,>4cm,1
 drm24,Inner Reef,S,3082,40,MUSS,<4cm,0
 drm24,Inner Reef,S,3082,40,MYCE,>4cm,0
 drm24,Inner Reef,S,3082,20,ORBI,<4cm,0
-drm24,Inner Reef,S,3082,20,ORBI,>4cm,0
+drm24,Inner Reef,S,3082,40,ORBI,>4cm,0
 drm24,Inner Reef,S,3082,40,PCLI,>4cm,0
 drm24,Inner Reef,S,3082,20,PORI,<4cm,0
 drm24,Inner Reef,S,3082,20,PORI,>4cm,3
@@ -8368,7 +8368,7 @@ drm24,Inner Reef,S,3083,40,MMEA,>4cm,0
 drm24,Inner Reef,S,3083,40,MUSS,<4cm,0
 drm24,Inner Reef,S,3083,40,MYCE,>4cm,0
 drm24,Inner Reef,S,3083,20,ORBI,<4cm,0
-drm24,Inner Reef,S,3083,20,ORBI,>4cm,0
+drm24,Inner Reef,S,3083,40,ORBI,>4cm,0
 drm24,Inner Reef,S,3083,40,PCLI,>4cm,0
 drm24,Inner Reef,S,3083,20,PORI,<4cm,5
 drm24,Inner Reef,S,3083,20,PORI,>4cm,6
@@ -8397,7 +8397,7 @@ drm24,Inner Reef,S,3084,40,MMEA,>4cm,0
 drm24,Inner Reef,S,3084,40,MUSS,<4cm,3
 drm24,Inner Reef,S,3084,40,MYCE,>4cm,0
 drm24,Inner Reef,S,3084,20,ORBI,<4cm,0
-drm24,Inner Reef,S,3084,20,ORBI,>4cm,0
+drm24,Inner Reef,S,3084,40,ORBI,>4cm,0
 drm24,Inner Reef,S,3084,40,PCLI,>4cm,0
 drm24,Inner Reef,S,3084,20,PORI,<4cm,0
 drm24,Inner Reef,S,3084,20,PORI,>4cm,8
@@ -8426,7 +8426,7 @@ drm24,Inner Reef,S,3085,40,MMEA,>4cm,0
 drm24,Inner Reef,S,3085,40,MUSS,<4cm,0
 drm24,Inner Reef,S,3085,40,MYCE,>4cm,1
 drm24,Inner Reef,S,3085,20,ORBI,<4cm,0
-drm24,Inner Reef,S,3085,20,ORBI,>4cm,0
+drm24,Inner Reef,S,3085,40,ORBI,>4cm,0
 drm24,Inner Reef,S,3085,40,PCLI,>4cm,0
 drm24,Inner Reef,S,3085,20,PORI,<4cm,2
 drm24,Inner Reef,S,3085,20,PORI,>4cm,0
@@ -8455,7 +8455,7 @@ drm24,Inner Reef,S,3086,40,MMEA,>4cm,1
 drm24,Inner Reef,S,3086,40,MUSS,<4cm,0
 drm24,Inner Reef,S,3086,40,MYCE,>4cm,0
 drm24,Inner Reef,S,3086,20,ORBI,<4cm,0
-drm24,Inner Reef,S,3086,20,ORBI,>4cm,0
+drm24,Inner Reef,S,3086,40,ORBI,>4cm,0
 drm24,Inner Reef,S,3086,40,PCLI,>4cm,0
 drm24,Inner Reef,S,3086,20,PORI,<4cm,1
 drm24,Inner Reef,S,3086,20,PORI,>4cm,3
@@ -8484,7 +8484,7 @@ drm24,Inner Reef,S,3087,40,MMEA,>4cm,1
 drm24,Inner Reef,S,3087,40,MUSS,<4cm,0
 drm24,Inner Reef,S,3087,40,MYCE,>4cm,0
 drm24,Inner Reef,S,3087,20,ORBI,<4cm,0
-drm24,Inner Reef,S,3087,20,ORBI,>4cm,0
+drm24,Inner Reef,S,3087,40,ORBI,>4cm,0
 drm24,Inner Reef,S,3087,40,PCLI,>4cm,0
 drm24,Inner Reef,S,3087,20,PORI,<4cm,1
 drm24,Inner Reef,S,3087,20,PORI,>4cm,1
@@ -8513,7 +8513,7 @@ drm24,Middle Reef,N,3088,40,MMEA,>4cm,0
 drm24,Middle Reef,N,3088,40,MUSS,<4cm,0
 drm24,Middle Reef,N,3088,40,MYCE,>4cm,0
 drm24,Middle Reef,N,3088,20,ORBI,<4cm,0
-drm24,Middle Reef,N,3088,20,ORBI,>4cm,0
+drm24,Middle Reef,N,3088,40,ORBI,>4cm,0
 drm24,Middle Reef,N,3088,40,PCLI,>4cm,0
 drm24,Middle Reef,N,3088,20,PORI,<4cm,4
 drm24,Middle Reef,N,3088,20,PORI,>4cm,1
@@ -8542,7 +8542,7 @@ drm24,Middle Reef,N,3089,40,MMEA,>4cm,0
 drm24,Middle Reef,N,3089,40,MUSS,<4cm,0
 drm24,Middle Reef,N,3089,40,MYCE,>4cm,0
 drm24,Middle Reef,N,3089,20,ORBI,<4cm,0
-drm24,Middle Reef,N,3089,20,ORBI,>4cm,0
+drm24,Middle Reef,N,3089,40,ORBI,>4cm,0
 drm24,Middle Reef,N,3089,40,PCLI,>4cm,0
 drm24,Middle Reef,N,3089,20,PORI,<4cm,1
 drm24,Middle Reef,N,3089,20,PORI,>4cm,5
@@ -8571,7 +8571,7 @@ drm24,Middle Reef,N,3090,40,MMEA,>4cm,3
 drm24,Middle Reef,N,3090,40,MUSS,<4cm,0
 drm24,Middle Reef,N,3090,40,MYCE,>4cm,0
 drm24,Middle Reef,N,3090,20,ORBI,<4cm,0
-drm24,Middle Reef,N,3090,20,ORBI,>4cm,0
+drm24,Middle Reef,N,3090,40,ORBI,>4cm,0
 drm24,Middle Reef,N,3090,40,PCLI,>4cm,0
 drm24,Middle Reef,N,3090,20,PORI,<4cm,0
 drm24,Middle Reef,N,3090,20,PORI,>4cm,5
@@ -8600,7 +8600,7 @@ drm24,Middle Reef,N,3091,40,MMEA,>4cm,4
 drm24,Middle Reef,N,3091,40,MUSS,<4cm,0
 drm24,Middle Reef,N,3091,40,MYCE,>4cm,2
 drm24,Middle Reef,N,3091,20,ORBI,<4cm,0
-drm24,Middle Reef,N,3091,20,ORBI,>4cm,0
+drm24,Middle Reef,N,3091,40,ORBI,>4cm,0
 drm24,Middle Reef,N,3091,40,PCLI,>4cm,0
 drm24,Middle Reef,N,3091,20,PORI,<4cm,0
 drm24,Middle Reef,N,3091,20,PORI,>4cm,4
@@ -8629,7 +8629,7 @@ drm24,Middle Reef,S,3092,40,MMEA,>4cm,1
 drm24,Middle Reef,S,3092,40,MUSS,<4cm,0
 drm24,Middle Reef,S,3092,40,MYCE,>4cm,0
 drm24,Middle Reef,S,3092,20,ORBI,<4cm,0
-drm24,Middle Reef,S,3092,20,ORBI,>4cm,0
+drm24,Middle Reef,S,3092,40,ORBI,>4cm,0
 drm24,Middle Reef,S,3092,40,PCLI,>4cm,0
 drm24,Middle Reef,S,3092,20,PORI,<4cm,1
 drm24,Middle Reef,S,3092,20,PORI,>4cm,2
@@ -8658,7 +8658,7 @@ drm24,Middle Reef,S,3093,40,MMEA,>4cm,0
 drm24,Middle Reef,S,3093,40,MUSS,<4cm,0
 drm24,Middle Reef,S,3093,40,MYCE,>4cm,1
 drm24,Middle Reef,S,3093,20,ORBI,<4cm,0
-drm24,Middle Reef,S,3093,20,ORBI,>4cm,0
+drm24,Middle Reef,S,3093,40,ORBI,>4cm,0
 drm24,Middle Reef,S,3093,40,PCLI,>4cm,0
 drm24,Middle Reef,S,3093,20,PORI,<4cm,2
 drm24,Middle Reef,S,3093,20,PORI,>4cm,2
@@ -8687,7 +8687,7 @@ drm24,Nearshore Ridge Complex,N,3095,40,MMEA,>4cm,0
 drm24,Nearshore Ridge Complex,N,3095,40,MUSS,<4cm,0
 drm24,Nearshore Ridge Complex,N,3095,40,MYCE,>4cm,0
 drm24,Nearshore Ridge Complex,N,3095,20,ORBI,<4cm,0
-drm24,Nearshore Ridge Complex,N,3095,20,ORBI,>4cm,0
+drm24,Nearshore Ridge Complex,N,3095,40,ORBI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3095,40,PCLI,>4cm,0
 drm24,Nearshore Ridge Complex,N,3095,20,PORI,<4cm,3
 drm24,Nearshore Ridge Complex,N,3095,20,PORI,>4cm,0
@@ -8716,7 +8716,7 @@ drm24,Inner Reef,N,3110,40,MMEA,>4cm,0
 drm24,Inner Reef,N,3110,40,MUSS,<4cm,0
 drm24,Inner Reef,N,3110,40,MYCE,>4cm,0
 drm24,Inner Reef,N,3110,20,ORBI,<4cm,0
-drm24,Inner Reef,N,3110,20,ORBI,>4cm,0
+drm24,Inner Reef,N,3110,40,ORBI,>4cm,0
 drm24,Inner Reef,N,3110,40,PCLI,>4cm,0
 drm24,Inner Reef,N,3110,20,PORI,<4cm,1
 drm24,Inner Reef,N,3110,20,PORI,>4cm,2

@@ -2415,7 +2415,7 @@ mod_nb3.7 <- brm(
     prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
   ),
   chains = 4, cores = 4, threads = threading(5),
-  iter = 100, warmup = 50, thin = 1,
+  iter = 6000, warmup = 3000, thin = 1,
   backend = "cmdstanr",
   control = list(adapt_delta = 0.99),
   seed = 20240717
