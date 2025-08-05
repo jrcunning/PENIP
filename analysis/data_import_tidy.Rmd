@@ -2445,10 +2445,10 @@ area <- mod_nb3.7$data$transect_area_m2
 
 y <- mod_nb3.7$data$n / area
 set.seed(124)
-yrep  <- posterior_predict(mod_nb3.7, ndraws = 100)
+yrep  <- posterior_predict(mod_nb3.7, ndraws = 1000)
 yrep <- sweep(yrep, 2, area, FUN = "/")
 set.seed(124)
-mu    <- posterior_epred(mod_nb3.7, ndraws = 100)  # matrix: draws x observations
+mu    <- posterior_epred(mod_nb3.7, ndraws = 1000)  # matrix: draws x observations
 mu   <- sweep(mu,   2, area, FUN = "/")
 
 
@@ -2514,7 +2514,7 @@ dfftaxon <- dfftaxon %>%
   mutate(taxon_class = paste(taxon, class, sep = "_"))
 
 # Step 2: Draw predicted counts
-ppreds <- add_predicted_draws(mod_nb3.7, newdata = dfftaxon, ndraws = 100) %>%
+ppreds <- add_predicted_draws(mod_nb3.7, newdata = dfftaxon, ndraws = 1000) %>%
   mutate(.prediction = .prediction / transect_area_m2)    # CONVERT TO DENSITY
 
 
@@ -2588,15 +2588,27 @@ ppp_zero <- compute_ppp("p_zero_pred", "p_zero_obs")
 ppp_skew <- compute_ppp("skew_pred", "skew_obs")
 
 # Step 6: Combine
-ppp_summary_grouped <- bind_rows(ppp_mean, ppp_sd, ppp_zero, ppp_skew) %>%
+ppp_summary_grouped <- bind_rows(ppp_mean, ppp_sd, ppp_zero, ppp_skew) 
+
+# Compare observed to predicted values for taxon-class-habitat groups that were actually observed
+observed_combos <- dfftaxon %>% filter(n > 0) %>% distinct(taxon, class, Type) %>%
+  mutate(taxon_class = paste(taxon, class, sep = "_"))
+
+ppp_summary_grouped_obs <- ppp_summary_grouped %>%
+  semi_join(observed_combos, by = c("taxon_class", "Type"))
+
+ppp_summary_grouped_obs_ext <- ppp_summary_grouped_obs %>%
   filter(ppp < 0.05 | ppp > 0.95) %>%
   pivot_wider(names_from = statistic, values_from = ppp)
 
-ppp_summary_grouped %>% print(n = nrow(.))
+ppp_summary_grouped_obs_ex
+nrow(ppp_summary_grouped_obs)
 ```
 
 
 ### Final density estimates
+
+#### Datasets equal-weighted
 
 ```{r}
 # Equal weighting datasets
@@ -2663,6 +2675,57 @@ summary_equal_weighted_combined <- draws_equal_weighted_combined %>%
 
 ```
 
+#### 2024-specific estimates
+```{r}
+newdata_drm24 <- dfftaxon %>%
+  distinct(taxon, class, Type) %>% 
+  mutate(transect_area_m2 = 1)  %>%
+  complete(Type = unique(dfftaxon$Type),  # add all habitat Types
+           fill = list(transect_area_m2 = 1)) %>%
+  mutate(dataset = "drm24")
+
+preds_drm24 <- add_epred_draws(
+  mod_nb3.7,
+  newdata = newdata_drm24,
+  re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
+)
+
+summary_drm24 <- preds_drm24 %>%
+  group_by(taxon, class, Type) %>%
+  mean_qi(.epred, .width = 0.95) %>%
+  rename(n_m2 = .epred)
+
+draws_drm24_combined <- preds_drm24 %>%
+  group_by(.draw, taxon, class, Type) %>%
+  summarize(n_m2 = mean(.epred), .groups = "drop") %>%
+
+  # Compute "All" class
+  group_by(.draw, taxon, Type) %>%
+  mutate(total_n_m2 = sum(n_m2[class != "All"])) %>%
+  ungroup() %>%
+  pivot_longer(
+    cols = c("n_m2", "total_n_m2"),
+    names_to = "class_source",
+    values_to = "n_m2"
+  ) %>%
+  mutate(class = ifelse(class_source == "total_n_m2", "All", class)) %>%
+  select(-class_source) %>%
+
+  # Remove redundant "All" for single-class taxa
+  group_by(taxon) %>%
+  mutate(n_classes = n_distinct(class[class != "All"])) %>%
+  ungroup() %>%
+  filter(class != "All" | n_classes > 1) %>%
+  select(-n_classes)
+
+summary_drm24_combined <- draws_drm24_combined %>%
+  group_by(taxon, class, Type) %>%
+  mean_qi(n_m2, .width = 0.95)
+
+
+summary_drm24_combined %>% filter(class != "All")
+
+```
 
 # Results
 
@@ -3059,25 +3122,6 @@ tot1 <- left_join(densities_tot, area_summary, by = "Type") %>%
          tot_lower = n_m2 * total_area_m2,
          tot_upper = n_m2 * total_area_m2)
 
-# taba2 <- tot1 %>%
-#   group_by(Type, name) %>%
-#   summarize(total_area_m2 = sum(total_area_m2), .groups = "drop") %>%
-#   pivot_wider(names_from = name, values_from = total_area_m2) %>%
-#   janitor::adorn_totals(where = c("row", "col")) %>%
-#   mutate(across(where(is.numeric), ~ formatC(.x, format = "e", digits = 2)))
-# 
-# taba2 %>%
-#   knitr::kable(caption = "Total area (m2) of each habitat type in each impact zone")
-# 
-# # Transpose using first column as rownames
-# taba2_flipped <- taba2 %>%
-#   column_to_rownames(var = names(taba2)[1]) %>%  # Set first column as rownames
-#   t() %>%
-#   as.data.frame() %>%
-#   rownames_to_column(var = names(taba2)[1])      # Move former colnames into a new column
-# 
-# write_csv(taba2_flipped, file = "outputs/TableA2.csv")
-
 # Calculate total per taxclass per impact zone (sum all habitat Types)
 tot2 <- tot1 %>%
   group_by(taxon, class, name) %>%
@@ -3115,64 +3159,7 @@ tot3 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
 
 write_csv(tot3, file = "outputs/Table2.csv")
-
-ttt <- tot2 %>% filter(taxon %in% c("ACER", "ORBI")) %>%
-  group_by(taxon) %>%
-  summarize(tot = sum(tot))
-ttt
 ```
-
-
-```{r}
-# posterior_type_totals <- preds %>%
-#   group_by(.draw, taxon, class, Type, dataset) %>%
-#   summarize(mean_value = mean(.epred), .groups = "drop") %>%
-#   group_by(.draw, dataset, Type) %>%
-#   summarize(total_epred = sum(mean_value), .groups = "drop")
-# 
-# 
-# total_perType <- posterior_type_totals %>%
-#   group_by(dataset, Type) %>%
-#   summarize(
-#     fit_mean = mean(total_epred),
-#     fit_sd = sd(total_epred),
-#     fit_lower = quantile(total_epred, 0.025),
-#     fit_upper = quantile(total_epred, 0.975),
-#     .groups = "drop"
-#   )
-# 
-# totals <- left_join(total_perType, area_summary, by = "Type") %>%  # area_summary must have Type, total_area_m2, name
-#   mutate(
-#     tot_estimate = fit_mean * total_area_m2,
-#     tot_lower = fit_lower * total_area_m2,
-#     tot_upper = fit_upper * total_area_m2,
-#     Type = factor(Type, levels = type_levels),
-#     name = factor(name, levels = zone_levels)
-#   ) %>%
-#   complete(dataset, Type, fill = list(tot_estimate = NA, tot_lower = NA, tot_upper = NA))
-# 
-# totals <- totals %>% mutate(dataset = factor(dataset, levels = dataset_levels))
-# 
-# ggplot(totals, aes(x = dataset, y = tot_estimate, fill = fct_rev(name))) +
-#   facet_grid(~Type) +
-#   geom_col(position = "stack") +
-#   scale_fill_brewer(palette = "Set3") +
-#   labs(
-#     x = "Survey Dataset",
-#     y = "Total Corals (area-scaled)",
-#     fill = "Impact Zone",
-#     title = "Estimated Total Coral Abundance per Habitat Type and Dataset"
-#   ) +
-#   theme_classic(base_size = 10) +
-#   theme(
-#     axis.text.x = element_text(angle = 90, vjust = 0.5),
-#     strip.background = element_blank(),
-#     strip.text = element_text(face = "bold")
-#   )
-# 
-# ggsave(filename = "outputs/FigA2.png")
-```
-
 
 
 ### Treemap plot - Scenario2+NMFS
@@ -3278,7 +3265,7 @@ p +
              min.segment.length = 0.1,
              segment.size = 0.2,
              hjust = 0,
-             size = 1.7) +
+             size = 1.7, seed = 123) +
   theme_void() +
   theme(
     legend.position = "none",
@@ -3393,7 +3380,7 @@ p +
              force = 5,
              min.segment.length = 0.1,
              segment.size = 0.2,
-             hjust = 0,
+             hjust = 0, seed = 123,
              size = 2) +
   theme_void() +
   theme(
@@ -3424,7 +3411,7 @@ newdata <- dfftaxon %>%
 # Step 1: Predictions (same as before)
 preds <- add_epred_draws(
   mod_nb3.7,
-  ndraws = 100,
+  ndraws = 2000,
   newdata = newdata,
   re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
 )
@@ -3664,6 +3651,14 @@ trends_summary <- trends_summary %>%
     abs_change
   ) %>%
   ungroup()
+
+
+
+
+
+
+# Look at 2011 -- 2017 trends for the 3 spp
+
 ```
 
 ### Plot trajectories
@@ -3911,5 +3906,104 @@ ggplot(trends_summary_trans, aes(x = abs_change_trans, y = taxon)) +
         legend.spacing.x = unit(0.1, "cm"))    # horizontal space between items)
 
 ggsave(filename = "outputs/Fig6.png", width = 140, height = 120, units = "mm", dpi = 300)
+```
+
+### Total abundances - 2024
+```{r}
+# TOTAL COLONIES IN EACH IMPACT ZONE
+densities_tot_2024 <- summary_drm24_combined %>% filter(class != "All")
+
+# Calculate total per taxclass per habitat Type and impact zone
+tot1_2024 <- left_join(densities_tot_2024, area_summary, by = "Type") %>%
+  mutate(tot = n_m2 * total_area_m2,
+         tot_lower = n_m2 * total_area_m2,
+         tot_upper = n_m2 * total_area_m2)
+
+# Calculate total per taxclass per impact zone (sum all habitat Types)
+tot2_2024 <- tot1_2024 %>%
+  group_by(taxon, class, name) %>%
+  summarize(tot = round(sum(tot))) %>%
+  arrange(name)
+
+# STEP 1: Aggregate total abundance by taxon + class
+tot4_2024 <- tot2_2024 %>%
+  filter(name != "Rest of Monitoring Area") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop")
+
+# Add taxon_class to original data
+tot4_2024 <- tot4_2024 %>%
+  mutate(taxon_class = paste(taxon, class, sep = "_"))
+
+# Plot with taxon labels only
+p <- ggplot(tot4_2024, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
+  geom_treemap(color = NA)+#, layout = "srow") +
+  geom_treemap_subgroup_border(colour = "white", size = 1)+#, layout = "srow") +
+  # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
+  #                             alpha = 0.8, colour = "black", size = 8) +
+  scale_fill_manual(values = fill_colors) +
+  theme(legend.position = "none")
+
+
+# 5. Get tile layout and attach taxon_class
+tile_layout <- treemapify(tot4_2024, area = "tot",#, layout = "srow",
+                          fill = "taxon_class", subgroup = "taxon")
+
+# 6. Flag small boxes (aggregate size classes)
+tile_layout_ag <- tile_layout %>%
+  group_by(taxon) %>%
+  summarize(xmin = min(xmin), xmax = max(xmax),
+            ymin = min(ymin), ymax = max(ymax),
+            area = (xmax - xmin) * (ymax - ymin),
+            center_x = (xmin + xmax) / 2,
+            center_y = (ymin + ymax) / 2)
+area_threshold <- 0.0009
+internal_labels <- tile_layout_ag %>% 
+  filter(area >= area_threshold)
+external_labels <- tile_layout_ag %>% 
+  filter(area < area_threshold)
+
+# Create labels with taxontotals
+taxtots <- tot4_2024 %>%
+  group_by(taxon) %>%
+  summarize(tot = scales::comma(sum(tot)))
+
+internal_labels <- left_join(internal_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+external_labels <- left_join(external_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+# 7. Final plot
+p + 
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  coord_cartesian(clip = "off") +
+  geom_text(data = internal_labels,
+            aes(x = xmin, y = ymax-0.00001,
+                label = label, size = area), inherit.aes = FALSE,
+            hjust = 0, vjust = 1, lineheight = 0.7,
+            nudge_x = 0.001, nudge_y = -0.005) +
+  scale_size_continuous(range = c(1.5, 15)) +
+  geom_text_repel(data = external_labels,
+             aes(x = center_x, y = center_y, 
+                 label = label), inherit.aes = FALSE,
+             max.overlaps = Inf,
+             box.padding = 0.18,
+             xlim = c(1, NA),
+             force = 3,
+             lineheight = 0.7,
+             min.segment.length = 0.1,
+             segment.size = 0.2,
+             hjust = 0,
+             size = 1.7, seed = 123) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
+    plot.background = element_rect(fill = "white", color = NA),
+  )
+  
+ggsave(filename = "outputs/Fig4_2024.png", width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
