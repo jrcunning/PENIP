@@ -2390,37 +2390,37 @@ sd(vmr_summary_f$log_phi, na.rm = TRUE)
 
 ## Fit model
 ```{r}
-mod_nb3.7 <- brm(
-  bf(
-    n ~ taxon:class * Type +
-      (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
-      (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
-      (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-      offset(log(transect_area_m2)),
-    zi ~ taxon:class * Type,
-    shape ~ taxon:class * Type
-  ),
-  data = dfftaxon,
-  family = zero_inflated_negbinomial(),
-  prior = c(
-    # Effects on log density (taxon:class * Type)
-    prior(normal(0, 2), class = "b"),
-    # Centered on global mean log-density
-    prior(normal(-2.8, 1.8), class = "Intercept"),
-    # Informed by logit(p_zero) distribution
-    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-    # Matches empirical shape estimates
-    prior(normal(-0.9, 1), class = "b", dpar = "shape"),
-    # Regularize random effects to prevent overfitting (important for PPP)
-    prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-  ),
-  chains = 4, cores = 4, threads = threading(5),
-  iter = 6000, warmup = 3000, thin = 1,
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.99),
-  seed = 20240717
-)
-saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
+# mod_nb3.7 <- brm(
+#   bf(
+#     n ~ taxon:class * Type +
+#       (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
+#       (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
+#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
+#       offset(log(transect_area_m2)),
+#     zi ~ taxon:class * Type,
+#     shape ~ taxon:class * Type
+#   ),
+#   data = dfftaxon,
+#   family = zero_inflated_negbinomial(),
+#   prior = c(
+#     # Effects on log density (taxon:class * Type)
+#     prior(normal(0, 2), class = "b"),
+#     # Centered on global mean log-density
+#     prior(normal(-2.8, 1.8), class = "Intercept"),
+#     # Informed by logit(p_zero) distribution
+#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+#     # Matches empirical shape estimates
+#     prior(normal(-0.9, 1), class = "b", dpar = "shape"),
+#     # Regularize random effects to prevent overfitting (important for PPP)
+#     prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
+#   ),
+#   chains = 4, cores = 4, threads = threading(5),
+#   iter = 6000, warmup = 3000, thin = 1,
+#   backend = "cmdstanr",
+#   control = list(adapt_delta = 0.99),
+#   seed = 20240717
+# )
+# saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
 mod_nb3.7 <- readRDS("data/processed/mod_nb3.7.rds")
 
 ```
@@ -2741,7 +2741,7 @@ fig2 <- taxdens +
         legend.key.width = unit(2, "lines"),
         legend.margin = margin(t = -5, b = 0))  # move legend up)
 fig2
-ggsave(filename = "outputs/Fig2new.png", width = 170, height = 170, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
 
 #### TABLE
 
@@ -2915,7 +2915,7 @@ plot_total <- ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
   geom_col(fill = "#7570b3") +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 0.25) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.75), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = bquote("Density (colonies m"^-2*")"),
@@ -2946,7 +2946,7 @@ plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)
   #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
   scale_fill_manual(values = c(">4cm" = "#1b9e77", "<4cm" = "#d95f02")) +
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.75), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
@@ -3004,7 +3004,7 @@ plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)
   )
 )+
   scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.75), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
+  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
   labs(
     x = "Habitat Type",
     y = "",
