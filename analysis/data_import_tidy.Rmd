@@ -1670,6 +1670,26 @@ area_summary2 <- habitat_in_zones_proj %>%
 area_summary2 %>% 
   pivot_wider(names_from = scenario, values_from = total_area_m2)
 
+
+area_summary_acres <- area_summary %>%
+  pivot_wider(
+    names_from = Type,
+    values_from = total_area_m2,
+    names_glue = "{Type}_m2",
+    values_fill = 0
+  ) %>%
+  # Create acres columns from m² columns
+  mutate(across(
+    ends_with("_m2"),
+    ~ .x / 4046.86,
+    .names = "{sub('_m2$', '_acres', .col)}"
+  )) %>%
+  # Round m² columns to the nearest m²
+  mutate(across(ends_with("_m2"), ~ round(.x, 0))) %>%
+  # Round acres columns to 3 decimal places
+  mutate(across(ends_with("_acres"), ~ round(.x, 3)))
+
+write_csv(area_summary_acres, file = "outputs/TableA2.csv")
 ```
 
 # Combine and filter data
@@ -3097,16 +3117,16 @@ ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dp
 
 
 
-summary_combined <- bind_rows(
-  summary_class %>% transmute(Type, group = as.character(class), mean = total_epred, lower = .lower, upper = .upper),
-  summary_sus   %>% transmute(Type, group = as.character(sus_group), mean = total_epred, lower = .lower, upper = .upper),
-  summary_total_density_by_type %>% transmute(Type, group = "all_corals", mean, lower, upper)
-) %>%
-  mutate(mean_ci = sprintf("%.2f [%.2f-%.2f]", mean, lower, upper)) %>%
-  select(Type, group, mean_ci) %>%
-  arrange(Type, group)
-
-write_csv(summary_combined, file = "outputs/TableA2.csv")
+# summary_combined <- bind_rows(
+#   summary_class %>% transmute(Type, group = as.character(class), mean = total_epred, lower = .lower, upper = .upper),
+#   summary_sus   %>% transmute(Type, group = as.character(sus_group), mean = total_epred, lower = .lower, upper = .upper),
+#   summary_total_density_by_type %>% transmute(Type, group = "all_corals", mean, lower, upper)
+# ) %>%
+#   mutate(mean_ci = sprintf("%.2f [%.2f-%.2f]", mean, lower, upper)) %>%
+#   select(Type, group, mean_ci) %>%
+#   arrange(Type, group)
+# 
+# write_csv(summary_combined, file = "outputs/TableA2.csv")
 ```
 
 ## Totals in impact zones
