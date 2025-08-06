@@ -3271,7 +3271,8 @@ p +
     legend.position = "none",
     plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
     plot.background = element_rect(fill = "white", color = NA),
-  )
+  ) +
+  labs(title = "Total corals in scenario 2 zones + NMFS areas, surveys (all years) equal-weighted")
   
 ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", dpi = 600)
 
@@ -3387,7 +3388,8 @@ p +
     legend.position = "none",
     plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
     plot.background = element_rect(fill = "white", color = NA),
-  )
+  ) +
+  labs(title = "Total corals in full impact monitoring area, surveys (all years) equal-weighted")
   
 ggsave(filename = "outputs/FigA2.png", width = 180, height = 130, units = "mm", dpi = 600)
 
@@ -4003,7 +4005,8 @@ p +
     legend.position = "none",
     plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
     plot.background = element_rect(fill = "white", color = NA),
-  )
+  ) +
+  labs(title = "Total corals in scenario 2 zones + NMFS areas, 2024 estimates")
   
 ggsave(filename = "outputs/FigA3.png", width = 180, height = 130, units = "mm", dpi = 600)
 ```
@@ -4101,7 +4104,8 @@ p +
     legend.position = "none",
     plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
     plot.background = element_rect(fill = "white", color = NA),
-  )
+  ) +
+  labs(title = "Total corals in full impact monitoring area, 2024 estimates")
   
 ggsave(filename = "outputs/FigA4.png", width = 180, height = 130, units = "mm", dpi = 600)
 ```
