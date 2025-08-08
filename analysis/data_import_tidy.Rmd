@@ -62,9 +62,17 @@ taxon_groups_juv <- list(
   FAVI = c("FAVI", "FFRA", "MARE", "DLAB", "PSTR", "PCLI", "CNAT"),
   MEAN = c("MMEA", "MEAN", "DCYL", "DSTO", "EFAS")
 )
+taxon_group_df <- bind_rows(lapply(names(taxon_groups_juv), function(group) {
+  tibble(taxon = taxon_groups_juv[[group]], group = group)
+}))
+taxon_group_df <- taxon_group_df %>% filter(taxon != group)
 # Convert to lookup tibble
 taxon_lookup_juv <- enframe(taxon_groups_juv, name = "taxon_group", value = "taxon") %>%
   unnest(taxon)
+
+
+
+
 
 
 # Create taxon labels
@@ -92,13 +100,24 @@ taxon_labels <- c(
    All = '"All taxa"'
 )
 
-
+# Define susceptibility groups
+group_definitions <- tibble(
+  taxon = names(taxon_labels),
+  sus_group = case_when(
+    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA", "DLAB", "CNAT", "PSTR", "PCLI") ~ "high_sus",
+    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "mod_sus",
+    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
+    TRUE ~ NA_character_
+  )
+) %>%
+  mutate(sus_group = factor(sus_group, levels = c("low_sus", "mod_sus", "high_sus")))
 
 # Order levels of Habitat Types
 type_levels <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef",
                  "Outer Reef")
 type_labels <- c("NRC", "IR", "MR", "OR")
 names(type_labels) <- type_levels
+type_labels2 <- c("Nearshore\nRidge Complex", "Inner\nReef", "Middle\nReef", "Outer\nReef")
 
 # Order survey datasets
 dataset_levels <- c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")
@@ -1689,7 +1708,7 @@ area_summary_acres <- area_summary %>%
   # Round acres columns to 3 decimal places
   mutate(across(ends_with("_acres"), ~ round(.x, 3)))
 
-write_csv(area_summary_acres, file = "outputs/TableA2.csv")
+write_csv(area_summary_acres, file = "outputs/TableA1.csv")
 ```
 
 # Combine and filter data
@@ -2153,6 +2172,9 @@ var_count / mean_count
 
 
 dfftaxon %>% filter(taxon == "ORBI", dataset == "drm24", n > 0)
+dfftaxon %>% filter(taxon == "ORBI", dataset == "dca17", n > 0)
+dfftaxon %>% filter(taxon == "ORBI", dataset == "tt21", n > 0)
+dfftaxon %>% filter(taxon == "ORBI", dataset == "tt23", n > 0)
 ```
 
 # Map surveys & impact zones
@@ -2692,7 +2714,22 @@ summary_equal_weighted_combined <- draws_equal_weighted_combined %>%
   mean_qi(n_m2, .width = 0.95)
 
 
+# Set taxon order for plotting
+# Order taxa by overall abundance for plotting
+taxorder <- summary_equal_weighted_combined %>%
+  group_by(taxon) %>%
+  mutate(
+    n_classes = n_distinct(class[class != "All"])
+  ) %>%
+  ungroup() %>%
+  filter((n_classes > 1 & class == "All") | (n_classes == 1 & class != "All")) %>%
+  group_by(taxon) %>%
+  summarize(maxdens = max(n_m2), .groups = "drop") %>%
+  mutate(taxon = fct_reorder(taxon, -maxdens))
 
+summary_equal_weighted_combined <- summary_equal_weighted_combined %>%
+  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)),
+         class = factor(class, levels = c("<4cm", "All", ">4cm")))
 ```
 
 #### 2024-specific estimates
@@ -2743,7 +2780,9 @@ summary_drm24_combined <- draws_drm24_combined %>%
   mean_qi(n_m2, .width = 0.95)
 
 
-summary_drm24_combined %>% filter(class != "All")
+summary_drm24_combined <- summary_drm24_combined %>%
+  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)),
+         class = factor(class, levels = c("<4cm", "All", ">4cm")))
 
 ```
 
@@ -2753,114 +2792,142 @@ summary_drm24_combined %>% filter(class != "All")
 
 ### Taxon densities
 ```{r, fig.width = 10, fig.height = 10}
-densities <- summary_equal_weighted_combined
+##### Function to plot densities of all taxon:class:habitat combinations with provided data frame
 
-###############
-# DENSITY OF EACH TAXON x CLASS IN EACH HABITAT TYPE
-
-# Order taxa by overall abundance for plotting
-taxorder <- densities %>%
-  group_by(taxon) %>%
-  mutate(
-    n_classes = n_distinct(class[class != "All"])
-  ) %>%
-  ungroup() %>%
-  filter((n_classes > 1 & class == "All") | (n_classes == 1 & class != "All")) %>%
-  group_by(taxon) %>%
-  summarize(maxdens = max(n_m2), .groups = "drop") %>%
-  mutate(taxon = fct_reorder(taxon, -maxdens))
-
-densities <- densities %>%
-  mutate(taxon = factor(taxon, levels = levels(taxorder$taxon)),
-         class = factor(class, levels = c("<4cm", "All", ">4cm")))
-levels(as.factor(densities$class))
-
-#### PLOT
-taxdens <- ggplot(densities, aes(x = Type, y = n_m2, color = class)) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.4,
-                position = position_dodge(width = 0.2), alpha = 0.6) +
-  geom_line(aes(group = class, color = class),
-             position = position_dodge(width = 0.2)) +
-  geom_point(size = 1.5, alpha = 0.6,
-              position = position_dodge(width = 0.2)) +
-  facet_wrap(~taxon, labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed)), scales = "free_y", ncol = 4) +
-  scale_x_discrete(labels = type_labels) +
-  scale_color_manual(values = c("<4cm" = "#d95f02", ">4cm" = "#1b9e77", "All" = "#7570b3"),
-                     labels = c("<4cm", "≥4cm", "All"),
-                     breaks = c("<4cm", ">4cm", "All")) +
-  labs(
-  x = "Habitat Type",
-  y = bquote("Density (colonies m"^-2*")")) +
-  theme_minimal()
-
-
-taxon_group_df <- bind_rows(lapply(names(taxon_groups_juv), function(group) {
-  tibble(taxon = taxon_groups_juv[[group]], group = group)
-}))
-taxon_group_df <- taxon_group_df %>% filter(taxon != group)
-
-annotation_df <- densities %>%
-  distinct(taxon) %>%
-  left_join(taxon_group_df, by = "taxon") %>%
-  filter(!is.na(group)) %>%
-  mutate(group2 = case_when(group == "FAVI" ~ "Faviinae",
-                            group == "MUSS" ~ "Mussinae",
-                            group == "MEAN" ~ "Meandrinidae")) %>%
-  mutate(taxon = factor(taxon, levels = taxorder$taxon),
-         label = paste0("<4cm = ", group2),
-         # Choose a y-position (adjust as needed for your scale)
-         x = 2.5,
-         y = Inf)  # log10-scale safe low value
-
-fig2 <- taxdens +
-  geom_text(data = annotation_df, aes(x = x, y = y, label = label),
-            inherit.aes = FALSE, hjust = 0.5, size = 2.5, color = "#d95f02") +
-  theme(panel.background = element_rect(fill = "white", color = NA),
-        plot.background = element_rect(fill = "white", color = NA)) +
-  coord_cartesian(clip = "off") +
-  scale_y_continuous(limits = c(0, NA)) +
-  labs(color = "Size class") +
-  theme(legend.position = "bottom",
-        legend.key.width = unit(2, "lines"),
-        legend.margin = margin(t = -5, b = 0))  # move legend up)
-fig2
-ggsave(filename = "outputs/Fig2.png", width = 170, height = 170, units = "mm", dpi = 300)
-
-#### TABLE
-
-# Step 1: Format the data
-type_order <- unique(densities$Type)  # preserves original order
-class_order <- c("<4cm", ">4cm", "All")
-
-summary_preds_fmt <- densities %>%
-  mutate(
-    class = factor(class, levels = class_order),
-    Type = factor(Type, levels = type_order),
-    mean_ci = sprintf(
-      "%s [%s-%s]",  # en-dash
-      formatC(n_m2, format = "fg", digits = 2, flag = "#"),
-      formatC(.lower, format = "fg", digits = 2, flag = "#"),
-      formatC(.upper, format = "fg", digits = 2, flag = "#")
+make_taxon_density_plot <- function(densities, output_path, width, height) {
+  
+  # Create base plot
+  taxdens <- ggplot(densities, aes(x = Type, y = n_m2, color = class)) +
+    geom_errorbar(aes(ymin = .lower, ymax = .upper), width = 0, linewidth = 0.4,
+                  position = position_dodge(width = 0.2), alpha = 0.6) +
+    geom_line(aes(group = class), position = position_dodge(width = 0.2)) +
+    geom_point(size = 1.5, alpha = 0.6, position = position_dodge(width = 0.2)) +
+    facet_wrap(~taxon, labeller = labeller(taxon = as_labeller(taxon_labels, label_parsed)),
+               scales = "free_y", ncol = 4) +
+    scale_x_discrete(labels = type_labels) +
+    scale_color_manual(
+      values = c("<4cm" = "#d95f02", ">4cm" = "#1b9e77", "All" = "#7570b3"),
+      labels = c("<4cm", "≥4cm", "All"),
+      breaks = c("<4cm", ">4cm", "All")
+    ) +
+    labs(
+      x = "Habitat Type",
+      y = bquote("Density (colonies m"^-2*")"),
+      color = "Size class"
+    ) +
+    theme_minimal()
+  
+  # Generate taxon group annotations
+  taxon_group_df <- bind_rows(lapply(names(taxon_groups_juv), function(group) {
+    tibble(taxon = taxon_groups_juv[[group]], group = group)
+  })) %>%
+    filter(taxon != group)
+  
+  annotation_df <- densities %>%
+    distinct(taxon) %>%
+    left_join(taxon_group_df, by = "taxon") %>%
+    filter(!is.na(group)) %>%
+    mutate(
+      group2 = case_when(
+        group == "FAVI" ~ "Faviinae",
+        group == "MUSS" ~ "Mussinae",
+        group == "MEAN" ~ "Meandrinidae",
+        TRUE ~ group
+      ),
+      taxon = factor(taxon, levels = taxorder$taxon),
+      label = paste0("<4cm = ", group2),
+      x = 2.5,
+      y = Inf
     )
-  )
+  
+  # Final figure with annotations
+  fig <- taxdens +
+    geom_text(data = annotation_df, aes(x = x, y = y, label = label),
+              inherit.aes = FALSE, hjust = 0.5, size = 2.5, color = "#d95f02") +
+    theme(
+      panel.background = element_rect(fill = "white", color = NA),
+      plot.background = element_rect(fill = "white", color = NA),
+      legend.position = "bottom",
+      legend.key.width = unit(2, "lines"),
+      legend.margin = margin(t = -5, b = 0)
+    ) +
+    coord_cartesian(clip = "off") +
+    scale_y_continuous(limits = c(0, NA))
+  
+  # Save and return the plot
+  ggsave(filename = output_path, plot = fig, 
+         width = width, height = height, 
+         units = "mm", dpi = 300)
+  return(fig)
+}
 
 
+# Create plot for dataset-averaged densities
+make_taxon_density_plot(densities = summary_equal_weighted_combined, 
+                        output_path = "outputs/Fig2.png",
+                        width = 170, height = 170)
 
-# Step 2: Pivot to have one column per habitat Type
-table_out <- summary_preds_fmt %>%
-  select(taxon, class, Type, mean_ci) %>%
-  pivot_wider(names_from = Type, values_from = mean_ci) %>%
-  arrange(taxon, class)
+# Create plot for current/2024 densities
+make_taxon_density_plot(densities = summary_drm24_combined, 
+                        output_path = "outputs/FigA2.png",
+                        width = 170, height = 170)
+
+# Create plot for just ACER/ORBI
+make_taxon_density_plot(densities = summary_equal_weighted_combined %>%
+                          filter(taxon %in% c("ACER", "ORBI")),
+                        output_path = "outputs/ACERORBI.png",
+                        width = 120, height = 70)
+
+make_taxon_density_plot(densities = summary_drm24_combined %>%
+                          filter(taxon %in% c("ACER", "ORBI")),
+                        output_path = "outputs/ACERORBI_2024.png",
+                        width = 120, height = 70)
 
 
-############
-write_csv(table_out, file = "outputs/TableA1.csv")
+#### TABLE version
+
+make_taxon_density_table <- function(densities, output_path) {
+  
+  # Set display order
+  type_order <- unique(densities$Type)  # preserves appearance order
+  class_order <- c("<4cm", ">4cm", "All")
+  taxon_levels <- taxorder$taxon  # assumed available
+  
+  # Format and reshape
+  table_out <- densities %>%
+    mutate(
+      taxon = factor(taxon, levels = taxon_levels),
+      class = factor(class, levels = class_order),
+      Type = factor(Type, levels = type_order),
+      mean_ci = sprintf(
+        "%s [%s–%s]",  # en-dash
+        formatC(n_m2, format = "fg", digits = 2, flag = "#"),
+        formatC(.lower, format = "fg", digits = 2, flag = "#"),
+        formatC(.upper, format = "fg", digits = 2, flag = "#")
+      )
+    ) %>%
+    select(taxon, class, Type, mean_ci) %>%
+    pivot_wider(names_from = Type, values_from = mean_ci) %>%
+    arrange(taxon, class)
+  
+  # Save to CSV
+  write_csv(table_out, file = output_path)
+  
+  return(table_out)
+}
+
+# Create table for dataset-averaged densities
+make_taxon_density_table(densities = summary_equal_weighted_combined, 
+                         output_path = "outputs/TableA2.csv")
+
+# Create table for current/2024 densities
+make_taxon_density_table(densities = summary_drm24_combined, 
+                         output_path = "outputs/TableA3.csv")
 ```
 
 ### Raw vs. modeled taxon densities
 
 ```{r}
-
 # Average density per dataset-taxon-class-Type group
 raw_density_summary <- dfftaxon %>%
   mutate(density = n / transect_area_m2) %>%
@@ -2878,7 +2945,7 @@ raw_density_summary <- dfftaxon %>%
     raw_density_upper = raw_density_mean + t_crit * raw_density_se
   )
 
-all <- raw_density_summary %>% left_join(densities) %>%
+all <- raw_density_summary %>% left_join(summary_equal_weighted_combined) %>%
   mutate(taxon_class = paste(taxon, class))
 
 all_long <- all %>%
@@ -2980,443 +3047,159 @@ ggsave(filename = "outputs/FigA1.png", width = 190, height = 250, units = "mm")
 
 ### Combined densities by size and SCTLD-susceptibility
 
+
+
 ```{r}
-type_labels2 <- c("Nearshore\nRidge Complex", "Inner\nReef", "Middle\nReef", "Outer\nReef")
-# ---- TOTAL CORAL DENSITY ----
-summary_total_density_by_type <- draws_equal_weighted %>%
-  group_by(.draw, Type) %>%
-  summarize(total_density = sum(n_m2), .groups = "drop") %>%
-  group_by(Type) %>%
-  summarize(
-    mean = mean(total_density),
-    lower = quantile(total_density, 0.025),
-    upper = quantile(total_density, 0.975),
-    .groups = "drop"
+make_combined_density_figure <- function(draws,
+                                         output_path,
+                                         y_limits = c(0, 2.8)) {
+  draws <- draws %>% filter(class != "All")
+  type_order <- unique(draws$Type)
+  y_breaks <- seq(y_limits[1], y_limits[2] - 0.3, 0.5)
+  y_minor_breaks <- seq(y_limits[1], y_limits[2] - 0.05, 0.25)
+  
+  # -- Total density summary --
+  summary_total <- draws %>%
+    group_by(.draw, Type) %>%
+    summarize(total_density = sum(n_m2), .groups = "drop") %>%
+    group_by(Type) %>%
+    summarize(
+      mean = mean(total_density),
+      lower = quantile(total_density, 0.025),
+      upper = quantile(total_density, 0.975),
+      .groups = "drop"
+    )
+  
+  plot_total <- ggplot(summary_total, aes(x = Type, y = mean)) +
+    geom_col(fill = "#7570b3") +
+    geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 0.25) +
+    scale_x_discrete(labels = type_labels2) +
+    scale_y_continuous(
+      limits = y_limits,
+      breaks = y_breaks,
+      minor_breaks = y_minor_breaks,
+      expand = expansion(mult = c(0.02, 0))
+    ) +
+    labs(
+      x = "Habitat Type",
+      y = bquote("Density (colonies m"^-2*")")
+    ) +
+    theme_minimal(base_size = 8) +
+    theme(
+      axis.text.x = element_text(angle = 0, hjust = 0.5),
+      panel.background = element_rect(fill = "white", color = NA),
+      plot.background = element_rect(fill = "white", color = NA)
+    )
+  
+  # -- Size class summary --
+  summary_class <- draws %>%
+    group_by(.draw, Type, class) %>%
+    summarize(total_epred = sum(n_m2), .groups = "drop") %>%
+    group_by(Type, class) %>%
+    mean_qi(total_epred, .width = 0.95) %>%
+    mutate(
+      class = factor(class, levels = c("<4cm", ">4cm")),
+      label = sprintf("%.2f", total_epred)
+    )
+  
+  plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)) +
+    geom_col(position = position_dodge(width = 0.8), width = 0.8) +
+    geom_errorbar(aes(ymin = .lower, ymax = .upper),
+                  position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
+    scale_fill_manual(values = c(">4cm" = "#1b9e77", "<4cm" = "#d95f02")) +
+    scale_x_discrete(labels = type_labels2) +
+    scale_y_continuous(
+      limits = y_limits,
+      breaks = y_breaks,
+      minor_breaks = y_minor_breaks,
+      expand = expansion(mult = c(0.02, 0))
+    ) +
+    labs(
+      x = "Habitat Type",
+      y = "",
+      fill = "Size Class"
+    ) +
+    theme_minimal(base_size = 8) +
+    theme(
+      axis.text.x = element_text(angle = 0, hjust = 0.5),
+      legend.key.size = unit(4, "mm"),
+      legend.background = element_rect(fill = "white", color = "black", linewidth = 0.25),
+      legend.position = c(0.75, 0.85),
+      panel.background = element_rect(fill = "white", color = NA),
+      plot.background = element_rect(fill = "white", color = NA)
+    )
+  
+  # -- SCTLD susceptibility summary --
+  summary_sus <- draws %>%
+    left_join(group_definitions, by = "taxon") %>%
+    group_by(.draw, Type, sus_group) %>%
+    summarize(total_epred = sum(n_m2), .groups = "drop") %>%
+    group_by(Type, sus_group) %>%
+    mean_qi(total_epred, .width = 0.95) %>%
+    mutate(
+      taxon_group = factor(sus_group, levels = c("high_sus", "mod_sus", "low_sus")),
+      label = sprintf("%.2f", total_epred)
+    )
+  
+  plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)) +
+    geom_col(position = position_dodge(width = 0.8), width = 0.8) +
+    geom_errorbar(aes(ymin = .lower, ymax = .upper),
+                  position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
+    scale_fill_manual(
+      values = c(
+        "high_sus" = darken("#7570b3", 0.3),
+        "mod_sus"  = "#7570b3",
+        "low_sus"  = lighten("#7570b3", 0.4)
+      ),
+      labels = c(
+        "high_sus" = "High",
+        "mod_sus"  = "Moderate",
+        "low_sus"  = "Low"
+      )
+    ) +
+    scale_x_discrete(labels = type_labels2) +
+    scale_y_continuous(
+      limits = y_limits,
+      breaks = y_breaks,
+      minor_breaks = y_minor_breaks,
+      expand = expansion(mult = c(0.02, 0))
+    ) +
+    labs(
+      x = "Habitat Type",
+      y = "",
+      fill = "SCTLD\nSusceptibility"
+    ) +
+    theme_minimal(base_size = 8) +
+    theme(
+      axis.text.x = element_text(angle = 0, hjust = 0.5),
+      legend.key.size = unit(4, "mm"),
+      legend.background = element_rect(fill = "white", color = "black", linewidth = 0.25),
+      legend.position = c(0.75, 0.85),
+      panel.background = element_rect(fill = "white", color = NA),
+      plot.background = element_rect(fill = "white", color = NA)
+    )
+  
+  # -- Combine all panels --
+  combined_plot <- cowplot::plot_grid(
+    plot_total, plot_class, plot_sus,
+    ncol = 3,
+    labels = c("A", "B", "C"),
+    label_size = 10,
+    align = "hv"
   )
-
-plot_total <- ggplot(summary_total_density_by_type, aes(x = Type, y = mean)) +
-  geom_col(fill = "#7570b3") +
-  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 0.25) +
-  scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
-  labs(
-    x = "Habitat Type",
-    y = bquote("Density (colonies m"^-2*")"),
-    title = NULL
-  ) +
-  theme_minimal(base_size = 8) +
-  theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
-
-# ---- BY SIZE CLASS ----
-summary_class <- draws_equal_weighted %>%
-  group_by(.draw, Type, class) %>%
-  summarize(total_epred = sum(n_m2), .groups = "drop") %>%
-  group_by(Type, class) %>%
-  mean_qi(total_epred, .width = 0.95) %>%
-  mutate(
-    class = factor(class, levels = c("<4cm", ">4cm")),
-    label = sprintf("%.2f", total_epred)
-  )
-
-plot_class <- ggplot(summary_class, aes(x = Type, y = total_epred, fill = class)) +
-  geom_col(position = position_dodge(width = 0.8), width = 0.8) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper),
-                position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
-  #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
-  scale_fill_manual(values = c(">4cm" = "#1b9e77", "<4cm" = "#d95f02")) +
-  scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
-  labs(
-    x = "Habitat Type",
-    y = "",
-    fill = "Size Class"
-  ) +
-  theme_minimal(base_size = 8) +
-  theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5),
-    legend.key.size = unit(4, "mm"),
-    legend.background = element_rect(fill = "white", color = "black", linewidth = 0.25),
-    legend.position = c(0.75, 0.85),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
-
-# ---- BY SUSCEPTIBILITY GROUP ----
-# Define susceptibility groups
-group_definitions <- tibble(
-  taxon = unique(preds$taxon),
-  sus_group = case_when(
-    taxon %in% c("FAVI", "MUSS", "MEAN", "DSTO", "EFAS", "MMEA", "DLAB", "CNAT", "PSTR", "PCLI") ~ "high_sus",
-    taxon %in% c("MCAV", "ORBI", "SIDE", "SINT", "SOLE") ~ "mod_sus",
-    taxon %in% c("ACER", "PORI", "AGAR", "MYCE", "MADR") ~ "low_sus",
-    TRUE ~ NA_character_
-  )
-) %>%
-  mutate(sus_group = factor(sus_group, levels = c("low_sus", "mod_sus", "high_sus")))
-
-summary_sus <- draws_equal_weighted %>%
-  left_join(group_definitions) %>%
-  group_by(.draw, Type, sus_group) %>%
-  summarize(total_epred = sum(n_m2), .groups = "drop") %>%
-  group_by(Type, sus_group) %>%
-  mean_qi(total_epred, .width = 0.95) %>%
-  mutate(
-    taxon_group = factor(sus_group, levels = c("high_sus", "mod_sus", "low_sus")),
-    label = sprintf("%.2f", total_epred)
-  )
-
-plot_sus <- ggplot(summary_sus, aes(x = Type, y = total_epred, fill = sus_group)) +
-  geom_col(position = position_dodge(width = 0.8), width = 0.8) +
-  geom_errorbar(aes(ymin = .lower, ymax = .upper),
-                position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
-  #geom_text(aes(label = label), position = position_dodge(width = 0.8), vjust = -0.5, size = 2.5) +
-  scale_fill_manual(
-  values = c(
-    "high_sus" = darken("#7570b3", 0.3),
-    "mod_sus"  = "#7570b3",
-    "low_sus"  = lighten("#7570b3", 0.4)
-  ),
-  labels = c(
-    "high_sus" = "High",
-    "mod_sus"  = "Moderate",
-    "low_sus"  = "Low"
-  )
-)+
-  scale_x_discrete(labels = type_labels2) +
-  scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 2.5, 0.5), minor_breaks = seq(0, 2.75, 0.25), expand = expansion(mult = c(0.02, 0))) +
-  labs(
-    x = "Habitat Type",
-    y = "",
-    fill = "SCTLD\nSusceptibility"
-  ) +
-  theme_minimal(base_size = 8) +
-  theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5),
-    legend.key.size = unit(4, "mm"),
-    legend.background = element_rect(fill = "white", color = "black", linewidth = 0.25),
-    legend.position = c(0.75, 0.85),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
-
-# ---- Combine using cowplot ----
-combined_plot <- cowplot::plot_grid(
-  plot_total, plot_class, plot_sus,
-  ncol = 3,
-  labels = c("A", "B", "C"),
-  label_size = 10,
-  align = "hv"
-)
-
-combined_plot
-ggsave(filename = "outputs/Fig3.png", width = 180, height = 80, units = "mm", dpi = 300)
-
-
-
-# summary_combined <- bind_rows(
-#   summary_class %>% transmute(Type, group = as.character(class), mean = total_epred, lower = .lower, upper = .upper),
-#   summary_sus   %>% transmute(Type, group = as.character(sus_group), mean = total_epred, lower = .lower, upper = .upper),
-#   summary_total_density_by_type %>% transmute(Type, group = "all_corals", mean, lower, upper)
-# ) %>%
-#   mutate(mean_ci = sprintf("%.2f [%.2f-%.2f]", mean, lower, upper)) %>%
-#   select(Type, group, mean_ci) %>%
-#   arrange(Type, group)
-# 
-# write_csv(summary_combined, file = "outputs/TableA2.csv")
-```
-
-## Totals in impact zones
-
-### Taxon totals
-```{r}
-# TOTAL COLONIES IN EACH IMPACT ZONE
-densities_tot <- densities %>% filter(class != "All")
-
-# Calculate total per taxclass per habitat Type and impact zone
-tot1 <- left_join(densities_tot, area_summary, by = "Type") %>%
-  mutate(tot = n_m2 * total_area_m2,
-         tot_lower = n_m2 * total_area_m2,
-         tot_upper = n_m2 * total_area_m2)
-
-# Calculate total per taxclass per impact zone (sum all habitat Types)
-tot2 <- tot1 %>%
-  group_by(taxon, class, name) %>%
-  summarize(tot = round(sum(tot))) %>%
-  arrange(name)
-
-tab2 <- tot2 %>% ungroup() %>%
-  pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
-  janitor::adorn_totals(where = c("row", "col")) %>%
-  mutate(across(where(is.numeric), scales::comma))
-
-tab2 %>%
-  knitr::kable(caption = "Total number of colonies of each coral taxon and size class in each impact zone")
-
-write_csv(tab2, file = "outputs/TableA3.csv")
-```
-
-### Combined totals
-```{r}
-# Calculate total ESA and non-ESA corals per impact zone
-tot3 <- tot2 %>%
-  mutate(ESA = case_when(!taxon %in% c("ACER", "ORBI") ~ "non-ESA",
-                         TRUE ~ taxon)) %>%
-  group_by(name, ESA) %>%
-  summarize(tot = sum(tot), .groups = "drop") %>%
-  pivot_wider(names_from = ESA, values_from = tot) %>%
-  janitor::adorn_totals(where = "col") %>%
-  mutate(cum_ACER = cumsum(ACER),
-         cum_ORBI = cumsum(ORBI),
-         cum_non_ESA = cumsum(`non-ESA`),
-         cum_Total = cumsum(Total)) %>%
-  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
-
-tot3 %>%
-  knitr::kable(caption = "Total coral colonies in all impact zones")
-
-write_csv(tot3, file = "outputs/Table2.csv")
-```
-
-
-### Treemap plot - Scenario2+NMFS
-```{r working_treemap1}
-# STEP 1: Aggregate total abundance by taxon + class
-tot4 <- tot2 %>%
-  filter(name != "Rest of Monitoring Area") %>%
-  group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop")
-
-# Assign a base color per taxon
-set.seed(3)
-base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
-names(base_colors) <- unique(tot4$taxon)
-
-# Define shading function
-get_shades <- function(base_col, class, all_classes) {
-  if (length(all_classes) == 2) {
-    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
-    else colorspace::darken(base_col, 0.1)
-  } else {
-    base_col
-  }
+  
+  ggsave(filename = output_path, plot = combined_plot, width = 180, height = 80, units = "mm", dpi = 300)
+  
+  return(combined_plot)
 }
 
-# Build taxon_class and corresponding shades
-shade_map <- tot4 %>%
-  distinct(taxon, class) %>%
-  rowwise() %>%
-  mutate(
-    base_col = base_colors[[taxon]],
-    all_classes = list(tot4$class[tot4$taxon == taxon]),
-    shade = get_shades(base_col, class, all_classes),
-    taxon_class = paste(taxon, class, sep = "_")
-  ) %>%
-  ungroup()
+make_combined_density_figure(draws = draws_equal_weighted,
+                             output_path = "outputs/Fig3.png")
 
-# Final color map
-fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
-
-# Add taxon_class to original data
-tot4 <- tot4 %>%
-  mutate(taxon_class = paste(taxon, class, sep = "_"))
-
-# Plot with taxon labels only
-p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
-  geom_treemap(color = NA)+#, layout = "srow") +
-  geom_treemap_subgroup_border(colour = "white", size = 1)+#, layout = "srow") +
-  # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
-  #                             alpha = 0.8, colour = "black", size = 8) +
-  scale_fill_manual(values = fill_colors) +
-  theme(legend.position = "none")
-
-
-# 5. Get tile layout and attach taxon_class
-tile_layout <- treemapify(tot4, area = "tot",#, layout = "srow",
-                          fill = "taxon_class", subgroup = "taxon")
-
-# 6. Flag small boxes (aggregate size classes)
-tile_layout_ag <- tile_layout %>%
-  group_by(taxon) %>%
-  summarize(xmin = min(xmin), xmax = max(xmax),
-            ymin = min(ymin), ymax = max(ymax),
-            area = (xmax - xmin) * (ymax - ymin),
-            center_x = (xmin + xmax) / 2,
-            center_y = (ymin + ymax) / 2)
-area_threshold <- 0.001
-internal_labels <- tile_layout_ag %>% 
-  filter(area >= area_threshold)
-external_labels <- tile_layout_ag %>% 
-  filter(area < area_threshold)
-
-# Create labels with taxontotals
-taxtots <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(tot = scales::comma(sum(tot)))
-
-internal_labels <- left_join(internal_labels, taxtots) %>%
-  mutate(label = paste0(taxon, "\n", tot))
-
-external_labels <- left_join(external_labels, taxtots) %>%
-  mutate(label = paste0(taxon, "\n", tot))
-
-# 7. Final plot
-p + 
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  coord_cartesian(clip = "off") +
-  geom_text(data = internal_labels,
-            aes(x = xmin, y = ymax-0.00001,
-                label = label, size = area), inherit.aes = FALSE,
-            hjust = 0, vjust = 1, lineheight = 0.7,
-            nudge_x = 0.001, nudge_y = -0.005) +
-  scale_size_continuous(range = c(1.5, 15)) +
-  geom_text_repel(data = external_labels,
-             aes(x = center_x, y = center_y, 
-                 label = label), inherit.aes = FALSE,
-             max.overlaps = Inf,
-             box.padding = 0.18,
-             xlim = c(1, NA),
-             force = 3,
-             lineheight = 0.7,
-             min.segment.length = 0.1,
-             segment.size = 0.2,
-             hjust = 0,
-             size = 1.7, seed = 123) +
-  theme_void() +
-  theme(
-    legend.position = "none",
-    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
-    plot.background = element_rect(fill = "white", color = NA),
-  ) +
-  labs(title = "Total corals in scenario 2 zones + NMFS areas, surveys (all years) equal-weighted")
-  
-ggsave(filename = "outputs/Fig4.png", width = 180, height = 130, units = "mm", dpi = 600)
-
-sum(tot4$tot)
-tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
-
-tot2 %>% group_by(taxon) %>% summarize(tot = sum(tot)) %>% filter(taxon %in% c("ACER", "ORBI"))
+make_combined_density_figure(draws = draws_drm24_combined,
+                             y_limits = c(0, 5.2),
+                             output_path = "outputs/FigA3.png")
 ```
-
-### Treemap plot - Full monitoring area
-```{r working_treemap2}
-# STEP 1: Aggregate total abundance by taxon + class
-tot4 <- tot2 %>%
-  group_by(taxon, class) %>%
-  summarize(tot = sum(tot), .groups = "drop")
-
-# Assign a base color per taxon
-set.seed(3)
-base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
-names(base_colors) <- unique(tot4$taxon)
-
-# Define shading function
-get_shades <- function(base_col, class, all_classes) {
-  if (length(all_classes) == 2) {
-    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
-    else colorspace::darken(base_col, 0.1)
-  } else {
-    base_col
-  }
-}
-
-# Build taxon_class and corresponding shades
-shade_map <- tot4 %>%
-  distinct(taxon, class) %>%
-  rowwise() %>%
-  mutate(
-    base_col = base_colors[[taxon]],
-    all_classes = list(tot4$class[tot4$taxon == taxon]),
-    shade = get_shades(base_col, class, all_classes),
-    taxon_class = paste(taxon, class, sep = "_")
-  ) %>%
-  ungroup()
-
-# Final color map
-fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
-
-# Add taxon_class to original data
-tot4 <- tot4 %>%
-  mutate(taxon_class = paste(taxon, class, sep = "_"))
-
-# Plot with taxon labels only
-p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
-  geom_treemap(color = NA) +
-  geom_treemap_subgroup_border(colour = "white", size = 1) +
-  # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
-  #                             alpha = 0.8, colour = "black", size = 8) +
-  scale_fill_manual(values = fill_colors) +
-  theme(legend.position = "none")
-
-
-# 5. Get tile layout and attach taxon_class
-tile_layout <- treemapify(tot4, area = "tot", 
-                          fill = "taxon_class", subgroup = "taxon")
-
-# 6. Flag small boxes (aggregate size classes)
-tile_layout_ag <- tile_layout %>%
-  group_by(taxon) %>%
-  summarize(xmin = min(xmin), xmax = max(xmax),
-            ymin = min(ymin), ymax = max(ymax),
-            area = (xmax - xmin) * (ymax - ymin),
-            center_x = (xmin + xmax) / 2,
-            center_y = (ymin + ymax) / 2)
-area_threshold <- 0.001
-internal_labels <- tile_layout_ag %>% 
-  filter(area >= area_threshold)
-external_labels <- tile_layout_ag %>% 
-  filter(area < area_threshold)
-
-# Create labels with taxontotals
-taxtots <- tot4 %>%
-  group_by(taxon) %>%
-  summarize(tot = scales::comma(sum(tot)))
-
-internal_labels <- left_join(internal_labels, taxtots) %>%
-  mutate(label = paste0(taxon, "\n", tot))
-
-external_labels <- left_join(external_labels, taxtots) %>%
-  mutate(label = paste0(taxon, "\n", tot))
-
-# 7. Final plot
-p + 
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  coord_cartesian(clip = "off") +
-  geom_text(data = internal_labels,
-            aes(x = xmin, y = ymax-0.00001,
-                label = label, size = area), inherit.aes = FALSE,
-            hjust = 0, vjust = 1, lineheight = 0.7,
-            nudge_x = 0.005, nudge_y = -0.005) +
-  scale_size_continuous(range = c(1.5, 15)) +
-  geom_text_repel(data = external_labels,
-             aes(x = center_x, y = center_y, 
-                 label = label), inherit.aes = FALSE,
-             max.overlaps = Inf,
-             xlim = c(1, NA),
-             force = 5,
-             min.segment.length = 0.1,
-             segment.size = 0.2,
-             hjust = 0, seed = 123,
-             size = 2) +
-  theme_void() +
-  theme(
-    legend.position = "none",
-    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
-    plot.background = element_rect(fill = "white", color = NA),
-  ) +
-  labs(title = "Total corals in full impact monitoring area, surveys (all years) equal-weighted")
-  
-ggsave(filename = "outputs/FigA2.png", width = 180, height = 130, units = "mm", dpi = 600)
-
-sum(tot4$tot)
-tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
-```
-
 
 ## Temporal trends
 
@@ -3675,9 +3458,18 @@ trends_summary <- trends_summary %>%
   ungroup()
 
 
-
-
-
+trends_summary %>% filter(taxon == "PSTR")
+trends_summary %>% filter(taxon == "MYCE")
+trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+  filter(taxon %in% c("PORI", "SIDE", "MCAV"))
+trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+  filter(taxon %in% c("SOLE", "AGAR"))
+trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+  filter(taxon %in% c("MMEA", "EFAS", "ORBI"))
+trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+  filter(taxon %in% c("FAVI", "MEAN"))
+trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+  filter(taxon %in% c("PSTR", "MYCE"))
 
 # Look at 2011 -- 2017 trends for the 3 spp
 
@@ -3851,7 +3643,14 @@ final_plot <- alltax + p_others[[1]] + p_others[[2]] + p_others[[3]] +
 
 final_plot
 
-ggsave(filename = "outputs/Fig5.png", width = 180, height = 180, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig4.png", width = 180, height = 180, units = "mm", dpi = 300)
+
+
+figz <- (alltax + theme(axis.title.y = element_text(margin = margin(r = 0)))) +
+  p_others[[which(taxa_other == "ACER")]] +
+  p_others[[which(taxa_other == "ORBI")]] +
+  plot_layout(ncol = 3)
+ggsave(filename = "outputs/Trends_all_acer_orbi.png", width = 170, height = 70, units = "mm")
 ```
 
 
@@ -3927,10 +3726,299 @@ ggplot(trends_summary_trans, aes(x = abs_change_trans, y = taxon)) +
         legend.spacing.y = unit(0.1, "cm"),    # vertical space between items
         legend.spacing.x = unit(0.1, "cm"))    # horizontal space between items)
 
-ggsave(filename = "outputs/Fig6.png", width = 140, height = 120, units = "mm", dpi = 300)
+ggsave(filename = "outputs/Fig5.png", width = 140, height = 120, units = "mm", dpi = 300)
 ```
 
-### Total abundances - 2024
+## Totals in impact zones
+
+### Equal-weighted estimates
+```{r}
+# TOTAL COLONIES IN EACH IMPACT ZONE
+densities_tot <- summary_equal_weighted_combined %>% filter(class != "All")
+
+# Calculate total per taxclass per habitat Type and impact zone
+tot1 <- left_join(densities_tot, area_summary, by = "Type") %>%
+  mutate(tot = n_m2 * total_area_m2,
+         tot_lower = n_m2 * total_area_m2,
+         tot_upper = n_m2 * total_area_m2)
+
+# Calculate total per taxclass per impact zone (sum all habitat Types)
+tot2 <- tot1 %>%
+  group_by(taxon, class, name) %>%
+  summarize(tot = round(sum(tot))) %>%
+  arrange(name)
+
+tab2 <- tot2 %>% ungroup() %>%
+  pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
+  janitor::adorn_totals(where = c("row", "col")) %>%
+  mutate(across(where(is.numeric), scales::comma))
+
+tab2 %>%
+  knitr::kable(caption = "Total number of colonies in each impact zone - surveys (years) equal-weighted")
+
+write_csv(tab2, file = "outputs/TableA4.csv")
+
+
+# Calculate total ESA and non-ESA corals per impact zone
+tot3 <- tot2 %>%
+  mutate(ESA = case_when(!taxon %in% c("ACER", "ORBI") ~ "non-ESA",
+                         TRUE ~ taxon)) %>%
+  group_by(name, ESA) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
+  pivot_wider(names_from = ESA, values_from = tot) %>%
+  janitor::adorn_totals(where = "col") %>%
+  mutate(cum_ACER = cumsum(ACER),
+         cum_ORBI = cumsum(ORBI),
+         cum_non_ESA = cumsum(`non-ESA`),
+         cum_Total = cumsum(Total)) %>%
+  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
+
+tot3 %>%
+  knitr::kable(caption = "Total coral colonies in all impact zones")
+
+write_csv(tot3, file = "outputs/Table2.csv")
+```
+
+
+#### Treemap plot - Scenario2+NMFS
+```{r working_treemap1}
+# STEP 1: Aggregate total abundance by taxon + class
+tot4 <- tot2 %>%
+  filter(name != "Rest of Monitoring Area") %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop")
+
+# Assign a base color per taxon
+set.seed(3)
+base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
+names(base_colors) <- unique(tot4$taxon)
+
+# Define shading function
+get_shades <- function(base_col, class, all_classes) {
+  if (length(all_classes) == 2) {
+    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
+    else colorspace::darken(base_col, 0.1)
+  } else {
+    base_col
+  }
+}
+
+# Build taxon_class and corresponding shades
+shade_map <- tot4 %>%
+  distinct(taxon, class) %>%
+  rowwise() %>%
+  mutate(
+    base_col = base_colors[[taxon]],
+    all_classes = list(tot4$class[tot4$taxon == taxon]),
+    shade = get_shades(base_col, class, all_classes),
+    taxon_class = paste(taxon, class, sep = "_")
+  ) %>%
+  ungroup()
+
+# Final color map
+fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
+
+# Add taxon_class to original data
+tot4 <- tot4 %>%
+  mutate(taxon_class = paste(taxon, class, sep = "_"))
+
+# Plot with taxon labels only
+p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
+  geom_treemap(color = NA)+#, layout = "srow") +
+  geom_treemap_subgroup_border(colour = "white", size = 1)+#, layout = "srow") +
+  # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
+  #                             alpha = 0.8, colour = "black", size = 8) +
+  scale_fill_manual(values = fill_colors) +
+  theme(legend.position = "none")
+
+
+# 5. Get tile layout and attach taxon_class
+tile_layout <- treemapify(tot4, area = "tot",#, layout = "srow",
+                          fill = "taxon_class", subgroup = "taxon")
+
+# 6. Flag small boxes (aggregate size classes)
+tile_layout_ag <- tile_layout %>%
+  group_by(taxon) %>%
+  summarize(xmin = min(xmin), xmax = max(xmax),
+            ymin = min(ymin), ymax = max(ymax),
+            area = (xmax - xmin) * (ymax - ymin),
+            center_x = (xmin + xmax) / 2,
+            center_y = (ymin + ymax) / 2)
+area_threshold <- 0.001
+internal_labels <- tile_layout_ag %>% 
+  filter(area >= area_threshold)
+external_labels <- tile_layout_ag %>% 
+  filter(area < area_threshold)
+
+# Create labels with taxontotals
+taxtots <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(tot = scales::comma(sum(tot)))
+
+internal_labels <- left_join(internal_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+external_labels <- left_join(external_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+# 7. Final plot
+p + 
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  coord_cartesian(clip = "off") +
+  geom_text(data = internal_labels,
+            aes(x = xmin, y = ymax-0.00001,
+                label = label, size = area), inherit.aes = FALSE,
+            hjust = 0, vjust = 1, lineheight = 0.7,
+            nudge_x = 0.001, nudge_y = -0.005) +
+  scale_size_continuous(range = c(1.5, 15)) +
+  geom_text_repel(data = external_labels,
+             aes(x = center_x, y = center_y, 
+                 label = label), inherit.aes = FALSE,
+             max.overlaps = Inf,
+             box.padding = 0.18,
+             xlim = c(1, NA),
+             force = 3,
+             lineheight = 0.7,
+             min.segment.length = 0.1,
+             segment.size = 0.2,
+             hjust = 0,
+             size = 1.7, seed = 123) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
+    plot.background = element_rect(fill = "white", color = NA),
+  ) +
+  labs(title = "Total corals in scenario 2 zones + NMFS areas, surveys (all years) equal-weighted")
+  
+ggsave(filename = "outputs/Fig6.png", width = 180, height = 130, units = "mm", dpi = 600)
+
+sum(tot4$tot)
+tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
+
+tot2 %>% group_by(taxon) %>% summarize(tot = sum(tot)) %>% filter(taxon %in% c("ACER", "ORBI"))
+```
+
+#### Treemap plot - Full monitoring area
+```{r working_treemap2}
+# STEP 1: Aggregate total abundance by taxon + class
+tot4 <- tot2 %>%
+  group_by(taxon, class) %>%
+  summarize(tot = sum(tot), .groups = "drop")
+
+# Assign a base color per taxon
+set.seed(3)
+base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
+names(base_colors) <- unique(tot4$taxon)
+
+# Define shading function
+get_shades <- function(base_col, class, all_classes) {
+  if (length(all_classes) == 2) {
+    if (class == "<4cm") colorspace::lighten(base_col, 0.1)
+    else colorspace::darken(base_col, 0.1)
+  } else {
+    base_col
+  }
+}
+
+# Build taxon_class and corresponding shades
+shade_map <- tot4 %>%
+  distinct(taxon, class) %>%
+  rowwise() %>%
+  mutate(
+    base_col = base_colors[[taxon]],
+    all_classes = list(tot4$class[tot4$taxon == taxon]),
+    shade = get_shades(base_col, class, all_classes),
+    taxon_class = paste(taxon, class, sep = "_")
+  ) %>%
+  ungroup()
+
+# Final color map
+fill_colors <- setNames(shade_map$shade, shade_map$taxon_class)
+
+# Add taxon_class to original data
+tot4 <- tot4 %>%
+  mutate(taxon_class = paste(taxon, class, sep = "_"))
+
+# Plot with taxon labels only
+p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
+  geom_treemap(color = NA) +
+  geom_treemap_subgroup_border(colour = "white", size = 1) +
+  # geom_treemap_subgroup_text(place = "topleft", grow = TRUE, 
+  #                             alpha = 0.8, colour = "black", size = 8) +
+  scale_fill_manual(values = fill_colors) +
+  theme(legend.position = "none")
+
+
+# 5. Get tile layout and attach taxon_class
+tile_layout <- treemapify(tot4, area = "tot", 
+                          fill = "taxon_class", subgroup = "taxon")
+
+# 6. Flag small boxes (aggregate size classes)
+tile_layout_ag <- tile_layout %>%
+  group_by(taxon) %>%
+  summarize(xmin = min(xmin), xmax = max(xmax),
+            ymin = min(ymin), ymax = max(ymax),
+            area = (xmax - xmin) * (ymax - ymin),
+            center_x = (xmin + xmax) / 2,
+            center_y = (ymin + ymax) / 2)
+area_threshold <- 0.001
+internal_labels <- tile_layout_ag %>% 
+  filter(area >= area_threshold)
+external_labels <- tile_layout_ag %>% 
+  filter(area < area_threshold)
+
+# Create labels with taxontotals
+taxtots <- tot4 %>%
+  group_by(taxon) %>%
+  summarize(tot = scales::comma(sum(tot)))
+
+internal_labels <- left_join(internal_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+external_labels <- left_join(external_labels, taxtots) %>%
+  mutate(label = paste0(taxon, "\n", tot))
+
+# 7. Final plot
+p + 
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  coord_cartesian(clip = "off") +
+  geom_text(data = internal_labels,
+            aes(x = xmin, y = ymax-0.00001,
+                label = label, size = area), inherit.aes = FALSE,
+            hjust = 0, vjust = 1, lineheight = 0.7,
+            nudge_x = 0.005, nudge_y = -0.005) +
+  scale_size_continuous(range = c(1.5, 15)) +
+  geom_text_repel(data = external_labels,
+             aes(x = center_x, y = center_y, 
+                 label = label), inherit.aes = FALSE,
+             max.overlaps = Inf,
+             xlim = c(1, NA),
+             force = 5,
+             min.segment.length = 0.1,
+             segment.size = 0.2,
+             hjust = 0, seed = 123,
+             size = 2) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(t = 0, r = 20, b = 10, l = 10),
+    plot.background = element_rect(fill = "white", color = NA),
+  ) +
+  labs(title = "Total corals in full impact monitoring area, surveys (all years) equal-weighted")
+  
+ggsave(filename = "outputs/FigA4.png", width = 180, height = 130, units = "mm", dpi = 600)
+
+sum(tot4$tot)
+tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
+```
+
+
+
+
+### 2024 estimates
 ```{r}
 # TOTAL COLONIES IN EACH IMPACT ZONE
 densities_tot_2024 <- summary_drm24_combined %>% filter(class != "All")
@@ -3947,6 +4035,16 @@ tot2_2024 <- tot1_2024 %>%
   group_by(taxon, class, name) %>%
   summarize(tot = round(sum(tot))) %>%
   arrange(name)
+
+tab2_2024 <- tot2_2024 %>% ungroup() %>%
+  pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
+  janitor::adorn_totals(where = c("row", "col")) %>%
+  mutate(across(where(is.numeric), scales::comma))
+
+tab2_2024 %>%
+  knitr::kable(caption = "Total number of colonies in each impact zone - 2024 estimates")
+
+write_csv(tab2_2024, file = "outputs/TableA5.csv")
 
 # STEP 1: Aggregate total abundance by taxon + class
 tot4_2024 <- tot2_2024 %>%
@@ -4028,7 +4126,7 @@ p +
   ) +
   labs(title = "Total corals in scenario 2 zones + NMFS areas, 2024 estimates")
   
-ggsave(filename = "outputs/FigA3.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/FigA5.png", width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
 ```{r}
@@ -4127,7 +4225,7 @@ p +
   ) +
   labs(title = "Total corals in full impact monitoring area, 2024 estimates")
   
-ggsave(filename = "outputs/FigA4.png", width = 180, height = 130, units = "mm", dpi = 600)
+ggsave(filename = "outputs/FigA6.png", width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
 
@@ -4147,8 +4245,8 @@ tot3_2024 <- tot2_2024 %>%
   mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
 
 tot3_2024 %>%
-  knitr::kable(caption = "Total coral colonies in all impact zones")
+  knitr::kable(caption = "Total coral colonies in all impact zones, 2024 estimates")
 
-write_csv(tot3_2024, file = "outputs/TableA4.csv")
+write_csv(tot3_2024, file = "outputs/TableA6.csv")
 ```
 
