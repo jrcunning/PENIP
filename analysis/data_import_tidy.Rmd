@@ -2328,6 +2328,36 @@ ggsave(
 
 ```
 
+extra map figure 
+```{r}
+pp3 <- ggplot(polygons_final) +
+    geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
+    geom_point(
+        data = selected,
+        aes(x = longitude, y = latitude),
+        pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
+    ) +
+    scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+    facet_wrap(~ dataset, ncol = 3,
+               labeller = as_labeller(c(
+                   "nsu11_esa" = "2011 – NSU ESA Survey",
+                   "dca17_esa" = "2017 – DCA ESA Survey",
+                   "dca17"     = "2017 – DCA Recon Survey",
+                   "tt21"      = "2021 – Tetra Tech Survey",
+                   "tt23"      = "2023 – Tetra Tech Survey",
+                   "drm24"     = "2024 – Shedd Survey"
+               ))) +
+    coord_limits +
+    labs(title = NULL, fill = NULL) +
+    base_theme +
+    theme(
+        legend.position = "bottom",
+        strip.text = element_text(size = 6),
+        panel.spacing = unit(0.5, "lines")
+    )
+ggsave(pp3, filename = "outputs/survey_locations.png", width = 180, height = 220, units = "mm", dpi = 300, bg = "white")
+```
+
 # Statistical modeling 
 
 ## Generate data-informed priors
