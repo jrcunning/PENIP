@@ -1899,6 +1899,9 @@ polyplot +
 
 
 # Filter dataset to just selected sites
+dff0 <- df_completed %>% inner_join(selected)
+dff0 %>% filter(Type == "Artificial", taxon %in% c("ACER", "ORBI"), n > 0)
+
 dff <- df_completed %>% inner_join(selected)
 ```
 
@@ -3080,7 +3083,7 @@ ggsave(filename = "outputs/FigA1.png", width = 190, height = 250, units = "mm")
 
 
 ```{r}
-make_combined_density_figure <- function(draws,
+make_combined_density_figure <- function(draws, table = FALSE,
                                          output_path,
                                          y_limits = c(0, 2.8)) {
   draws <- draws %>% filter(class != "All")
@@ -3218,17 +3221,42 @@ make_combined_density_figure <- function(draws,
     align = "hv"
   )
   
-  ggsave(filename = output_path, plot = combined_plot, width = 180, height = 80, units = "mm", dpi = 300)
-  
-  return(combined_plot)
+  if (table == FALSE) {
+    ggsave(filename = output_path, plot = combined_plot, width = 180, height = 80, units = "mm", dpi = 300)
+    return(combined_plot)
+  } else {
+    return(list(summary_sus, summary_class, summary_total))
+  }
 }
 
 make_combined_density_figure(draws = draws_equal_weighted,
                              output_path = "outputs/Fig3.png")
+make_combined_density_figure(draws = draws_equal_weighted, table = TRUE)
 
 make_combined_density_figure(draws = draws_drm24_combined,
                              y_limits = c(0, 5.2),
                              output_path = "outputs/FigA3.png")
+
+
+
+# Size class overall averages
+post_summ <- draws_equal_weighted %>%
+  group_by(.draw, Type, class) %>%
+  summarise(total_epred = sum(n_m2), .groups = "drop") %>%
+  group_by(.draw, class) %>%
+  summarise(avg_total_epred = mean(total_epred), .groups = "drop") %>%
+  group_by(class) %>%
+  summarise(
+    mean = mean(avg_total_epred),
+    sd_post = sd(avg_total_epred),          # posterior SD of the mean
+    # optional: 95% CrI if you still want it for comparison
+    lower = quantile(avg_total_epred, 0.025),
+    upper = quantile(avg_total_epred, 0.975),
+    n_draws = dplyr::n()
+  )
+post_summ
+
+
 ```
 
 ## Temporal trends
@@ -4332,5 +4360,59 @@ ncadens <- nca %>%
   filter(primary_sample_unit != 3100)
 mean(ncadens$n_m2)
 hist(ncadens$n_m2)
+```
+
+
+# Reanalyze Jones and Gilliam data with 4cm threshold
+```{r}
+jg_siteinfo <- read_csv("https://raw.githubusercontent.com/nj350/Recruitment-Size-Structure---Frontiers/refs/heads/main/Site%20Info.csv") %>%
+  janitor::clean_names()
+
+distinct(jg_siteinfo, latitude, longitude, habitat) %>%
+  ggplot(aes(x = longitude, y = latitude, color = habitat)) +
+  geom_point()
+
+jg_adults <- read_csv("https://raw.githubusercontent.com/nj350/Recruitment-Size-Structure---Frontiers/refs/heads/main/All%20Colonies.csv") %>%
+  janitor::clean_names()
+
+jg_juv <- read_csv("https://raw.githubusercontent.com/nj350/Recruitment-Size-Structure---Frontiers/refs/heads/main/All%20Juveniles.csv") %>%
+  janitor::clean_names()
+
+jg_juv4 <- jg_adults %>%
+  filter(pmax(colony_length, colony_width, colony_height) < 4) %>%
+  group_by(survey_year, year, site, species) %>%
+  summarize(abundance = n())
+
+jg_juv_combined <- bind_rows(jg_juv, jg_juv4) %>%
+  group_by(survey_year, year, site, species) %>%
+  summarise(abundance = sum(abundance, na.rm = TRUE), .groups = "drop") %>%
+  left_join(jg_siteinfo)
+
+jg_juv_summ <- jg_juv_combined %>%
+  group_by(survey_year, year, site, habitat) %>%
+  summarize(tot_juv = sum(abundance), .groups = "drop") %>%
+  mutate(tot_juv_dens = tot_juv / 30) %>%
+  filter(site != "FTL6")
+
+jg_juv_summ %>%
+  ggplot(aes(x = tot_juv_dens)) +
+  geom_histogram()
+mean(jg_juv_summ$tot_juv_dens)
+median(jg_juv_summ$tot_juv_dens)
+
+
+jg_adults_summ <- jg_adults %>%
+  filter(pmax(colony_length, colony_height, colony_height) >= 4) %>%
+  count(survey_year, year, site) %>%
+  mutate(tot_adult_dens = n / 30) %>%
+  left_join(jg_siteinfo) %>%
+  filter(site != "FTL6")
+
+jg_adults_summ %>%
+  ggplot(aes(x = tot_adult_dens)) +
+  geom_histogram()
+
+mean(jg_adults_summ$tot_adult_dens)
+median(jg_adults_summ$tot_adult_dens)
 ```
 
