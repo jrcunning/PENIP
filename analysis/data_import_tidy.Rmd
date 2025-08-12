@@ -4280,3 +4280,57 @@ tot3_2024 %>%
 write_csv(tot3_2024, file = "outputs/TableA6.csv")
 ```
 
+# NCRMP analysis
+```{r}
+library(ncrmp.benthics.analysis)
+#> Loading required package: ncrmp.benthics.analysis
+
+#The 'data' function will load a dataframe to the Global Environment keeping the existing name,
+
+data("SEFL_2024_NTOT")
+
+SEFL_2024_NTOT
+
+data("SEFCRI_2024_coral_demographics")
+
+SEFCRI_2024_coral_demographics$MAX_DIAMETER
+SEFCRI_2024_coral_demographics$JUV
+SEFCRI_2024_coral_demographics$HEIGHT
+SEFCRI_2024_coral_demographics$SPECIES_NAME
+
+data("NCRMP_SEFCRI_2014_24_density_species")
+View(NCRMP_SEFCRI_2014_24_density_species)
+
+
+nc <- read_csv("/Users/rcunning/Downloads/0306238/1.1/data/0-data/Data_Sets/NCRMP_SEFCRI2024_Benthic_Data02_CoralDemographics.csv") %>%
+  janitor::clean_names()
+allsites <- nc %>% distinct(primary_sample_unit)
+
+nca <- nc %>%
+  filter(juv == 0) %>%
+  right_join(allsites) %>%
+  replace_na(list(n = 0))
+#ncj0 <- filter(nc, juv == 1)
+ncj <- nc %>%
+  filter(juv == 1) %>%
+  right_join(allsites) %>%
+  replace_na(list(n = 0))
+#n_distinct(ncj0$primary_sample_unit)
+#n_distinct(ncj$primary_sample_unit)
+
+ncjdens <- ncj %>%
+  group_by(primary_sample_unit) %>%
+  summarize(n = sum(n)) %>%
+  mutate(n_m2 = n / 10)
+mean(ncjdens$n_m2)
+hist(ncjdens$n_m2)
+
+ncadens <- nca %>%
+  group_by(primary_sample_unit) %>%
+  summarize(n = sum(n)) %>%
+  mutate(n_m2 = n / 10) %>%
+  filter(primary_sample_unit != 3100)
+mean(ncadens$n_m2)
+hist(ncadens$n_m2)
+```
+
