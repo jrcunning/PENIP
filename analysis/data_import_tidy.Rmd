@@ -1,7 +1,7 @@
 ---
 title: "Port Everglades Coral Survey Data Analysis"
 author: "R. Cunning"
-date: "2025-04-21"
+date: "2025-08-18"
 output: 
   html_document:
     toc: true
@@ -36,7 +36,7 @@ library(moments)
 library(colorspace)
 ```
 
-```{r custom}
+```{r definitions}
 # Define genus level taxon groups (plus one family FAVI)
 taxon_groups <- list(
   PORI = c("PPOR", "PFUR", "PDIV", "PAST", "PORI"),
@@ -49,11 +49,9 @@ taxon_groups <- list(
   MYCE = c("MFER", "MLAM", "MALI", "MYCE"),
   OCUL = c("OROB", "ODIF", "OCUL")
 )
-
 # Convert to lookup tibble
 taxon_lookup <- enframe(taxon_groups, name = "taxon_group", value = "taxon") %>%
   unnest(taxon)
-
 
 
 # Define juvenile family level taxon groups (following DRM survey convention)
@@ -69,10 +67,6 @@ taxon_group_df <- taxon_group_df %>% filter(taxon != group)
 # Convert to lookup tibble
 taxon_lookup_juv <- enframe(taxon_groups_juv, name = "taxon_group", value = "taxon") %>%
   unnest(taxon)
-
-
-
-
 
 
 # Create taxon labels
@@ -100,7 +94,8 @@ taxon_labels <- c(
    All = '"All taxa"'
 )
 
-# Define susceptibility groups
+
+# Define SCTLD susceptibility groups (following Papke et al. 2024)
 group_definitions <- tibble(
   taxon = names(taxon_labels),
   sus_group = case_when(
@@ -112,12 +107,14 @@ group_definitions <- tibble(
 ) %>%
   mutate(sus_group = factor(sus_group, levels = c("low_sus", "mod_sus", "high_sus")))
 
+
 # Order levels of Habitat Types
 type_levels <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef",
                  "Outer Reef")
 type_labels <- c("NRC", "IR", "MR", "OR")
 names(type_labels) <- type_levels
 type_labels2 <- c("Nearshore\nRidge Complex", "Inner\nReef", "Middle\nReef", "Outer\nReef")
+
 
 # Order survey datasets
 dataset_levels <- c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")
@@ -160,63 +157,21 @@ nsu11_esa_counts_ag <- nsu11_esa_counts %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop") %>%
   mutate(tier = "t1")
-
-# # Tier 2 surveys
-# nsu11_esa_tier2_0 <- read_csv("data/2011_nsu_esa/NSU_2011_Table_3_-_Tier_2_Acropora_cervicornis.csv") %>%
-#   janitor::clean_names()
-# 
-# nsu11_esa_tier2_counts_ag <- nsu11_esa_tier2_0 %>%
-#   mutate(dataset = "nsu11_esa", taxon = "ACER", class = ">4cm", tier = "t2") %>%
-#   select(dataset, site, taxon, class, n = colonies)
-# 
-# # combine tier1 and tier2
-# nsu11_esa_counts_ag <- bind_rows(
-#   nsu11_esa_counts_ag
-# )
-
-# Subset of NSU survey as presented by DCA
-# nsu11_esa_counts0 <- readxl::read_xlsx("data/2011_nsu_esa/Appendix F_DCA and NSU estimated coral abundance.xlsx",
-#                                   skip = 1) %>%
-#   janitor::clean_names()
-# 
-# nsu11_esa_counts <- nsu11_esa_counts0 %>%
-#   filter(grepl("NSU", x1)) %>%
-#   # Create ACER and ORBI columns
-#   mutate(
-#     ACER = a_cervicornis_n,
-#     ORBI = o_annularis_n + o_franksi_n + o_faveolata_n
-#   ) %>%
-#   # Keep only relevant columns plus any grouping identifiers
-#   select(site = x2, ACER, ORBI, transect_area_m2 = x9) %>%
-#   mutate(site = as.character(parse_number(site))) %>%
-#   # Pivot longer to have taxon and count columns
-#   pivot_longer(
-#     cols = c(ACER, ORBI),
-#     names_to = "taxon",
-#     values_to = "n"
-#   )
-# 
-# allsites <- nsu11_esa_sitemd %>% count(site)
-# subsites <- nsu11_esa_counts %>% count(site)
-# sites_missing <- allsites %>%
-#   anti_join(subsites, by = "site")
 ```
 
 ## 2017 DCA ESA Survey
 ```{r}
-# New sitemd
-dca17_esa_sitemd0 <- readxl::read_xlsx("data/2017_dca_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx", 
+# Site metadata
+dca17_esa_sitemd0 <- readxl::read_xlsx("data/2017_dca_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx",
                                        sheet = "2017_DCA_ESA survey") %>% janitor::clean_names()
 
 dca17_esa_sitemd <- dca17_esa_sitemd0 %>%
   select(site = id, longitude, latitude) %>%
   mutate(site = as.character(site))
 
-# Get coral data
 
-
+# Coral data
 # Appendix D -- contains individual colony sizes for observed corals
-# what is the "NUMBER" column? ignore for now.
 dca17_esa0 <- readxl::read_xlsx("data/2017_dca_esa/Appendix D_ESA_listed_coral_Plotted_Locations.xlsx") %>%
   janitor::clean_names() %>%
   select(site = site_id, taxon = species, length_cm, width_cm, height_cm, m2_of_habi, density) %>%
@@ -231,12 +186,8 @@ dca17_esa <- dca17_esa0 %>%
 dca17_esa_counts <- dca17_esa %>%
   count(site, taxon, class) %>%
   mutate(site = as.character(site))
-n_distinct(dca17_esa_counts$site)    # 57 sites had counts > 0 (where are zeros recorded?) 
 
-
-# Total area surveyed per site = 784 m2 (crossed 100x4m belt transects with 16m2 overlap)
-
-# Agreggate taxa (OFAV -> ORBI)
+# Aggregate taxa (OFAV -> ORBI)
 dca17_esa_counts_ag <- dca17_esa_counts %>%
   left_join(taxon_lookup, by = "taxon") %>%
   mutate(taxon = coalesce(taxon_group, taxon)) %>%
@@ -246,24 +197,20 @@ dca17_esa_counts_ag <- dca17_esa_counts %>%
 
 
 # Merge with site metadata to get zero counts
-# Step 1: Define all taxon-class combos you want to include
-# This can be pulled from your full dataset (like dfftaxon), or hardcoded:
+## Define all taxon-class combos to include
 all_taxon_class <- expand_grid(
   taxon = c("ACER", "ORBI"),  # example taxa
   class = c("<4cm", ">4cm")
 )
-
-# Step 2: Get all site IDs from the site metadata
+# Get all site IDs from the site metadata
 all_sites <- dca17_esa_sitemd %>%
   distinct(site)
-
-# Step 3: Create full site × taxon × class combinations
+# Create full site × taxon × class combinations
 full_grid <- expand_grid(
   site = as.character(all_sites$site),
   all_taxon_class
 )
-
-# Step 4: Left join with observed counts and fill missing with 0
+# Left join with observed counts and fill missing with 0
 dca17_esa_counts_ag_full <- full_grid %>%
   left_join(dca17_esa_counts_ag, by = c("site", "taxon", "class")) %>%
   mutate(n = replace_na(n, 0))
@@ -272,15 +219,13 @@ dca17_esa_counts_ag_full <- full_grid %>%
 
 ## 2017 DCA Recon Survey
 
-DCA site metadata
-```{r 2017_DCA_site_metadata}
+```{r 2017_DCA_recon_data}
 # Site metadata
 # Read in site coordinates
 dca17_sitemd0 <- readxl::read_xlsx("data/2017_dca_recon/Recon_Site_Coordinates_Extracted.xlsx") %>%
   janitor::clean_names()
 
 # All sites have start and end coordinates...
-
 # Tidy and Calculate midpoint per transect
 dca17_sitemd <- dca17_sitemd0 %>%
   mutate(
@@ -294,10 +239,8 @@ dca17_sitemd <- dca17_sitemd0 %>%
     depth = mean(depth, na.rm = TRUE),
     .groups = "drop"
   )
-```
 
-DCA coral data
-```{r 2017_DCA_coral_data}
+
 # Read in survey data
 dca170 <- readxl::read_xlsx("data/2017_dca_recon/Compiled_DCA_RECON_Belt_data.xlsx") %>%
   janitor::clean_names()
@@ -327,10 +270,6 @@ sort(unique(dca17$taxon))
 dca17 <- dca17 %>%
   filter(!taxon %in% c("CORAL", "Cup Coral"))
 
-# Write long data to file
-#write_csv(dca17, file = "data/processed/dca_2017_long.csv")
-
-
 # Convert to count data
 # Add explicit zeros for any taxon/size class missing at any site
 dca17_counts <- dca17 %>%
@@ -339,8 +278,6 @@ dca17_counts <- dca17 %>%
   complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
   # # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
   filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
-
-#write_csv(dca17_counts, file = "data/processed/dca_2017_counts.csv")
 
 # Aggregate count data based on taxonomic groups defined above
 dca17_counts_ag <- dca17_counts %>%
@@ -356,7 +293,6 @@ dca17_counts_ag %>%
   summarize(tot = sum(n))
 # 100% of observed DSTO were >4cm
 
-
 # Further aggregate juvenile counts to family (following DRM methods)
 dca17_counts_ag <- dca17_counts_ag %>%
   left_join(taxon_lookup_juv, by = "taxon") %>%
@@ -366,20 +302,12 @@ dca17_counts_ag <- dca17_counts_ag %>%
   select(-taxon_group) %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
-
-
-dca17_counts_ag %>%
-  distinct(taxon, class) %>%
-  arrange(taxon, class)
-
-#write_csv(dca17_counts_ag, file = "data/processed/dca_2017_counts_ag.csv")
 ```
 
 ## 2021 TT Recon & ESA Survey
 
-2021 TT site metadata
 ```{r tt21_site_metadata}
-# site metadata
+# Recon site metadata
 tt21_sitemd0 <- read_csv("data/2021_tt_recon_esa/midpoints_latlon.csv") %>%
   janitor::clean_names()
 
@@ -411,11 +339,11 @@ tt21_esa_sitemd <- tt21_esa_sitemd0 %>%
   # total sum transect length * length of recorded sediment * 4m width - 16m2 overlap (crossed design)
   mutate(area = ((200 - sum_of_no_rb_sed_segment_cover) * 4) - 16) %>%
   select(site, area)
-```
 
-2021 TT coral data
-```{r tt21_coral_data}
-# coral data - recon belt transects
+
+
+
+# Coral data - recon belt transects
 tt21recon0 <- readxl::read_xlsx("data/2021_tt_recon_esa/Recon 30x1m Coral Belt Transect.xlsx") %>%
   janitor::clean_names()
 
@@ -471,12 +399,6 @@ tt21 <- tt21 %>%
   ))
 sort(unique(tt21$taxon))
 
-# Write long data to file
-#write_csv(tt21, file = "data/processed/tt_2021_long.csv")
-
-
-
-
 
 # Count
 # Add explicit zeros for any taxon/size class missing at any site
@@ -486,10 +408,6 @@ tt21_counts <- tt21 %>%
   complete(site, taxon, class = c(">4cm", "<4cm"), fill = list(n = 0)) %>%
   # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
   filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
-
-#write_csv(tt21_counts, file = "data/processed/tt_2021_counts.csv")
-
-
 
 
 # Aggregate count data based on taxonomic groups defined above
@@ -518,16 +436,11 @@ tt21_counts_ag <- tt21_counts_ag %>%
 
 # Exclude data from sites that were recorded as 100% sand
 tt21_counts_ag <- tt21_counts_ag %>% filter(site %in% tt21_sitemd$site)
-
-#write_csv(tt21_counts_ag, file = "data/processed/tt21_counts_ag.csv")
-
-
 ```
 
 ## 2023 TT Impact Survey
 
-TT23 site metadata
-```{r 2023_tt_site_metadata}
+```{r 2023_tt_data}
 # Site metadata
 tt23_sitemd <- readxl::read_xlsx("data/2023_tt_impact/Impact site tracking.xlsx", skip = 1) %>%
   janitor::clean_names()
@@ -538,12 +451,7 @@ tt23_sitemd <- tt23_sitemd %>%
          longitude = as.numeric(actual_start_x)) %>%
   select(site, latitude, longitude) 
 
-# Many sites missing coords in sheet.... whats up with that
 tt23_sitemd <- drop_na(tt23_sitemd, longitude)
-
-
-# missing ten impact site coords
-
 
 
 # vertical wall transects
@@ -569,10 +477,10 @@ tt23_sitemd <- bind_rows(
   tt23_sitemd,
   tt23v_sitemd
 )
-```
 
-TT23 coral data
-```{r 2023_tt_coral_data}
+
+
+# Coral data
 tt230 <- readxl::read_xlsx("data/2023_tt_impact/Impact Raw Data 05 31 2024.xlsx") %>%
   janitor::clean_names() 
 
@@ -631,11 +539,6 @@ tt23 %>% filter(taxon == "MFER")
 tt23 %>% filter(is.na(max_width_cm))
 tt23 <- tt23 %>% filter(!is.na(max_width_cm))
 
-# Write long data to file
-#write_csv(tt23, file = "data/processed/tt_2024_long.csv")
-
-
-
 
 # Count
 # Add explicit zeros for any taxon/size class missing at any site
@@ -646,11 +549,6 @@ tt23_counts <- tt23 %>%
   # Don't create zeros for MEAN/MUSS/FAVI adults, since these IDs only applied to juv
   filter(!(taxon %in% c("MEAN", "MUSS", "FAVI") & class == ">4cm" & n == 0))
 
-# tt23_counts %>% filter(site == "sb1")
-# tt23_sitemd %>% filter(site == "sb1")
-#write_csv(tt23_counts, file = "data/processed/tt_2023_counts.csv")
-
-tt23_counts %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 
 
 # Aggregate count data based on taxonomic groups defined above
@@ -660,8 +558,6 @@ tt23_counts_ag <- tt23_counts %>%
   dplyr::select(-taxon_group) %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
-
-tt23_counts_ag %>% filter(site == "cpsn4") %>% print(n=nrow(.))
 
 tt23_counts_ag %>%
   filter(taxon == "DSTO") %>%
@@ -677,37 +573,21 @@ tt23_counts_ag2 <- tt23_counts_ag %>%
   select(-taxon_group) %>%
   group_by(site, taxon, class) %>%
   summarize(n = sum(n), .groups = "drop")
-
-tt23_counts_ag2 %>% filter(site == "cpsn4") %>% print(n=nrow(.))
-
-#write_csv(tt23_counts_ag2, file = "data/processed/tt23_counts_ag.csv")
-
-
-# n_distinct(tt23_counts_ag$site)
-# tt23_counts_ag %>%
-#   group_by(site) %>%
-#   summarize(total = sum(n)) %>%
-#   filter(total == 0)
-
-
-# BUT CPSN4 HAS SLAC? WHERE IS IT?
 ```
 
 
 ## 2024 DRM/Shedd Survey
 
-Shedd site metadata
-```{r 2024_shedd_site_metadata}
+```{r 2024_shedd_data}
 # Site metadata
 drm24_sitemd <- readxl::read_xlsx("data/2024_shedd_drm/site_metadata.xlsx") %>%
   janitor::clean_names() %>%
   mutate(site = as.character(drm_site_id)) %>%
   select(site, latitude = lat, longitude = lon) %>%
   mutate(depth = NA)
-```
 
-Shedd coral data
-```{r 2024_shedd_coral_data}
+
+
 # Adult coral data from main DRM surveys
 alldrm2024 <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_RawCoralDataTransect1and2_Shedd.xlsx") %>%
   janitor::clean_names() %>%
@@ -715,8 +595,6 @@ alldrm2024 <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_RawCoralDataTransec
 
 shedddrm2024 <- alldrm2024 %>% filter(team == "Shedd Aquarium")
 
-# shedddrm2024 %>%
-#   count(subregion, date)
 
 # Most sites were included in main DRM database for 2024 -- Import these
 adultst1t2 <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_RawCoralDataTransect1and2_Shedd.xlsx") %>%
@@ -807,24 +685,18 @@ drm24_long <- bind_rows(adults_long, juv_long, t1t2juv_long_updated) %>%
 # Check species names
 sort(unique(drm24_long$taxon))
 
-#write_csv(drm24_long, file = "data/processed/drm_2024_long.csv")
-
 
 # COUNT based on rules
-# ✅ Updated Rules Summary for counting from DRM/Shedd data:
-# Juvenile taxa (searched for in <4cm size class only):
-#    "MEAN", "MUSS", "FAVI"
+# 
+# Juvenile taxa (searched for in <4cm size class only):  "MEAN", "MUSS", "FAVI"
 #    → these should only ever appear in <4cm, never >4cm, and should not be zero-filled for adults.
-# Other juvenile-capable taxa:
-#    "MCAV", "SSID", "SRAD", "PAST", "PPOR", "SINT", "SBOU", "AAGA", "MAUR"
-#    → these can be counted in both >4cm and <4cm, but only in <4cm if juveniles were searched on that transect and team.
-# Transect-based search rules still apply:
-# Transects 1 & 2: all adult taxa always searched. Juvenile search depends on team:
-#    "Shedd Aquarium" → all juvenile taxa above searched
-#    others → only MEAN, MUSS, FAVI, MCAV
+# Other adult and juvenile taxa: "MCAV", "SSID", "SRAD", "PAST", "PPOR", "SINT", "SBOU", "AAGA", "MAUR"
+#    → these can be counted in both >4cm and <4cm, but only in <4cm if juveniles were searched on that transect.
+# Transect-based search rules:
+# Transects 1 & 2: all adult taxa always searched, and all juvenile taxa searched
 # Transects 3 & 4:
 #    only subset of adult taxa searched (adult_taxa_t3t4)
-#    only juveniles: MEAN, MUSS, FAVI, MCAV
+#    only subset of juveniles: MEAN, MUSS, FAVI, MCAV
 
 # Step 1: Define size classes
 drm24_classed <- drm24_long %>%
@@ -847,7 +719,7 @@ search_grid <- drm24_classed %>%
     searched_taxa_class = pmap(list(transect_num, team), function(transect, team) {
       # Helper: define juv taxa allowed for this transect/team
       juv_taxa <- if (transect %in% c(1, 2)) {
-        if (team == "Shedd Aquarium") {      # Shedd searched for other juv taxa on T1 and T2, other DRM survey teams did not
+        if (team == "Shedd Aquarium") {     
           all_juv_taxa
         } else {
           c(juv_only_taxa, "MCAV")
@@ -884,11 +756,6 @@ final_counts <- search_grid %>%
   mutate(n = replace_na(n, 0))
 
 
-#write_csv(final_counts, file = "data/processed/drm_2024_counts.csv")
-
-
-
-
 # AGGREGATE COUNT DATA
 # Aggregate taxa
 drm24_counts_ag <- final_counts %>%
@@ -898,10 +765,8 @@ drm24_counts_ag <- final_counts %>%
   group_by(across(-n)) %>%
   summarize(n = sum(n), .groups = "drop")
 
-#write_csv(drm24_counts_ag, file = "data/processed/drm_2024_counts_ag.csv")
 
-
-# Modify DRM2024 dataset to code as one pseudo-transect per site, since all other datasets have only one transect per site. We need the structure to be uniform across datasets for count modeling -- cannot include random effect for site to account for multiple transects per site while all other datasets only have one transect per site, because then there's no variability associated with site and its essentially treated as a fixed effect, which we don't want. Thus, we need to aggregate across transects in the DRM 2024 dataset. But since different taxa were searched for on different numbers of transects we need to do this carefully and have the appropriate total area searched for each taxon for teh pseudo-transect.
+# Modify DRM2024 dataset to code as one pseudo-transect per site, since all other datasets have only one transect per site. We need the structure to be uniform across datasets for count modeling -- cannot include random effect for site to account for multiple transects per site while all other datasets only have one transect per site, because then there's no variability associated with site and its essentially treated as a fixed effect, which we don't want. Thus, we need to aggregate across transects in the DRM 2024 dataset. But since different taxa were searched for on different numbers of transects (i.e., different total area searched) we need to do this carefully and have the appropriate total area searched for each taxon for the pseudo-transect.
 
 # Assign uniform transect area
 drm24_counts_ag <- drm24_counts_ag %>%
@@ -916,12 +781,6 @@ drm24_counts_agg <- drm24_counts_ag %>%
     .groups = "drop"
   )
 
-
-
-
-
-# drm24_counts_agg %>% 
-#   filter(site %in% c("2112", "1127", "2115", "3096", "3079", "3094"), taxon %in% c("ACER", "ORBI"))
 
 # add counts of ACER and OFAV from t3t4 bonus data
 t3t4bonus <- read_csv("data/2024_shedd_drm/T3_T4_bonus_data.csv") %>%
@@ -956,15 +815,12 @@ drm24_counts_combined <- bind_rows(
     .groups = "drop"
   )
 
-
-
 ## Exclude two sites that were selected specifically because of known ACER populations
 drm24_counts_combined <- drm24_counts_combined %>%
   filter(!site %in% c("3096", "3094"))
 
 # Update metadata
 drm24_sitemd <- drm24_sitemd %>% filter(site %in% unique(drm24_counts_combined$site))
-
 ```
 
 ## Habitat maps
@@ -4284,6 +4140,10 @@ p +
   labs(title = "Total corals in full impact monitoring area, 2024 estimates")
   
 ggsave(filename = "outputs/FigA6.png", width = 180, height = 130, units = "mm", dpi = 600)
+
+
+ggsave(filename = "outputs/FigA62.png", width = 180, height = 90, units = "mm", dpi = 600)
+
 ```
 
 
