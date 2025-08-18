@@ -124,7 +124,8 @@ names(dataset_labels) <- dataset_levels
 
 # Import data
 
-## 2011 NSU ESA Survey
+## Coral survey data
+### 2011 NSU ESA Survey
 ```{r}
 # Import data
 nsu11_esa0 <- readxl::read_xlsx("data/2011_nsu_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx",
@@ -159,7 +160,7 @@ nsu11_esa_counts_ag <- nsu11_esa_counts %>%
   mutate(tier = "t1")
 ```
 
-## 2017 DCA ESA Survey
+### 2017 DCA ESA Survey
 ```{r}
 # Site metadata
 dca17_esa_sitemd0 <- readxl::read_xlsx("data/2017_dca_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx",
@@ -217,7 +218,7 @@ dca17_esa_counts_ag_full <- full_grid %>%
 ```
 
 
-## 2017 DCA Recon Survey
+### 2017 DCA Recon Survey
 
 ```{r 2017_DCA_recon_data}
 # Site metadata
@@ -304,7 +305,7 @@ dca17_counts_ag <- dca17_counts_ag %>%
   summarize(n = sum(n), .groups = "drop")
 ```
 
-## 2021 TT Recon & ESA Survey
+### 2021 TT Recon & ESA Survey
 
 ```{r tt21_site_metadata}
 # Recon site metadata
@@ -438,7 +439,7 @@ tt21_counts_ag <- tt21_counts_ag %>%
 tt21_counts_ag <- tt21_counts_ag %>% filter(site %in% tt21_sitemd$site)
 ```
 
-## 2023 TT Impact Survey
+### 2023 TT Impact Survey
 
 ```{r 2023_tt_data}
 # Site metadata
@@ -576,7 +577,7 @@ tt23_counts_ag2 <- tt23_counts_ag %>%
 ```
 
 
-## 2024 DRM/Shedd Survey
+### 2024 DRM/Shedd Survey
 
 ```{r 2024_shedd_data}
 # Site metadata
@@ -823,12 +824,13 @@ drm24_counts_combined <- drm24_counts_combined %>%
 drm24_sitemd <- drm24_sitemd %>% filter(site %in% unique(drm24_counts_combined$site))
 ```
 
-## Habitat maps
+## Spatial data
+### Habitat types
 ```{r habitat_maps, fig.width = 10, fig.height = 10}
-# --- STEP 1: Load KML Polygons ---
-polygons <- st_read("data/spatial/Habitat classifications.kml")  # update path as needed
+# Load KML Polygons
+polygons <- st_read("data/spatial/Habitat classifications.kml") 
 
-# --- STEP 2: Extract Attributes from HTML Description ---
+# Extract Attributes from HTML Description
 extract_attrs <- function(desc) {
   if (is.na(desc) || desc == "") {
     return(tibble(Habitat = NA, Type = NA, Modifier = NA, Region = NA, Type2 = NA))
@@ -854,14 +856,13 @@ polygons_clean <- bind_cols(polygons %>% select(-Description), attrs)
 
 
 ###### GET RID OF OVERLAPPING SAND POLYGONS
-
-# 1. Set clean CRS and define area of interest (AOI)
+# Set clean CRS and define area of interest
 crs_clean <- st_crs(32617)
 
 aoi_bbox <- st_as_sfc(st_bbox(c(xmin = -80.113, xmax = -80.078, ymin = 26.058, ymax = 26.112), crs = 4326))
 aoi_bbox_utm <- st_transform(aoi_bbox, crs = crs_clean)
 
-# 2. Reproject and filter
+# Reproject and filter
 polygons_proj <- st_transform(polygons_clean, crs = crs_clean)
 
 sand_polygons <- polygons_proj %>%
@@ -872,7 +873,7 @@ non_sand_polygons <- polygons_proj %>%
   filter(Type != "Sand") %>%
   st_intersection(aoi_bbox_utm)
 
-# 3. Clean geometries using WKT rebuild
+# Clean geometries using WKT rebuild
 sand_geom_clean <- st_sfc(
   lapply(st_as_text(st_geometry(sand_polygons)), function(wkt) st_as_sfc(wkt)[[1]]),
   crs = crs_clean
@@ -880,7 +881,7 @@ sand_geom_clean <- st_sfc(
 
 nonsand_union_clean <- st_as_sfc(st_as_text(st_union(st_geometry(non_sand_polygons))), crs = crs_clean)[[1]]
 
-# 4. Subtract all non-sand from sand polygons
+# Subtract all non-sand from sand polygons
 cut_geoms <- lapply(seq_along(sand_geom_clean), function(i) {
   g <- sand_geom_clean[[i]]
   g_fixed <- st_buffer(g, 0)
@@ -893,28 +894,22 @@ cut_geoms <- lapply(seq_along(sand_geom_clean), function(i) {
   )
 })
 
-# 5. Rebuild sand_cut sf object and drop empty geometries
+# Rebuild sand_cut sf object and drop empty geometries
 sand_cut <- sand_polygons
 st_geometry(sand_cut) <- st_sfc(cut_geoms, crs = crs_clean)
 sand_cut <- sand_cut[!st_is_empty(sand_cut), ]
 
-# 6. Combine everything
+# Combine everything
 combined <- bind_rows(sand_cut, non_sand_polygons)
 
-# 7. Reproject to WGS84 for plotting
+# Reproject to WGS84 for plotting
 polygons_final <- st_transform(combined, crs = 4326)
 
 ```
 
-
-
-## Assign sites to habitat types
+#### Assign survey sites to habitats
 ```{r}
-
-######## MERGE WITH SURVEY SITES
-# --- STEP 3: Prepare Site Coordinate Data ---
-# Get all site coordinates, and assign north and south
-# Combine site metadata
+# Combine site metadata, and assign north and south
 allsitemd <- bind_rows(.id = "dataset",
   nsu11_esa = nsu11_esa_sitemd,
   dca17_esa = dca17_esa_sitemd,
@@ -924,9 +919,11 @@ allsitemd <- bind_rows(.id = "dataset",
   drm24 = drm24_sitemd
 ) %>%
   mutate(dir = if_else(latitude > 26.093570, "N", "S"))
+
+# Get lat/lon of all sites
 points <- st_as_sf(allsitemd, coords = c("longitude", "latitude"), crs = 4326)
 
-# --- STEP 4: Validate Geometry and Match CRS ---
+# Validate Geometry and Match CRS
 polygons_final <- polygons_final %>%
   st_zm(drop = TRUE, what = "ZM") %>%
   st_make_valid() %>%
@@ -934,7 +931,7 @@ polygons_final <- polygons_final %>%
 
 sf_use_s2(FALSE)  # prevent s2 geometry issues
 
-# --- STEP 5: Spatial Join ---
+# Spatial Join survey sites with habitat polygons
 joined <- st_join(points, polygons_final, join = st_within)
 
 joined_df <- joined %>%
@@ -948,9 +945,8 @@ allsitemd <- joined_df
 allsitemd <- allsitemd %>%
   mutate(ESAonly = if_else(dataset %in% c("nsu11_esa", "dca17_esa"), "ESA only", "All corals"))
 
-# Visualize habitat classifications
-polyplot <- polygons_final %>% 
-  #filter(Type != "Sand") %>%
+# # Visualize habitat classifications
+polyplot <- polygons_final %>%
   ggplot() +
   geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
   scale_fill_brewer(palette = "Set3", na.value = "gray80") +
@@ -958,37 +954,16 @@ polyplot <- polygons_final %>%
   labs(fill = NULL, shape = NULL, x = NULL, y = NULL) +
   theme(legend.position = "right") +
   coord_sf(
-    xlim = c(-80.113, -80.078),  # Adjusted to reduce whitespace
+    xlim = c(-80.113, -80.078),
     ylim = c(26.058, 26.112),
     expand = FALSE
   ) +
   scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
   scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
-                     labels = scales::number_format(accuracy = 0.01))  # Fewer long ticks
-
-
-# Plot all coral surveys and ESA coral surveys
-esa_all_plot <- polyplot +
-  geom_point(data = filter(allsitemd, ESAonly == "All corals"),
-             aes(x = longitude, y = latitude, shape = dataset),
-             inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
-  scale_shape_manual(values = c(2, 1, 4, 5)) +
-  guides(fill = "none", shape = "none") +
-  theme_minimal()
- 
-esa_esa_plot <- polyplot +
-  geom_point(data = filter(allsitemd, ESAonly == "ESA only"),
-             aes(x = longitude, y = latitude, shape = dataset),
-             inherit.aes = FALSE, alpha = 0.3, size = 0.5) +
-  scale_shape_manual(values = c(3, 6)) +
-  guides(fill = "none", shape = "none") +
-  theme_minimal() #+
-  # theme(plot.title = element_text(hjust = 0, face = "bold", size = 9))
-
-# cowplot::plot_grid(esa_all_plot, esa_esa_plot)
+                     labels = scales::number_format(accuracy = 0.01))
 ```
 
-## Impact Zones
+### Impact zones
 ```{r}
 # Impact zone Scenario 2 and NMFS consideration areas
 # Define the extraction function once
@@ -1035,8 +1010,6 @@ extract_placemark_info <- function(kml_file, source_label) {
     st_as_sf()
 }
 
-
-
 # File paths
 impact_kml <- "data/spatial/Impact_zones_Scenario 2.kml"
 nmfs_kml <- "data/spatial/Scenario2_NMFSConsiderationAreas.kml"
@@ -1059,13 +1032,15 @@ all_zones_sf <- all_zones_sf %>%
     scenario = if_else(name %in% c("North", "South", "East", "Nearshore"), "NMFS Consideration", "Scenario 2")
   )
 
-# Create new polygon covering Rest of Monitoring Area, from 1.2 km N to 1.2 km S of the channel
 
-# 1. Extract the 'Channel' polygon
+
+### Create new polygon covering Rest of Monitoring Area, from 1.2 km N to 1.2 km S of the channel
+
+# Extract the 'Channel' polygon
 channel_poly <- all_zones_sf %>%
   filter(str_detect(tolower(name), "channel"))
 
-# 2. Transform all relevant layers to UTM (meters) for buffering
+# Transform all relevant layers to UTM (meters) for buffering
 utm_crs <- 32617  # UTM Zone 17N — suitable for SE Florida
 
 if (st_is_longlat(channel_poly)) {
@@ -1077,10 +1052,10 @@ if (st_is_longlat(channel_poly)) {
   all_zones_sf_m <- all_zones_sf
 }
 
-# 3. Get bounds of channel (north-south)
+# Get bounds of channel (north-south)
 bbox_channel <- st_bbox(channel_poly)
 
-# 4. Define rectangular box: full E-W extent of reef habitat, ±1.2 km N/S of channel
+# Define rectangular box: full E-W extent of reef habitat, ±1.2 km N/S of channel
 ew_range <- st_bbox(polygons_clean_m)[c("xmin", "xmax")]
 ns_range <- c(bbox_channel["ymin"] - 1200, bbox_channel["ymax"] + 1200)
 names(ns_range) <- c("ymin", "ymax")
@@ -1092,22 +1067,22 @@ new_box <- st_as_sfc(st_bbox(c(
   ymax = ns_range[[2]]
 ), crs = st_crs(polygons_clean_m)))
 
-# 5. Clip the box to reef habitat
+# Clip the box to reef habitat
 intersected_box <- st_union(st_intersection(new_box, st_union(polygons_clean_m)))
 
-# 6. Subtract all existing zones (Impact + NMFS) by taking concave hull
-# 6. Create a tight, shrink-wrapped outer boundary around all existing zones
+# Subtract all existing zones (Impact + NMFS) by taking concave hull
+# Create a tight, shrink-wrapped outer boundary around all existing zones
 existing_zone_hull <- all_zones_sf_m %>%
   st_make_valid() %>% 
   st_union() %>%
-  st_buffer(20) %>%     # Buffer OUTWARD 40 meters to close gaps (adjust as needed)
+  st_buffer(20) %>%     # Buffer OUTWARD 40 meters to close gaps
   st_union() %>%
   st_buffer(-20)        # Buffer INWARD to return to approximate original size
 
-# 7. Subtract existing zones from monitoring area
+# Subtract existing zones from monitoring area
 new_zone_geom <- st_difference(intersected_box, existing_zone_hull)
 
-# 8. Build the new polygon row
+# Build the new polygon row
 new_zone <- st_sf(
   folder = "Generated",
   name = "Rest of Monitoring Area",
@@ -1117,12 +1092,12 @@ new_zone <- st_sf(
   crs = st_crs(polygons_clean_m)
 )
 
-# 9. Transform back to match original CRS (likely WGS84)
+# Transform back to match original CRS
 if (st_crs(new_zone) != st_crs(all_zones_sf)) {
   new_zone <- st_transform(new_zone, st_crs(all_zones_sf))
 }
 
-# 10. Add the new zone to the combined zones object
+# Add the new zone to the combined zones object
 all_zones_sf <- bind_rows(all_zones_sf, new_zone)
 zone_levels <- c("Channel", "Side Slopes", "Depth_10cm", "Depth_5cm", "Depth_1cm", "Depth_0_5cm", "Depth_0_1cm",
                  "Nearshore", "North", "East", "South", "Rest of Monitoring Area")
@@ -1132,13 +1107,12 @@ all_zones_sf$name <- factor(all_zones_sf$name, levels = zone_levels)
 
 #### MERGE CONTIGUOUS POLYGONS OF SAME ZONE TYPE/NAME
 
-
-# 1. Ensure individual polygons (not MULTIPOLYGONs)
+# Ensure individual polygons (not MULTIPOLYGONs)
 zones_split <- all_zones_sf %>%
   st_cast("POLYGON") %>%
   mutate(row_id = row_number())  # unique ID to track rows
 
-# 2. Group and merge contiguous polygons with the same name
+# Group and merge contiguous polygons with the same name
 zones_merged <- zones_split %>%
   group_by(name) %>%
   group_split() %>%
@@ -1166,20 +1140,15 @@ zones_merged <- zones_split %>%
 
 
 #### PLOT
-
-
-
-
-########### gradient colors
-# 1. Transform to UTM Zone 17N for proper distance in meters
+# Transform to UTM Zone 17N for proper distance in meters
 utm_crs <- 32617
 zones_utm <- st_transform(zones_merged, utm_crs)
 channel_utm <- st_transform(channel_poly, utm_crs)
 
-# 2. Get Y coordinate of channel centroid
+# Get Y coordinate of channel centroid
 channel_centroid_y <- st_coordinates(st_centroid(channel_utm))[,"Y"]
 
-# 3. Compute distance from channel (north/south) in meters
+# Compute distance from channel (north/south) in meters
 zones_with_dist <- zones_utm %>%
   mutate(
     is_channel = name == "Channel",
@@ -1192,7 +1161,7 @@ zones_with_dist <- zones_utm %>%
     )
   )
 
-# Define a more distinct gradient palette
+# Define a gradient color palette
 distance_palette <- c(
   "#B2182B",  # deep red
   "#EF8A62",  # reddish-orange
@@ -1202,14 +1171,12 @@ distance_palette <- c(
 
 # Plot
 p <- ggplot() +
-  # Habitat polygons (no legend)
+  # Habitat polygons
   geom_sf(data = polygons_clean, aes(fill = Type),
           color = NA, size = 0.1, alpha = 0.25, show.legend = FALSE) +
   scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-
   ggnewscale::new_scale_fill() +
-
-  # Zones (with 12 manual colors and legend)
+  # Zones 
   geom_sf(data = zones_with_dist %>% filter(!is_channel),
           aes(fill = dist_from_channel), color = "black", alpha = 0.5, linewidth = 0.075) +
   geom_sf(data = zones_with_dist %>% filter(is_channel),
@@ -1218,7 +1185,6 @@ p <- ggplot() +
     colors = distance_palette,
     name = "Distance from Channel (m)"
   ) +
-
   theme_minimal() +
   theme(legend.position = "none") +
   coord_sf(
@@ -1230,7 +1196,7 @@ p <- ggplot() +
   scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
                      labels = scales::number_format(accuracy = 0.01))
 
-# LABEL ZONES
+# Zone labels
 zone_labels <- tribble(
   ~name,                   ~label_x, ~label_y,
   "Channel",               -80.085,  26.0938,
@@ -1272,35 +1238,33 @@ zone_segments <- tribble(
 label_segments <- zone_segments %>%
   left_join(zone_labels, by = "name")
 
-iz_plot <- p +
-  geom_segment(data = label_segments,
-               aes(x = segment_x, y = segment_y,
-                   xend = label_x, yend = label_y),
-               color = "black", linewidth = 0.2) +
-  geom_text(data = zone_labels,
-            aes(x = label_x, y = label_y, label = name),
-            size = 2, hjust = 1) +
-  coord_sf(
-    xlim = c(-80.113, -80.077),
-    ylim = c(26.058, 26.112),
-    expand = FALSE
-  ) +
-  labs(x = "", y = "") +
-  scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
-  scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
-                     labels = scales::number_format(accuracy = 0.01))
+# iz_plot <- p +
+#   geom_segment(data = label_segments,
+#                aes(x = segment_x, y = segment_y,
+#                    xend = label_x, yend = label_y),
+#                color = "black", linewidth = 0.2) +
+#   geom_text(data = zone_labels,
+#             aes(x = label_x, y = label_y, label = name),
+#             size = 2, hjust = 1) +
+#   coord_sf(
+#     xlim = c(-80.113, -80.077),
+#     ylim = c(26.058, 26.112),
+#     expand = FALSE
+#   ) +
+#   labs(x = "", y = "") +
+#   scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
+#   scale_x_continuous(breaks = seq(-80.11, -80.08, by = 0.01),
+#                      labels = scales::number_format(accuracy = 0.01))
 
-iz_plot
 
 ###### SCALE BAR
-
 # Distances (m) for ticks
 tick_offsets <- c(300, 600, 1200)
 
 # X position for the scale bar (longitude)
 x_lon <- -80.077
 
-# 1. Convert X-position to UTM (using midpoint latitude just for reference)
+# Convert X-position to UTM (using midpoint latitude just for reference)
 x_pos_utm <- st_transform(
   st_sfc(st_point(c(x_lon, (bbox_channel["ymin"] + bbox_channel["ymax"]) / 2 / 111320)), crs = 4326),
   32617
@@ -1308,7 +1272,7 @@ x_pos_utm <- st_transform(
   st_coordinates() %>%
   .[,"X"]
 
-# 2. Create tick positions in UTM
+# Create tick positions in UTM
 ticks_utm <- data.frame(
   x = rep(x_pos_utm, 2 * length(tick_offsets) + 2),
   y = c(
@@ -1325,14 +1289,14 @@ ticks_utm <- data.frame(
   )
 )
 
-# 3. Convert tick positions to WGS84 (lat/lon)
+# Convert tick positions to WGS84 (lat/lon)
 ticks_latlon <- st_as_sf(ticks_utm, coords = c("x", "y"), crs = 32617) %>%
   st_transform(4326) %>%
   st_coordinates() %>%
   as.data.frame() %>%
   mutate(dist_m = ticks_utm$dist_m)
 
-# 4. Convert ymin and ymax to lat/lon for the two scale bar segments
+# Convert ymin and ymax to lat/lon for the two scale bar segments
 bbox_channel_latlon <- st_as_sf(
   data.frame(
     x = rep(x_pos_utm, 2),
@@ -1347,7 +1311,7 @@ bbox_channel_latlon <- st_as_sf(
 ymin_lat <- bbox_channel_latlon[1, "Y"]
 ymax_lat <- bbox_channel_latlon[2, "Y"]
 
-# 5. Two scale bar segments: from ymin down and ymax up
+# Two scale bar segments: from ymin down and ymax up
 scale_lines <- data.frame(
   x = c(x_lon, x_lon),
   xend = c(x_lon, x_lon),
@@ -1355,7 +1319,7 @@ scale_lines <- data.frame(
   yend = c(max(ticks_latlon$Y), min(ticks_latlon$Y))
 )
 
-# 6. Tick marks (short horizontal segments)
+# Tick marks (short horizontal segments)
 tick_length <- 0.0005
 ticks_segments <- data.frame(
   x = x_lon - tick_length,
@@ -1364,7 +1328,7 @@ ticks_segments <- data.frame(
   yend = ticks_latlon$Y
 )
 
-# 7. Tick labels
+# Tick labels
 tick_labels <- data.frame(
   x = x_lon - 0.0004,
   y = ticks_latlon$Y,
@@ -1374,136 +1338,32 @@ tick_labels <- data.frame(
     paste0(abs(ticks_latlon$dist_m), "m")
   )
 )
-
-# 8. Add to plot
-iz_plot +
-  geom_segment(
-    data = scale_lines,
-    aes(x = x, y = y, xend = xend, yend = yend),
-    inherit.aes = FALSE,
-    color = "black",
-    linewidth = 0.4
-  ) +
-  geom_segment(
-    data = ticks_segments,
-    aes(x = x, y = y, xend = xend, yend = yend),
-    color = "black",
-    linewidth = 0.3
-  ) +
-  geom_text(
-    data = tick_labels,
-    aes(x = x, y = y, label = label),
-    hjust = 1,
-    vjust = c(rep(1.5, 4), rep(-0.5, 4)),
-    size = 1.5
-  )
-
-
+# 
+# # Add to plot
+# iz_plot +
+#   geom_segment(
+#     data = scale_lines,
+#     aes(x = x, y = y, xend = xend, yend = yend),
+#     inherit.aes = FALSE,
+#     color = "black",
+#     linewidth = 0.4
+#   ) +
+#   geom_segment(
+#     data = ticks_segments,
+#     aes(x = x, y = y, xend = xend, yend = yend),
+#     color = "black",
+#     linewidth = 0.3
+#   ) +
+#   geom_text(
+#     data = tick_labels,
+#     aes(x = x, y = y, label = label),
+#     hjust = 1,
+#     vjust = c(rep(1.5, 4), rep(-0.5, 4)),
+#     size = 1.5
+#   )
 ```
 
-## Multipanel map figure
-```{r}
-# Shared axis limits for all maps
-coord_limits <- coord_sf(
-  xlim = c(-80.113, -80.078),
-  ylim = c(26.058, 26.112),
-  expand = FALSE
-)
-
-# Apply consistent theme + coordinate limits
-base_theme <- theme_minimal(base_size = 7) +
-  theme(
-    axis.title = element_blank(),
-    axis.text.y = element_text(size = 6),
-    axis.text.x = element_text(size = 6),
-    legend.position = "none",
-    plot.margin = margin(5,0,0,0, unit = "mm"),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA),
-    legend.spacing.y = unit(0.05, "cm"),    # reduce vertical space between keys
-    legend.key.height = unit(0.2, "cm"),   # reduce height of each legend key box
-    legend.key.width = unit(0.4, "cm"),
-    legend.text = element_text(margin = margin(0,0,0,0)),  # tighten text spacing
-    legend.title = element_text(margin = margin(0,0,0,0)),
-    legend.margin = margin(1,1,1,0),
-    legend.title.align = 0.5,
-    legend.key = element_blank(),
-    legend.background = element_blank(),
-    legend.box.background = element_rect(color = NA, fill = alpha("white", 0.7))
-  )
-
-# 1. Left panel: All corals (keep y-axis)
-esa_all_plot_clean <- esa_all_plot +
-  coord_limits +
-  base_theme +
-  guides(shape = "legend") +
-  theme(legend.position = c(0.75, 0.2))
-
-# 2. Middle panel: ESA corals (remove y-axis)
-esa_esa_plot_clean <- esa_esa_plot +
-  coord_limits +
-  base_theme +
-  guides(shape = "legend") +
-  theme(axis.text.y = element_blank(),
-        legend.position = c(0.25, 0.2))
-
-# 3. Right panel: Impact zones (remove y-axis)
-iz_plot_clean <- iz_plot +
-  coord_limits +
-  base_theme +
-  theme(axis.text.y = element_blank(),
-        axis.ticks.y = element_blank())
-
-# 4. Extract compact fill legend from polyplot
-legend_plot <- polyplot +
-  guides(shape = "none", color = "none", fill = guide_legend(nrow = 2)) +
-  base_theme +
-  theme(
-    legend.position = "bottom",
-    legend.key.size = unit(0.3, "cm"),  # Reduce square size
-    legend.text = element_text(size = 6),  # Optional: smaller legend text
-    legend.title = element_text(size = 7)  # Optional: smaller legend title
-  )
-grob <- ggplotGrob(legend_plot)
-fill_legend <- gtable::gtable_filter(grob, "guide-box")
-
-# 5. Align the plot panels (so heights match)
-aligned_maps <- cowplot::align_plots(
-  esa_all_plot_clean, esa_esa_plot_clean, iz_plot_clean,
-  align = "hv", axis = "tblr"
-)
-
-# 6. Assemble horizontal row of aligned plots
-map_row <- cowplot::plot_grid(
-  plotlist = aligned_maps,
-  labels = c("A. Surveys of all corals", "B. Surveys of ESA corals", "C. Impact zones"),
-  label_size = 8,
-  label_fontface = "bold",
-  label_x = c(-0.2, -0.2, -0.1),
-  label_y = 1,
-  nrow = 1,
-  rel_widths = c(1, 1, 1)
-)
-
-# 7. Add the legend below the row
-final_plot <- cowplot::plot_grid(
-  map_row,
-  fill_legend,
-  ncol = 1,
-  rel_heights = c(1, 0.07)
-)
-
-# 8. Draw final plot
-ggdraw() + draw_plot(final_plot) +
-  theme(plot.background = element_rect(fill = "white", color = NA))
-
-
-# ggsave(filename = "outputs/Fig1.png", width = 170, height = 100, units = "mm", dpi = 300)
-```
-
-
-
-## Area of each habitat type in each impact zone
+#### Area of habitats in impact zones
 ```{r}
 # Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons, and that Aggregated Patch Reef is changed to Outer Reef
 polygons_filtered <- polygons_final %>%
@@ -1688,48 +1548,21 @@ df_completed <- df_completed %>%
 #   filter(dataset == "tt21", taxon %in% c("ACER", "ORBI", "SIDE")) %>% arrange(site, taxon)
 
 
-
-
-
-
-
-
-
 ## Other datasets had fixed transect areas
 df_completed <- df_completed %>%
   mutate(transect_area_m2 = case_when(
-     # Count-specific areas for nsu11 (since they did tier 1 surveys and tier 2 only if n > 5 for ACER)
-    # dataset == "nsu11_esa" & taxon == "ACER" & n > 5 ~ 600,  
-    # dataset == "nsu11_esa" & taxon == "ACER" & n <= 5 ~ 3600,
-    # dataset == "nsu11_esa" & taxon != "ACER" ~ 3600,
     dataset == "nsu11_esa" ~ 3600,
     dataset == "dca17_esa" ~ 784,
     dataset == "dca17" ~ 30,     # DCA belt transects were 30m
     dataset == "tt23" & site %in% tt23v_sitemd$site ~ 10,  # vertical wall sites
     dataset == "tt23" ~ 20,                                # all other tt23 sites
     TRUE ~ transect_area_m2))
-
-
-# check that everything has transect_area_m2
-df_completed %>% filter(is.na(transect_area_m2))
-
-df_completed %>%
-  distinct(dataset, site, transect_area_m2)
-
-df_completed %>%
-  filter(dataset == "nsu11_esa", site == "41")
 ```
-
-
-
 
 ## Filter by habitat
 
 ```{r select_habitats, fig.width = 10, fig.height = 10}
 allsitemd %>% count(Type)
-
-#### RECLASSIFY VERTICAL TRANSECTS MANUALLY AS A SEPARATE HABITAT TYPE?
-# probably yes. 
 
 # Select sites in Nearshore Ridge Complex, Inner Reef, and Middle Reef, Outer Reef and Aggregated Patch Reef
 selected <- allsitemd %>%
@@ -1742,25 +1575,11 @@ excluded <- anti_join(allsitemd, selected)
 excluded %>%
   count(dataset, Type)
 
-#df_completed %>% right_join(excluded) %>% arrange(-n) %>% print(n=100)
-
-# Plot all selected sites
-polyplot + 
-  geom_point(data = selected, 
-             aes(x = longitude, y = latitude, shape = dataset), 
-             inherit.aes = FALSE, alpha = 0.6) +
-  scale_shape_manual(values = c(2, 3, 4, 5, 6, 7)) +
-  facet_wrap(~ESAonly) +
-  labs(title = "Selected sites - all surveys")
-
 
 # Filter dataset to just selected sites
 dff0 <- df_completed %>% inner_join(selected)
-dff0 %>% filter(Type == "Artificial", taxon %in% c("ACER", "ORBI"), n > 0)
-
 dff <- df_completed %>% inner_join(selected)
 ```
-
 
 Shedd dataset has some sites in the NRC south that are further from the channel relative to other datasets. Are these similar enough to the NRC south sites that are closer to the channel that they can be reasonably included?
 
@@ -1777,7 +1596,7 @@ drm24_NRCS <- drm24_NRCS %>%
 # Fit a Negative Binomial GLM
 mod_nb <- MASS::glm.nb(n ~ grp, data = drm24_NRCS)
 
-# Generate new data only for existing taxon-size class combinations
+# Generate prediction grid for far/near sites
 newdata_1 <- drm24_NRCS %>%
   distinct(grp)
 
@@ -1805,31 +1624,29 @@ total_ci_nb <- results_nb %>%
   )
 
 knitr::kable(total_ci_nb)
-
 ```
 
 Next, look at community composition between the nearer vs. farther sites
 ```{r NRCS_community_composition}
-
-# 1. Create a wide community matrix: rows = site x grp, columns = taxa
+# Create a wide community matrix: rows = site x grp, columns = taxa
 comm_matrix <- drm24_NRCS %>%
   group_by(site, grp, taxon) %>%
   summarize(total_n = sum(n), .groups = "drop") %>%
   pivot_wider(names_from = taxon, values_from = total_n, values_fill = 0)
 
-# 2. Extract community matrix and metadata
+# Extract community matrix and metadata
 comm_data <- comm_matrix %>% select(-site, -grp)
 site_info <- comm_matrix %>% select(site, grp)
 
-# 3. Run NMDS (k = 2 dimensions is standard)
-set.seed(123)  # for reproducibility
+# Run NMDS
+set.seed(123) 
 nmds <- metaMDS(comm_data, distance = "bray", k = 2, trymax = 100)
 
-# 4. Prepare data for plotting
+# Prepare data for plotting
 scores_df <- scores(nmds)$sites %>%
   bind_cols(site_info)
 
-# 5. Plot NMDS with ggplot2
+# Plot NMDS
 ggplot(scores_df, aes(x = NMDS1, y = NMDS2, color = grp)) +
   geom_point(size = 3, alpha = 0.8) +
   theme_minimal() +
@@ -1838,7 +1655,6 @@ ggplot(scores_df, aes(x = NMDS1, y = NMDS2, color = grp)) +
 ```
 
 Density and community composition are not different in the NRC S sites that are nearer vs. farther from the channel. So, no need to exclude the farther sites.
-
 
 DCA dataset has the most sites in the "Artificial" habitat classification. (Some in other datasets too, but DCA has most). Can 'Artificial' be aggregated with 'Nearshore Ridge Complex'?
 
@@ -1849,20 +1665,19 @@ Test for differences in coral density in DCA survey between habitat types
 ```{r artificial_vs_nrc_density}
 # Subset DCA data
 dcadf <- dca17_counts_ag %>%
-  left_join(allsitemd) %>%
-  filter(Type %in% c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Artificial", "Outer Reef", "Aggregated Patch Reef"))
+  left_join(allsitemd)
 
 # Fit a Negative Binomial GLM
 mod_nb <- MASS::glm.nb(n ~ Type, data = dcadf)
 
-# Generate new data only for existing taxon-size class combinations
+# Generate new data only for existing habitats
 newdata_1 <- dcadf %>%
   distinct(Type)
 
 # Get predicted values & standard errors (log scale)
 preds_nb <- predict(mod_nb, newdata_1, type = "link", se.fit = TRUE)
 
-# Compute both total coral density & taxon-size class-specific densities in one step
+# Compute total coral density per habitat
 results_nb <- newdata_1 %>%
   mutate(
     fit = exp(preds_nb$fit),                    # Convert fitted values to response scale
@@ -1888,25 +1703,25 @@ Highly overlapping confidence intervals for Artifical and Nearshore Ridge Comple
 
 Test for differences in community composition in DCA survey
 ```{r artificial_vs_nrc_nmds}
-# 1. Create a wide community matrix: rows = site x Type, columns = taxa
+# Create a wide community matrix: rows = site x Type, columns = taxa
 comm_matrix <- dcadf %>%
   group_by(site, Type, taxon) %>%
   summarize(total_n = sum(n), .groups = "drop") %>%
   pivot_wider(names_from = taxon, values_from = total_n, values_fill = 0)
 
-# 2. Extract community matrix and metadata
+# Extract community matrix and metadata
 comm_data <- comm_matrix %>% select(-site, -Type)
 site_info <- comm_matrix %>% select(site, Type)
 
-# 3. Run NMDS (k = 2 dimensions is standard)
-set.seed(123)  # for reproducibility
+# Run NMDS
+set.seed(123)
 nmds <- metaMDS(comm_data, distance = "bray", k = 2, trymax = 100)
 
-# 4. Prepare data for plotting
+# Prepare data for plotting
 scores_df <- scores(nmds)$sites %>%
   bind_cols(site_info)
 
-# 5. Plot NMDS with ggplot2
+# Plot NMDS
 ggplot(scores_df, aes(x = NMDS1, y = NMDS2, color = Type)) +
   geom_point(size = 3, alpha = 0.8) +
   theme_minimal() +
@@ -1930,7 +1745,7 @@ dff[dff$Type == "Aggregated Patch Reef", "Type"] <- "Outer Reef"
 dff <- dff %>% mutate(Type = factor(Type, levels = type_levels))
 ```
 
-Remove ACER (zeros) from tt23 dataset?
+Remove ACER (zeros) from tt23 dataset
 ```{r}
 dstax <- dff %>%
   filter(!dataset %in% c("nsu11_esa", "dca17_esa")) %>%
@@ -1954,7 +1769,7 @@ dff <- dff %>%
 
 
 
-# Summarize data
+# Summarize combined dataset
 ```{r}
 # Count number of sites per habitat
 nsites <- dff %>%
@@ -2028,18 +1843,10 @@ var_count <- var(dfftaxon$n)
 var_count / mean_count
 
 # Data are highly zero-inflated and overdispersed -- use zero-inflated negative binomial models. 
-
-
-dfftaxon %>% filter(taxon == "ORBI", dataset == "drm24", n > 0)
-dfftaxon %>% filter(taxon == "ORBI", dataset == "dca17", n > 0)
-dfftaxon %>% filter(taxon == "ORBI", dataset == "tt21", n > 0)
-dfftaxon %>% filter(taxon == "ORBI", dataset == "tt23", n > 0)
 ```
 
 # Map surveys & impact zones
 ```{r plot_maps, fig.width = 10, fig.height = 10}
-## New multipanel map fig
-
 # Define shared coordinate limits
 coord_limits <- coord_sf(
   xlim = c(-80.1116, -80.078),
@@ -2157,9 +1964,8 @@ final_fig <- plot_grid(
   rel_widths = c(0.59, 0.41)  # adjust until panel areas are visually aligned
 )
 
-final_fig
 
-# 4. Extract compact fill legend from polyplot
+# Extract fill legend from habitat polygon plot
 legend_plot <- polyplot +
   guides(shape = "none", color = "none", fill = guide_legend(nrow = 2)) +
   base_theme +
@@ -2187,35 +1993,6 @@ ggsave(
 
 ```
 
-extra map figure 
-```{r}
-pp3 <- ggplot(polygons_final) +
-    geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
-    geom_point(
-        data = selected,
-        aes(x = longitude, y = latitude),
-        pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
-    ) +
-    scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-    facet_wrap(~ dataset, ncol = 3,
-               labeller = as_labeller(c(
-                   "nsu11_esa" = "2011 – NSU ESA Survey",
-                   "dca17_esa" = "2017 – DCA ESA Survey",
-                   "dca17"     = "2017 – DCA Recon Survey",
-                   "tt21"      = "2021 – Tetra Tech Survey",
-                   "tt23"      = "2023 – Tetra Tech Survey",
-                   "drm24"     = "2024 – Shedd Survey"
-               ))) +
-    coord_limits +
-    labs(title = NULL, fill = NULL) +
-    base_theme +
-    theme(
-        legend.position = "bottom",
-        strip.text = element_text(size = 6),
-        panel.spacing = unit(0.5, "lines")
-    )
-ggsave(pp3, filename = "outputs/survey_locations.png", width = 180, height = 220, units = "mm", dpi = 300, bg = "white")
-```
 
 # Statistical modeling 
 
@@ -2229,20 +2006,20 @@ df_pos <- dfftaxon %>%
   mutate(density = n / transect_area_m2,
          log_density = log(density))
 
-# -- 1. PRIOR FOR INTERCEPT (count model log mean density) --
+# PRIOR FOR INTERCEPT (count model log mean density, class = "Intercept")
 summary_log_density <- summary(df_pos$log_density)
 summary_log_density
 # Output: 
  #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- # -8.189  -3.401  -2.708  -2.534  -1.609   2.046 
+ # -8.189  -3.401  -2.708  -2.781  -1.609   2.046 
 
 # Prior choice:
-# Center at ~mean or median (e.g., -2.5 ≈ exp(-2.5) ≈ 0.08/m²)
+# Center at ~mean or median (e.g., -2.8 ≈ exp(-2.8) ≈ 0.06/m²)
 # SD wide enough to cover most observed log densities
-# => normal(-2.5, 1.5)
+# => normal(-2.8, 1.8)
 # This covers ~log densities from -6.5 to 1.5 => densities from ~0.0015 to ~4.5
 
-# -- 2. PRIOR FOR FIXED EFFECTS (class = "b") --
+# PRIOR FOR FIXED EFFECTS (class = "b") --
 group_effects <- df_pos %>%
   group_by(taxon, class, Type) %>%
   summarize(mean_log_density = mean(log_density), .groups = "drop")
@@ -2250,7 +2027,6 @@ group_effects <- df_pos %>%
 sd_group_effects <- sd(group_effects$mean_log_density)
 sd_group_effects
 summary(group_effects$mean_log_density)
-# Example: ~1.0
 
 # Prior choice:
 # Effects likely centered near 0 (mean difference from Intercept)
@@ -4276,3 +4052,31 @@ mean(jg_adults_summ$tot_adult_dens)
 median(jg_adults_summ$tot_adult_dens)
 ```
 
+```{r extra_figures}
+pp3 <- ggplot(polygons_final) +
+    geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
+    geom_point(
+        data = selected,
+        aes(x = longitude, y = latitude),
+        pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
+    ) +
+    scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+    facet_wrap(~ dataset, ncol = 3,
+               labeller = as_labeller(c(
+                   "nsu11_esa" = "2011 – NSU ESA Survey",
+                   "dca17_esa" = "2017 – DCA ESA Survey",
+                   "dca17"     = "2017 – DCA Recon Survey",
+                   "tt21"      = "2021 – Tetra Tech Survey",
+                   "tt23"      = "2023 – Tetra Tech Survey",
+                   "drm24"     = "2024 – Shedd Survey"
+               ))) +
+    coord_limits +
+    labs(title = NULL, fill = NULL) +
+    base_theme +
+    theme(
+        legend.position = "bottom",
+        strip.text = element_text(size = 6),
+        panel.spacing = unit(0.5, "lines")
+    )
+ggsave(pp3, filename = "outputs/survey_locations.png", width = 180, height = 220, units = "mm", dpi = 300, bg = "white")
+```
