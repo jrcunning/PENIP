@@ -2019,7 +2019,7 @@ summary_log_density
 # => normal(-2.8, 1.8)
 # This covers ~log densities from -6.5 to 1.5 => densities from ~0.0015 to ~4.5
 
-# PRIOR FOR FIXED EFFECTS (class = "b") --
+# PRIOR FOR FIXED EFFECTS (class = "b")
 group_effects <- df_pos %>%
   group_by(taxon, class, Type) %>%
   summarize(mean_log_density = mean(log_density), .groups = "drop")
@@ -2032,7 +2032,7 @@ summary(group_effects$mean_log_density)
 # Effects likely centered near 0 (mean difference from Intercept)
 # Use a bit wider SD to regularize: normal(0, 2.0)
 
-# -- 3. PRIOR FOR ZERO-INFLATION (logit of zero probability) --
+# PRIOR FOR ZERO-INFLATION (logit of zero probability)
 zi_est <- dfftaxon %>%
   group_by(taxon, class, Type) %>%
   summarize(p_zero = mean(n == 0), .groups = "drop") %>%
@@ -2043,26 +2043,11 @@ sd_logit_zi <- sd(zi_est$logit_p_zero)
 # Prior choice:
 # Centered at mean with reasonable spread => normal(1.5, 2.5)
 
-# -- 4. PRIOR FOR SHAPE PARAMETER (dispersion) --
-vmr_summary <- dfftaxon %>%
-  group_by(taxon, class, Type) %>%
-  mutate(dens = n / transect_area_m2,
-         pseudo_n = round(dens / min(dens), 0)) %>%
-  summarize(mean_n = mean(pseudo_n), var_n = var(pseudo_n), .groups = "drop") %>%
-  mutate(vmr = var_n / mean_n,
-         phi_est = ifelse(vmr > 1, mean_n / (vmr - 1), NA),
-         log_phi = log(phi_est))
-
-summary(vmr_summary$log_phi)
-sd(vmr_summary$log_phi, na.rm = T)
-
-
-####### FINAL PRIOR ESTIMATION
+# PRIOR FOR SHAPE PARAMETER (dispersion)
 vmr_summary <- dfftaxon %>%
   mutate(dens = n / transect_area_m2) %>%
   group_by(taxon, class, Type) %>%
-  #filter(sum(n) > 50) %>%
-  filter(sum(dens > 0, na.rm = TRUE) > 6) %>%     # TRY THIS
+  filter(sum(dens > 0, na.rm = TRUE) > 5) %>%     # filter for well-observed taxa for prior estimation
   mutate(
     dens_min = min(dens[dens > 0], na.rm = TRUE),  # min nonzero density
     pseudo_n = round(dens / dens_min)
@@ -2082,17 +2067,8 @@ vmr_summary <- dfftaxon %>%
 summary(vmr_summary$log_phi)
 sd(vmr_summary$log_phi, na.rm = TRUE)
 
-# Optional: histogram
-ggplot(vmr_summary, aes(x = log_phi)) +
-  geom_histogram(color = "black", fill = "gray80", bins = 30) +
-  labs(x = "log(phi) from pseudo-counts", y = "Frequency") +
-  theme_minimal()
-
-# summary without outlier
-vmr_summary_f <- vmr_summary %>%
-  filter(log_phi < 30, log_phi > -4)
-summary(vmr_summary_f$log_phi)
-sd(vmr_summary_f$log_phi, na.rm = TRUE)
+# Prior choice:
+# normal(-0.9, 1)
 ```
 
 ## Fit model
@@ -2129,11 +2105,11 @@ sd(vmr_summary_f$log_phi, na.rm = TRUE)
 # )
 # saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
 mod_nb3.7 <- readRDS("data/processed/mod_nb3.7.rds")
-
 ```
 
 
 ## Model evaluation
+
 ```{r, eval = F}
 # Convergence check
 #summary(mod_nb3.7)  # confirm Rhat ≈ 1.00, no divergences
@@ -2143,10 +2119,11 @@ bayes_R2(mod_nb3.7)
 ```
 
 ### Posterior predictive checks
+
 #### Global PPP
 ```{r, eval = F}
 
-# 1. GLOBAL POSTERIOR PREDICTIVE PLOTS ------------------------------------
+# GLOBAL POSTERIOR PREDICTIVE PLOTS ------------------------------------
 # Extract observed data and predicted draws
 area <- mod_nb3.7$data$transect_area_m2
 
@@ -2214,18 +2191,17 @@ plot_grid(plotlist = plot_list, ncol = 1)
 
 #### Grouped PPP
 ```{r, eval = F}
-# 2. GROUPED POSTERIOR PREDICTIVE PLOTS ------------------------------------
+# GROUPED POSTERIOR PREDICTIVE PLOTS ------------------------------------
 
-# Step 1: Create taxon_class column
+# Create taxon_class column
 dfftaxon <- dfftaxon %>%
   mutate(taxon_class = paste(taxon, class, sep = "_"))
 
-# Step 2: Draw predicted counts
+# Draw predicted counts
 ppreds <- add_predicted_draws(mod_nb3.7, newdata = dfftaxon, ndraws = 1000) %>%
   mutate(.prediction = .prediction / transect_area_m2)    # CONVERT TO DENSITY
 
-
-# Step 3: Summarize predicted statistics by taxon_class and draw
+# Summarize predicted statistics by taxon_class and draw
 pp_stats <- ppreds %>%
   group_by(taxon_class, Type, .draw) %>%
   summarize(
@@ -2236,7 +2212,7 @@ pp_stats <- ppreds %>%
     .groups = "drop"
   )
 
-# Step 4: Summarize observed statistics
+# Summarize observed statistics
 obs_stats <- dfftaxon %>%
   mutate(n = n / transect_area_m2) %>%     # convert to density
   group_by(taxon_class, Type) %>%
@@ -2248,7 +2224,7 @@ obs_stats <- dfftaxon %>%
     .groups = "drop"
   )
 
-# Step 5: Plot function
+# Plot function
 plot_stat2 <- function(stat_name, stat_label) {
   ggplot(pp_stats, aes_string(x = "Type", y = paste0(stat_name, "_pred"))) +
     stat_halfeye(fill = "orange", alpha = 0.6) +
@@ -2264,15 +2240,17 @@ plot_stat2 <- function(stat_name, stat_label) {
 }
 
 
-# Step 6: Generate plots
+# Generate plots
 plot_stat2("mean", "Mean") 
 plot_stat2("sd", "Standard Deviation")
 plot_stat2("p_zero", "Proportion Zeros")
 plot_stat2("skew", "Skewness")
 
+
+
 ### grouped ppps
 
-# Step 5: Compute PPP per stat per group
+# Compute PPP per stat per group
 compute_ppp <- function(pred_col, obs_col) {
   pp_stats %>%
     select(taxon_class, Type, .draw, !!sym(pred_col)) %>%
@@ -2294,7 +2272,7 @@ ppp_sd <- compute_ppp("sd_pred", "sd_obs")
 ppp_zero <- compute_ppp("p_zero_pred", "p_zero_obs")
 ppp_skew <- compute_ppp("skew_pred", "skew_obs")
 
-# Step 6: Combine
+# Combine
 ppp_summary_grouped <- bind_rows(ppp_mean, ppp_sd, ppp_zero, ppp_skew) 
 
 # Compare observed to predicted values for taxon-class-habitat groups that were actually observed
@@ -2320,12 +2298,12 @@ nrow(ppp_summary_grouped_obs)
 ```{r}
 # Equal weighting datasets
 
-# Step 2: Create newdata for prediction — dataset level only (site & dir not needed)
+# Create newdata for prediction — dataset level only (site & dir not needed)
 newdata <- dfftaxon %>% 
   distinct(dataset, taxon, class, Type) %>%
   mutate(transect_area_m2 = 1)
 
-# Step 3: Get predictions from the model
+# Get predictions from the model
 # - Dataset RE included
 # - Dir RE marginalized out
 preds <- add_epred_draws(
@@ -2334,12 +2312,12 @@ preds <- add_epred_draws(
   re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
 )
 
-# Step 4: Equal-weight datasets so no dataset dominates
+# Equal-weight datasets so no dataset dominates
 draws_equal_weighted <- preds %>%
   group_by(.draw, taxon, class, Type) %>%
   summarize(n_m2 = mean(.epred), .groups = "drop")
 
-# Step 5: Summarize posterior draws
+# Summarize posterior draws
 summary_equal_weighted_new <- draws_equal_weighted %>%
   group_by(taxon, class, Type) %>%
   mean_qi(n_m2, .width = 0.95)
@@ -2537,16 +2515,6 @@ make_taxon_density_plot(densities = summary_drm24_combined,
                         output_path = "outputs/FigA2.png",
                         width = 170, height = 170)
 
-# Create plot for just ACER/ORBI
-make_taxon_density_plot(densities = summary_equal_weighted_combined %>%
-                          filter(taxon %in% c("ACER", "ORBI")),
-                        output_path = "outputs/ACERORBI.png",
-                        width = 120, height = 70)
-
-make_taxon_density_plot(densities = summary_drm24_combined %>%
-                          filter(taxon %in% c("ACER", "ORBI")),
-                        output_path = "outputs/ACERORBI_2024.png",
-                        width = 120, height = 70)
 
 
 #### TABLE version
@@ -2710,9 +2678,7 @@ figA1 <- raw_vs_mod + theme_minimal() +
 ggsave(filename = "outputs/FigA1.png", width = 190, height = 250, units = "mm")
 ```
 
-### Combined densities by size and SCTLD-susceptibility
-
-
+### Total densities by size and SCTLD-susceptibility
 
 ```{r}
 make_combined_density_figure <- function(draws, table = FALSE,
@@ -4080,3 +4046,17 @@ pp3 <- ggplot(polygons_final) +
     )
 ggsave(pp3, filename = "outputs/survey_locations.png", width = 180, height = 220, units = "mm", dpi = 300, bg = "white")
 ```
+
+```{r more_extrafigs}
+# Create plot for just ACER/ORBI
+make_taxon_density_plot(densities = summary_equal_weighted_combined %>%
+                          filter(taxon %in% c("ACER", "ORBI")),
+                        output_path = "outputs/ACERORBI.png",
+                        width = 120, height = 70)
+
+make_taxon_density_plot(densities = summary_drm24_combined %>%
+                          filter(taxon %in% c("ACER", "ORBI")),
+                        output_path = "outputs/ACERORBI_2024.png",
+                        width = 120, height = 70)
+```
+
