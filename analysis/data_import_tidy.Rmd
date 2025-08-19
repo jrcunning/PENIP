@@ -2860,6 +2860,7 @@ post_summ
 ## Temporal trends
 
 ```{r}
+# Prediction grid
 newdata <- dfftaxon %>%     
   distinct(dataset, Type, taxon, class) %>%
   mutate(transect_area_m2 = 1) %>%
@@ -2869,7 +2870,7 @@ newdata <- dfftaxon %>%
            fill = list(transect_area_m2 = 1)) %>%
   ungroup()
 
-# Step 1: Predictions (same as before)
+# Predictions (same as before)
 preds <- add_epred_draws(
   mod_nb3.7,
   ndraws = 2000,
@@ -2877,31 +2878,11 @@ preds <- add_epred_draws(
   re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
 )
 
-# # WHY SO MUCH PORITES IN DRM24?????
-# pori <- preds %>% filter(taxon == "PORI") %>% 
-#   group_by(dataset,class,Type) %>%
-#   mean_qi(.epred)
-
-# type_areas <- area_summary %>%
-#   group_by(Type) %>%
-#   summarize(total_area_m2 = sum(total_area_m2))
-# type_weights <- type_areas %>%
-#   mutate(weight = total_area_m2 / sum(total_area_m2))
-# 
-# preds_weighted <- preds %>%
-#   left_join(type_weights, by = "Type") %>%
-#   group_by(.draw, dataset, taxon, class) %>%
-#   summarize(mean_epred = weighted.mean(.epred, weight), .groups = "drop") %>%
-#   mutate(year = parse_number(as.character(dataset)))
-
-# Step 2: Average across habitat types per draw
+# Average across habitat types per draw
 preds_avg <- preds %>%
   group_by(.draw, dataset, taxon, class) %>%
   summarize(mean_epred = mean(.epred), .groups = "drop") %>%
   mutate(year = parse_number(as.character(dataset)))
-
-# # # use weighted?
-# preds_avg <- preds_weighted
 
 # Helper function for slopes + modeled changes
 compute_trends <- function(data, group_vars, value_col) {
@@ -2923,7 +2904,7 @@ compute_trends <- function(data, group_vars, value_col) {
     select(-fit)
 }
 
-# --- Taxon × class ---
+# Taxon × class
 trends_taxon_class <- compute_trends(preds_avg, c("taxon", "class"), "mean_epred")
 
 trends_taxon_class_preds <- trends_taxon_class %>%
@@ -2932,7 +2913,7 @@ trends_taxon_class_preds <- trends_taxon_class %>%
   group_by(taxon, class, year) %>%
   mean_qi(pred_density, .width = 0.95) 
 
-# --- Taxon totals ---
+# Taxon totals
 trends_taxon <- preds_avg %>%
   group_by(taxon) %>%
   filter(n_distinct(class) > 1) %>%   # keep only taxa with multiple size classes
@@ -2949,7 +2930,7 @@ trends_taxon_preds <- trends_taxon %>%
   mean_qi(pred_density, .width = 0.95) %>%
   mutate(class = "All")
 
-# --- All corals (overall) ---
+# All corals (overall)
 trends_all_totals <- preds_avg %>%
   # Totals cannot be derived from the ESA-only surveys
   filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
@@ -2958,7 +2939,7 @@ trends_all_totals <- preds_avg %>%
   compute_trends(character(0), "total_epred") %>%
   mutate(taxon = "All", class = "All")
 
-# --- All corals by size class ---
+# All corals by size class
 trends_all_by_class <- preds_avg %>%
   # Totals cannot be derived from the ESA-only surveys
   filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
@@ -3005,24 +2986,6 @@ preds_combined <- preds_combined %>%
     by = c("taxon", "class")
   )
 
-
-# Get subsets (totals only)
-trends_summary_subset <- trends_summary %>%
-  group_by(taxon) %>%
-  filter(!(n_distinct(class) > 1 & class != "All")) %>%
-  ungroup() 
-
-trends_summary_subset <- trends_summary_subset %>% 
-  mutate(taxon = fct_reorder(taxon, -abs(slope)))
-
-
-
-preds_combined_subset <- preds_combined %>%
-  group_by(taxon) %>%
-  filter(!(n_distinct(class) > 1 & class != "All")) %>%
-  ungroup() %>%
-  mutate(taxon = factor(taxon, levels = levels(trends_summary_subset$taxon)))
-
 preds_combined <- preds_combined %>%
   mutate(taxon = factor(taxon, levels = levels(trends_summary_subset$taxon)))
 
@@ -3033,13 +2996,13 @@ trends_summary <- trends_summary %>%
 
 
 
-# 1. Taxon × class summary
+# Taxon × class summary
 summary_taxon_class <- preds_avg %>%
   group_by(dataset, taxon, class) %>%
   mean_qi(mean_epred, .width = 0.95) %>%
   mutate(level = "taxon_class")
 
-# 2. Taxon totals (sum over classes)
+# Taxon totals (sum over classes)
 summary_taxon <- preds_avg %>%
   group_by(taxon) %>%
   filter(n_distinct(class) > 1) %>%   # keep only taxa with multiple size classes
@@ -3050,7 +3013,7 @@ summary_taxon <- preds_avg %>%
   mean_qi(mean_epred, .width = 0.95) %>%
   mutate(class = "All", level = "taxon")
 
-# 3. All corals combined (sum over taxa and classes)
+# All corals combined (sum over taxa and classes)
 summary_all <- preds_avg %>%
   # Totals cannot be derived from the ESA-only surveys
   filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
@@ -3060,7 +3023,7 @@ summary_all <- preds_avg %>%
   mean_qi(mean_epred, .width = 0.95) %>%
   mutate(taxon = "All", class = "All", level = "all")
 
-# 4. All corals combined by size class (sum over taxa)
+# All corals combined by size class (sum over taxa)
 summary_all_by_class <- preds_avg %>%
   # Totals cannot be derived from the ESA-only surveys
   filter(dataset %in% c("dca17", "tt21", "tt23", "drm24")) %>%
@@ -3070,7 +3033,7 @@ summary_all_by_class <- preds_avg %>%
   mean_qi(mean_epred, .width = 0.95) %>%
   mutate(taxon = "All", level = "all_by_class")
 
-# 5. Combine all summaries
+# Combine all summaries
 summary_datasets <- bind_rows(
   summary_taxon_class,
   summary_taxon,
@@ -3079,19 +3042,6 @@ summary_datasets <- bind_rows(
 ) %>%
   mutate(year = parse_number(dataset)) %>%
   mutate(taxon = factor(taxon, levels = levels(trends_summary_subset$taxon)))
-
-summary_datasets_subset <- summary_datasets %>%
-  group_by(taxon) %>%
-  filter(!(n_distinct(class) > 1 & class != "All")) %>%
-  ungroup() %>%
-  mutate(taxon = factor(taxon, levels = levels(trends_summary_subset$taxon)))
-
-
-summary_datasets %>%
-  filter(taxon == "SIDE") %>%
-  arrange(taxon, class, year)
-
-
 
 
 trends_summary <- trends_summary %>%
@@ -3114,21 +3064,19 @@ trends_summary <- trends_summary %>%
   ungroup()
 
 
-trends_summary %>% filter(taxon == "PSTR")
-trends_summary %>% filter(taxon == "MYCE")
-trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
-  filter(taxon %in% c("PORI", "SIDE", "MCAV"))
-trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
-  filter(taxon %in% c("SOLE", "AGAR"))
-trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
-  filter(taxon %in% c("MMEA", "EFAS", "ORBI"))
-trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
-  filter(taxon %in% c("FAVI", "MEAN"))
-trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
-  filter(taxon %in% c("PSTR", "MYCE"))
-
-# Look at 2011 -- 2017 trends for the 3 spp
-
+# trends_summary %>% filter(taxon == "PSTR")
+# trends_summary %>% filter(taxon == "MYCE")
+# trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+#   filter(taxon %in% c("PORI", "SIDE", "MCAV"))
+# trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+#   filter(taxon %in% c("SOLE", "AGAR"))
+# trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+#   filter(taxon %in% c("MMEA", "EFAS", "ORBI"))
+# trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+#   filter(taxon %in% c("FAVI", "MEAN"))
+# trends_summary %>% select(taxon, class, abs_change, pct_change) %>%
+#   filter(taxon %in% c("PSTR", "MYCE"))
+# 
 ```
 
 ### Plot trajectories
@@ -3225,8 +3173,6 @@ p_others <- map(taxa_other, function(taxon) {
 })
 
 
-
-
 # MAKE STANDALONE LEGEND
 # Dummy data for legend creation
 legend_data <- data.frame(
@@ -3318,7 +3264,6 @@ ggsave(filename = "outputs/Trends_all_acer_orbi.png", width = 170, height = 70, 
 signed_pseudo_log <- function(x, scale = 1000) {
   sign(x) * log1p(abs(x) * scale)
 }
-
 
 # Transform slopes
 scale_factor <- 2000
@@ -3438,7 +3383,7 @@ write_csv(tot3, file = "outputs/Table2.csv")
 
 #### Treemap plot - Scenario2+NMFS
 ```{r working_treemap1}
-# STEP 1: Aggregate total abundance by taxon + class
+# Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
   filter(name != "Rest of Monitoring Area") %>%
   group_by(taxon, class) %>%
@@ -3488,11 +3433,11 @@ p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
   theme(legend.position = "none")
 
 
-# 5. Get tile layout and attach taxon_class
+# Get tile layout and attach taxon_class
 tile_layout <- treemapify(tot4, area = "tot",#, layout = "srow",
                           fill = "taxon_class", subgroup = "taxon")
 
-# 6. Flag small boxes (aggregate size classes)
+# Flag small boxes (aggregate size classes)
 tile_layout_ag <- tile_layout %>%
   group_by(taxon) %>%
   summarize(xmin = min(xmin), xmax = max(xmax),
@@ -3517,7 +3462,7 @@ internal_labels <- left_join(internal_labels, taxtots) %>%
 external_labels <- left_join(external_labels, taxtots) %>%
   mutate(label = paste0(taxon, "\n", tot))
 
-# 7. Final plot
+# Final plot
 p + 
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
@@ -3549,16 +3494,11 @@ p +
   labs(title = "Total corals in scenario 2 zones + NMFS areas, surveys (all years) equal-weighted")
   
 ggsave(filename = "outputs/Fig6.png", width = 180, height = 130, units = "mm", dpi = 600)
-
-sum(tot4$tot)
-tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
-
-tot2 %>% group_by(taxon) %>% summarize(tot = sum(tot)) %>% filter(taxon %in% c("ACER", "ORBI"))
 ```
 
 #### Treemap plot - Full monitoring area
 ```{r working_treemap2}
-# STEP 1: Aggregate total abundance by taxon + class
+# Aggregate total abundance by taxon + class
 tot4 <- tot2 %>%
   group_by(taxon, class) %>%
   summarize(tot = sum(tot), .groups = "drop")
@@ -3607,11 +3547,11 @@ p <- ggplot(tot4, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
   theme(legend.position = "none")
 
 
-# 5. Get tile layout and attach taxon_class
+# Get tile layout and attach taxon_class
 tile_layout <- treemapify(tot4, area = "tot", 
                           fill = "taxon_class", subgroup = "taxon")
 
-# 6. Flag small boxes (aggregate size classes)
+# Flag small boxes (aggregate size classes)
 tile_layout_ag <- tile_layout %>%
   group_by(taxon) %>%
   summarize(xmin = min(xmin), xmax = max(xmax),
@@ -3636,7 +3576,7 @@ internal_labels <- left_join(internal_labels, taxtots) %>%
 external_labels <- left_join(external_labels, taxtots) %>%
   mutate(label = paste0(taxon, "\n", tot))
 
-# 7. Final plot
+# Final plot
 p + 
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
@@ -3666,15 +3606,11 @@ p +
   labs(title = "Total corals in full impact monitoring area, surveys (all years) equal-weighted")
   
 ggsave(filename = "outputs/FigA4.png", width = 180, height = 130, units = "mm", dpi = 600)
-
-sum(tot4$tot)
-tot4 %>% filter(taxon %in% c("ACER", "ORBI")) %>% summarize(tot = sum(tot))
 ```
 
 
-
-
 ### 2024 estimates
+
 ```{r}
 # TOTAL COLONIES IN EACH IMPACT ZONE
 densities_tot_2024 <- summary_drm24_combined %>% filter(class != "All")
@@ -3702,7 +3638,31 @@ tab2_2024 %>%
 
 write_csv(tab2_2024, file = "outputs/TableA5.csv")
 
-# STEP 1: Aggregate total abundance by taxon + class
+
+## SUM ESA and non-ESA corals
+# Calculate total ESA and non-ESA corals per impact zone
+tot3_2024 <- tot2_2024 %>%
+  mutate(ESA = case_when(!taxon %in% c("ACER", "ORBI") ~ "non-ESA",
+                         TRUE ~ taxon)) %>%
+  group_by(name, ESA) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
+  pivot_wider(names_from = ESA, values_from = tot) %>%
+  janitor::adorn_totals(where = "col") %>%
+  mutate(cum_ACER = cumsum(ACER),
+         cum_ORBI = cumsum(ORBI),
+         cum_non_ESA = cumsum(`non-ESA`),
+         cum_Total = cumsum(Total)) %>%
+  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
+
+tot3_2024 %>%
+  knitr::kable(caption = "Total coral colonies in all impact zones, 2024 estimates")
+
+write_csv(tot3_2024, file = "outputs/TableA6.csv")
+```
+
+#### Treemap plot - Scenario2+NMFS
+```{r}
+# Aggregate total abundance by taxon + class
 tot4_2024 <- tot2_2024 %>%
   filter(name != "Rest of Monitoring Area") %>%
   group_by(taxon, class) %>%
@@ -3722,11 +3682,11 @@ p <- ggplot(tot4_2024, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
   theme(legend.position = "none")
 
 
-# 5. Get tile layout and attach taxon_class
+# Get tile layout and attach taxon_class
 tile_layout <- treemapify(tot4_2024, area = "tot",#, layout = "srow",
                           fill = "taxon_class", subgroup = "taxon")
 
-# 6. Flag small boxes (aggregate size classes)
+# Flag small boxes (aggregate size classes)
 tile_layout_ag <- tile_layout %>%
   group_by(taxon) %>%
   summarize(xmin = min(xmin), xmax = max(xmax),
@@ -3751,7 +3711,7 @@ internal_labels <- left_join(internal_labels, taxtots) %>%
 external_labels <- left_join(external_labels, taxtots) %>%
   mutate(label = paste0(taxon, "\n", tot))
 
-# 7. Final plot
+# Final plot
 p + 
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
@@ -3785,6 +3745,8 @@ p +
 ggsave(filename = "outputs/FigA5.png", width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
+
+#### Treemap plot - Full monitoring area
 ```{r}
 # TOTAL COLONIES IN EACH IMPACT ZONE
 densities_tot_2024 <- summary_drm24_combined %>% filter(class != "All")
@@ -3802,7 +3764,7 @@ tot2_2024 <- tot1_2024 %>%
   summarize(tot = round(sum(tot))) %>%
   arrange(name)
 
-# STEP 1: Aggregate total abundance by taxon + class
+# Aggregate total abundance by taxon + class
 tot4_2024 <- tot2_2024 %>%
   group_by(taxon, class) %>%
   summarize(tot = sum(tot), .groups = "drop")
@@ -3821,11 +3783,11 @@ p <- ggplot(tot4_2024, aes(area = tot, fill = taxon_class, subgroup = taxon)) +
   theme(legend.position = "none")
 
 
-# 5. Get tile layout and attach taxon_class
+# Get tile layout and attach taxon_class
 tile_layout <- treemapify(tot4_2024, area = "tot",#, layout = "srow",
                           fill = "taxon_class", subgroup = "taxon")
 
-# 6. Flag small boxes (aggregate size classes)
+# Flag small boxes (aggregate size classes)
 tile_layout_ag <- tile_layout %>%
   group_by(taxon) %>%
   summarize(xmin = min(xmin), xmax = max(xmax),
@@ -3850,7 +3812,7 @@ internal_labels <- left_join(internal_labels, taxtots) %>%
 external_labels <- left_join(external_labels, taxtots) %>%
   mutate(label = paste0(taxon, "\n", tot))
 
-# 7. Final plot
+# Final plot
 p + 
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
@@ -3884,139 +3846,10 @@ p +
 ggsave(filename = "outputs/FigA6.png", width = 180, height = 130, units = "mm", dpi = 600)
 
 
-ggsave(filename = "outputs/FigA62.png", width = 180, height = 90, units = "mm", dpi = 600)
+#ggsave(filename = "outputs/FigA62.png", width = 180, height = 90, units = "mm", dpi = 600)
 
 ```
 
-
-```{r}
-# Calculate total ESA and non-ESA corals per impact zone
-tot3_2024 <- tot2_2024 %>%
-  mutate(ESA = case_when(!taxon %in% c("ACER", "ORBI") ~ "non-ESA",
-                         TRUE ~ taxon)) %>%
-  group_by(name, ESA) %>%
-  summarize(tot = sum(tot), .groups = "drop") %>%
-  pivot_wider(names_from = ESA, values_from = tot) %>%
-  janitor::adorn_totals(where = "col") %>%
-  mutate(cum_ACER = cumsum(ACER),
-         cum_ORBI = cumsum(ORBI),
-         cum_non_ESA = cumsum(`non-ESA`),
-         cum_Total = cumsum(Total)) %>%
-  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
-
-tot3_2024 %>%
-  knitr::kable(caption = "Total coral colonies in all impact zones, 2024 estimates")
-
-write_csv(tot3_2024, file = "outputs/TableA6.csv")
-```
-
-# NCRMP analysis
-```{r}
-library(ncrmp.benthics.analysis)
-#> Loading required package: ncrmp.benthics.analysis
-
-#The 'data' function will load a dataframe to the Global Environment keeping the existing name,
-
-data("SEFL_2024_NTOT")
-
-SEFL_2024_NTOT
-
-data("SEFCRI_2024_coral_demographics")
-
-SEFCRI_2024_coral_demographics$MAX_DIAMETER
-SEFCRI_2024_coral_demographics$JUV
-SEFCRI_2024_coral_demographics$HEIGHT
-SEFCRI_2024_coral_demographics$SPECIES_NAME
-
-data("NCRMP_SEFCRI_2014_24_density_species")
-View(NCRMP_SEFCRI_2014_24_density_species)
-
-
-nc <- read_csv("/Users/rcunning/Downloads/0306238/1.1/data/0-data/Data_Sets/NCRMP_SEFCRI2024_Benthic_Data02_CoralDemographics.csv") %>%
-  janitor::clean_names()
-allsites <- nc %>% distinct(primary_sample_unit)
-
-nca <- nc %>%
-  filter(juv == 0) %>%
-  right_join(allsites) %>%
-  replace_na(list(n = 0))
-#ncj0 <- filter(nc, juv == 1)
-ncj <- nc %>%
-  filter(juv == 1) %>%
-  right_join(allsites) %>%
-  replace_na(list(n = 0))
-#n_distinct(ncj0$primary_sample_unit)
-#n_distinct(ncj$primary_sample_unit)
-
-ncjdens <- ncj %>%
-  group_by(primary_sample_unit) %>%
-  summarize(n = sum(n)) %>%
-  mutate(n_m2 = n / 10)
-mean(ncjdens$n_m2)
-hist(ncjdens$n_m2)
-
-ncadens <- nca %>%
-  group_by(primary_sample_unit) %>%
-  summarize(n = sum(n)) %>%
-  mutate(n_m2 = n / 10) %>%
-  filter(primary_sample_unit != 3100)
-mean(ncadens$n_m2)
-hist(ncadens$n_m2)
-```
-
-
-# Reanalyze Jones and Gilliam data with 4cm threshold
-```{r}
-jg_siteinfo <- read_csv("https://raw.githubusercontent.com/nj350/Recruitment-Size-Structure---Frontiers/refs/heads/main/Site%20Info.csv") %>%
-  janitor::clean_names()
-
-distinct(jg_siteinfo, latitude, longitude, habitat) %>%
-  ggplot(aes(x = longitude, y = latitude, color = habitat)) +
-  geom_point()
-
-jg_adults <- read_csv("https://raw.githubusercontent.com/nj350/Recruitment-Size-Structure---Frontiers/refs/heads/main/All%20Colonies.csv") %>%
-  janitor::clean_names()
-
-jg_juv <- read_csv("https://raw.githubusercontent.com/nj350/Recruitment-Size-Structure---Frontiers/refs/heads/main/All%20Juveniles.csv") %>%
-  janitor::clean_names()
-
-jg_juv4 <- jg_adults %>%
-  filter(pmax(colony_length, colony_width, colony_height) < 4) %>%
-  group_by(survey_year, year, site, species) %>%
-  summarize(abundance = n())
-
-jg_juv_combined <- bind_rows(jg_juv, jg_juv4) %>%
-  group_by(survey_year, year, site, species) %>%
-  summarise(abundance = sum(abundance, na.rm = TRUE), .groups = "drop") %>%
-  left_join(jg_siteinfo)
-
-jg_juv_summ <- jg_juv_combined %>%
-  group_by(survey_year, year, site, habitat) %>%
-  summarize(tot_juv = sum(abundance), .groups = "drop") %>%
-  mutate(tot_juv_dens = tot_juv / 30) %>%
-  filter(site != "FTL6")
-
-jg_juv_summ %>%
-  ggplot(aes(x = tot_juv_dens)) +
-  geom_histogram()
-mean(jg_juv_summ$tot_juv_dens)
-median(jg_juv_summ$tot_juv_dens)
-
-
-jg_adults_summ <- jg_adults %>%
-  filter(pmax(colony_length, colony_height, colony_height) >= 4) %>%
-  count(survey_year, year, site) %>%
-  mutate(tot_adult_dens = n / 30) %>%
-  left_join(jg_siteinfo) %>%
-  filter(site != "FTL6")
-
-jg_adults_summ %>%
-  ggplot(aes(x = tot_adult_dens)) +
-  geom_histogram()
-
-mean(jg_adults_summ$tot_adult_dens)
-median(jg_adults_summ$tot_adult_dens)
-```
 
 ```{r extra_figures}
 pp3 <- ggplot(polygons_final) +
