@@ -1178,11 +1178,15 @@ distance_palette <- c(
 )
 
 # Plot
+
+pal <- RColorBrewer::brewer.pal(n = 11, name = "Set3")
+pal[1] <- "gray40"
 p <- ggplot() +
   # Habitat polygons
   geom_sf(data = polygons_clean, aes(fill = Type),
           color = NA, size = 0.1, alpha = 0.25, show.legend = FALSE) +
-  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  #scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  scale_fill_manual(values = pal, na.value = "gray80") +
   ggnewscale::new_scale_fill() +
   # Zones 
   geom_sf(data = zones_with_dist %>% filter(!is_channel),
@@ -2047,7 +2051,8 @@ selected <- selected %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa"
 
 
 # Left panel: faceted survey locations
-
+pal <- RColorBrewer::brewer.pal(n = 11, name = "Set3")
+pal[1] <- "gray40"
 pp2 <- ggplot(polygons_final) +
   # LAND background (from NOAA GSHHG)
   #geom_sf(data = land_zoom, fill = "grey90", color = "grey65", linewidth = 0.15) +
@@ -2058,7 +2063,8 @@ pp2 <- ggplot(polygons_final) +
     aes(x = longitude, y = latitude),
     pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
   ) +
-  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  #scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  scale_fill_manual(values = pal, na.value = "gray80") +
   facet_wrap(~ dataset, ncol = 3,
                labeller = as_labeller(c(
     "nsu11_esa" = "2011 – NSU ESA Survey",
@@ -2154,6 +2160,7 @@ final_fig
 
 # Extract fill legend from habitat polygon plot
 legend_plot <- polyplot +
+  scale_fill_manual(values = pal, na.value = "gray80") +
   guides(shape = "none", color = "none", fill = guide_legend(nrow = 2)) +
   base_theme +
   theme(
