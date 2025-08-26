@@ -1169,6 +1169,14 @@ distance_palette <- c(
   "#FFFFBF"  # yellow
 )
 
+distance_palette <- c(
+  "#67001F",  # very deep red/burgundy
+  "#B2182B",  # strong red
+  "#EF8A62",  # reddish-orange
+  "#FDB863",  # orange
+  "#FFFFBF"   # pale yellow
+)
+
 # Plot
 p <- ggplot() +
   # Habitat polygons
@@ -1180,7 +1188,7 @@ p <- ggplot() +
   geom_sf(data = zones_with_dist %>% filter(!is_channel),
           aes(fill = dist_from_channel), color = "black", alpha = 0.5, linewidth = 0.075) +
   geom_sf(data = zones_with_dist %>% filter(is_channel),
-          fill = "#B2182B", color = "black", linewidth = 0.075, alpha = 0.5) +  # Red for Channel
+          fill = "#67001F", color = "black", linewidth = 0.075, alpha = 0.5) +  # Red for Channel
   scale_fill_gradientn(
     colors = distance_palette,
     name = "Distance from Channel (m)"
@@ -1425,6 +1433,8 @@ area_summary_acres <- area_summary %>%
   mutate(across(ends_with("_acres"), ~ round(.x, 3)))
 
 write_csv(area_summary_acres, file = "outputs/TableA1.csv")
+
+area_summary_acres
 ```
 
 # Combine and filter data
@@ -1846,6 +1856,166 @@ var_count / mean_count
 ```
 
 # Map surveys & impact zones
+```{r}
+# High-resolution SE Florida coastline with GSHHG (no counties), plus ports & study box
+# ------------------------------------------------------------------------------------
+# Install if needed:
+# install.packages(c("sf","dplyr","ggplot2"))
+# (No special geofabrik/overpass/hires packages required)
+
+library(sf)
+library(dplyr)
+library(ggplot2)
+
+# 1) Define your exact view bbox (SE Florida)
+bbox_view <- st_bbox(c(
+  xmin = -80.4, ymin = 25.60,
+  xmax = -79.85, ymax = 26.50
+), crs = st_crs(4326))
+
+# Slight pad for safety when cropping
+pad <- 0.05
+bbox_pad <- bbox_view
+bbox_pad["xmin"] <- bbox_view["xmin"] - pad
+bbox_pad["ymin"] <- bbox_view["ymin"] - pad
+bbox_pad["xmax"] <- bbox_view["xmax"] + pad
+bbox_pad["ymax"] <- bbox_view["ymax"] + pad
+
+# 2) Download GSHHG high-resolution shapefiles (once) and read coast polygons
+#    (URL version may update; if it 404s, search "gshhg shapefile download")
+gshhg_url <- "https://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/latest/gshhg-shp-2.3.7.zip"
+td <- tempdir()
+zipfile <- file.path(td, "gshhg.zip")
+if (!file.exists(zipfile)) utils::download.file(gshhg_url, zipfile, mode = "wb")
+unz_dir <- file.path(td, "gshhg")
+if (!dir.exists(unz_dir)) unzip(zipfile, exdir = unz_dir)
+
+# High-res coastline polygons (level 1 = coastlines; 'h' = high resolution)
+# Path inside the zip: GSHHS_shp/h/GSHHS_h_L1.shp
+gshhg_coast <- st_read(file.path(unz_dir, "GSHHS_shp", "f", "GSHHS_f_L1.shp"), quiet = TRUE) |>
+  st_transform(4326)
+
+# 3) Crop to your SE Florida view and convert to outlines (boundaries)
+# 3) Validate, crop with s2 off, then take boundaries
+bbox_pad_sfc <- st_as_sfc(bbox_pad)
+
+# save current s2 setting and turn it off just for the clip
+old_s2 <- sf::sf_use_s2()
+sf::sf_use_s2(FALSE)
+on.exit(sf::sf_use_s2(old_s2), add = TRUE)
+
+# fix invalid rings, then clip to bbox
+gshhg_valid <- sf::st_make_valid(gshhg_coast)
+coast_crop  <- suppressWarnings(st_intersection(gshhg_valid, bbox_pad_sfc))
+
+# optional: keep only polygons (in case multiparts/lines slipped in)
+coast_crop  <- st_collection_extract(coast_crop, "POLYGON")
+
+coast_line <- st_boundary(coast_crop)  # draw only the outline (crisp line map)
+
+# 4) Annotations: ports + your detailed study box
+ports <- tibble::tibble(
+  name = c("Port Everglades", "Port of Miami"),
+  lon  = c(-80.118, -80.133),
+  lat  = c(26.090, 25.770)
+)
+cities <- tibble::tibble(
+  name = c("Miami", "Fort Lauderdale"),
+  lon = c(-80.1918, -80.1373),
+  lat = c(25.7617, 26.1224)
+)
+
+study_box <- st_as_sfc(st_bbox(
+  c(xmin = -80.1116, xmax = -80.078, ymin = 26.058, ymax = 26.112),
+  crs = 4326
+))
+
+# 5) Plot: ultra-clean coastline outline + study box + ports
+p_sef_gshhg <- ggplot() +
+  geom_sf(data = coast_crop, fill = "gray90", color = "black", linewidth = 0.1) +
+  geom_sf(data = study_box, fill = NA, color = "#D7301F", linewidth = 0.9) +
+  geom_text_repel(data = ports, aes(lon, lat, label = name), hjust = 0, size = 2, nudge_y = -0.06,
+                  xlim = c(-80.05, NA), segment.size = 0.2) +
+  geom_point(data = cities, aes(lon, lat), size = 1) +
+  geom_text(data = cities, aes(lon, lat, label = name), hjust = 1, vjust = 0, size = 2, nudge_x = -0.01) +
+  coord_sf(xlim = c(bbox_view["xmin"], bbox_view["xmax"]),
+           ylim = c(bbox_view["ymin"], bbox_view["ymax"]),
+           expand = FALSE) +
+  theme_void()
+
+p_sef_gshhg
+
+
+
+# KJ Coral Reef ECA (official DEP layer via ArcGIS REST → GeoJSON)
+kj_url <- "https://ca.dep.state.fl.us/arcgis/rest/services/OpenData/KJ_CORAL_REEF_ECA/MapServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
+
+kj_eca <- st_read(kj_url, quiet = TRUE)  # already WGS84 (outSR=4326)
+
+# (Optional) crop to your current view bbox if you have one defined
+# kj_eca <- st_crop(kj_eca, bbox_view)
+
+# Add to your existing map (choose fill/line to taste)
+p_sef_map <- p_sef_gshhg +   # or p_sef_gshhg / p_sef_hi, etc.
+  geom_sf(data = kj_eca, fill = NA, color = "#4B6CB7", linewidth = 0.6) +
+  # or with a subtle transparent fill:
+  # geom_sf(data = kj_eca, fill = scales::alpha("#4B6CB7", 0.08), color = "#4B6CB7", linewidth = 0.4)
+    coord_sf(xlim = c(bbox_view["xmin"], bbox_view["xmax"]),
+           ylim = c(bbox_view["ymin"], bbox_view["ymax"]),
+           expand = FALSE) +
+  annotate("text", x = -80.05, y = 25.9, label = "Kristin Jacobs\nCoral Reef Ecosystem\nConservation Area",
+           color = "#4B6CB7", hjust = 0, size = 2)
+
+#p_sef_map
+
+
+
+#####
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+# 1) Get a simple USA states outline
+usa_states <- ne_states(country = "United States of America", returnclass = "sf")
+fl_outline <- usa_states %>% filter(name == "Florida")
+
+# 2) Define a Florida-wide bbox for inset
+fl_bbox <- st_bbox(c(
+  xmin = -87.8, ymin = 24.0,
+  xmax = -79.5, ymax = 31.0
+), crs = st_crs(4326))
+fl_bbox_sfc <- st_as_sfc(fl_bbox)
+
+# 3) Build inset plot with simple Florida outline + red box for SE FL extent
+p_inset_simple <- ggplot() +
+  geom_sf(data = fl_outline, fill = "grey92", color = "black", linewidth = 0.1) +
+  geom_sf(data = st_as_sfc(bbox_view), fill = NA, color = "#D7301F", linewidth = 0.6) +
+  coord_sf(xlim = c(fl_bbox["xmin"], fl_bbox["xmax"]),
+           ylim = c(fl_bbox["ymin"], fl_bbox["ymax"]),
+           expand = FALSE) +
+  theme_void() +
+  theme(
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.25), # <-- border
+    panel.background = element_rect(color = "black", fill = "white", linewidth = 0) # <-- border
+  )
+
+# 4) Add inset to your detailed SE Florida map
+p_final_with_inset <- p_sef_map +
+  theme(plot.margin = margin(0,-10,0,0)) +
+  # theme(
+  #   plot.background = element_rect(
+  #     color = "black",   # border color
+  #     fill  = "white",   # background fill
+  #     linewidth = 1      # thickness of the border
+  #   )
+  # ) +
+  inset_element(p_inset_simple,
+                left = 0.05, bottom = 0.6, right = 0.5, top = 1.1,
+                align_to = "panel")
+
+p_final_with_inset
+```
+
+
 ```{r plot_maps, fig.width = 10, fig.height = 10}
 # Define shared coordinate limits
 coord_limits <- coord_sf(
@@ -1861,15 +2031,27 @@ base_theme <- theme_minimal(base_size = 8) +
     axis.title = element_blank(),
     axis.text = element_blank(),
     #axis.ticks = element_blank(),
-    #panel.grid = element_blank(),
+    panel.grid = element_blank(),
     plot.margin = margin(t = 12, r = 5, b = 5, l = 5),
   )
 
 # Reorder survey datasets
 selected <- selected %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")))
 
+
+
+
+
+
+
+
+
 # Left panel: faceted survey locations
+
 pp2 <- ggplot(polygons_final) +
+  # LAND background (from NOAA GSHHG)
+  #geom_sf(data = land_zoom, fill = "grey90", color = "grey65", linewidth = 0.15) +
+
   geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
   geom_point(
     data = selected,
@@ -1887,12 +2069,14 @@ pp2 <- ggplot(polygons_final) +
     "drm24"     = "2024 – Shedd Survey"
   ))) +
   coord_limits +
+  scale_x_continuous(breaks = c(-80.11, -80.10, -80.09, -80.08)) +
   labs(title = NULL, fill = NULL) +
   base_theme +
   theme(
     legend.position = "none",
     strip.text = element_text(size = 6),
-    panel.spacing = unit(0.5, "lines")
+    panel.spacing = unit(0.5, "lines"),
+    plot.margin = margin(2,0,0,-10)
   )
 
 # Right panel: impact zones
@@ -1907,7 +2091,7 @@ iz_plot_clean <- p +
   coord_sf(xlim = c(-80.1116, -80.077), ylim = c(26.058, 26.112), expand = FALSE) +
   base_theme +
   theme(legend.position = "none") +
-    geom_segment(
+  geom_segment(
     data = scale_lines,
     aes(x = x, y = y, xend = xend, yend = yend),
     inherit.aes = FALSE,
@@ -1926,43 +2110,46 @@ iz_plot_clean <- p +
     hjust = 1,
     vjust = c(rep(1.5, 4), rep(-0.5, 4)),
     size = 1.5
-  )
+  ) +
+  theme(plot.margin = margin(0,0,0,0))
 
-# Set y tick positions and labels manually
-y_breaks <- c(26.06, 26.07, 26.08, 26.11)  # adjust to match your plot extent
-x_right_label <- -80.08  # just outside your xlim max
+# # Set y tick positions and labels manually
+# y_breaks <- c(26.06, 26.07, 26.08, 26.11)  # adjust to match your plot extent
+# x_right_label <- -80.08  # just outside your xlim max
+# 
+# right_axis_labels <- tibble(
+#   x = x_right_label,
+#   y = y_breaks,
+#   label = scales::number(y_breaks, accuracy = 0.01)
+# )
+# 
+# x_breaks <- c(-80.09, -80.10, -80.11)
+# y_bottom_label <- 26.06 
+# bottom_axis_labels <- tibble(x = x_breaks, y = y_bottom_label,
+#                              label = scales::number(x_breaks, accuracy = 0.01))
 
-right_axis_labels <- tibble(
-  x = x_right_label,
-  y = y_breaks,
-  label = scales::number(y_breaks, accuracy = 0.01)
-)
-
-x_breaks <- c(-80.09, -80.10, -80.11)
-y_bottom_label <- 26.06 
-bottom_axis_labels <- tibble(x = x_breaks, y = y_bottom_label,
-                             label = scales::number(x_breaks, accuracy = 0.01))
-
-iz_plot_clean <- iz_plot_clean + 
-  geom_text(data = right_axis_labels,
-            aes(x = x, y = y, label = label),
-            size = 2, hjust = 1, vjust = 0, fontface = "italic", color = "gray") +
-  geom_text(data = bottom_axis_labels,
-            aes(x = x, y = y, label = label),
-            size = 2, hjust = 0, vjust = 1, fontface = "italic", color = "gray")
+# iz_plot_clean <- iz_plot_clean + 
+#   geom_text(data = right_axis_labels,
+#             aes(x = x, y = y, label = label),
+#             size = 2, hjust = 1, vjust = 0, fontface = "italic", color = "gray") +
+#   geom_text(data = bottom_axis_labels,
+#             aes(x = x, y = y, label = label),
+#             size = 2, hjust = 0, vjust = 1, fontface = "italic", color = "gray")
 
 
 
 # Combine with cowplot
 final_fig <- plot_grid(
+  p_final_with_inset, 
   pp2,
   iz_plot_clean,
   nrow = 1,
   align = "hv",
   axis = "tb",
-  labels = c("A. Coral survey sites", "B. Impact zones"), hjust = 0, label_size = 11,
-  rel_widths = c(0.59, 0.41)  # adjust until panel areas are visually aligned
+  labels = c("A", "B", "C"), hjust = 0, label_size = 11,
+  rel_widths = c(0.24, 0.36, 0.24)  # adjust until panel areas are visually aligned
 )
+final_fig
 
 
 # Extract fill legend from habitat polygon plot
@@ -1984,14 +2171,20 @@ final_final_fig <- plot_grid(final_fig, fill_legend, ncol = 1, rel_heights = c(0
 ggsave(
   filename = "outputs/Fig1.png",
   plot = final_final_fig,
-  width = 160,
-  height = 120,
+  width = 220,
+  height = 125,
   units = "mm",
   dpi = 300,
   bg = "white"
 )
 
 ```
+
+
+
+
+
+
 
 
 # Statistical modeling 
