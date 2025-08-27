@@ -2978,9 +2978,9 @@ make_combined_density_figure <- function(draws, table = FALSE,
                   position = position_dodge(width = 0.8), width = 0.2, linewidth = 0.25) +
     scale_fill_manual(
       values = c(
-        "high_sus" = darken("#7570b3", 0.3),
+        "high_sus" = darken("#7570b3", 0.5),
         "mod_sus"  = "#7570b3",
-        "low_sus"  = lighten("#7570b3", 0.4)
+        "low_sus"  = lighten("#7570b3", 0.5)
       ),
       labels = c(
         "high_sus" = "High",
