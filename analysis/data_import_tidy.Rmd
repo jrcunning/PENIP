@@ -905,6 +905,9 @@ combined <- bind_rows(sand_cut, non_sand_polygons)
 # Reproject to WGS84 for plotting
 polygons_final <- st_transform(combined, crs = 4326)
 
+# Remove tiny polygons of Acropora cervicornis -- not really a habitat
+polygons_final <- polygons_final %>%
+  filter(Type != "Acropora cervicornis")
 ```
 
 #### Assign survey sites to habitats
@@ -945,11 +948,15 @@ allsitemd <- joined_df
 allsitemd <- allsitemd %>%
   mutate(ESAonly = if_else(dataset %in% c("nsu11_esa", "dca17_esa"), "ESA only", "All corals"))
 
+# Get manual habitat Type fill colors
+typecols <- RColorBrewer::brewer.pal(nlevels(factor(polygons_final$Type)) + 1, "Set3")[-1]
+names(typecols) <- levels(factor(polygons_final$Type))
+
 # # Visualize habitat classifications
 polyplot <- polygons_final %>%
   ggplot() +
   geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
-  scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+  scale_fill_manual(values = typecols, na.value = "gray80") +
   theme_minimal(base_size = 8) +
   labs(fill = NULL, shape = NULL, x = NULL, y = NULL) +
   theme(legend.position = "right") +
@@ -1178,15 +1185,12 @@ distance_palette <- c(
 )
 
 # Plot
-
-pal <- RColorBrewer::brewer.pal(n = 11, name = "Set3")
-pal[1] <- "gray40"
 p <- ggplot() +
   # Habitat polygons
   geom_sf(data = polygons_clean, aes(fill = Type),
           color = NA, size = 0.1, alpha = 0.25, show.legend = FALSE) +
   #scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-  scale_fill_manual(values = pal, na.value = "gray80") +
+  scale_fill_manual(values = typecols, na.value = "white") +
   ggnewscale::new_scale_fill() +
   # Zones 
   geom_sf(data = zones_with_dist %>% filter(!is_channel),
@@ -1951,13 +1955,8 @@ p_sef_gshhg
 
 
 
-# KJ Coral Reef ECA (official DEP layer via ArcGIS REST → GeoJSON)
-kj_url <- "https://ca.dep.state.fl.us/arcgis/rest/services/OpenData/KJ_CORAL_REEF_ECA/MapServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
-
-kj_eca <- st_read(kj_url, quiet = TRUE)  # already WGS84 (outSR=4326)
-
-# (Optional) crop to your current view bbox if you have one defined
-# kj_eca <- st_crop(kj_eca, bbox_view)
+# KJ Coral Reef ECA
+kj_eca <- st_read("data/spatial/KJ_Coral_Aquatic_Preserve.gpkg", quiet = TRUE)
 
 # Add to your existing map (choose fill/line to taste)
 p_sef_map <- p_sef_gshhg +   # or p_sef_gshhg / p_sef_hi, etc.
@@ -2051,8 +2050,6 @@ selected <- selected %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa"
 
 
 # Left panel: faceted survey locations
-pal <- RColorBrewer::brewer.pal(n = 11, name = "Set3")
-pal[1] <- "gray40"
 pp2 <- ggplot(polygons_final) +
   # LAND background (from NOAA GSHHG)
   #geom_sf(data = land_zoom, fill = "grey90", color = "grey65", linewidth = 0.15) +
@@ -2064,7 +2061,7 @@ pp2 <- ggplot(polygons_final) +
     pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
   ) +
   #scale_fill_brewer(palette = "Set3", na.value = "gray80") +
-  scale_fill_manual(values = pal, na.value = "gray80") +
+  scale_fill_manual(values = typecols, na.value = "gray80") +
   facet_wrap(~ dataset, ncol = 3,
                labeller = as_labeller(c(
     "nsu11_esa" = "2011 – NSU ESA Survey",
@@ -2160,7 +2157,7 @@ final_fig
 
 # Extract fill legend from habitat polygon plot
 legend_plot <- polyplot +
-  scale_fill_manual(values = pal, na.value = "gray80") +
+  scale_fill_manual(values = typecols, na.value = "gray80") +
   guides(shape = "none", color = "none", fill = guide_legend(nrow = 2)) +
   base_theme +
   theme(
@@ -2172,7 +2169,8 @@ legend_plot <- polyplot +
 grob <- ggplotGrob(legend_plot)
 fill_legend <- gtable::gtable_filter(grob, "guide-box")
 
-final_final_fig <- plot_grid(final_fig, fill_legend, ncol = 1, rel_heights = c(0.92, 0.08))
+bottom_row <- plot_grid(NULL, fill_legend, ncol = 2, rel_widths = c(0.2, 0.6))
+final_final_fig <- plot_grid(final_fig, bottom_row, ncol = 1, rel_heights = c(0.92, 0.08))
 
 # Save output
 ggsave(
@@ -4059,7 +4057,7 @@ pp3 <- ggplot(polygons_final) +
         aes(x = longitude, y = latitude),
         pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
     ) +
-    scale_fill_brewer(palette = "Set3", na.value = "gray80") +
+    scale_fill_manual(values = typecols, na.value = "gray80") +
     facet_wrap(~ dataset, ncol = 3,
                labeller = as_labeller(c(
                    "nsu11_esa" = "2011 – NSU ESA Survey",
