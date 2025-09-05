@@ -4048,14 +4048,14 @@ ggsave(filename = "outputs/FigA6.png", width = 180, height = 130, units = "mm", 
 
 ```
 
-
+# Extra figures
 ```{r extra_figures}
 pp3 <- ggplot(polygons_final) +
     geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
     geom_point(
         data = selected,
         aes(x = longitude, y = latitude),
-        pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
+        pch = 4, alpha = 0.6, size = 1, stroke = 0.4, inherit.aes = FALSE
     ) +
     scale_fill_manual(values = typecols, na.value = "gray80") +
     facet_wrap(~ dataset, ncol = 3,
@@ -4067,14 +4067,39 @@ pp3 <- ggplot(polygons_final) +
                    "tt23"      = "2023 – Tetra Tech Survey",
                    "drm24"     = "2024 – Shedd Survey"
                ))) +
-    coord_limits +
+    #coord_limits +
     labs(title = NULL, fill = NULL) +
     base_theme +
     theme(
         legend.position = "bottom",
         strip.text = element_text(size = 6),
         panel.spacing = unit(0.5, "lines")
-    )
+    ) +
+  geom_segment(
+    data = scale_lines,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    inherit.aes = FALSE,
+    color = "black",
+    linewidth = 0.4
+  ) +
+  geom_segment(
+    data = ticks_segments,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    color = "black",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    data = tick_labels,
+    aes(x = x, y = y, label = label),
+    hjust = 1,
+    #vjust = c(rep(1.5, 4), rep(-0.5, 4)),
+    size = 1.7
+  ) +
+  theme(plot.margin = margin(0,0,0,0),
+        strip.text = element_text(size = 10, margin = margin(t = 8, b = -8)),
+        strip.clip = "off")
+
+
 ggsave(pp3, filename = "outputs/survey_locations.png", width = 180, height = 220, units = "mm", dpi = 300, bg = "white")
 ```
 
