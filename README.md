@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17065530.svg)](https://doi.org/10.5281/zenodo.17065530)
+
 This repository contains data and code to accompany the report titled
 
 ### Integrated Analysis of Coral Density and Community Structure Across Reef Habitats Near Port Everglades in Advance of Dredging Operations
