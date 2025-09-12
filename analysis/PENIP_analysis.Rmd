@@ -4134,3 +4134,37 @@ make_taxon_density_plot(densities = summary_drm24_combined %>%
                         width = 120, height = 70)
 ```
 
+```{r}
+iz_plot_clean2 <- iz_plot_clean +
+  coord_sf(xlim = c(-80.1116, -80.077), 
+           ylim = c(26.0675, 26.112), expand = FALSE) +
+  theme(plot.margin = margin(5,5,5,5))
+  
+legend_plot <- polyplot +
+  scale_fill_manual(values = typecols, na.value = "gray80") +
+  guides(
+    shape = "none",
+    color = "none",
+    fill  = guide_legend(nrow = 4, byrow = T)   # <- 3 rows
+  ) +
+  base_theme +
+  theme(
+    legend.position = "bottom",
+    legend.key.size = unit(0.3, "cm"),
+    legend.text = element_text(size = 6),
+    legend.title = element_text(size = 7),
+    legend.box = "vertical"                         # helps with multi-row at bottom
+  )
+
+grob <- ggplotGrob(legend_plot)
+fill_legend2 <- gtable::gtable_filter(grob, "guide-box")
+
+
+zonefig <- plot_grid(iz_plot_clean2, fill_legend2, ncol = 1, rel_heights = c(0.9, 0.1))
+
+
+
+zonefig
+ggsave(zonefig, filename = "outputs/zonefig.png", width = 110, height = 170, units = "mm", bg = "white")
+```
+
