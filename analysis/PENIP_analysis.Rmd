@@ -1381,6 +1381,24 @@ tick_labels <- data.frame(
 
 #### Area of habitats in impact zones
 ```{r}
+polygons_final %>%
+  st_make_valid() %>%
+  st_intersection(all_zones_sf) %>%
+  st_transform(32617) %>%
+  mutate(area_m2 = st_area(geometry)) %>%
+  group_by(name, Type) %>%
+  summarize(total_area_m2 = sum(area_m2)) %>%
+  filter(Type == "Artificial") %>%
+  as_tibble() %>%
+  dplyr::select(zone = name, Type, total_area_m2) %>%
+  mutate(total_area_acres = total_area_m2 / 4047) %>%
+  ungroup() %>%
+  mutate(
+    total_area_m2    = units::drop_units(total_area_m2),
+    total_area_acres = units::drop_units(total_area_acres)
+  ) %>%
+  janitor::adorn_totals()
+  
 # Make sure 'Artificial' is changed to 'Nearshore Ridge Complex' in habitat polygons, and that Aggregated Patch Reef is changed to Outer Reef
 polygons_filtered <- polygons_final %>%
   mutate(Type = if_else(Type == "Artificial", "Nearshore Ridge Complex", Type)) %>%
