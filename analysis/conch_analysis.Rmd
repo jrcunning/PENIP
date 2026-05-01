@@ -1,0 +1,2075 @@
+---
+title: "PENIP Queen Conch Habitat Classification"
+author: "R. Cunning"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+input_file <- knitr::current_input()
+if (!is.null(input_file)) {
+  knitr::opts_knit$set(root.dir = normalizePath(file.path(dirname(input_file), "..")))
+}
+```
+
+# Setup
+
+```{r libraries}
+library(dplyr)
+library(gstat)
+library(ggplot2)
+library(purrr)
+library(readxl)
+library(rvest)
+library(sf)
+library(tibble)
+library(tidyr)
+library(xml2)
+```
+
+```{r paths}
+conch_xlsx <- "data/conch/PENIP_QueenConchSurveys.xlsx"
+conch_sheet <- "PENIP_Conch_10mRadial"
+drift_sheet <- "PENIP_DriftTransects"
+drift_position_sheet <- "PENIP_ConchDriftPosition"
+radial_counts_csv <- "data/conch/PENIP_circular_counts.csv"
+
+output_map <- "outputs/conch_point_habitat_map.png"
+output_radial_abundance_points <- "outputs/conch_radial_abundance_points.png"
+output_radial_abundance_heatmap <- "outputs/conch_radial_abundance_heatmap.png"
+output_radial_mating_map <- "outputs/conch_radial_mating_map.png"
+output_adult_mating_halo_map <- "outputs/conch_adult_mating_halo_map.png"
+output_adult_mating_distance_plot <- "outputs/conch_adult_mating_distance_plot.png"
+output_adult_mating_distance_map <- "outputs/conch_adult_mating_distance_map.png"
+output_adult_mating_radius_plot <- "outputs/conch_adult_mating_radius_plot.png"
+output_adult_mating_radius_map <- "outputs/conch_adult_mating_radius_map.png"
+output_conch_blob_prediction_map <- "outputs/conch_blob_adult_juvenile_prediction_map.png"
+output_drift_background_density_plot <- "outputs/conch_drift_background_density_by_habitat.png"
+output_drift_map <- "outputs/conch_drift_transect_map.png"
+output_drift_habitat_histogram <- "outputs/conch_drift_habitat_area_histogram.png"
+output_drift_position_counts <- "outputs/conch_drift_position_habitat_counts.png"
+output_drift_conch_map <- "outputs/conch_drift_transects_observations_map.png"
+output_density_model_plot <- "outputs/conch_density_model_estimates.png"
+output_zinb_density_model_plot <- "outputs/conch_zinb_density_model_estimates.png"
+
+type_cols <- c(
+  "Aggregated Patch Reef" = "#8dd3c7",
+  "Artificial" = "#ffffb3",
+  "Inner Reef" = "#bebada",
+  "Middle Reef" = "#fb8072",
+  "Nearshore Ridge Complex" = "#80b1d3",
+  "Outer Reef" = "#fdb462",
+  "Ridge" = "#b3de69",
+  "Sand" = "#f2e8c9",
+  "Scattered Rock in Unconsolidated Sediment" = "#bc80bd"
+)
+```
+
+# Habitat Polygons
+
+This recreates `polygons_final` from `analysis/PENIP_analysis.Rmd`.
+
+```{r habitat-polygons}
+# Load final habitat polygons created in analysis/PENIP_analysis.Rmd
+polygons_final <- readRDS("data/processed/polygons_final.rds")
+
+old_s2 <- sf_use_s2()
+sf_use_s2(FALSE)
+
+polygons_final <- polygons_final %>%
+  st_zm(drop = TRUE, what = "ZM") %>%
+  st_make_valid() %>%
+  st_transform(4326)
+```
+
+# Radial survey Point Habitat Classification
+
+```{r conch-points}
+conch_points <- readxl::read_xlsx(conch_xlsx, sheet = conch_sheet)
+
+conch_points_sf <- conch_points %>%
+  mutate(
+    .record = row_number(),
+    .row_excel = row_number() + 1L
+  ) %>%
+  st_as_sf(coords = c("Lon", "Lat"), crs = 4326, remove = FALSE)
+
+polygons_for_join <- polygons_final %>%
+  st_transform(st_crs(conch_points_sf)) %>%
+  select(Type)
+
+point_matches <- st_join(
+  conch_points_sf,
+  polygons_for_join,
+  join = st_within,
+  left = TRUE
+) %>%
+  st_drop_geometry() %>%
+  select(
+    .record,
+    .row_excel,
+    Waypoint,
+    `Site Code`,
+    Lat,
+    Lon,
+    Habitat_Type = Type
+  )
+
+ambiguous_points <- point_matches %>%
+  count(.record, .row_excel, Waypoint, `Site Code`, name = "n_matches") %>%
+  filter(n_matches > 1)
+
+point_assignments <- point_matches %>%
+  group_by(.record) %>%
+  slice(1) %>%
+  ungroup()
+
+point_assignments %>%
+  count(Habitat_Type, sort = TRUE)
+
+ambiguous_points
+```
+
+## Radial Survey Data
+
+This creates the full `PENIP_Conch_10mRadial` data frame with the habitat classifications populated in `Habitat (class at point)`.
+
+```{r radial-survey-data}
+conch_radial <- conch_points %>%
+  mutate(`Habitat (class at point)` = point_assignments$Habitat_Type)
+
+stopifnot(
+  nrow(conch_radial) == nrow(conch_points),
+  sum(is.na(conch_radial[["Habitat (class at point)"]])) == 0
+)
+
+table(conch_radial[["Habitat (class at point)"]], useNA = "ifany")
+```
+
+## Radial Survey Abundance Points
+
+```{r radial-survey-abundance-points, fig.width=8, fig.height=6}
+radial_counts <- read.csv(
+  radial_counts_csv,
+  check.names = FALSE,
+  fileEncoding = "UTF-8-BOM"
+) %>%
+  filter(!is.na(`Site Code`), `Site Code` != "") %>%
+  mutate(
+    juvenile_count = as.numeric(`# Juv`),
+    adult_count = as.numeric(`# Adult`),
+    mating_count = as.numeric(ReproductiveActivity)
+  )
+
+radial_survey_area_m2 <- pi * 10^2
+
+radial_abundance <- conch_radial %>%
+  select(`Site Code`, Lat, Lon, `Habitat (class at point)`) %>%
+  left_join(
+    radial_counts %>%
+      select(`Site Code`, juvenile_count, adult_count, mating_count, `Habitat Description`),
+    by = "Site Code"
+  ) %>%
+  mutate(
+    juvenile_density_100m2 = juvenile_count / radial_survey_area_m2 * 100,
+    adult_density_100m2 = adult_count / radial_survey_area_m2 * 100
+  )
+
+stopifnot(
+  nrow(radial_abundance) == nrow(conch_radial),
+  sum(is.na(radial_abundance$juvenile_count)) == 0,
+  sum(is.na(radial_abundance$adult_count)) == 0
+)
+
+radial_abundance_long <- radial_abundance %>%
+  select(
+    `Site Code`,
+    Lat,
+    Lon,
+    Adult = adult_count,
+    Juvenile = juvenile_count
+  ) %>%
+  pivot_longer(
+    cols = c(Adult, Juvenile),
+    names_to = "age_class",
+    values_to = "n_animals"
+  )
+
+radial_map_xlim <- range(radial_abundance$Lon, na.rm = TRUE) + c(-0.001, 0.001)
+radial_map_ylim <- range(radial_abundance$Lat, na.rm = TRUE) + c(-0.001, 0.001)
+
+radial_abundance_points_plot <- ggplot() +
+  geom_sf(
+    data = polygons_final,
+    aes(fill = Type),
+    color = "grey35",
+    linewidth = 0.05,
+    alpha = 0.55
+  ) +
+  geom_point(
+    data = radial_abundance_long,
+    aes(x = Lon, y = Lat, size = n_animals),
+    shape = 21,
+    fill = "#FDE725",
+    color = "black",
+    alpha = 0.85,
+    stroke = 0.3
+  ) +
+  facet_wrap(~ age_class) +
+  scale_fill_manual(values = type_cols, na.value = "grey80") +
+  scale_size_area(max_size = 8, breaks = c(0, 5, 10, 20), name = "Observed conch") +
+  coord_sf(
+    xlim = radial_map_xlim,
+    ylim = radial_map_ylim,
+    expand = FALSE
+  ) +
+  labs(x = "Longitude", y = "Latitude", fill = "Habitat type") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+radial_abundance_points_plot
+
+ggsave(
+  filename = output_radial_abundance_points,
+  plot = radial_abundance_points_plot,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+```
+
+```{r radial-survey-abundance-heatmap, fig.width=8, fig.height=6}
+radial_abundance_count_long <- radial_abundance %>%
+  select(
+    `Site Code`,
+    Lat,
+    Lon,
+    Adult = adult_count,
+    Juvenile = juvenile_count
+  ) %>%
+  pivot_longer(
+    cols = c(Adult, Juvenile),
+    names_to = "age_class",
+    values_to = "n_animals"
+  )
+
+radial_abundance_count_sf <- radial_abundance_count_long %>%
+  st_as_sf(coords = c("Lon", "Lat"), crs = 4326, remove = FALSE) %>%
+  st_transform(32617)
+
+radial_heatmap_grid <- radial_abundance_count_sf %>%
+  st_union() %>%
+  st_convex_hull() %>%
+  st_buffer(150) %>%
+  st_make_grid(cellsize = 20, what = "centers") %>%
+  st_sf(geometry = .)
+
+make_count_idw_surface <- function(age_class_name) {
+  observed <- radial_abundance_count_sf %>%
+    filter(age_class == age_class_name)
+
+  gstat::idw(
+    n_animals ~ 1,
+    locations = observed,
+    newdata = radial_heatmap_grid,
+    idp = 2
+  ) %>%
+    mutate(age_class = age_class_name)
+}
+
+radial_abundance_count_surface <- bind_rows(
+  lapply(c("Adult", "Juvenile"), make_count_idw_surface)
+) %>%
+  mutate(n_animals = pmax(var1.pred, 0))
+
+radial_abundance_count_surface_df <- radial_abundance_count_surface %>%
+  mutate(
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  ) %>%
+  st_drop_geometry()
+
+radial_abundance_count_points_df <- radial_abundance_count_sf %>%
+  mutate(
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  ) %>%
+  st_drop_geometry()
+
+radial_heatmap_limits <- st_bbox(
+  radial_abundance_count_sf %>%
+    st_union() %>%
+    st_convex_hull() %>%
+    st_buffer(150)
+)
+
+radial_count_breaks <- c(0, 1, 2, 5, 10, 20, 40)
+
+radial_abundance_heatmap <- ggplot() +
+  geom_sf(
+    data = st_transform(polygons_final, 32617),
+    fill = "grey85",
+    color = "grey70",
+    linewidth = 0.05,
+    alpha = 0.35
+  ) +
+  geom_tile(
+    data = radial_abundance_count_surface_df,
+    aes(x = x, y = y, fill = n_animals),
+    width = 20,
+    height = 20,
+    alpha = 0.9
+  ) +
+  geom_point(
+    data = radial_abundance_count_points_df,
+    aes(x = x, y = y),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    size = 1.2,
+    stroke = 0.25
+  ) +
+  facet_wrap(~ age_class) +
+  scale_fill_viridis_c(
+    option = "magma",
+    limits = c(0, max(radial_abundance_count_long$n_animals, na.rm = TRUE)),
+    breaks = radial_count_breaks,
+    trans = "sqrt",
+    name = "Observed conch"
+  ) +
+  coord_sf(
+    crs = st_crs(32617),
+    xlim = c(radial_heatmap_limits["xmin"], radial_heatmap_limits["xmax"]),
+    ylim = c(radial_heatmap_limits["ymin"], radial_heatmap_limits["ymax"]),
+    expand = FALSE
+  ) +
+  labs(x = "Easting (m)", y = "Northing (m)") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+radial_abundance_heatmap
+
+ggsave(
+  filename = output_radial_abundance_heatmap,
+  plot = radial_abundance_heatmap,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+```
+
+```{r radial-survey-mating-map, fig.width=8, fig.height=6}
+radial_mating_plot_data <- radial_abundance %>%
+  filter(mating_count > 0)
+
+radial_mating_map <- ggplot() +
+  geom_sf(
+    data = polygons_final,
+    aes(fill = Type),
+    color = "grey35",
+    linewidth = 0.05,
+    alpha = 0.55
+  ) +
+  geom_point(
+    data = radial_abundance,
+    aes(x = Lon, y = Lat),
+    shape = 21,
+    fill = "white",
+    color = "grey30",
+    size = 1.4,
+    stroke = 0.25,
+    alpha = 0.7
+  ) +
+  geom_point(
+    data = radial_mating_plot_data,
+    aes(x = Lon, y = Lat, size = mating_count),
+    shape = 21,
+    fill = "#D7301F",
+    color = "black",
+    alpha = 0.9,
+    stroke = 0.3
+  ) +
+  scale_fill_manual(values = type_cols, na.value = "grey80") +
+  scale_size_area(max_size = 9, breaks = c(1, 2, 3, 5), name = "Mating observations") +
+  coord_sf(
+    xlim = radial_map_xlim,
+    ylim = radial_map_ylim,
+    expand = FALSE
+  ) +
+  labs(x = "Longitude", y = "Latitude", fill = "Habitat type") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+radial_mating_map
+
+ggsave(
+  filename = output_radial_mating_map,
+  plot = radial_mating_map,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+radial_abundance %>%
+  summarize(
+    mating_sites = sum(mating_count > 0),
+    total_mating_observations = sum(mating_count)
+  )
+```
+
+```{r adult-mating-halo-model, fig.width=8, fig.height=6}
+radial_abundance_sf_utm <- radial_abundance %>%
+  st_as_sf(coords = c("Lon", "Lat"), crs = 4326, remove = FALSE) %>%
+  st_transform(32617)
+
+mating_sites_sf_utm <- radial_abundance_sf_utm %>%
+  filter(mating_count > 0)
+
+radial_to_mating_dist <- st_distance(radial_abundance_sf_utm, mating_sites_sf_utm) %>%
+  as.matrix() %>%
+  as.numeric() %>%
+  matrix(nrow = nrow(radial_abundance_sf_utm), ncol = nrow(mating_sites_sf_utm))
+
+mating_weights <- mating_sites_sf_utm$mating_count
+
+calculate_mating_halo <- function(dist_matrix, weights, scale_m) {
+  as.numeric(exp(-dist_matrix / scale_m) %*% weights)
+}
+
+halo_scales_m <- seq(25, 500, by = 25)
+
+adult_mating_halo_model_selection <- tibble(scale_m = halo_scales_m) %>%
+  mutate(
+    model = map(scale_m, function(scale_m) {
+      model_data <- radial_abundance %>%
+        mutate(
+          survey_area_m2 = radial_survey_area_m2,
+          mating_halo = calculate_mating_halo(
+            radial_to_mating_dist,
+            mating_weights,
+            scale_m
+          )
+        )
+
+      MASS::glm.nb(
+        adult_count ~ mating_halo + offset(log(survey_area_m2)),
+        data = model_data
+      )
+    }),
+    AIC = map_dbl(model, AIC)
+  ) %>%
+  arrange(AIC)
+
+best_halo_scale_m <- adult_mating_halo_model_selection$scale_m[[1]]
+
+adult_mating_halo_data <- radial_abundance %>%
+  mutate(
+    survey_area_m2 = radial_survey_area_m2,
+    distance_nearest_mating_m = as.numeric(apply(radial_to_mating_dist, 1, min)),
+    mating_halo = calculate_mating_halo(
+      radial_to_mating_dist,
+      mating_weights,
+      best_halo_scale_m
+    )
+  )
+
+adult_mating_halo_points <- radial_abundance_sf_utm %>%
+  mutate(
+    adult_count = radial_abundance$adult_count,
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  ) %>%
+  st_drop_geometry()
+
+adult_distance_model <- MASS::glm.nb(
+  adult_count ~ distance_nearest_mating_m + offset(log(survey_area_m2)),
+  data = adult_mating_halo_data
+)
+
+adult_mating_halo_model <- MASS::glm.nb(
+  adult_count ~ mating_halo + offset(log(survey_area_m2)),
+  data = adult_mating_halo_data
+)
+
+adult_mating_model_comparison <- tibble(
+  model = c("nearest mating distance", "additive mating halo"),
+  AIC = c(AIC(adult_distance_model), AIC(adult_mating_halo_model))
+) %>%
+  mutate(delta_AIC = AIC - min(AIC))
+
+halo_prediction_grid <- radial_abundance_sf_utm %>%
+  st_union() %>%
+  st_convex_hull() %>%
+  st_buffer(150) %>%
+  st_make_grid(cellsize = 20, what = "centers") %>%
+  st_sf(geometry = .)
+
+grid_to_mating_dist <- st_distance(halo_prediction_grid, mating_sites_sf_utm) %>%
+  as.matrix() %>%
+  as.numeric() %>%
+  matrix(nrow = nrow(halo_prediction_grid), ncol = nrow(mating_sites_sf_utm))
+
+halo_prediction_grid <- halo_prediction_grid %>%
+  mutate(
+    mating_halo = calculate_mating_halo(
+      grid_to_mating_dist,
+      mating_weights,
+      best_halo_scale_m
+    ),
+    survey_area_m2 = 1,
+    adult_density_m2 = predict(
+      adult_mating_halo_model,
+      newdata = tibble(mating_halo = mating_halo, survey_area_m2 = survey_area_m2),
+      type = "response"
+    ),
+    adult_density_100m2 = adult_density_m2 * 100,
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  )
+
+halo_map_limits <- st_bbox(
+  radial_abundance_sf_utm %>%
+    st_union() %>%
+    st_convex_hull() %>%
+    st_buffer(150)
+)
+
+adult_mating_halo_map <- ggplot() +
+  geom_sf(
+    data = st_transform(polygons_final, 32617),
+    fill = "grey85",
+    color = "grey70",
+    linewidth = 0.05,
+    alpha = 0.35
+  ) +
+  geom_tile(
+    data = st_drop_geometry(halo_prediction_grid),
+    aes(x = x, y = y, fill = adult_density_100m2),
+    width = 20,
+    height = 20,
+    alpha = 0.9
+  ) +
+  geom_point(
+    data = adult_mating_halo_points,
+    aes(x = x, y = y, size = adult_count),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    stroke = 0.25,
+    alpha = 0.8
+  ) +
+  geom_sf(
+    data = mating_sites_sf_utm,
+    shape = 24,
+    fill = "#D7301F",
+    color = "black",
+    size = 3,
+    stroke = 0.35
+  ) +
+  scale_fill_viridis_c(
+    option = "magma",
+    name = expression("Predicted adults per 100 " * m^2)
+  ) +
+  scale_size_area(max_size = 7, name = "Observed adults") +
+  coord_sf(
+    crs = st_crs(32617),
+    xlim = c(halo_map_limits["xmin"], halo_map_limits["xmax"]),
+    ylim = c(halo_map_limits["ymin"], halo_map_limits["ymax"]),
+    expand = FALSE
+  ) +
+  labs(x = "Easting (m)", y = "Northing (m)") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+adult_mating_halo_map
+
+ggsave(
+  filename = output_adult_mating_halo_map,
+  plot = adult_mating_halo_map,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+adult_mating_halo_model_selection %>%
+  select(scale_m, AIC) %>%
+  slice_head(n = 5)
+
+adult_mating_model_comparison
+summary(adult_mating_halo_model)
+```
+
+```{r adult-mating-distance-model-plots, fig.width=8, fig.height=6}
+adult_distance_prediction <- tibble(
+  distance_nearest_mating_m = seq(
+    0,
+    max(adult_mating_halo_data$distance_nearest_mating_m, na.rm = TRUE),
+    length.out = 200
+  ),
+  survey_area_m2 = radial_survey_area_m2
+)
+
+adult_distance_prediction_link <- predict(
+  adult_distance_model,
+  newdata = adult_distance_prediction,
+  type = "link",
+  se.fit = TRUE
+)
+
+adult_distance_prediction <- adult_distance_prediction %>%
+  mutate(
+    adult_count_fit = exp(adult_distance_prediction_link$fit),
+    adult_count_lwr = exp(adult_distance_prediction_link$fit - 1.96 * adult_distance_prediction_link$se.fit),
+    adult_count_upr = exp(adult_distance_prediction_link$fit + 1.96 * adult_distance_prediction_link$se.fit),
+    adult_density_100m2_fit = adult_count_fit / radial_survey_area_m2 * 100,
+    adult_density_100m2_lwr = adult_count_lwr / radial_survey_area_m2 * 100,
+    adult_density_100m2_upr = adult_count_upr / radial_survey_area_m2 * 100
+  )
+
+adult_mating_distance_plot <- ggplot() +
+  geom_point(
+    data = adult_mating_halo_data,
+    aes(
+      x = distance_nearest_mating_m,
+      y = adult_count / radial_survey_area_m2 * 100
+    ),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    alpha = 0.8
+  ) +
+  geom_ribbon(
+    data = adult_distance_prediction,
+    aes(
+      x = distance_nearest_mating_m,
+      ymin = adult_density_100m2_lwr,
+      ymax = adult_density_100m2_upr
+    ),
+    fill = "#2C7FB8",
+    alpha = 0.2
+  ) +
+  geom_line(
+    data = adult_distance_prediction,
+    aes(x = distance_nearest_mating_m, y = adult_density_100m2_fit),
+    color = "#2C7FB8",
+    linewidth = 1
+  ) +
+  labs(
+    x = "Distance to nearest mating observation (m)",
+    y = expression("Adult conch density (adults per 100 " * m^2 * ")")
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank())
+
+adult_mating_distance_plot
+
+ggsave(
+  filename = output_adult_mating_distance_plot,
+  plot = adult_mating_distance_plot,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+grid_to_nearest_mating_dist <- apply(grid_to_mating_dist, 1, min)
+
+distance_prediction_grid <- halo_prediction_grid %>%
+  mutate(
+    distance_nearest_mating_m = grid_to_nearest_mating_dist,
+    survey_area_m2 = 1,
+    adult_density_m2 = predict(
+      adult_distance_model,
+      newdata = tibble(
+        distance_nearest_mating_m = distance_nearest_mating_m,
+        survey_area_m2 = survey_area_m2
+      ),
+      type = "response"
+    ),
+    adult_density_100m2 = adult_density_m2 * 100,
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  )
+
+adult_mating_distance_map <- ggplot() +
+  geom_sf(
+    data = st_transform(polygons_final, 32617),
+    fill = "grey85",
+    color = "grey70",
+    linewidth = 0.05,
+    alpha = 0.35
+  ) +
+  geom_tile(
+    data = st_drop_geometry(distance_prediction_grid),
+    aes(x = x, y = y, fill = adult_density_100m2),
+    width = 20,
+    height = 20,
+    alpha = 0.9
+  ) +
+  geom_point(
+    data = adult_mating_halo_points,
+    aes(x = x, y = y, size = adult_count),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    stroke = 0.25,
+    alpha = 0.8
+  ) +
+  geom_sf(
+    data = mating_sites_sf_utm,
+    shape = 24,
+    fill = "#D7301F",
+    color = "black",
+    size = 3,
+    stroke = 0.35
+  ) +
+  scale_fill_viridis_c(
+    option = "magma",
+    name = expression("Predicted adults per 100 " * m^2)
+  ) +
+  scale_size_area(max_size = 7, name = "Observed adults") +
+  coord_sf(
+    crs = st_crs(32617),
+    xlim = c(halo_map_limits["xmin"], halo_map_limits["xmax"]),
+    ylim = c(halo_map_limits["ymin"], halo_map_limits["ymax"]),
+    expand = FALSE
+  ) +
+  labs(x = "Easting (m)", y = "Northing (m)") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+adult_mating_distance_map
+
+ggsave(
+  filename = output_adult_mating_distance_map,
+  plot = adult_mating_distance_map,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+adult_mating_model_comparison
+summary(adult_distance_model)
+```
+
+```{r adult-mating-radius-density-model, fig.width=8, fig.height=6}
+calculate_mating_within_radius <- function(dist_matrix, weights, radius_m) {
+  as.numeric((dist_matrix <= radius_m) %*% weights)
+}
+
+mating_radii_m <- seq(25, 500, by = 25)
+
+adult_mating_radius_model_selection <- tibble(radius_m = mating_radii_m) %>%
+  mutate(
+    model = map(radius_m, function(radius_m) {
+      model_data <- adult_mating_halo_data %>%
+        mutate(
+          mating_within_radius = calculate_mating_within_radius(
+            radial_to_mating_dist,
+            mating_weights,
+            radius_m
+          )
+        )
+
+      MASS::glm.nb(
+        adult_count ~ mating_within_radius + offset(log(survey_area_m2)),
+        data = model_data
+      )
+    }),
+    AIC = map_dbl(model, AIC)
+  ) %>%
+  arrange(AIC)
+
+best_mating_radius_m <- adult_mating_radius_model_selection$radius_m[[1]]
+
+adult_mating_radius_data <- adult_mating_halo_data %>%
+  mutate(
+    mating_within_radius = calculate_mating_within_radius(
+      radial_to_mating_dist,
+      mating_weights,
+      best_mating_radius_m
+    )
+  )
+
+adult_mating_radius_model <- MASS::glm.nb(
+  adult_count ~ mating_within_radius + offset(log(survey_area_m2)),
+  data = adult_mating_radius_data
+)
+
+adult_mating_model_comparison <- bind_rows(
+  adult_mating_model_comparison,
+  tibble(
+    model = paste0("mating observations within ", best_mating_radius_m, " m"),
+    AIC = AIC(adult_mating_radius_model)
+  )
+) %>%
+  mutate(delta_AIC = AIC - min(AIC)) %>%
+  arrange(AIC)
+
+adult_radius_prediction <- tibble(
+  mating_within_radius = seq(
+    0,
+    max(adult_mating_radius_data$mating_within_radius, na.rm = TRUE),
+    by = 1
+  ),
+  survey_area_m2 = radial_survey_area_m2
+)
+
+adult_radius_prediction_link <- predict(
+  adult_mating_radius_model,
+  newdata = adult_radius_prediction,
+  type = "link",
+  se.fit = TRUE
+)
+
+adult_radius_prediction <- adult_radius_prediction %>%
+  mutate(
+    adult_count_fit = exp(adult_radius_prediction_link$fit),
+    adult_count_lwr = exp(adult_radius_prediction_link$fit - 1.96 * adult_radius_prediction_link$se.fit),
+    adult_count_upr = exp(adult_radius_prediction_link$fit + 1.96 * adult_radius_prediction_link$se.fit),
+    adult_density_100m2_fit = adult_count_fit / radial_survey_area_m2 * 100,
+    adult_density_100m2_lwr = adult_count_lwr / radial_survey_area_m2 * 100,
+    adult_density_100m2_upr = adult_count_upr / radial_survey_area_m2 * 100
+  )
+
+adult_mating_radius_plot <- ggplot() +
+  geom_point(
+    data = adult_mating_radius_data,
+    aes(
+      x = mating_within_radius,
+      y = adult_count / radial_survey_area_m2 * 100
+    ),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    alpha = 0.8
+  ) +
+  geom_ribbon(
+    data = adult_radius_prediction,
+    aes(
+      x = mating_within_radius,
+      ymin = adult_density_100m2_lwr,
+      ymax = adult_density_100m2_upr
+    ),
+    fill = "#7B3294",
+    alpha = 0.2
+  ) +
+  geom_line(
+    data = adult_radius_prediction,
+    aes(x = mating_within_radius, y = adult_density_100m2_fit),
+    color = "#7B3294",
+    linewidth = 1
+  ) +
+  labs(
+    x = paste0("Mating observations within ", best_mating_radius_m, " m"),
+    y = expression("Adult conch density (adults per 100 " * m^2 * ")")
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank())
+
+adult_mating_radius_plot
+
+ggsave(
+  filename = output_adult_mating_radius_plot,
+  plot = adult_mating_radius_plot,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+radius_prediction_grid <- halo_prediction_grid %>%
+  mutate(
+    mating_within_radius = calculate_mating_within_radius(
+      grid_to_mating_dist,
+      mating_weights,
+      best_mating_radius_m
+    ),
+    survey_area_m2 = 1,
+    adult_density_m2 = predict(
+      adult_mating_radius_model,
+      newdata = tibble(
+        mating_within_radius = mating_within_radius,
+        survey_area_m2 = survey_area_m2
+      ),
+      type = "response"
+    ),
+    adult_density_100m2 = adult_density_m2 * 100,
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  )
+
+adult_radius_map_max <- max(radius_prediction_grid$adult_density_100m2, na.rm = TRUE)
+
+adult_mating_radius_map <- ggplot() +
+  geom_sf(
+    data = st_transform(polygons_final, 32617),
+    fill = "grey85",
+    color = "grey70",
+    linewidth = 0.05,
+    alpha = 0.35
+  ) +
+  geom_tile(
+    data = st_drop_geometry(radius_prediction_grid),
+    aes(x = x, y = y, fill = adult_density_100m2),
+    width = 20,
+    height = 20,
+    alpha = 0.9
+  ) +
+  geom_point(
+    data = adult_mating_halo_points,
+    aes(x = x, y = y, size = adult_count),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    stroke = 0.25,
+    alpha = 0.8
+  ) +
+  geom_sf(
+    data = mating_sites_sf_utm,
+    shape = 24,
+    fill = "#D7301F",
+    color = "black",
+    size = 3,
+    stroke = 0.35
+  ) +
+  scale_fill_viridis_c(
+    option = "magma",
+    limits = c(0, adult_radius_map_max),
+    trans = "sqrt",
+    name = expression("Predicted adults per 100 " * m^2)
+  ) +
+  scale_size_area(max_size = 7, name = "Observed adults") +
+  coord_sf(
+    crs = st_crs(32617),
+    xlim = c(halo_map_limits["xmin"], halo_map_limits["xmax"]),
+    ylim = c(halo_map_limits["ymin"], halo_map_limits["ymax"]),
+    expand = FALSE
+  ) +
+  labs(x = "Easting (m)", y = "Northing (m)") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+adult_mating_radius_map
+
+ggsave(
+  filename = output_adult_mating_radius_map,
+  plot = adult_mating_radius_map,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+adult_mating_radius_model_selection %>%
+  select(radius_m, AIC) %>%
+  slice_head(n = 5)
+
+adult_mating_model_comparison
+summary(adult_mating_radius_model)
+```
+
+```{r blob-population-and-background-density, fig.width=8, fig.height=6}
+blob_buffer_m <- 150
+prediction_cellsize_m <- 20
+
+radial_blob_candidates <- radial_abundance_sf_utm %>%
+  st_buffer(blob_buffer_m) %>%
+  st_union() %>%
+  st_sf(geometry = .) %>%
+  st_cast("POLYGON") %>%
+  mutate(
+    blob_id = row_number(),
+    area_m2 = as.numeric(st_area(geometry)),
+    n_radial_sites = lengths(st_intersects(., radial_abundance_sf_utm))
+  ) %>%
+  arrange(desc(n_radial_sites), desc(area_m2))
+
+radial_blob <- radial_blob_candidates %>%
+  slice(1)
+
+blob_grid <- st_make_grid(
+  radial_blob,
+  cellsize = prediction_cellsize_m,
+  what = "polygons",
+  square = TRUE
+) %>%
+  st_sf(geometry = .) %>%
+  st_intersection(radial_blob) %>%
+  mutate(cell_area_m2 = as.numeric(st_area(geometry))) %>%
+  filter(cell_area_m2 > 0)
+
+blob_grid_points <- st_point_on_surface(blob_grid)
+
+blob_to_mating_dist <- st_distance(blob_grid_points, mating_sites_sf_utm) %>%
+  as.matrix() %>%
+  as.numeric() %>%
+  matrix(nrow = nrow(blob_grid_points), ncol = nrow(mating_sites_sf_utm))
+
+blob_adult_prediction <- blob_grid %>%
+  mutate(
+    mating_within_radius = calculate_mating_within_radius(
+      blob_to_mating_dist,
+      mating_weights,
+      best_mating_radius_m
+    ),
+    survey_area_m2 = 1,
+    adult_density_m2 = predict(
+      adult_mating_radius_model,
+      newdata = tibble(
+        mating_within_radius = mating_within_radius,
+        survey_area_m2 = survey_area_m2
+      ),
+      type = "response"
+    ),
+    adult_total = adult_density_m2 * cell_area_m2
+  )
+
+blob_total_adults <- sum(blob_adult_prediction$adult_total, na.rm = TRUE)
+
+blob_grid_points_df <- blob_grid_points %>%
+  mutate(
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  ) %>%
+  st_drop_geometry()
+
+blob_to_radial_dist <- st_distance(blob_grid_points, radial_abundance_count_sf) %>%
+  as.matrix() %>%
+  as.numeric() %>%
+  matrix(nrow = nrow(blob_grid_points), ncol = nrow(radial_abundance_count_sf))
+
+calculate_idw_prediction <- function(dist_matrix, values, power = 2) {
+  apply(dist_matrix, 1, function(d) {
+    if (any(d == 0)) {
+      mean(values[d == 0], na.rm = TRUE)
+    } else {
+      weights <- 1 / d^power
+      sum(weights * values, na.rm = TRUE) / sum(weights, na.rm = TRUE)
+    }
+  })
+}
+
+juvenile_radial_values <- radial_abundance_count_sf %>%
+  filter(age_class == "Juvenile") %>%
+  pull(n_animals)
+
+blob_to_juvenile_radial_dist <- st_distance(
+  blob_grid_points,
+  radial_abundance_count_sf %>% filter(age_class == "Juvenile")
+) %>%
+  as.matrix() %>%
+  as.numeric() %>%
+  matrix(nrow = nrow(blob_grid_points), ncol = length(juvenile_radial_values))
+
+blob_juvenile_prediction <- blob_grid %>%
+  mutate(
+    juvenile_count_idw = calculate_idw_prediction(
+      blob_to_juvenile_radial_dist,
+      juvenile_radial_values,
+      power = 2
+    ),
+    juvenile_density_m2 = juvenile_count_idw / radial_survey_area_m2,
+    juvenile_total = juvenile_density_m2 * cell_area_m2
+  )
+
+blob_total_juveniles <- sum(blob_juvenile_prediction$juvenile_total, na.rm = TRUE)
+
+blob_prediction_long <- bind_rows(
+  blob_adult_prediction %>%
+    mutate(
+      age_class = "Adult",
+      density_100m2 = adult_density_m2 * 100,
+      total_animals = adult_total
+    ) %>%
+    select(age_class, density_100m2, total_animals, geometry),
+  blob_juvenile_prediction %>%
+    mutate(
+      age_class = "Juvenile",
+      density_100m2 = juvenile_density_m2 * 100,
+      total_animals = juvenile_total
+    ) %>%
+    select(age_class, density_100m2, total_animals, geometry)
+)
+
+blob_prediction_points <- blob_prediction_long %>%
+  st_point_on_surface() %>%
+  mutate(
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  ) %>%
+  st_drop_geometry()
+
+blob_density_max <- max(blob_prediction_points$density_100m2, na.rm = TRUE)
+
+conch_blob_prediction_map <- ggplot() +
+  geom_sf(
+    data = st_transform(polygons_final, 32617),
+    fill = "grey85",
+    color = "grey70",
+    linewidth = 0.05,
+    alpha = 0.35
+  ) +
+  geom_tile(
+    data = blob_prediction_points,
+    aes(x = x, y = y, fill = density_100m2),
+    width = prediction_cellsize_m,
+    height = prediction_cellsize_m,
+    alpha = 0.9
+  ) +
+  geom_sf(
+    data = radial_blob,
+    fill = NA,
+    color = "black",
+    linewidth = 0.6
+  ) +
+  geom_point(
+    data = adult_mating_halo_points,
+    aes(x = x, y = y),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    size = 1,
+    stroke = 0.2,
+    alpha = 0.7
+  ) +
+  facet_wrap(~ age_class) +
+  scale_fill_viridis_c(
+    option = "magma",
+    limits = c(0, blob_density_max),
+    trans = "sqrt",
+    name = expression("Conch per 100 " * m^2)
+  ) +
+  coord_sf(
+    crs = st_crs(32617),
+    xlim = st_bbox(radial_blob)[c("xmin", "xmax")],
+    ylim = st_bbox(radial_blob)[c("ymin", "ymax")],
+    expand = FALSE
+  ) +
+  labs(x = "Easting (m)", y = "Northing (m)") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+conch_blob_prediction_map
+
+ggsave(
+  filename = output_conch_blob_prediction_map,
+  plot = conch_blob_prediction_map,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+if (!exists("drift_rectangles")) {
+  drift_surveys <- readxl::read_xlsx(conch_xlsx, sheet = drift_sheet) %>%
+    mutate(
+      start_lat = as.numeric(`StartLat (dec deg)`),
+      start_lon = as.numeric(`StartLong (dec deg)`),
+      end_lat = as.numeric(`EndLat (dec deg)`),
+      end_lon = as.numeric(`EndLon (dec deg)`)
+    ) %>%
+    filter(
+      !is.na(start_lat),
+      !is.na(start_lon),
+      !is.na(end_lat),
+      !is.na(end_lon)
+    ) %>%
+    mutate(.record = row_number())
+
+  drift_start_sf <- drift_surveys %>%
+    st_as_sf(coords = c("start_lon", "start_lat"), crs = 4326, remove = FALSE) %>%
+    st_transform(32617)
+
+  drift_end_sf <- drift_surveys %>%
+    st_as_sf(coords = c("end_lon", "end_lat"), crs = 4326, remove = FALSE) %>%
+    st_transform(32617)
+
+  start_xy <- st_coordinates(drift_start_sf)
+  end_xy <- st_coordinates(drift_end_sf)
+
+  make_transect_rectangle <- function(start_point, end_point, half_width_m = 2) {
+    direction <- end_point - start_point
+    transect_length <- sqrt(sum(direction^2))
+
+    if (transect_length == 0) {
+      return(st_polygon())
+    }
+
+    unit_direction <- direction / transect_length
+    perpendicular <- c(-unit_direction[[2]], unit_direction[[1]]) * half_width_m
+
+    corners <- rbind(
+      start_point + perpendicular,
+      end_point + perpendicular,
+      end_point - perpendicular,
+      start_point - perpendicular,
+      start_point + perpendicular
+    )
+
+    st_polygon(list(corners))
+  }
+
+  drift_rectangles <- st_sf(
+    drift_surveys %>% select(-start_lat, -start_lon, -end_lat, -end_lon),
+    geometry = st_sfc(
+      map2(
+        seq_len(nrow(start_xy)),
+        seq_len(nrow(end_xy)),
+        ~ make_transect_rectangle(start_xy[.x, ], end_xy[.y, ], half_width_m = 2)
+      ),
+      crs = 32617
+    )
+  ) %>%
+    filter(!st_is_empty(.)) %>%
+    st_transform(4326)
+}
+
+if (!exists("drift_habitat_area")) {
+  drift_habitat_intersections <- st_intersection(
+    drift_rectangles %>% st_transform(32617) %>% st_make_valid(),
+    polygons_final %>% st_transform(32617) %>% st_make_valid() %>% select(Type)
+  ) %>%
+    mutate(area_m2 = as.numeric(st_area(geometry)))
+
+  drift_habitat_area <- drift_habitat_intersections %>%
+    st_drop_geometry() %>%
+    group_by(.record, Transect, Line, Type) %>%
+    summarize(area_m2 = sum(area_m2), .groups = "drop") %>%
+    arrange(.record, desc(area_m2), Type)
+}
+
+if (!exists("conch_drift_positions_out")) {
+  conch_drift_positions <- readxl::read_xlsx(conch_xlsx, sheet = drift_position_sheet) %>%
+    mutate(
+      .record = row_number(),
+      lat = as.numeric(`Lat (dec deg)`),
+      lon = as.numeric(`Long (dec deg)`),
+      animal_id = sub("^.*([AJ][0-9]+)$", "\\1", `WPT (B/E)`),
+      animal_stage = case_when(
+        grepl("^A", animal_id) ~ "Adult",
+        grepl("^J", animal_id) ~ "Juvenile",
+        TRUE ~ NA_character_
+      ),
+      transect = sub("([AJ][0-9]+)$", "", `WPT (B/E)`)
+    ) %>%
+    filter(!is.na(lat), !is.na(lon))
+
+  conch_drift_positions_sf <- conch_drift_positions %>%
+    st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE)
+
+  conch_drift_position_matches <- st_join(
+    conch_drift_positions_sf,
+    polygons_for_join,
+    join = st_within,
+    left = TRUE
+  ) %>%
+    st_drop_geometry() %>%
+    select(.record, Habitat_Type = Type)
+
+  conch_drift_positions_out <- conch_drift_positions %>%
+    left_join(
+      conch_drift_position_matches %>%
+        group_by(.record) %>%
+        slice(1) %>%
+        ungroup(),
+      by = ".record"
+    ) %>%
+    mutate(`Habitat (Class at point)` = Habitat_Type) %>%
+    select(-Habitat_Type)
+}
+
+drift_rectangles_utm <- drift_rectangles %>%
+  st_transform(32617) %>%
+  st_make_valid()
+
+drift_background_records <- drift_rectangles_utm %>%
+  mutate(
+    transect_group = sub(" cont\\.$", "", Transect),
+    intersects_blob = lengths(st_intersects(., radial_blob)) > 0
+  ) %>%
+  st_drop_geometry() %>%
+  select(.record, Transect, transect_group, Line, intersects_blob)
+
+background_drift_records <- drift_background_records %>%
+  group_by(transect_group) %>%
+  summarize(intersects_blob = any(intersects_blob), .groups = "drop") %>%
+  filter(!intersects_blob)
+
+background_drift_area <- drift_habitat_area %>%
+  mutate(transect_group = sub(" cont\\.$", "", Transect)) %>%
+  semi_join(background_drift_records, by = "transect_group")
+
+background_drift_counts <- conch_drift_positions_out %>%
+  semi_join(background_drift_records, by = c("transect" = "transect_group")) %>%
+  count(
+    transect,
+    `Habitat (Class at point)`,
+    animal_stage,
+    name = "n_animals"
+  ) %>%
+  rename(
+    Transect = transect,
+    Type = `Habitat (Class at point)`
+  )
+
+background_drift_density <- background_drift_area %>%
+  expand_grid(animal_stage = c("Adult", "Juvenile")) %>%
+  left_join(
+    background_drift_counts,
+    by = c("Transect", "Type", "animal_stage")
+  ) %>%
+  mutate(n_animals = replace_na(n_animals, 0L)) %>%
+  group_by(Type, animal_stage) %>%
+  summarize(
+    n_animals = sum(n_animals),
+    area_m2 = sum(area_m2),
+    density_m2 = n_animals / area_m2,
+    density_100m2 = density_m2 * 100,
+    .groups = "drop"
+  ) %>%
+  arrange(Type, animal_stage)
+
+background_drift_density_plot <- ggplot(
+  background_drift_density,
+  aes(x = Type, y = density_100m2, fill = animal_stage)
+) +
+  geom_col(position = position_dodge(width = 0.75), color = "grey30", linewidth = 0.2) +
+  coord_flip() +
+  labs(
+    x = "Habitat type",
+    y = expression("Background density (conch per 100 " * m^2 * ")"),
+    fill = "Conch stage"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+background_drift_density_plot
+
+ggsave(
+  filename = output_drift_background_density_plot,
+  plot = background_drift_density_plot,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+
+tibble(
+  blob_buffer_m = blob_buffer_m,
+  blob_area_m2 = sum(blob_adult_prediction$cell_area_m2),
+  blob_area_ha = sum(blob_adult_prediction$cell_area_m2) / 10000,
+  n_radial_sites_in_blob = radial_blob$n_radial_sites,
+  best_mating_radius_m = best_mating_radius_m,
+  estimated_adults_in_blob = blob_total_adults,
+  estimated_juveniles_in_blob = blob_total_juveniles,
+  background_drift_transects = n_distinct(background_drift_records$transect_group),
+  excluded_drift_transects = drift_background_records %>%
+    group_by(transect_group) %>%
+    summarize(intersects_blob = any(intersects_blob), .groups = "drop") %>%
+    summarize(n = sum(intersects_blob)) %>%
+    pull(n)
+)
+
+background_drift_density
+```
+
+## Map
+
+```{r habitat-map, fig.width=8, fig.height=8}
+conch_map <- ggplot() +
+  geom_sf(
+    data = polygons_final,
+    aes(fill = Type),
+    color = "grey35",
+    linewidth = 0.05,
+    alpha = 0.65
+  ) +
+  geom_sf(
+    data = conch_points_sf,
+    shape = 21,
+    fill = "black",
+    color = "white",
+    stroke = 0.25,
+    size = 2
+  ) +
+  scale_fill_manual(values = type_cols, na.value = "grey80") +
+  coord_sf(
+    xlim = c(-80.1116, -80.077),
+    ylim = c(26.058, 26.112),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Longitude",
+    y = "Latitude",
+    fill = "Habitat type"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+conch_map +
+  coord_sf(xlim = c(-80.1116, -80.1),
+    ylim = c(26.08, 26.095))
+
+ggsave(
+  filename = output_map,
+  plot = conch_map,
+  width = 8,
+  height = 8,
+  dpi = 300
+)
+```
+
+# Drift Survey Transects
+
+```{r drift-survey-transects, fig.width=8, fig.height=8}
+drift_surveys <- readxl::read_xlsx(conch_xlsx, sheet = drift_sheet) %>%
+  mutate(
+    start_lat = as.numeric(`StartLat (dec deg)`),
+    start_lon = as.numeric(`StartLong (dec deg)`),
+    end_lat = as.numeric(`EndLat (dec deg)`),
+    end_lon = as.numeric(`EndLon (dec deg)`)
+  ) %>%
+  filter(
+    !is.na(start_lat),
+    !is.na(start_lon),
+    !is.na(end_lat),
+    !is.na(end_lon)
+  ) %>%
+  mutate(.record = row_number())
+
+drift_start_sf <- drift_surveys %>%
+  st_as_sf(coords = c("start_lon", "start_lat"), crs = 4326, remove = FALSE) %>%
+  st_transform(32617)
+
+drift_end_sf <- drift_surveys %>%
+  st_as_sf(coords = c("end_lon", "end_lat"), crs = 4326, remove = FALSE) %>%
+  st_transform(32617)
+
+start_xy <- st_coordinates(drift_start_sf)
+end_xy <- st_coordinates(drift_end_sf)
+
+make_transect_rectangle <- function(start_point, end_point, half_width_m = 2) {
+  direction <- end_point - start_point
+  transect_length <- sqrt(sum(direction^2))
+
+  if (transect_length == 0) {
+    return(st_polygon())
+  }
+
+  unit_direction <- direction / transect_length
+  perpendicular <- c(-unit_direction[[2]], unit_direction[[1]]) * half_width_m
+
+  corners <- rbind(
+    start_point + perpendicular,
+    end_point + perpendicular,
+    end_point - perpendicular,
+    start_point - perpendicular,
+    start_point + perpendicular
+  )
+
+  st_polygon(list(corners))
+}
+
+drift_rectangles <- st_sf(
+  drift_surveys %>% select(-start_lat, -start_lon, -end_lat, -end_lon),
+  geometry = st_sfc(
+    map2(
+      seq_len(nrow(start_xy)),
+      seq_len(nrow(end_xy)),
+      ~ make_transect_rectangle(start_xy[.x, ], end_xy[.y, ], half_width_m = 2)
+    ),
+    crs = 32617
+  )
+) %>%
+  filter(!st_is_empty(.)) %>%
+  st_transform(4326)
+
+mid_xy <- (start_xy + end_xy) / 2
+
+drift_label_points <- drift_surveys %>%
+  mutate(
+    label_x = mid_xy[, "X"],
+    label_y = mid_xy[, "Y"]
+  ) %>%
+  st_as_sf(coords = c("label_x", "label_y"), crs = 32617) %>%
+  st_transform(4326)
+
+drift_label_df <- drift_label_points %>%
+  mutate(
+    label_lon = st_coordinates(.)[, "X"],
+    label_lat = st_coordinates(.)[, "Y"]
+  ) %>%
+  st_drop_geometry()
+
+drift_map <- ggplot() +
+  geom_sf(
+    data = polygons_final,
+    aes(fill = Type),
+    color = "grey35",
+    linewidth = 0.05,
+    alpha = 0.65
+  ) +
+  geom_sf(
+    data = drift_rectangles,
+    fill = NA,
+    color = "black",
+    linewidth = 0.45
+  ) +
+  geom_text(
+    data = drift_label_df,
+    aes(x = label_lon, y = label_lat, label = Line),
+    size = 2.5,
+    color = "black"
+  ) +
+  scale_fill_manual(values = type_cols, na.value = "grey80") +
+  coord_sf(
+    xlim = c(-80.1116, -80.077),
+    ylim = c(26.058, 26.112),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Longitude",
+    y = "Latitude",
+    fill = "Habitat type"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+drift_map
+
+ggsave(
+  filename = output_drift_map,
+  plot = drift_map,
+  width = 8,
+  height = 8,
+  dpi = 300
+)
+```
+
+## Drift Survey Habitat Areas
+
+```{r drift-survey-habitat-areas, fig.width=8, fig.height=5}
+drift_rectangles_utm <- drift_rectangles %>%
+  st_transform(32617) %>%
+  st_make_valid()
+
+polygons_final_utm <- polygons_final %>%
+  st_transform(32617) %>%
+  st_make_valid()
+
+drift_habitat_intersections <- st_intersection(
+  drift_rectangles_utm,
+  polygons_final_utm %>% select(Type)
+) %>%
+  mutate(area_m2 = as.numeric(st_area(geometry)))
+
+drift_habitat_area <- drift_habitat_intersections %>%
+  st_drop_geometry() %>%
+  group_by(.record, Transect, Line, Type) %>%
+  summarize(area_m2 = sum(area_m2), .groups = "drop") %>%
+  arrange(.record, desc(area_m2), Type)
+
+drift_habitat_totals <- drift_habitat_area %>%
+  group_by(Type) %>%
+  summarize(area_m2 = sum(area_m2), .groups = "drop") %>%
+  arrange(desc(area_m2))
+
+drift_habitat_histogram <- ggplot(
+  drift_habitat_totals,
+  aes(x = reorder(Type, area_m2), y = area_m2, fill = Type)
+) +
+  geom_col(color = "grey30", linewidth = 0.2) +
+  coord_flip() +
+  scale_fill_manual(values = type_cols, na.value = "grey80", guide = "none") +
+  labs(
+    x = "Habitat type",
+    y = expression("Area within drift rectangles (" * m^2 * ")")
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+drift_habitat_histogram
+
+ggsave(
+  filename = output_drift_habitat_histogram,
+  plot = drift_habitat_histogram,
+  width = 8,
+  height = 5,
+  dpi = 300
+)
+
+drift_habitat_area
+```
+
+## Conch Drift Positions
+
+```{r conch-drift-positions, fig.width=9, fig.height=5}
+conch_drift_positions <- readxl::read_xlsx(conch_xlsx, sheet = drift_position_sheet) %>%
+  mutate(
+    .record = row_number(),
+    lat = as.numeric(`Lat (dec deg)`),
+    lon = as.numeric(`Long (dec deg)`),
+    animal_id = sub("^.*([AJ][0-9]+)$", "\\1", `WPT (B/E)`),
+    animal_stage = case_when(
+      grepl("^A", animal_id) ~ "Adult",
+      grepl("^J", animal_id) ~ "Juvenile",
+      TRUE ~ NA_character_
+    ),
+    transect = sub("([AJ][0-9]+)$", "", `WPT (B/E)`)
+  ) %>%
+  filter(!is.na(lat), !is.na(lon))
+
+conch_drift_positions_sf <- conch_drift_positions %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE)
+
+conch_drift_position_matches <- st_join(
+  conch_drift_positions_sf,
+  polygons_for_join,
+  join = st_within,
+  left = TRUE
+) %>%
+  st_drop_geometry() %>%
+  select(
+    .record,
+    `WPT (B/E)`,
+    transect,
+    animal_id,
+    animal_stage,
+    lat,
+    lon,
+    Habitat_Type = Type
+  )
+
+ambiguous_drift_positions <- conch_drift_position_matches %>%
+  count(.record, `WPT (B/E)`, transect, animal_id, name = "n_matches") %>%
+  filter(n_matches > 1)
+
+conch_drift_position_assignments <- conch_drift_position_matches %>%
+  group_by(.record) %>%
+  slice(1) %>%
+  ungroup()
+
+conch_drift_positions_out <- conch_drift_positions %>%
+  left_join(
+    conch_drift_position_assignments %>% select(.record, Habitat_Type),
+    by = ".record"
+  ) %>%
+  mutate(`Habitat (Class at point)` = Habitat_Type) %>%
+  select(-Habitat_Type)
+
+transect_levels <- drift_surveys$Transect %>%
+  sub(" cont\\.$", "", .) %>%
+  unique()
+
+conch_drift_position_counts <- conch_drift_positions_out %>%
+  mutate(
+    transect = factor(transect, levels = transect_levels),
+    `Habitat (Class at point)` = if_else(
+      is.na(`Habitat (Class at point)`),
+      "Unmatched",
+      `Habitat (Class at point)`
+    )
+  ) %>%
+  count(transect, `Habitat (Class at point)`, name = "n_animals")
+
+conch_drift_position_counts_plot <- ggplot(
+  conch_drift_position_counts,
+  aes(x = transect, y = n_animals, fill = `Habitat (Class at point)`)
+) +
+  geom_col(color = "grey30", linewidth = 0.2) +
+  scale_fill_manual(values = c(type_cols, "Unmatched" = "grey70"), na.value = "grey70") +
+  labs(
+    x = "Transect",
+    y = "Observed conch",
+    fill = "Habitat type"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    legend.position = "right"
+  )
+
+conch_drift_position_counts_plot
+
+ggsave(
+  filename = output_drift_position_counts,
+  plot = conch_drift_position_counts_plot,
+  width = 9,
+  height = 5,
+  dpi = 300
+)
+
+conch_drift_position_counts
+ambiguous_drift_positions
+```
+
+```{r conch-drift-observation-map, fig.width=8, fig.height=8}
+drift_conch_map <- ggplot() +
+  geom_sf(
+    data = polygons_final,
+    aes(fill = Type),
+    color = "grey35",
+    linewidth = 0.05,
+    alpha = 0.65
+  ) +
+  geom_sf(
+    data = drift_rectangles,
+    fill = NA,
+    color = "black",
+    linewidth = 0.45
+  ) +
+  geom_sf(
+    data = conch_drift_positions_sf,
+    aes(color = animal_stage),
+    size = 2,
+    alpha = 0.9
+  ) +
+  geom_text(
+    data = drift_label_df,
+    aes(x = label_lon, y = label_lat, label = Line),
+    size = 2.5,
+    color = "black"
+  ) +
+  scale_fill_manual(values = type_cols, na.value = "grey80") +
+  scale_color_manual(
+    values = c("Adult" = "#D95F02", "Juvenile" = "#1B9E77"),
+    na.value = "grey20"
+  ) +
+  coord_sf(
+    xlim = c(-80.1116, -80.077),
+    ylim = c(26.058, 26.112),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Longitude",
+    y = "Latitude",
+    fill = "Habitat type",
+    color = "Conch stage"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+drift_conch_map
+
+ggsave(
+  filename = output_drift_conch_map,
+  plot = drift_conch_map,
+  width = 8,
+  height = 8,
+  dpi = 300
+)
+```
+
+# Conch Density Model
+
+```{r conch-density-model, fig.width=8, fig.height=5}
+conch_counts_by_habitat <- conch_drift_positions_out %>%
+  count(
+    transect,
+    `Habitat (Class at point)`,
+    animal_stage,
+    name = "n_animals"
+  ) %>%
+  rename(
+    Transect = transect,
+    Type = `Habitat (Class at point)`
+  )
+
+age_classes <- c("Adult", "Juvenile")
+
+conch_density_model_data <- drift_habitat_area %>%
+  expand_grid(animal_stage = age_classes) %>%
+  left_join(
+    conch_counts_by_habitat,
+    by = c("Transect", "Type", "animal_stage")
+  ) %>%
+  mutate(
+    n_animals = replace_na(n_animals, 0L),
+    Type = factor(Type, levels = names(type_cols)),
+    animal_stage = factor(animal_stage, levels = age_classes)
+  ) %>%
+  filter(area_m2 > 0)
+
+conch_density_model <- MASS::glm.nb(
+  n_animals ~ Type + animal_stage + offset(log(area_m2)),
+  data = conch_density_model_data
+)
+
+density_prediction_grid <- conch_density_model_data %>%
+  st_drop_geometry() %>%
+  distinct(Type, animal_stage) %>%
+  arrange(Type, animal_stage) %>%
+  mutate(area_m2 = 1)
+
+density_prediction <- predict(
+  conch_density_model,
+  newdata = density_prediction_grid,
+  type = "link",
+  se.fit = TRUE
+)
+
+observed_density_summary <- conch_density_model_data %>%
+  group_by(Type, animal_stage) %>%
+  summarize(
+    observed_count = sum(n_animals),
+    sampled_area_m2 = sum(area_m2),
+    observed_density_per_m2 = observed_count / sampled_area_m2,
+    .groups = "drop"
+  )
+
+conch_density_estimates <- density_prediction_grid %>%
+  mutate(
+    density_per_m2 = exp(density_prediction$fit),
+    density_lwr_per_m2 = exp(density_prediction$fit - 1.96 * density_prediction$se.fit),
+    density_upr_per_m2 = exp(density_prediction$fit + 1.96 * density_prediction$se.fit),
+    density_per_100m2 = density_per_m2 * 100,
+    density_lwr_per_100m2 = density_lwr_per_m2 * 100,
+    density_upr_per_100m2 = density_upr_per_m2 * 100
+  ) %>%
+  left_join(observed_density_summary, by = c("Type", "animal_stage")) %>%
+  mutate(
+    estimable = observed_count > 0,
+    density_per_m2 = if_else(estimable, density_per_m2, 0),
+    density_lwr_per_m2 = if_else(estimable, density_lwr_per_m2, NA_real_),
+    density_upr_per_m2 = if_else(estimable, density_upr_per_m2, NA_real_),
+    density_per_100m2 = if_else(estimable, density_per_100m2, 0),
+    density_lwr_per_100m2 = if_else(estimable, density_lwr_per_100m2, NA_real_),
+    density_upr_per_100m2 = if_else(estimable, density_upr_per_100m2, NA_real_)
+  ) %>%
+  arrange(Type, animal_stage)
+
+conch_density_plot <- ggplot(
+  conch_density_estimates,
+  aes(x = Type, y = density_per_100m2, fill = animal_stage)
+) +
+  geom_col(position = position_dodge(width = 0.75), color = "grey30", linewidth = 0.2) +
+  geom_errorbar(
+    aes(ymin = density_lwr_per_100m2, ymax = density_upr_per_100m2),
+    position = position_dodge(width = 0.75),
+    width = 0.2,
+    na.rm = TRUE
+  ) +
+  coord_flip() +
+  labs(
+    x = "Habitat type",
+    y = expression("Estimated conch density (animals per 100 " * m^2 * ")"),
+    fill = "Conch stage"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+conch_density_plot
+
+ggsave(
+  filename = output_density_model_plot,
+  plot = conch_density_plot,
+  width = 8,
+  height = 5,
+  dpi = 300
+)
+
+summary(conch_density_model)
+conch_density_estimates
+```
+
+## Zero-Inflated Density Model
+
+```{r conch-zero-inflated-density-model, fig.width=8, fig.height=5}
+conch_zinb_density_model <- pscl::zeroinfl(
+  n_animals ~ Type + animal_stage + offset(log(area_m2)) | 1,
+  data = conch_density_model_data,
+  dist = "negbin",
+  EM = TRUE
+)
+
+nb_expected_zero_prob <- dnbinom(
+  0,
+  mu = fitted(conch_density_model),
+  size = conch_density_model$theta
+)
+
+zinb_zero_prob <- predict(
+  conch_zinb_density_model,
+  type = "prob"
+)[, "0"]
+
+zero_inflation_assessment <- tibble(
+  model = c("negative binomial", "zero-inflated negative binomial"),
+  AIC = c(AIC(conch_density_model), AIC(conch_zinb_density_model)),
+  observed_zero_proportion = mean(conch_density_model_data$n_animals == 0),
+  expected_zero_proportion = c(
+    mean(nb_expected_zero_prob),
+    mean(zinb_zero_prob)
+  )
+) %>%
+  mutate(delta_AIC = AIC - min(AIC))
+
+zero_inflation_interpretation <- if (
+  zero_inflation_assessment$delta_AIC[zero_inflation_assessment$model == "zero-inflated negative binomial"] < -2
+) {
+  "The zero-inflated model is clearly favored by AIC."
+} else if (
+  abs(diff(zero_inflation_assessment$expected_zero_proportion)) < 0.05 &&
+    zero_inflation_assessment$delta_AIC[zero_inflation_assessment$model == "zero-inflated negative binomial"] > 0
+) {
+  "The negative-binomial model already matches the observed zero proportion well, and the zero-inflated model is not favored by AIC."
+} else {
+  "The zero-inflated model does not provide a clear improvement over the negative-binomial model."
+}
+
+zinb_density_prediction_grid <- density_prediction_grid
+
+zinb_density_prediction <- predict(
+  conch_zinb_density_model,
+  newdata = zinb_density_prediction_grid,
+  type = "response"
+)
+
+simulate_zinb_response <- function(model, newdata, n_sims = 5000, seed = 1) {
+  set.seed(seed)
+
+  coef_hat <- coef(model)
+  coef_vcov <- as.matrix(vcov(model))
+
+  finite_diag <- diag(coef_vcov)[is.finite(diag(coef_vcov)) & diag(coef_vcov) > 0]
+  fallback_var <- if (length(finite_diag) > 0) max(finite_diag) else 1
+  bad_diag <- !is.finite(diag(coef_vcov)) | diag(coef_vcov) <= 0
+
+  coef_vcov[!is.finite(coef_vcov)] <- 0
+  diag(coef_vcov)[bad_diag] <- fallback_var
+  coef_vcov <- coef_vcov + diag(1e-8, nrow(coef_vcov))
+
+  eig <- eigen((coef_vcov + t(coef_vcov)) / 2, symmetric = TRUE)
+  eig$values <- pmax(eig$values, 0)
+  coef_draws <- matrix(rnorm(n_sims * length(coef_hat)), nrow = n_sims) %*%
+    (eig$vectors %*% diag(sqrt(eig$values), nrow = length(eig$values))) +
+    matrix(coef_hat, nrow = n_sims, ncol = length(coef_hat), byrow = TRUE)
+  colnames(coef_draws) <- names(coef_hat)
+
+  count_coef_names <- grep("^count_", names(coef_hat), value = TRUE)
+  zero_coef_names <- grep("^zero_", names(coef_hat), value = TRUE)
+
+  x_count <- model.matrix(
+    ~ Type + animal_stage,
+    data = newdata
+  )
+  x_count <- x_count[, sub("^count_", "", count_coef_names), drop = FALSE]
+
+  x_zero <- matrix(1, nrow = nrow(newdata), ncol = length(zero_coef_names))
+  colnames(x_zero) <- sub("^zero_", "", zero_coef_names)
+
+  count_eta <- x_count %*% t(coef_draws[, count_coef_names, drop = FALSE]) +
+    log(newdata$area_m2)
+  zero_eta <- x_zero %*% t(coef_draws[, zero_coef_names, drop = FALSE])
+
+  count_mu <- exp(pmin(count_eta, 30))
+  zero_prob <- plogis(zero_eta)
+
+  response_draws <- (1 - zero_prob) * count_mu
+
+  tibble(
+    density_lwr_per_m2 = apply(response_draws, 1, quantile, probs = 0.025, na.rm = TRUE),
+    density_upr_per_m2 = apply(response_draws, 1, quantile, probs = 0.975, na.rm = TRUE)
+  )
+}
+
+zinb_density_intervals <- simulate_zinb_response(
+  conch_zinb_density_model,
+  zinb_density_prediction_grid
+)
+
+conch_zinb_density_estimates <- zinb_density_prediction_grid %>%
+  mutate(
+    density_per_m2 = as.numeric(zinb_density_prediction),
+    density_lwr_per_m2 = zinb_density_intervals$density_lwr_per_m2,
+    density_upr_per_m2 = zinb_density_intervals$density_upr_per_m2,
+    density_per_100m2 = density_per_m2 * 100,
+    density_lwr_per_100m2 = density_lwr_per_m2 * 100,
+    density_upr_per_100m2 = density_upr_per_m2 * 100
+  ) %>%
+  left_join(observed_density_summary, by = c("Type", "animal_stage")) %>%
+  mutate(estimable = observed_count > 0) %>%
+  arrange(Type, animal_stage)
+
+conch_zinb_density_plot <- ggplot(
+  conch_zinb_density_estimates,
+  aes(x = Type, y = density_per_100m2, fill = animal_stage)
+) +
+  geom_col(position = position_dodge(width = 0.75), color = "grey30", linewidth = 0.2) +
+  geom_errorbar(
+    aes(ymin = density_lwr_per_100m2, ymax = density_upr_per_100m2),
+    position = position_dodge(width = 0.75),
+    width = 0.2
+  ) +
+  coord_flip() +
+  labs(
+    x = "Habitat type",
+    y = expression("ZINB estimated conch density (animals per 100 " * m^2 * ")"),
+    fill = "Conch stage"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+conch_zinb_density_plot
+
+ggsave(
+  filename = output_zinb_density_model_plot,
+  plot = conch_zinb_density_plot,
+  width = 8,
+  height = 5,
+  dpi = 300
+)
+
+zero_inflation_assessment
+zero_inflation_interpretation
+summary(conch_zinb_density_model)
+conch_zinb_density_estimates
+```
+
+```{r cleanup, include=FALSE}
+sf_use_s2(old_s2)
+```

@@ -908,6 +908,11 @@ polygons_final <- st_transform(combined, crs = 4326)
 # Remove tiny polygons of Acropora cervicornis -- not really a habitat
 polygons_final <- polygons_final %>%
   filter(Type != "Acropora cervicornis")
+
+saveRDS(
+  polygons_final,
+  file = "data/processed/polygons_final.rds"
+)
 ```
 
 #### Assign survey sites to habitats

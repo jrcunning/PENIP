@@ -1,0 +1,392 @@
+﻿Site Code,# Juv,# Adult,ReproductiveActivity,Habitat Description
+001PEV04122024,3,0,0,reef rubble and sand
+002PEV04122024,1,4,0,sand
+003PEV04122024,1,10,0,sand
+004PEV04122024,3,8,0,reef rubble
+005PEV04122024,9,0,0,reef rubble/colonized pavement
+006PEV04122024,0,10,2,sand
+007PEV04122024,1,14,3,colonized pavement
+008PEV04122024,0,3,0,sand
+009PEV04122024,0,2,0,sand
+010PEV04122024,3,0,0,colonized pavement >90% macroalgae
+011PEV04122024,9,0,0,colonized pavement >90% macroalgae
+012PEV04122024,3,4,1,50-90% macroalgae
+013PEV04122024,5,6,1,50-90% macroalgae
+014PEV04122024,0,3,2,50-90% macroalgae
+015PEV04122024,2,6,0,50-90% macroalgae
+016PEV04132024,15,0,0,50-90% macroalgae
+017PEV04132024,6,0,0,colonized pavement with sand patches
+018PEV04132024,4,1,0,reef rubble/sand
+019PEV04132024,3,0,0,patchy macroalgae
+020PEV04132024,4,4,1,colonized pavement 70% macroalgae
+021PEV04132024,2,1,0,colonized pavement 70% macroalgae
+022PEV04132024,0,0,0,colonized pavement >90% macroalgae
+023PEV04132024,3,0,0,colonized pavement >90% macroalgae
+024PEV04132024,1,0,0,colonized pavement >90% macroalgae
+025PEV04132024,1,0,0,colonized pavement >50% macroalgae
+026PEV04132024,1,1,0,colonized pavement 20% macroalgae
+027PEV04132024,18,1,0,colonized pavement 20% macroalgae
+028PEV04132024,9,0,0,colonized pavement 20% macroalgae
+029PEV04142024,4,1,0,"hardbottom, mixed sand filled pockets, sparse live coral, macro"
+030PEV04142024,6,1,0,"hardbottom, mixed sand filled pockets, sparse live coral, macro"
+031PEV04142024,2,1,0,"majority sand, some hardbottom"
+032PEV04142024,3,0,0,"hardbottom, mixed sand filled pockets, sparse live coral, macro"
+033PEV04152024,0,1,0,"hardbottom, mixed sand filled pockets, sparse live coral, macro"
+034PEV04152024,5,0,0,"hardbottom, mixed sand filled pockets, sparse live coral, macro"
+035PEV04152024,1,0,0,"hardbottom, mixed sand filled pockets, sparse live coral, macro"
+036PEV04152024,0,0,0,"hardbottom, dense wavy algae, mixed sand filled pockets, sparse live coral, macro"
+037PEV04152024,0,0,0,"hardbottom, dense wavy algae, mixed sand filled pockets, sparse live coral, macro"
+038PEV04152024,0,0,0,"majority sand, some hardbottom"
+039PEV04152024,5,1,0,"hardbottom, dense wavy algae, mixed sand filled pockets, sparse live coral, macro"
+040PEV04152024,17,5,0,"hardbottom, mixed sand filled pockets, sparse live coral, lots of gorgs, macro"
+041PEV04152024,5,1,0,"hardbottom, dense wavy algae, mixed sand filled pockets, sparse live coral, macro"
+042PEV04162024,1,6,0,sand w/ 10-50% macroalgae
+043PEV04162024,8,18,2,sand w/ 10-50% macroalgae
+044PEV04162024,1,4,0,sand w/ 10-50% macroalgae
+045PEV04162024,2,0,0,no habitat
+046PEV04162024,2,0,0,no habitat
+047PEV04162024,6,0,0,no habitat
+048PEV04162024,6,0,0,hardbottom with sparse sargassum and sand pockets; some octocorals and sparse stonies
+049PEV04162024,0,0,0,coral encrusted low relief hardbottom
+050PEV04162024,0,0,0,sand dominated
+051PEV04162024,3,1,0,no habitat
+052PEV04162024,9,1,0,no habitat
+053PEV04162024,1,0,0,reefy
+054PEV04172024,0,0,0,rubble
+055PEV04172024,1,0,0,rubble
+056PEV04172024,2,3,0,rubble
+057PEV04172024,0,0,0,tall macroalgae
+058PEV04172024,0,0,0,"colonized pavement, macroalgae"
+059PEV04172024,1,0,0,"colonized pavement, macroalgae"
+060PEV04172024,0,12,1,"colonized pavement, rubble"
+061PEV04172024,1,8,0,coral rubble and sand
+062PEV04172024,4,2,0,rubble
+063PEV04172024,0,7,0,sand
+064PEV04172024,0,6,0,rubble
+065PEV04172024,3,0,0,"sandy bottom, small patchy (?)"
+066PEV04172024,7,0,0,"sandy rock, patchy coral"
+067PEV04172024,1,0,0,colonized pavement
+068PEV04172024,2,1,0,"hardbottom with sparse macroalgae and occasional hardcoral, less algae than elsewhere"
+069PEV04172024,1,1,0,"majority sand, some hardbottom"
+070PEV04172024,0,0,0,no habitat
+071PEV04172024,0,0,0,no habitat
+72PEV06302024,25,1,0,Rubble on top of hardbottom with algae; 5 hawkwing/1qc dead
+73PEV06302024,7,2,0,Rubble on top of hardbottom with algae; 1 dead hawkwing
+74PEV07102024,4,1,0,rubble
+75PEV07102024,0,5,0,"rubble, a quarter sand"
+76PEV07102024,0,15,0,rubble
+77PEV07102024,7,1,0,rubble
+78PEV07102024,3,28,0,rubble
+79PEV07102024,1,0,0,rubble
+80PEV07102024,1,1,0,rubble
+81PEV07102024,4,14,2,rubble and macroalgae; mating pair and simult eggs
+82PEV07102024,1,14,8,"rubble and sand; 6 copulating, 2 laying eggs"
+83PEV07102024,1,8,0,rubble and macroalgae
+84PEV07102024,23,0,0,"Hard bottom with macroalgae, sparse octocoral, and sand pockets filled with juveniles"
+85PEV07102024,0,11,1,"Hard bottom sparsly covered with macroalgae and transected with cables; copulation on transect, eggs off transect"
+86PEV07102024,6,0,0,"West: sand and hardbottom with macroalgae, with sparse octocoral, North: same but with more sand, East: same as North but deeper, South: same but less sand, more macroalgae and shallower"
+87PEV07102024,40,1,0,"Majority hard bottom with coral, macroalgae and sand occasionally (all directions); this adult contained a conch fish"
+88PEV07102024,4,0,0,"Majority hard bottom with coarse sand covering, far larger rubble, seemingly unnavigable by conch, and more wires than I've ever seen, also more than 20 and less than 40 lobsters"
+89PEV08262025,1,1,0,
+90PEV08262025,0,18,4,"2matingpairs,both eggin"
+91PEV08272025,2,0,0,ACER / bleached brains
+92PEV08272025,1,8,1,"eggs being laid, 3 other masses present"
+93PEV08272025,2,0,0,hundreds of ACER
+94PEV08272025,2,0,0,
+95PEV08272025,4,0,0,
+96PEV08272025,0,0,0,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,217,159,,
+,3.056338028,2.23943662,,
