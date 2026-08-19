@@ -39,8 +39,12 @@ conch_sheet <- "PENIP_Conch_10mRadial"
 drift_sheet <- "PENIP_DriftTransects"
 drift_position_sheet <- "PENIP_ConchDriftPosition"
 radial_counts_csv <- "data/conch/PENIP_circular_counts.csv"
+populated_conch_xlsx <- "data/conch/Populated_PENIP_QueenConchSurveys.xlsx"
 
 output_map <- "outputs/conch_point_habitat_map.png"
+output_fine_habitat_map <- "outputs/conch_fine_habitat_map.png"
+output_populated_habitat_points_map <- "outputs/conch_populated_habitat_points_map.png"
+output_populated_habitat_pies_map <- "outputs/conch_populated_habitat_pies_map.png"
 output_radial_abundance_points <- "outputs/conch_radial_abundance_points.png"
 output_radial_abundance_heatmap <- "outputs/conch_radial_abundance_heatmap.png"
 output_radial_mating_map <- "outputs/conch_radial_mating_map.png"
@@ -86,6 +90,236 @@ polygons_final <- polygons_final %>%
   st_zm(drop = TRUE, what = "ZM") %>%
   st_make_valid() %>%
   st_transform(4326)
+
+polygons_fine_final <- readRDS("data/processed/polygons_fine_final.rds") %>%
+  st_zm(drop = TRUE, what = "ZM") %>%
+  st_make_valid() %>%
+  st_transform(4326)
+```
+
+## Fine-Scale Habitat Map
+
+```{r fine-habitat-map, fig.width=10, fig.height=8}
+fine_type_levels <- sort(unique(polygons_fine_final$FineType))
+fine_type_cols <- setNames(
+  viridisLite::turbo(length(fine_type_levels)),
+  fine_type_levels
+)
+
+fine_habitat_map <- ggplot() +
+  geom_sf(
+    data = polygons_fine_final,
+    aes(fill = FineType),
+    color = "grey35",
+    linewidth = 0.04,
+    alpha = 0.8
+  ) +
+  scale_fill_manual(values = fine_type_cols, na.value = "grey80") +
+  coord_sf(
+    xlim = c(-80.1116, -80.077),
+    ylim = c(26.058, 26.112),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Longitude",
+    y = "Latitude",
+    fill = "Fine habitat"
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right",
+    legend.text = element_text(size = 7)
+  )
+
+fine_habitat_map
+
+ggsave(
+  filename = output_fine_habitat_map,
+  plot = fine_habitat_map,
+  width = 10,
+  height = 8,
+  dpi = 300
+)
+```
+
+## Populated Habitat Survey Maps
+
+```{r populated-habitat-survey-maps, fig.width=9, fig.height=7}
+populated_radial <- readxl::read_xlsx(populated_conch_xlsx, sheet = "10mRadial")
+
+populated_habitat_cols <- grep("% in 10 m radius", names(populated_radial), value = TRUE)
+
+populated_habitat_names <- populated_habitat_cols %>%
+  sub(" \\(% in 10 m radius\\)", "", .) %>%
+  sub("\\(% in 10 m radius\\)", "", .)
+names(populated_habitat_names) <- populated_habitat_cols
+
+populated_habitat_labels <- c(
+  Sand = "Sand",
+  ScatteredRock = "Scattered Rock",
+  OuterReef = "Outer Reef",
+  MiddleReef = "Middle Reef",
+  InnerReef = "Inner Reef",
+  NearshoreRidgeComplex = "Nearshore Ridge Complex",
+  Ridge = "Ridge",
+  AggregatedPatchReef = "Aggregated Patch Reef",
+  Artificial = "Artificial"
+)
+
+populated_habitat_cols_long <- populated_habitat_names
+populated_habitat_cols_long[] <- if_else(
+  populated_habitat_cols_long %in% names(populated_habitat_labels),
+  populated_habitat_labels[populated_habitat_cols_long],
+  populated_habitat_cols_long
+)
+
+populated_type_cols <- c(
+  "Sand" = "#f2e8c9",
+  "Scattered Rock" = "#bc80bd",
+  "Outer Reef" = "#fdb462",
+  "Middle Reef" = "#fb8072",
+  "Inner Reef" = "#bebada",
+  "Nearshore Ridge Complex" = "#80b1d3",
+  "Ridge" = "#b3de69",
+  "Aggregated Patch Reef" = "#8dd3c7",
+  "Artificial" = "#ffffb3"
+)
+
+populated_radial <- populated_radial %>%
+  mutate(
+    point_habitat = populated_habitat_labels[`Habitat (class at point)`],
+    point_habitat = if_else(
+      is.na(point_habitat),
+      `Habitat (class at point)`,
+      point_habitat
+    )
+  )
+
+populated_radial_sf <- populated_radial %>%
+  st_as_sf(coords = c("Lon", "Lat"), crs = 4326, remove = FALSE) %>%
+  st_transform(32617) %>%
+  mutate(
+    x = st_coordinates(.)[, "X"],
+    y = st_coordinates(.)[, "Y"]
+  )
+
+populated_map_limits <- st_bbox(
+  populated_radial_sf %>%
+    st_union() %>%
+    st_convex_hull() %>%
+    st_buffer(150)
+)
+
+populated_habitat_points_map <- ggplot() +
+  geom_sf(
+    data = st_transform(polygons_fine_final, 32617),
+    fill = "grey90",
+    color = "grey75",
+    linewidth = 0.04,
+    alpha = 0.45
+  ) +
+  geom_point(
+    data = populated_radial_sf %>% st_drop_geometry(),
+    aes(x = x, y = y, color = point_habitat),
+    size = 2.2,
+    alpha = 0.9
+  ) +
+  scale_color_manual(values = populated_type_cols, na.value = "grey30") +
+  coord_sf(
+    crs = st_crs(32617),
+    xlim = c(populated_map_limits["xmin"], populated_map_limits["xmax"]),
+    ylim = c(populated_map_limits["ymin"], populated_map_limits["ymax"]),
+    expand = FALSE
+  ) +
+  labs(x = "Easting (m)", y = "Northing (m)", color = "Point habitat") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+populated_habitat_points_map
+
+ggsave(
+  filename = output_populated_habitat_points_map,
+  plot = populated_habitat_points_map,
+  width = 9,
+  height = 7,
+  dpi = 300
+)
+
+populated_pie_data <- populated_radial_sf %>%
+  st_drop_geometry() %>%
+  select(`Site Code`, x, y, all_of(populated_habitat_cols)) %>%
+  pivot_longer(
+    cols = all_of(populated_habitat_cols),
+    names_to = "habitat_col",
+    values_to = "percent"
+  ) %>%
+  mutate(
+    habitat = populated_habitat_cols_long[habitat_col],
+    proportion = percent / 100
+  ) %>%
+  filter(!is.na(proportion), proportion > 0) %>%
+  group_by(`Site Code`) %>%
+  arrange(habitat, .by_group = TRUE) %>%
+  mutate(
+    start = 2 * pi * lag(cumsum(proportion), default = 0),
+    end = 2 * pi * cumsum(proportion),
+    pie_radius_m = 18
+  ) %>%
+  ungroup()
+
+populated_habitat_pies_map <- ggplot() +
+  geom_sf(
+    data = st_transform(polygons_fine_final, 32617),
+    fill = "grey90",
+    color = "grey75",
+    linewidth = 0.04,
+    alpha = 0.45
+  ) +
+  ggforce::geom_arc_bar(
+    data = populated_pie_data,
+    aes(
+      x0 = x,
+      y0 = y,
+      r0 = 0,
+      r = pie_radius_m,
+      start = start,
+      end = end,
+      fill = habitat
+    ),
+    color = "grey20",
+    linewidth = 0.08,
+    alpha = 0.95
+  ) +
+  scale_fill_manual(values = populated_type_cols, na.value = "grey80") +
+  coord_sf(
+    crs = st_crs(32617),
+    xlim = c(populated_map_limits["xmin"], populated_map_limits["xmax"]),
+    ylim = c(populated_map_limits["ymin"], populated_map_limits["ymax"]),
+    expand = FALSE
+  ) +
+  labs(x = "Easting (m)", y = "Northing (m)", fill = "10 m radius habitat") +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major = element_line(color = "grey85", linewidth = 0.2),
+    legend.position = "right"
+  )
+
+populated_habitat_pies_map
+
+ggsave(
+  filename = output_populated_habitat_pies_map,
+  plot = populated_habitat_pies_map,
+  width = 9,
+  height = 7,
+  dpi = 300
+)
+
+populated_radial %>%
+  count(point_habitat, sort = TRUE)
 ```
 
 # Radial survey Point Habitat Classification

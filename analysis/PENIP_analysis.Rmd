@@ -913,6 +913,15 @@ saveRDS(
   polygons_final,
   file = "data/processed/polygons_final.rds"
 )
+
+# Save a finer-scale habitat version using the KML Modifier field
+polygons_fine_final <- polygons_final %>%
+  mutate(FineType = if_else(is.na(Modifier) | Modifier == "", Type, Modifier))
+
+saveRDS(
+  polygons_fine_final,
+  file = "data/processed/polygons_fine_final.rds"
+)
 ```
 
 #### Assign survey sites to habitats
@@ -4172,4 +4181,3 @@ zonefig <- plot_grid(iz_plot_clean2, fill_legend2, ncol = 1, rel_heights = c(0.9
 zonefig
 ggsave(zonefig, filename = "outputs/zonefig.png", width = 110, height = 170, units = "mm", bg = "white")
 ```
-
