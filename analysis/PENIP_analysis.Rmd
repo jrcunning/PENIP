@@ -1923,8 +1923,8 @@ bbox_pad["ymax"] <- bbox_view["ymax"] + pad
 
 # 2) Download GSHHG high-resolution shapefiles (once) and read coast polygons
 #    (URL version may update; if it 404s, search "gshhg shapefile download")
-gshhg_url <- "https://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/latest/gshhg-shp-2.3.7.zip"
-td <- tempdir()
+gshhg_url <- "http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip"
+td <- "data/spatial"
 zipfile <- file.path(td, "gshhg.zip")
 if (!file.exists(zipfile)) utils::download.file(gshhg_url, zipfile, mode = "wb")
 unz_dir <- file.path(td, "gshhg")
@@ -2147,6 +2147,19 @@ iz_plot_clean <- p +
     size = 1.5
   ) +
   theme(plot.margin = margin(0,0,0,0))
+
+dir.create("outputs/combined_assets", recursive = TRUE, showWarnings = FALSE)
+saveRDS(p_final_with_inset, "outputs/combined_assets/coral_fig1_panel_a_ggplot.rds")
+saveRDS(iz_plot_clean, "outputs/combined_assets/coral_fig1_panel_c_ggplot.rds")
+ggsave(
+  "outputs/combined_assets/coral_fig1_panel_c.png",
+  iz_plot_clean,
+  width = 85,
+  height = 120,
+  units = "mm",
+  dpi = 300,
+  bg = "white"
+)
 
 # # Set y tick positions and labels manually
 # y_breaks <- c(26.06, 26.07, 26.08, 26.11)  # adjust to match your plot extent
