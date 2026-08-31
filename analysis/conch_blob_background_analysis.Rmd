@@ -80,8 +80,8 @@ kriging_nmin <- 1
 kriging_sensitivity_nmax <- c(8, 12, 20)
 kriging_sensitivity_maxdist_m <- c(250, 330, 500, 1000)
 kriging_sensitivity_nmin <- c(3, 5)
-kriging_selected_nmax <- 12
-kriging_selected_maxdist_m <- 330
+kriging_selected_nmax <- 8
+kriging_selected_maxdist_m <- 1000
 kriging_selected_nmin <- 3
 kriging_cv_cores <- 4
 breeding_activity_radius_m <- 330
@@ -94,6 +94,7 @@ output_data_collection_map <- "outputs/conch_data_collection_overview_map.png"
 output_idw_map <- "outputs/conch_idw_density_map.png"
 output_kriging_map <- "outputs/conch_kriging_density_map.png"
 output_kriging_loocv_plot <- "outputs/conch_kriging_loocv.png"
+output_kriging_impact_uncertainty_plot <- "outputs/conch_kriging_impact_uncertainty.png"
 output_kriging_sensitivity_plot <- "outputs/conch_kriging_sensitivity.png"
 output_kriging_selected_map <- "outputs/conch_kriging_selected_constrained_map.png"
 output_kriging_adult_parameter_maps <- "outputs/conch_kriging_adult_parameter_maps.png"
@@ -2809,18 +2810,30 @@ knitr::kable(
 ```
 
 ```{r kriging-prediction}
+kriging_best_adult_params <- kriging_loocv_best %>%
+  filter(age_class == "Adult")
+
+kriging_best_juvenile_params <- kriging_loocv_best %>%
+  filter(age_class == "Juvenile")
+
 adult_kriging_prediction <- predict_ordinary_kriging(
   idw_observations_sf_utm,
   idw_grid,
   "adult_density_m2",
-  "Adult"
+  "Adult",
+  nmax = kriging_best_adult_params$kriging_nmax[[1]],
+  maxdist = kriging_best_adult_params$kriging_maxdist_m[[1]],
+  nmin = kriging_best_adult_params$kriging_nmin[[1]]
 )
 
 juvenile_kriging_prediction <- predict_ordinary_kriging(
   idw_observations_sf_utm,
   idw_grid,
   "juvenile_density_m2",
-  "Juvenile"
+  "Juvenile",
+  nmax = kriging_best_juvenile_params$kriging_nmax[[1]],
+  maxdist = kriging_best_juvenile_params$kriging_maxdist_m[[1]],
+  nmin = kriging_best_juvenile_params$kriging_nmin[[1]]
 )
 
 kriging_prediction <- bind_rows(
@@ -2889,57 +2902,210 @@ kriging_habitat_zone_prediction_area <- st_intersection(
   kriging_habitat_prediction_area,
   impact_zones_utm %>% select(name, scenario)
 ) %>%
-  mutate(zone_area_m2 = as.numeric(st_area(geometry)))
+  mutate(
+    zone_area_m2 = as.numeric(st_area(geometry)),
+    kriging_variance_m2 = kriging_variance_per_ha / 10000^2,
+    total_variance = kriging_variance_m2 * zone_area_m2^2
+  )
+
+kriging_adult_breeding_activity_zone_totals <- st_intersection(
+  kriging_habitat_zone_prediction_area %>%
+    filter(age_class == "Adult") %>%
+    select(name, density_m2, kriging_variance_per_ha),
+  st_sf(geometry = breeding_activity_buffer_utm)
+) %>%
+  mutate(
+    breeding_zone_area_m2 = as.numeric(st_area(geometry)),
+    kriging_variance_m2 = kriging_variance_per_ha / 10000^2,
+    total_variance = kriging_variance_m2 * breeding_zone_area_m2^2
+  ) %>%
+  st_drop_geometry() %>%
+  group_by(name) %>%
+  summarize(
+    estimated_adults_near_breeding = sum(density_m2 * breeding_zone_area_m2, na.rm = TRUE),
+    estimate_se_adults_near_breeding = sqrt(sum(total_variance, na.rm = TRUE)),
+    lower_95_adults_near_breeding = pmax(estimated_adults_near_breeding - 1.96 * estimate_se_adults_near_breeding, 0),
+    upper_95_adults_near_breeding = estimated_adults_near_breeding + 1.96 * estimate_se_adults_near_breeding,
+    .groups = "drop"
+  )
 
 kriging_impact_zone_totals <- kriging_habitat_zone_prediction_area %>%
   st_drop_geometry() %>%
   group_by(name, age_class) %>%
   summarize(
     estimated_conch = sum(density_m2 * zone_area_m2, na.rm = TRUE),
+    estimate_se = sqrt(sum(total_variance, na.rm = TRUE)),
+    lower_95 = pmax(estimated_conch - 1.96 * estimate_se, 0),
+    upper_95 = estimated_conch + 1.96 * estimate_se,
     .groups = "drop"
   ) %>%
   pivot_wider(
     names_from = age_class,
-    values_from = estimated_conch,
+    values_from = c(estimated_conch, estimate_se, lower_95, upper_95),
     values_fill = 0
   ) %>%
+  left_join(kriging_adult_breeding_activity_zone_totals, by = "name") %>%
   right_join(tibble(name = impact_zone_order), by = "name") %>%
   mutate(
-    Adult = replace_na(Adult, 0),
-    Juvenile = replace_na(Juvenile, 0),
-    Total = Adult + Juvenile,
+    across(where(is.numeric), ~ replace_na(., 0)),
+    estimated_total = estimated_conch_Adult + estimated_conch_Juvenile,
+    total_se = sqrt(estimate_se_Adult^2 + estimate_se_Juvenile^2),
+    total_lower_95 = pmax(estimated_total - 1.96 * total_se, 0),
+    total_upper_95 = estimated_total + 1.96 * total_se,
     impact_area = impact_zone_labels[name],
     name = factor(name, levels = impact_zone_order)
   ) %>%
   arrange(name) %>%
-  select(impact_area, Adult, Juvenile, Total)
+  mutate(
+    cumulative_adults = cumsum(estimated_conch_Adult),
+    cumulative_juveniles = cumsum(estimated_conch_Juvenile),
+    cumulative_total = cumsum(estimated_total)
+  ) %>%
+  select(
+    impact_area,
+    estimated_conch_Adult,
+    estimate_se_Adult,
+    lower_95_Adult,
+    upper_95_Adult,
+    estimated_adults_near_breeding,
+    estimate_se_adults_near_breeding,
+    lower_95_adults_near_breeding,
+    upper_95_adults_near_breeding,
+    estimated_conch_Juvenile,
+    estimate_se_Juvenile,
+    lower_95_Juvenile,
+    upper_95_Juvenile,
+    estimated_total,
+    total_se,
+    total_lower_95,
+    total_upper_95,
+    cumulative_adults,
+    cumulative_juveniles,
+    cumulative_total
+  )
 
 kriging_impact_zone_totals_with_total <- bind_rows(
   kriging_impact_zone_totals,
   kriging_impact_zone_totals %>%
     summarize(
       impact_area = "Total",
-      Adult = sum(Adult, na.rm = TRUE),
-      Juvenile = sum(Juvenile, na.rm = TRUE),
-      Total = sum(Total, na.rm = TRUE)
+      estimated_conch_Adult = sum(estimated_conch_Adult, na.rm = TRUE),
+      estimate_se_Adult = sqrt(sum(estimate_se_Adult^2, na.rm = TRUE)),
+      lower_95_Adult = pmax(estimated_conch_Adult - 1.96 * estimate_se_Adult, 0),
+      upper_95_Adult = estimated_conch_Adult + 1.96 * estimate_se_Adult,
+      estimated_adults_near_breeding = sum(estimated_adults_near_breeding, na.rm = TRUE),
+      estimate_se_adults_near_breeding = sqrt(sum(estimate_se_adults_near_breeding^2, na.rm = TRUE)),
+      lower_95_adults_near_breeding = pmax(estimated_adults_near_breeding - 1.96 * estimate_se_adults_near_breeding, 0),
+      upper_95_adults_near_breeding = estimated_adults_near_breeding + 1.96 * estimate_se_adults_near_breeding,
+      estimated_conch_Juvenile = sum(estimated_conch_Juvenile, na.rm = TRUE),
+      estimate_se_Juvenile = sqrt(sum(estimate_se_Juvenile^2, na.rm = TRUE)),
+      lower_95_Juvenile = pmax(estimated_conch_Juvenile - 1.96 * estimate_se_Juvenile, 0),
+      upper_95_Juvenile = estimated_conch_Juvenile + 1.96 * estimate_se_Juvenile,
+      estimated_total = sum(estimated_total, na.rm = TRUE),
+      total_se = sqrt(sum(total_se^2, na.rm = TRUE)),
+      total_lower_95 = pmax(estimated_total - 1.96 * total_se, 0),
+      total_upper_95 = estimated_total + 1.96 * total_se,
+      cumulative_adults = sum(estimated_conch_Adult, na.rm = TRUE),
+      cumulative_juveniles = sum(estimated_conch_Juvenile, na.rm = TRUE),
+      cumulative_total = sum(estimated_total, na.rm = TRUE)
     )
 )
 
+format_interval <- function(estimate, lower, upper) {
+  paste0(
+    format(round(estimate), big.mark = ",", scientific = FALSE, trim = TRUE),
+    " (",
+    format(round(lower), big.mark = ",", scientific = FALSE, trim = TRUE),
+    "-",
+    format(round(upper), big.mark = ",", scientific = FALSE, trim = TRUE),
+    ")"
+  )
+}
+
 kriging_impact_zone_totals_display <- kriging_impact_zone_totals_with_total %>%
-  mutate(across(
-    where(is.numeric),
-    ~ format(round(.), big.mark = ",", scientific = FALSE, trim = TRUE)
-  )) %>%
-  rename(
+  transmute(
     `Impact area` = impact_area,
-    `Adult conch` = Adult,
-    `Juvenile conch` = Juvenile,
-    `Total conch` = Total
+    `Adult conch (approx. 95% CI)` = format_interval(estimated_conch_Adult, lower_95_Adult, upper_95_Adult),
+    `Adult conch within 330 m of breeding activity (approx. 95% CI)` = format_interval(
+      estimated_adults_near_breeding,
+      lower_95_adults_near_breeding,
+      upper_95_adults_near_breeding
+    ),
+    `Juvenile conch (approx. 95% CI)` = format_interval(estimated_conch_Juvenile, lower_95_Juvenile, upper_95_Juvenile),
+    `Total conch (approx. 95% CI)` = format_interval(estimated_total, total_lower_95, total_upper_95),
+    `Cumulative adult conch` = format(round(cumulative_adults), big.mark = ",", scientific = FALSE, trim = TRUE),
+    `Cumulative juvenile conch` = format(round(cumulative_juveniles), big.mark = ",", scientific = FALSE, trim = TRUE),
+    `Cumulative total conch` = format(round(cumulative_total), big.mark = ",", scientific = FALSE, trim = TRUE)
   )
 
 knitr::kable(
   kriging_impact_zone_totals_display,
-  caption = "Kriging-estimated total adult and juvenile conch in each impact zone. Estimates are based on local ordinary kriging over the same Inner Reef and Nearshore Ridge Complex habitat mask used for IDW, with Artificial habitat included in Nearshore Ridge Complex."
+  caption = "Recommended kriging-estimated adult and juvenile conch abundance by impact area. Estimates use the age-specific best leave-one-out cross-validation settings; values in parentheses are approximate 95% intervals propagated from cell-level kriging prediction variances. The Total row sums adults and juveniles across all listed impact and monitoring areas. Intervals do not include spatial covariance among cells."
+)
+```
+
+```{r kriging-impact-zone-uncertainty-plot, fig.width=9, fig.height=6}
+kriging_impact_zone_uncertainty_plot_data <- kriging_impact_zone_totals %>%
+  select(
+    impact_area,
+    estimated_conch_Adult,
+    lower_95_Adult,
+    upper_95_Adult,
+    estimated_conch_Juvenile,
+    lower_95_Juvenile,
+    upper_95_Juvenile
+  ) %>%
+  pivot_longer(
+    cols = -impact_area,
+    names_to = c(".value", "age_class"),
+    names_pattern = "(estimated_conch|lower_95|upper_95)_(.*)"
+  ) %>%
+  mutate(
+    impact_area = factor(impact_area, levels = rev(impact_zone_labels[impact_zone_order])),
+    age_class = factor(age_class, levels = c("Adult", "Juvenile"))
+  )
+
+kriging_impact_zone_uncertainty_plot <- ggplot(
+  kriging_impact_zone_uncertainty_plot_data,
+  aes(x = estimated_conch, y = impact_area, color = age_class)
+) +
+  geom_errorbarh(
+    aes(xmin = lower_95, xmax = upper_95),
+    height = 0.22,
+    position = position_dodge(width = 0.55),
+    linewidth = 0.5
+  ) +
+  geom_point(
+    position = position_dodge(width = 0.55),
+    size = 1.8
+  ) +
+  scale_x_continuous(labels = scales::comma) +
+  scale_color_manual(
+    values = c("Adult" = "#2C7BB6", "Juvenile" = "#D7191C"),
+    name = "Age class"
+  ) +
+  labs(
+    x = "Estimated conch abundance",
+    y = NULL,
+    title = "Recommended kriging abundance by impact area",
+    subtitle = "Horizontal bars show approximate 95% intervals from kriging prediction variance"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold")
+  )
+
+kriging_impact_zone_uncertainty_plot
+
+ggsave(
+  output_kriging_impact_uncertainty_plot,
+  kriging_impact_zone_uncertainty_plot,
+  width = 9,
+  height = 6,
+  dpi = 300,
+  bg = "white"
 )
 ```
 
@@ -2972,6 +3138,7 @@ kriging_map <- ggplot() +
       "50-100" = "#737373",
       ">100" = "#252525"
     ),
+    na.value = "#F6D55C",
     drop = FALSE,
     name = "Conch per ha"
   ) +
