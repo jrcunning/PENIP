@@ -3577,25 +3577,85 @@ ggsave(filename = "outputs/Fig5.png", width = 140, height = 120, units = "mm", d
 
 ### Equal-weighted estimates
 ```{r}
+format_count <- function(x) {
+  format(round(x), big.mark = ",", scientific = FALSE, trim = TRUE)
+}
+
+format_interval_count <- function(estimate, lower, upper) {
+  paste0(
+    format_count(estimate),
+    " (",
+    format_count(lower),
+    "-",
+    format_count(upper),
+    ")"
+  )
+}
+
+make_taxclass_zone_interval_table <- function(draw_totals) {
+  draw_totals <- draw_totals %>%
+    mutate(
+      taxon = as.character(taxon),
+      class = as.character(class),
+      name = as.character(name)
+    )
+
+  draw_totals_for_table <- bind_rows(
+    draw_totals,
+    draw_totals %>%
+      group_by(.draw, taxon, class) %>%
+      summarize(name = "Total", tot = sum(tot), .groups = "drop"),
+    draw_totals %>%
+      group_by(.draw, name) %>%
+      summarize(taxon = "Total", class = "-", tot = sum(tot), .groups = "drop"),
+    draw_totals %>%
+      group_by(.draw) %>%
+      summarize(taxon = "Total", class = "-", name = "Total", tot = sum(tot), .groups = "drop")
+  )
+
+  draw_totals_for_table %>%
+    mutate(
+      name = factor(name, levels = c(zone_levels, "Total")),
+      taxon = factor(taxon, levels = c(sort(unique(draw_totals$taxon)), "Total")),
+      class = factor(class, levels = c("<4cm", ">4cm", "-"))
+    ) %>%
+    group_by(taxon, class, name) %>%
+    summarize(
+      tot_estimate = mean(tot),
+      tot_lower_95 = quantile(tot, 0.025),
+      tot_upper_95 = quantile(tot, 0.975),
+      .groups = "drop"
+    ) %>%
+    mutate(tot = format_interval_count(tot_estimate, tot_lower_95, tot_upper_95)) %>%
+    arrange(taxon, class, name) %>%
+    select(taxon, class, name, tot) %>%
+    pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
+    mutate(
+      taxon = as.character(taxon),
+      class = as.character(class)
+    )
+}
+
 # TOTAL COLONIES IN EACH IMPACT ZONE
-densities_tot <- summary_equal_weighted_combined %>% filter(class != "All")
+densities_tot_draws <- draws_equal_weighted_combined %>% filter(class != "All")
 
 # Calculate total per taxclass per habitat Type and impact zone
-tot1 <- left_join(densities_tot, area_summary, by = "Type") %>%
-  mutate(tot = n_m2 * total_area_m2,
-         tot_lower = n_m2 * total_area_m2,
-         tot_upper = n_m2 * total_area_m2)
+tot1_draws <- left_join(densities_tot_draws, area_summary, by = "Type") %>%
+  mutate(tot = n_m2 * total_area_m2)
 
 # Calculate total per taxclass per impact zone (sum all habitat Types)
-tot2 <- tot1 %>%
-  group_by(taxon, class, name) %>%
-  summarize(tot = round(sum(tot))) %>%
+tot2_draws <- tot1_draws %>%
+  group_by(.draw, taxon, class, name) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
   arrange(name)
 
-tab2 <- tot2 %>% ungroup() %>%
-  pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
-  janitor::adorn_totals(where = c("row", "col")) %>%
-  mutate(across(where(is.numeric), scales::comma))
+tot2 <- tot2_draws %>%
+  group_by(taxon, class, name) %>%
+  mean_qi(tot, .width = 0.95) %>%
+  ungroup() %>%
+  mutate(tot = round(tot))
+
+tab2 <- make_taxclass_zone_interval_table(tot2_draws)
 
 tab2 %>%
   knitr::kable(caption = "Total number of colonies in each impact zone - surveys (years) equal-weighted")
@@ -3604,12 +3664,23 @@ write_csv(tab2, file = "outputs/TableA4.csv")
 
 
 # Calculate total ESA and non-ESA corals per impact zone
-tot3 <- tot2 %>%
+tot3_draws <- tot2_draws %>%
   mutate(ESA = case_when(!taxon %in% c("ACER", "ORBI") ~ "non-ESA",
                          TRUE ~ taxon)) %>%
-  group_by(name, ESA) %>%
+  group_by(.draw, name, ESA) %>%
   summarize(tot = sum(tot), .groups = "drop") %>%
-  pivot_wider(names_from = ESA, values_from = tot) %>%
+  pivot_wider(names_from = ESA, values_from = tot, values_fill = list(tot = 0)) %>%
+  mutate(Total = ACER + ORBI + `non-ESA`)
+
+tot3 <- tot3_draws %>%
+  group_by(name) %>%
+  summarize(
+    ACER = round(mean(ACER)),
+    ORBI = round(mean(ORBI)),
+    `non-ESA` = round(mean(`non-ESA`)),
+    Total = round(mean(Total)),
+    .groups = "drop"
+  ) %>%
   janitor::adorn_totals(where = "col") %>%
   mutate(cum_ACER = cumsum(ACER),
          cum_ORBI = cumsum(ORBI),
@@ -3621,6 +3692,56 @@ tot3 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
 
 write_csv(tot3, file = "outputs/Table2.csv")
+
+tot3_total_draws <- tot3_draws %>%
+  group_by(.draw) %>%
+  summarize(
+    name = "Total",
+    ACER = sum(ACER),
+    ORBI = sum(ORBI),
+    `non-ESA` = sum(`non-ESA`),
+    Total = sum(Total),
+    .groups = "drop"
+  )
+
+tot3_intervals <- bind_rows(tot3_draws, tot3_total_draws) %>%
+  mutate(name = factor(name, levels = c(zone_levels, "Total"))) %>%
+  arrange(name) %>%
+  group_by(name) %>%
+  summarize(
+    ACER_estimate = mean(ACER),
+    ACER_lower_95 = quantile(ACER, 0.025),
+    ACER_upper_95 = quantile(ACER, 0.975),
+    ORBI_estimate = mean(ORBI),
+    ORBI_lower_95 = quantile(ORBI, 0.025),
+    ORBI_upper_95 = quantile(ORBI, 0.975),
+    non_ESA_estimate = mean(`non-ESA`),
+    `non-ESA_lower_95` = quantile(`non-ESA`, 0.025),
+    `non-ESA_upper_95` = quantile(`non-ESA`, 0.975),
+    Total_estimate = mean(Total),
+    Total_lower_95 = quantile(Total, 0.025),
+    Total_upper_95 = quantile(Total, 0.975),
+    .groups = "drop"
+  ) %>%
+  rename(
+    ACER = ACER_estimate,
+    ORBI = ORBI_estimate,
+    `non-ESA` = non_ESA_estimate,
+    Total = Total_estimate
+  ) %>%
+  select(
+    name,
+    ACER, ACER_lower_95, ACER_upper_95,
+    ORBI, ORBI_lower_95, ORBI_upper_95,
+    `non-ESA`, `non-ESA_lower_95`, `non-ESA_upper_95`,
+    Total, Total_lower_95, Total_upper_95
+  ) %>%
+  mutate(name = as.character(name))
+
+tot3_intervals %>%
+  knitr::kable(caption = "Total coral colonies in all impact zones with 95% posterior intervals")
+
+write_csv(tot3_intervals, file = "outputs/Table2_coral_intervals.csv")
 ```
 
 
@@ -3856,25 +3977,26 @@ ggsave(filename = "outputs/FigA4.png", width = 180, height = 130, units = "mm", 
 
 ```{r}
 # TOTAL COLONIES IN EACH IMPACT ZONE
-densities_tot_2024 <- summary_drm24_combined %>% filter(class != "All")
+densities_tot_2024_draws <- draws_drm24_combined %>% filter(class != "All")
 
 
 # Calculate total per taxclass per habitat Type and impact zone
-tot1_2024 <- left_join(densities_tot_2024, area_summary, by = "Type") %>%
-  mutate(tot = n_m2 * total_area_m2,
-         tot_lower = n_m2 * total_area_m2,
-         tot_upper = n_m2 * total_area_m2)
+tot1_2024_draws <- left_join(densities_tot_2024_draws, area_summary, by = "Type") %>%
+  mutate(tot = n_m2 * total_area_m2)
 
 # Calculate total per taxclass per impact zone (sum all habitat Types)
-tot2_2024 <- tot1_2024 %>%
-  group_by(taxon, class, name) %>%
-  summarize(tot = round(sum(tot))) %>%
+tot2_2024_draws <- tot1_2024_draws %>%
+  group_by(.draw, taxon, class, name) %>%
+  summarize(tot = sum(tot), .groups = "drop") %>%
   arrange(name)
 
-tab2_2024 <- tot2_2024 %>% ungroup() %>%
-  pivot_wider(names_from = name, values_from = tot, names_sort = FALSE) %>%
-  janitor::adorn_totals(where = c("row", "col")) %>%
-  mutate(across(where(is.numeric), scales::comma))
+tot2_2024 <- tot2_2024_draws %>%
+  group_by(taxon, class, name) %>%
+  mean_qi(tot, .width = 0.95) %>%
+  ungroup() %>%
+  mutate(tot = round(tot))
+
+tab2_2024 <- make_taxclass_zone_interval_table(tot2_2024_draws)
 
 tab2_2024 %>%
   knitr::kable(caption = "Total number of colonies in each impact zone - 2024 estimates")
@@ -3884,18 +4006,41 @@ write_csv(tab2_2024, file = "outputs/TableA5.csv")
 
 ## SUM ESA and non-ESA corals
 # Calculate total ESA and non-ESA corals per impact zone
-tot3_2024 <- tot2_2024 %>%
+tot3_2024_draws <- tot2_2024_draws %>%
   mutate(ESA = case_when(!taxon %in% c("ACER", "ORBI") ~ "non-ESA",
                          TRUE ~ taxon)) %>%
-  group_by(name, ESA) %>%
+  group_by(.draw, name, ESA) %>%
   summarize(tot = sum(tot), .groups = "drop") %>%
-  pivot_wider(names_from = ESA, values_from = tot) %>%
-  janitor::adorn_totals(where = "col") %>%
+  pivot_wider(names_from = ESA, values_from = tot, values_fill = list(tot = 0)) %>%
+  mutate(Total = ACER + ORBI + `non-ESA`) %>%
+  mutate(name = factor(name, levels = zone_levels)) %>%
+  arrange(.draw, name) %>%
+  group_by(.draw) %>%
   mutate(cum_ACER = cumsum(ACER),
          cum_ORBI = cumsum(ORBI),
          cum_non_ESA = cumsum(`non-ESA`),
          cum_Total = cumsum(Total)) %>%
-  mutate(across(where(is.numeric), ~ format(round(.), big.mark = ","))) 
+  ungroup()
+
+tot3_2024 <- tot3_2024_draws %>%
+  select(.draw, name, ACER, ORBI, `non-ESA`, Total, cum_ACER, cum_ORBI, cum_non_ESA, cum_Total) %>%
+  pivot_longer(-c(.draw, name), names_to = "metric", values_to = "tot") %>%
+  group_by(name, metric) %>%
+  summarize(
+    tot_estimate = mean(tot),
+    tot_lower_95 = quantile(tot, 0.025),
+    tot_upper_95 = quantile(tot, 0.975),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    name = factor(name, levels = zone_levels),
+    metric = factor(metric, levels = c("ACER", "ORBI", "non-ESA", "Total", "cum_ACER", "cum_ORBI", "cum_non_ESA", "cum_Total")),
+    tot = format_interval_count(tot_estimate, tot_lower_95, tot_upper_95)
+  ) %>%
+  arrange(name, metric) %>%
+  select(name, metric, tot) %>%
+  pivot_wider(names_from = metric, values_from = tot) %>%
+  mutate(name = as.character(name))
 
 tot3_2024 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones, 2024 estimates")
