@@ -84,6 +84,7 @@ age_class_cols <- c("Juvenile" = "#2B8CBE", "Sub-adult" = "#31A354", "Adult" = "
 keys_comparison_location_levels <- c("Port Everglades", "Rest of Florida Keys")
 
 output_data_collection_map <- "outputs/conch_data_collection_overview_map.png"
+output_drift_observation_map <- "outputs/conch_drift_observation_locations_map.png"
 output_kriging_map <- "outputs/conch_kriging_density_map.png"
 output_kriging_loocv_plot <- "outputs/conch_kriging_loocv.png"
 output_port_length_lip_histograms <- "outputs/conch_port_everglades_length_lip_histograms.png"
@@ -169,14 +170,98 @@ polygons_utm <- polygons_final %>%
   st_transform(utm_crs) %>%
   st_make_valid()
 
-polygons_conch_habitat_utm <- polygons_utm %>%
+conch_habitat_bbox <- st_bbox(polygons_utm)
+sand_scattered_inshore_strip_height_m <- prediction_cellsize_m
+
+make_inner_reef_inshore_mask <- function(inner_reef_utm, mask_bbox, strip_height_m) {
+  y_breaks <- seq(mask_bbox[["ymin"]], mask_bbox[["ymax"]], by = strip_height_m)
+  if (tail(y_breaks, 1) < mask_bbox[["ymax"]]) {
+    y_breaks <- c(y_breaks, mask_bbox[["ymax"]])
+  }
+
+  inner_reef_boundary_xy <- inner_reef_utm %>%
+    st_segmentize(dfMaxLength = strip_height_m) %>%
+    st_boundary() %>%
+    st_coordinates() %>%
+    as_tibble()
+
+  strip_east_edges <- tibble(
+    strip_index = seq_len(length(y_breaks) - 1),
+    y_min = head(y_breaks, -1),
+    y_max = tail(y_breaks, -1)
+  ) %>%
+    mutate(east_x = map2_dbl(y_min, y_max, function(y_min_i, y_max_i) {
+      strip_points <- inner_reef_boundary_xy %>%
+        filter(Y >= y_min_i, Y < y_max_i)
+
+      if (nrow(strip_points) == 0) {
+        return(NA_real_)
+      }
+
+      max(strip_points$X, na.rm = TRUE)
+    }))
+
+  valid_strips <- which(is.finite(strip_east_edges$east_x))
+  if (length(valid_strips) == 0) {
+    stop("Could not build inshore Sand/Scattered Rock mask from Inner Reef polygons.", call. = FALSE)
+  }
+
+  run_id <- cumsum(c(TRUE, diff(valid_strips) != 1))
+  mask_polygons <- map(split(valid_strips, run_id), function(strip_rows) {
+    strip_run <- strip_east_edges[strip_rows, ]
+    east_edge_coords <- map(seq(nrow(strip_run), 1), function(j) {
+      rbind(
+        c(strip_run$east_x[[j]], strip_run$y_max[[j]]),
+        c(strip_run$east_x[[j]], strip_run$y_min[[j]])
+      )
+    }) %>%
+      do.call(rbind, .)
+
+    coords <- rbind(
+      c(mask_bbox[["xmin"]], strip_run$y_min[[1]]),
+      c(mask_bbox[["xmin"]], strip_run$y_max[[nrow(strip_run)]]),
+      east_edge_coords,
+      c(mask_bbox[["xmin"]], strip_run$y_min[[1]])
+    )
+
+    st_polygon(list(coords))
+  })
+
+  st_sfc(mask_polygons, crs = st_crs(inner_reef_utm)) %>%
+    st_make_valid() %>%
+    st_union() %>%
+    st_make_valid()
+}
+
+inner_reef_inshore_mask_utm <- make_inner_reef_inshore_mask(
+  polygons_utm %>%
+    filter(Type == "Inner Reef") %>%
+    st_union() %>%
+    st_make_valid(),
+  conch_habitat_bbox,
+  sand_scattered_inshore_strip_height_m
+)
+
+polygons_conch_habitat_base_utm <- polygons_utm %>%
   mutate(
     conch_habitat = case_when(
       Type %in% c("Artificial", "Nearshore Ridge Complex") ~ "Nearshore Ridge Complex",
       Type == "Inner Reef" ~ "Inner Reef",
       TRUE ~ NA_character_
     )
-  )
+  ) %>%
+  filter(!is.na(conch_habitat))
+
+sand_scattered_conch_habitat_utm <- polygons_utm %>%
+  filter(Type %in% c("Sand", "Scattered Rock in Unconsolidated Sediment")) %>%
+  st_intersection(inner_reef_inshore_mask_utm) %>%
+  mutate(conch_habitat = "Sand/Scattered Rock") %>%
+  filter(!st_is_empty(.))
+
+polygons_conch_habitat_utm <- bind_rows(
+  polygons_conch_habitat_base_utm,
+  sand_scattered_conch_habitat_utm
+)
 
 target_habitats_utm <- polygons_conch_habitat_utm %>%
   filter(!is.na(conch_habitat)) %>%
@@ -645,6 +730,87 @@ drift_observation_assignment_summary <- tibble(
 knitr::kable(drift_observation_assignment_summary, digits = 2)
 ```
 
+```{r drift-observation-locations-map, fig.width=7, fig.height=7}
+drift_observation_map_padding_m <- 150
+drift_observation_map_bbox <- st_bbox(c(
+  st_geometry(drift_transect_lines),
+  st_geometry(conch_drift_positions_sf_utm)
+))
+
+drift_observation_map_xlim <- drift_observation_map_bbox[c("xmin", "xmax")] +
+  c(-drift_observation_map_padding_m, drift_observation_map_padding_m)
+drift_observation_map_ylim <- drift_observation_map_bbox[c("ymin", "ymax")] +
+  c(-drift_observation_map_padding_m, drift_observation_map_padding_m)
+
+drift_observation_map_extent_utm <- st_as_sfc(st_bbox(
+  c(
+    xmin = drift_observation_map_xlim[[1]],
+    xmax = drift_observation_map_xlim[[2]],
+    ymin = drift_observation_map_ylim[[1]],
+    ymax = drift_observation_map_ylim[[2]]
+  ),
+  crs = st_crs(polygons_utm)
+))
+
+drift_observation_habitats_utm <- polygons_utm %>%
+  st_filter(drift_observation_map_extent_utm, .predicate = st_intersects)
+
+drift_observation_map <- ggplot() +
+  geom_sf(
+    data = drift_observation_habitats_utm,
+    aes(fill = Type),
+    color = "white",
+    linewidth = 0.05,
+    alpha = 0.55
+  ) +
+  geom_sf(
+    data = drift_transect_lines,
+    color = "white",
+    linewidth = 1.1,
+    alpha = 0.8
+  ) +
+  geom_sf(
+    data = drift_transect_lines,
+    color = "black",
+    linewidth = 0.35,
+    alpha = 0.9
+  ) +
+  geom_sf(
+    data = conch_drift_positions_sf_utm,
+    aes(color = animal_stage),
+    size = 2,
+    alpha = 0.45
+  ) +
+  scale_fill_manual(values = type_cols, na.value = "gray80", name = "Habitat") +
+  scale_color_manual(values = age_class_cols[c("Adult", "Juvenile")], name = "Observed conch") +
+  coord_sf(
+    crs = st_crs(utm_crs),
+    xlim = drift_observation_map_xlim,
+    ylim = drift_observation_map_ylim,
+    expand = FALSE,
+    datum = NA
+  ) +
+  theme_void(base_size = 11) +
+  theme(
+    legend.position = "right",
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA),
+    legend.title = element_text(size = 9),
+    legend.text = element_text(size = 8)
+  )
+
+drift_observation_map
+
+ggsave(
+  output_drift_observation_map,
+  drift_observation_map,
+  width = 7,
+  height = 7,
+  dpi = 300,
+  bg = "white"
+)
+```
+
 # Broad-Scale Survey Counts
 
 The Berry broad-scale survey counts are classified as adult = `Adult + Old` and juvenile/non-adult = `Juv + Sub + Young`. Each broad-scale site is treated as 240 m2 of surveyed area, from two 30 m transects surveyed 2 m on each side of the tape.
@@ -801,7 +967,7 @@ ggsave(output_data_collection_map, data_collection_map, width = 180, height = 90
 
 # Analysis Units and Prediction Grid
 
-The abundance model combines radial surveys, segmented drift transects, and broad-scale survey sites as observation units. Adult and juvenile densities are modeled separately. Prediction is limited to Inner Reef and Nearshore Ridge Complex habitat within the survey-effort map extent; Artificial habitat is included with Nearshore Ridge Complex.
+The abundance model combines radial surveys, segmented drift transects, and broad-scale survey sites as observation units. Adult and juvenile densities are modeled separately. Prediction is limited to Inner Reef, Nearshore Ridge Complex, and the inshore portion of Sand/Scattered Rock habitat within the survey-effort map extent; Artificial habitat is included with Nearshore Ridge Complex, and Sand/Scattered Rock is clipped strip-wise to the area west of the local eastern edge of the mapped Inner Reef polygons.
 
 ```{r conch-observations}
 conch_observations_sf_utm <- bind_rows(
@@ -1681,6 +1847,7 @@ kriging_map <- ggplot() +
     values = c(
       "Inner Reef" = type_cols[["Inner Reef"]],
       "Nearshore Ridge Complex" = type_cols[["Nearshore Ridge Complex"]],
+      "Sand/Scattered Rock" = type_cols[["Sand"]],
       "Within 330 m of breeding activity" = "#7B3294"
     ),
     name = "Map overlays"

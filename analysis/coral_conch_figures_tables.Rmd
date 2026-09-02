@@ -61,6 +61,7 @@ polygons_rds <- "data/processed/polygons_final.rds"
 impact_kml <- "data/spatial/Impact_zones_Scenario 2.kml"
 nmfs_kml <- "data/spatial/Scenario2_NMFSConsiderationAreas.kml"
 kj_eca_gpkg <- "data/spatial/KJ_Coral_Aquatic_Preserve.gpkg"
+gshhg_full_coast_shp <- "data/spatial/gshhg/GSHHS_shp/f/GSHHS_f_L1.shp"
 conch_xlsx <- "data/conch/PENIP_QueenConchSurveys.xlsx"
 berry_broad_xlsx <- "data/conch/Berry_Conch_per_site.xlsx"
 
@@ -98,18 +99,16 @@ dataset_labels <- c(
   "tt21" = "2021 - Tetra Tech Survey",
   "tt23" = "2023 - Tetra Tech Survey",
   "drm24" = "2024 - Shedd Survey",
-  "berry_conch" = "2012 - Barry et al.",
-  "penip_radial_conch" = "2024 Radial Survey",
-  "penip_drift_conch" = "2024 Drift Survey"
+  "berry_conch" = "2012 - Berry et al.",
+  "penip_radial_conch" = "2024 - Radial Survey",
+  "penip_drift_conch" = "2024 - Drift Survey"
 )
 
 output_combined_figure1 <- "outputs/Fig1_New.png"
 output_table1_new <- "outputs/Table1_New.csv"
 output_table2_new <- "outputs/Table2_New.csv"
+coral_table2_intervals_csv <- "outputs/Table2_coral_intervals.csv"
 conch_kriging_impact_zone_totals_rds <- "outputs/cache/conch_kriging_impact_zone_totals_with_total.rds"
-output_figure1_panel_a <- "outputs/coral_conch_figure1_panel_a.png"
-output_figure1_panel_b <- "outputs/coral_conch_figure1_panel_b.png"
-output_figure1_panel_c <- "outputs/coral_conch_figure1_panel_c.png"
 original_coral_figure1 <- "outputs/Fig1.png"
 original_coral_panel_c_png <- "outputs/combined_assets/coral_fig1_panel_c.png"
 original_coral_panel_c_crop <- "outputs/coral_fig1_panel_c_crop.png"
@@ -392,8 +391,17 @@ all_effort_panel_polygons <- crossing(dataset = factor(dataset_levels, levels = 
 # Figure 1
 
 ```{r figure-1, fig.width=4.72, fig.height=5.71}
+panel_a_bbox_ymin <- 25.60
+panel_a_bbox_ymax <- 26.30
+panel_a_original_bbox_ymax <- 26.50
+panel_a_original_rel_height <- 0.48
+panel_c_rel_height <- 0.52
+panel_a_rel_height <- panel_a_original_rel_height *
+  (panel_a_bbox_ymax - panel_a_bbox_ymin) /
+  (panel_a_original_bbox_ymax - panel_a_bbox_ymin)
+
 bbox_view <- st_bbox(
-  c(xmin = -80.4, ymin = 25.60, xmax = -79.72, ymax = 26.50),
+  c(xmin = -80.4, ymin = panel_a_bbox_ymin, xmax = -79.72, ymax = panel_a_bbox_ymax),
   crs = st_crs(4326)
 )
 
@@ -405,6 +413,25 @@ fl_bbox <- st_bbox(
 usa_states <- rnaturalearth::ne_states(country = "United States of America", returnclass = "sf")
 fl_outline <- usa_states %>% filter(name == "Florida")
 kj_eca <- st_read(kj_eca_gpkg, quiet = TRUE) %>% st_transform(4326)
+
+if (!file.exists(gshhg_full_coast_shp)) {
+  stop("Could not find ", gshhg_full_coast_shp, call. = FALSE)
+}
+
+panel_a_bbox_sfc <- st_as_sfc(bbox_view)
+panel_a_land_selected <- st_read(gshhg_full_coast_shp, quiet = TRUE) %>%
+  st_transform(4326) %>%
+  st_filter(panel_a_bbox_sfc, .predicate = st_intersects) %>%
+  st_make_valid()
+
+panel_a_land <- panel_a_land_selected %>%
+  suppressWarnings(st_intersection(panel_a_bbox_sfc)) %>%
+  st_collection_extract("POLYGON")
+
+panel_a_coastline <- panel_a_land_selected %>%
+  st_boundary() %>%
+  suppressWarnings(st_intersection(panel_a_bbox_sfc)) %>%
+  st_collection_extract("LINESTRING")
 
 ports <- tibble(
   name = c("Port Everglades", "Port of Miami"),
@@ -438,7 +465,8 @@ panel_a_inset <- ggplot() +
   )
 
 panel_a <- ggplot() +
-  geom_sf(data = fl_outline, fill = "grey90", color = "black", linewidth = 0.1) +
+  geom_sf(data = panel_a_land, fill = "grey90", color = NA) +
+  geom_sf(data = panel_a_coastline, color = "black", linewidth = 0.1) +
   geom_sf(data = kj_eca, fill = NA, color = "#4B6CB7", linewidth = 0.4) +
   geom_sf(data = study_box, fill = NA, color = "#D7301F", linewidth = 0.8) +
   geom_text_repel(
@@ -468,7 +496,7 @@ panel_a <- ggplot() +
   ) +
   theme_void() +
   theme(plot.margin = margin(0, 2, 2, 2)) +
-  inset_element(panel_a_inset, left = 0.05, bottom = 0.58, right = 0.5, top = 1.04, align_to = "panel")
+  inset_element(panel_a_inset, left = 0.64, bottom = 0.74, right = 0.99, top = 0.99, align_to = "panel")
 
 survey_map_theme <- theme_minimal(base_size = 7) +
   theme(
@@ -758,15 +786,15 @@ if (use_original_coral_panel_c_rds && file.exists(original_coral_panel_c_rds)) {
 
 panel_b_group_labels <- ggdraw() +
   draw_label("Coral surveys", x = 0.35, y = 0.68, angle = 90, size = 7) +
-  draw_line(x = c(0.82, 0.82), y = c(0.36, 0.98), size = 0.35) +
+  draw_line(x = c(0.99, 0.99), y = c(0.36, 0.98), size = 0.35) +
   draw_label("Conch surveys", x = 0.35, y = 0.17, angle = 90, size = 7) +
-  draw_line(x = c(0.82, 0.82), y = c(0.02, 0.31), size = 0.35)
+  draw_line(x = c(0.99, 0.99), y = c(0.02, 0.31), size = 0.35)
 
 panel_b_labeled <- plot_grid(
   panel_b_group_labels,
   panel_b,
   nrow = 1,
-  rel_widths = c(0.045, 0.955)
+  rel_widths = c(0.055, 0.945)
 )
 
 panel_b_labeled_shifted <- ggdraw() +
@@ -785,7 +813,7 @@ left_column <- plot_grid(
   labels = c("A", "C"),
   label_size = 11,
   hjust = 0,
-  rel_heights = c(0.48, 0.52)
+  rel_heights = c(panel_a_rel_height, panel_c_rel_height)
 )
 
 figure_1_no_legend <- plot_grid(
@@ -804,9 +832,16 @@ legend_items <- tibble(
   y = 1
 )
 
+legend_type_labels <- setNames(survey_effort_types, survey_effort_types)
+legend_type_labels[["Scattered Rock in Unconsolidated Sediment"]] <- "Scattered Rock in\nUnconsolidated Sediment"
+
 legend_plot <- ggplot(legend_items, aes(x, y, fill = Type)) +
   geom_tile(alpha = 0.5) +
-  scale_fill_manual(values = type_cols[survey_effort_types], na.value = "gray80") +
+  scale_fill_manual(
+    values = type_cols[survey_effort_types],
+    labels = legend_type_labels,
+    na.value = "gray80"
+  ) +
   guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
   theme_void(base_size = 7) +
   theme(
@@ -829,60 +864,6 @@ combined_figure_1 <- plot_grid(
 
 combined_figure_1
 
-panel_a_output <- plot_grid(
-  panel_a,
-  labels = "A",
-  label_size = 11,
-  hjust = 0
-)
-
-panel_b_output <- plot_grid(
-  panel_b_labeled_shifted,
-  fill_legend,
-  ncol = 1,
-  labels = c("B", ""),
-  label_size = 11,
-  hjust = 0,
-  rel_heights = c(0.9, 0.1)
-)
-
-panel_c_output <- plot_grid(
-  panel_c,
-  labels = "C",
-  label_size = 11,
-  hjust = 0
-)
-
-ggsave(
-  output_figure1_panel_a,
-  panel_a_output,
-  width = 65,
-  height = 95,
-  units = "mm",
-  dpi = 300,
-  bg = "white"
-)
-
-ggsave(
-  output_figure1_panel_b,
-  panel_b_output,
-  width = 125,
-  height = 145,
-  units = "mm",
-  dpi = 300,
-  bg = "white"
-)
-
-ggsave(
-  output_figure1_panel_c,
-  panel_c_output,
-  width = 65,
-  height = 95,
-  units = "mm",
-  dpi = 300,
-  bg = "white"
-)
-
 ggsave(
   output_combined_figure1,
   combined_figure_1,
@@ -901,8 +882,13 @@ table1_habitat_levels <- c(
   "Nearshore Ridge Complex",
   "Inner Reef",
   "Middle Reef",
-  "Outer Reef"
+  "Outer Reef",
+  "Sand/Scattered Rock"
 )
+
+point_habitat_tolerance_m <- 5
+drift_half_width_m <- 2
+drift_segment_length_m <- 20
 
 format_area_range <- function(x) {
   x <- x[is.finite(x)]
@@ -917,24 +903,46 @@ format_area_range <- function(x) {
   }
 }
 
-assign_point_habitat <- function(points_df, lon_col, lat_col) {
+recode_table1_habitat <- function(type) {
+  case_when(
+    type == "Artificial" ~ "Nearshore Ridge Complex",
+    type == "Aggregated Patch Reef" ~ "Outer Reef",
+    type %in% c("Sand", "Scattered Rock in Unconsolidated Sediment") ~ "Sand/Scattered Rock",
+    TRUE ~ as.character(type)
+  )
+}
+
+assign_point_habitat <- function(points_df, lon_col, lat_col, nearest_tolerance_m = point_habitat_tolerance_m) {
   points_sf <- points_df %>%
     filter(!is.na(.data[[lon_col]]), !is.na(.data[[lat_col]])) %>%
     st_as_sf(coords = c(lon_col, lat_col), crs = 4326, remove = FALSE)
 
   polygon_hits <- st_intersects(points_sf, polygons_final)
+  point_types <- map_chr(polygon_hits, function(i) {
+    if (length(i) == 0) NA_character_ else polygons_final$Type[[i[[1]]]]
+  })
+
+  unmatched <- which(is.na(point_types))
+  if (length(unmatched) > 0 && is.finite(nearest_tolerance_m) && nearest_tolerance_m > 0) {
+    unmatched_points_utm <- st_transform(points_sf[unmatched, ], utm_crs)
+    nearest_idx <- st_nearest_feature(unmatched_points_utm, polygons_utm)
+    nearest_dist_m <- as.numeric(st_distance(
+      unmatched_points_utm,
+      polygons_utm[nearest_idx, ],
+      by_element = TRUE
+    ))
+    close_enough <- nearest_dist_m <= nearest_tolerance_m
+    point_types[unmatched[close_enough]] <- polygons_utm$Type[nearest_idx[close_enough]]
+  }
 
   points_sf %>%
-    mutate(
-      Type = map_chr(polygon_hits, function(i) {
-        if (length(i) == 0) NA_character_ else polygons_final$Type[[i[[1]]]]
-      })
-    ) %>%
+    mutate(Type = point_types) %>%
     st_drop_geometry()
 }
 
 summarize_site_habitats <- function(site_types) {
   habitat_counts <- site_types %>%
+    mutate(Type = recode_table1_habitat(Type)) %>%
     distinct(site, Type) %>%
     filter(Type %in% table1_habitat_levels) %>%
     count(Type, name = "n") %>%
@@ -981,7 +989,7 @@ berry_site_types <- berry_broad_table %>%
 
 berry_table_row <- make_conch_table_row(
   dataset = "berry_conch",
-  dataset2 = "2012 / Barry et al.",
+  dataset2 = "2012 / Berry et al.",
   site_types = berry_site_types,
   area_per_site_m2 = berry_broad_table$survey_area_m2,
   total_n = sum(berry_broad_table$total_count, na.rm = TRUE)
@@ -1034,6 +1042,33 @@ make_table_transect_rectangle <- function(start_point, end_point, half_width_m =
   )))
 }
 
+make_table_segment_rectangles <- function(start_point, end_point, segment_length_m, half_width_m) {
+  direction <- end_point - start_point
+  transect_length <- sqrt(sum(direction^2))
+
+  if (transect_length == 0) return(tibble())
+
+  unit_direction <- direction / transect_length
+  segment_starts <- seq(0, transect_length, by = segment_length_m)
+  segment_ends <- pmin(segment_starts + segment_length_m, transect_length)
+  keep_segments <- segment_ends > segment_starts
+
+  tibble(
+    segment_index = seq_along(segment_starts)[keep_segments],
+    segment_start_m = segment_starts[keep_segments],
+    segment_end_m = segment_ends[keep_segments],
+    geometry = map2(
+      segment_start_m,
+      segment_end_m,
+      ~ make_table_transect_rectangle(
+        start_point + unit_direction * .x,
+        start_point + unit_direction * .y,
+        half_width_m = half_width_m
+      )
+    )
+  )
+}
+
 drift_surveys_table <- readxl::read_xlsx(conch_xlsx, sheet = "PENIP_DriftTransects") %>%
   mutate(
     site = paste(Line, Transect, sep = "_"),
@@ -1055,30 +1090,43 @@ drift_end_table <- drift_surveys_table %>%
 drift_start_xy <- st_coordinates(drift_start_table)
 drift_end_xy <- st_coordinates(drift_end_table)
 
-drift_area_per_site_m2 <- sqrt(rowSums((drift_end_xy - drift_start_xy)^2)) * 4
+drift_segment_table <- map_dfr(seq_len(nrow(drift_surveys_table)), function(i) {
+  make_table_segment_rectangles(
+    drift_start_xy[i, ],
+    drift_end_xy[i, ],
+    segment_length_m = drift_segment_length_m,
+    half_width_m = drift_half_width_m
+  ) %>%
+    mutate(
+      transect_site = drift_surveys_table$site[[i]],
+      segment_id = paste(transect_site, segment_index, sep = "_seg")
+    )
+})
 
-drift_rectangles_table <- st_sf(
-  drift_surveys_table %>% select(site),
-  geometry = st_sfc(
-    map2(
-      seq_len(nrow(drift_start_xy)),
-      seq_len(nrow(drift_end_xy)),
-      ~ make_table_transect_rectangle(drift_start_xy[.x, ], drift_end_xy[.y, ], half_width_m = 2)
-    ),
-    crs = utm_crs
-  )
+drift_segments_table <- st_as_sf(
+  drift_segment_table,
+  sf_column_name = "geometry",
+  crs = utm_crs
 ) %>%
-  mutate(survey_area_m2 = drift_area_per_site_m2)
+  select(site = segment_id, transect_site, segment_index, segment_start_m, segment_end_m) %>%
+  mutate(survey_area_m2 = as.numeric(st_area(geometry)))
 
-drift_site_types <- st_intersection(drift_rectangles_table, polygons_utm) %>%
-  mutate(habitat_overlap_m2 = as.numeric(st_area(geometry))) %>%
+drift_site_types <- st_intersection(drift_segments_table, polygons_utm) %>%
+  mutate(
+    Type = recode_table1_habitat(Type),
+    habitat_overlap_m2 = as.numeric(st_area(geometry))
+  ) %>%
   st_drop_geometry() %>%
   group_by(site, Type) %>%
   summarize(habitat_overlap_m2 = sum(habitat_overlap_m2, na.rm = TRUE), .groups = "drop") %>%
   group_by(site) %>%
   slice_max(habitat_overlap_m2, n = 1, with_ties = FALSE) %>%
   ungroup() %>%
-  select(site, Type)
+  select(site, Type) %>%
+  right_join(
+    drift_segments_table %>% st_drop_geometry() %>% distinct(site),
+    by = "site"
+  )
 
 drift_observation_count <- readxl::read_xlsx(conch_xlsx, sheet = "PENIP_ConchDriftPosition") %>%
   mutate(
@@ -1093,7 +1141,7 @@ drift_table_row <- make_conch_table_row(
   dataset = "penip_drift_conch",
   dataset2 = "2024 / Drift Survey",
   site_types = drift_site_types,
-  area_per_site_m2 = drift_area_per_site_m2,
+  area_per_site_m2 = drift_segments_table$survey_area_m2,
   total_n = drift_observation_count
 )
 
@@ -1103,7 +1151,10 @@ table1_new <- bind_rows(
   radial_table_row,
   drift_table_row
 ) %>%
-  mutate(across(all_of(c(table1_habitat_levels, "Total Sites", "total_area", "total_n")), as.numeric))
+  mutate(
+    across(all_of(table1_habitat_levels), ~ replace_na(as.numeric(.x), 0)),
+    across(all_of(c("Total Sites", "total_area", "total_n")), as.numeric)
+  )
 
 table1_total <- table1_new %>%
   summarize(
@@ -1115,7 +1166,16 @@ table1_total <- table1_new %>%
     dataset2 = "Total"
   )
 
-table1_new <- bind_rows(table1_new, table1_total)
+table1_new <- bind_rows(table1_new, table1_total) %>%
+  select(
+    dataset,
+    all_of(table1_habitat_levels),
+    `Total Sites`,
+    area_per_site,
+    total_area,
+    total_n,
+    dataset2
+  )
 
 write_csv(table1_new, output_table1_new)
 
@@ -1128,10 +1188,6 @@ table1_new %>%
 The combined Table 2 is streamlined relative to the coral-only table by removing the cumulative columns. This keeps the main table focused on estimated abundance within each impact area for the coral groups and conch age classes. If cumulative totals are needed, they are better handled as a companion appendix table.
 
 ```{r table-2-new}
-parse_count <- function(x) {
-  as.numeric(str_remove_all(as.character(x), ",|[[:space:]]"))
-}
-
 format_count <- function(x) {
   format(round(x), big.mark = ",", scientific = FALSE, trim = TRUE)
 }
@@ -1164,13 +1220,34 @@ coral_table2_area_labels <- c(
 
 table2_area_order <- unname(coral_table2_area_labels)
 
-table2_coral <- read_csv("outputs/Table2.csv", show_col_types = FALSE) %>%
+if (!file.exists(coral_table2_intervals_csv)) {
+  stop(
+    "Could not find ", coral_table2_intervals_csv,
+    ". Run analysis/PENIP_analysis.Rmd first to generate coral Table 2 intervals.",
+    call. = FALSE
+  )
+}
+
+table2_coral_intervals <- read_csv(coral_table2_intervals_csv, show_col_types = FALSE)
+
+table2_coral <- table2_coral_intervals %>%
+  filter(name != "Total") %>%
   transmute(
     `Impact area` = unname(coral_table2_area_labels[name]),
-    ACER = parse_count(ACER),
-    ORBI = parse_count(ORBI),
-    `Non-ESA corals` = parse_count(`non-ESA`),
-    `Total corals` = parse_count(Total)
+    ACER = format_interval_count(ACER, ACER_lower_95, ACER_upper_95),
+    ORBI = format_interval_count(ORBI, ORBI_lower_95, ORBI_upper_95),
+    `Non-ESA corals` = format_interval_count(`non-ESA`, `non-ESA_lower_95`, `non-ESA_upper_95`),
+    `Total corals` = format_interval_count(Total, Total_lower_95, Total_upper_95)
+  )
+
+table2_coral_total <- table2_coral_intervals %>%
+  filter(name == "Total") %>%
+  transmute(
+    `Impact area` = "Total",
+    ACER = format_interval_count(ACER, ACER_lower_95, ACER_upper_95),
+    ORBI = format_interval_count(ORBI, ORBI_lower_95, ORBI_upper_95),
+    `Non-ESA corals` = format_interval_count(`non-ESA`, `non-ESA_lower_95`, `non-ESA_upper_95`),
+    `Total corals` = format_interval_count(Total, Total_lower_95, Total_upper_95)
   )
 
 if (!file.exists(conch_kriging_impact_zone_totals_rds)) {
@@ -1200,41 +1277,27 @@ table2_conch <- readRDS(conch_kriging_impact_zone_totals_rds) %>%
     `Total conch` = format_interval_count(estimated_total, total_lower_95, total_upper_95)
   )
 
-table2_new_numeric <- full_join(table2_coral, table2_conch, by = "Impact area") %>%
-  mutate(`Impact area` = factor(`Impact area`, levels = table2_area_order)) %>%
-  arrange(`Impact area`)
-
-table2_total_row <- bind_cols(
-  tibble(`Impact area` = "Total"),
-  table2_coral %>%
-    summarize(
-      ACER = sum(ACER, na.rm = TRUE),
-      ORBI = sum(ORBI, na.rm = TRUE),
-      `Non-ESA corals` = sum(`Non-ESA corals`, na.rm = TRUE),
-      `Total corals` = sum(`Total corals`, na.rm = TRUE)
+table2_conch_total <- readRDS(conch_kriging_impact_zone_totals_rds) %>%
+  filter(impact_area == "Total") %>%
+  transmute(
+    `Impact area` = "Total",
+    `Adult conch` = format_interval_count(estimated_conch_Adult, lower_95_Adult, upper_95_Adult),
+    `Adult conch within 330 m of breeding activity` = format_interval_count(
+      estimated_adults_near_breeding,
+      lower_95_adults_near_breeding,
+      upper_95_adults_near_breeding
     ),
-  readRDS(conch_kriging_impact_zone_totals_rds) %>%
-    filter(impact_area == "Total") %>%
-    transmute(
-      `Adult conch` = format_interval_count(estimated_conch_Adult, lower_95_Adult, upper_95_Adult),
-      `Adult conch within 330 m of breeding activity` = format_interval_count(
-        estimated_adults_near_breeding,
-        lower_95_adults_near_breeding,
-        upper_95_adults_near_breeding
-      ),
-      `Juvenile conch` = format_interval_count(estimated_conch_Juvenile, lower_95_Juvenile, upper_95_Juvenile),
-      `Total conch` = format_interval_count(estimated_total, total_lower_95, total_upper_95)
-    )
-)
+    `Juvenile conch` = format_interval_count(estimated_conch_Juvenile, lower_95_Juvenile, upper_95_Juvenile),
+    `Total conch` = format_interval_count(estimated_total, total_lower_95, total_upper_95)
+  )
 
-table2_new <- table2_new_numeric %>%
+table2_new <- full_join(table2_coral, table2_conch, by = "Impact area") %>%
+  mutate(`Impact area` = factor(`Impact area`, levels = table2_area_order)) %>%
   mutate(
-    `Impact area` = as.character(`Impact area`),
-    across(c(ACER, ORBI, `Non-ESA corals`, `Total corals`), format_count)
+    `Impact area` = as.character(`Impact area`)
   ) %>%
   bind_rows(
-    table2_total_row %>%
-      mutate(across(c(ACER, ORBI, `Non-ESA corals`, `Total corals`), format_count))
+    full_join(table2_coral_total, table2_conch_total, by = "Impact area")
   )
 
 write_csv(table2_new, output_table2_new)
