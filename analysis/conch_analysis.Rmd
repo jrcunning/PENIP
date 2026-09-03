@@ -83,10 +83,10 @@ age_class_levels <- c("Juvenile", "Sub-adult", "Adult")
 age_class_cols <- c("Juvenile" = "#2B8CBE", "Sub-adult" = "#31A354", "Adult" = "#D95F0E")
 keys_comparison_location_levels <- c("Port Everglades", "Rest of Florida Keys")
 
-output_kriging_map <- "outputs/conch_kriging_density_map.png"
-output_kriging_loocv_plot <- "outputs/conch_kriging_loocv.png"
-output_port_length_lip_histograms <- "outputs/conch_port_everglades_length_lip_histograms.png"
-output_location_metric_distributions <- "outputs/conch_size_lip_distributions_by_location.png"
+output_kriging_map <- "outputs/Fig7.png"
+output_kriging_loocv_plot <- "outputs/FigA7.png"
+output_port_length_lip_histograms <- "outputs/FigA8.png"
+output_location_metric_distributions <- "outputs/Fig8.png"
 kriging_loocv_cache_rds <- "outputs/cache/conch_kriging_loocv_results.rds"
 
 survey_effort_xlim <- c(-80.1116, -80.078)

@@ -106,15 +106,16 @@ dataset_labels <- c(
   "penip_drift_conch" = "2024 - Drift Survey"
 )
 
-output_combined_figure1 <- "outputs/Fig1_New.png"
-output_table1_new <- "outputs/Table1_New.csv"
-output_table2_new <- "outputs/Table2_New.csv"
-coral_table2_intervals_csv <- "outputs/Table2_coral_intervals.csv"
+output_combined_figure1 <- "outputs/Fig1.png"
+output_table1 <- "outputs/Table1.csv"
+output_table2 <- "outputs/Table2.csv"
+coral_table1_csv <- "outputs/intermediate/coral_Table1.csv"
+coral_table2_intervals_csv <- "outputs/intermediate/coral_Table2_intervals.csv"
 conch_kriging_impact_zone_totals_rds <- "outputs/cache/conch_kriging_impact_zone_totals_with_total.rds"
-original_coral_figure1 <- "outputs/Fig1.png"
-original_coral_panel_c_png <- "outputs/combined_assets/coral_fig1_panel_c.png"
-original_coral_panel_c_crop <- "outputs/coral_fig1_panel_c_crop.png"
-original_coral_panel_c_rds <- "outputs/combined_assets/coral_fig1_panel_c_ggplot.rds"
+original_coral_figure1 <- "outputs/intermediate/coral_Fig1.png"
+original_coral_panel_c_png <- "outputs/intermediate/coral_fig1_panel_c.png"
+original_coral_panel_c_crop <- "outputs/intermediate/coral_fig1_panel_c_crop.png"
+original_coral_panel_c_rds <- "outputs/intermediate/coral_fig1_panel_c_ggplot.rds"
 use_original_coral_panel_c_rds <- FALSE
 panel_c_crop_rows <- 55:1310
 panel_c_crop_cols <- 1800:2585
@@ -764,7 +765,7 @@ if (use_original_coral_panel_c_rds && file.exists(original_coral_panel_c_rds)) {
     stop(
       "Could not find ", original_coral_panel_c_png, ", ", original_coral_panel_c_rds,
       ", or ", original_coral_figure1,
-      ". Knit PENIP_analysis.Rmd first or restore outputs/Fig1.png.",
+      ". Knit analysis/coral_analysis.Rmd first.",
       call. = FALSE
     )
   }
@@ -906,6 +907,17 @@ format_area_range <- function(x) {
   }
 }
 
+normalize_range_separator <- function(x) {
+  x <- as.character(x)
+  en_dash <- rawToChar(as.raw(c(0xe2, 0x80, 0x93)))
+  em_dash <- rawToChar(as.raw(c(0xe2, 0x80, 0x94)))
+  x <- gsub(en_dash, " - ", x, fixed = TRUE, useBytes = TRUE)
+  x <- gsub(em_dash, " - ", x, fixed = TRUE, useBytes = TRUE)
+  x <- gsub("<e2><80><93>", " - ", x, fixed = TRUE)
+  x <- gsub("<e2><80><94>", " - ", x, fixed = TRUE)
+  str_squish(x)
+}
+
 recode_table1_habitat <- function(type) {
   case_when(
     type == "Artificial" ~ "Nearshore Ridge Complex",
@@ -972,7 +984,16 @@ make_conch_table_row <- function(dataset, dataset2, site_types, area_per_site_m2
     )
 }
 
-table1_coral <- read_csv("outputs/Table1.csv", show_col_types = FALSE) %>%
+if (!file.exists(coral_table1_csv)) {
+  stop(
+    "Could not find ", coral_table1_csv,
+    ". Run analysis/coral_analysis.Rmd first to generate the coral Table 1 input.",
+    call. = FALSE
+  )
+}
+
+table1_coral <- read_csv(coral_table1_csv, show_col_types = FALSE) %>%
+  mutate(area_per_site = normalize_range_separator(area_per_site)) %>%
   filter(dataset != "Total")
 
 berry_broad_table <- readxl::read_xlsx(berry_broad_xlsx, sheet = 1) %>%
@@ -1180,7 +1201,7 @@ table1_new <- bind_rows(table1_new, table1_total) %>%
     dataset2
   )
 
-write_csv(table1_new, output_table1_new)
+write_csv(table1_new, output_table1)
 
 table1_new %>%
   knitr::kable()
@@ -1226,7 +1247,7 @@ table2_area_order <- unname(coral_table2_area_labels)
 if (!file.exists(coral_table2_intervals_csv)) {
   stop(
     "Could not find ", coral_table2_intervals_csv,
-    ". Run analysis/PENIP_analysis.Rmd first to generate coral Table 2 intervals.",
+    ". Run analysis/coral_analysis.Rmd first to generate coral Table 2 intervals.",
     call. = FALSE
   )
 }
@@ -1303,7 +1324,7 @@ table2_new <- full_join(table2_coral, table2_conch, by = "Impact area") %>%
     full_join(table2_coral_total, table2_conch_total, by = "Impact area")
   )
 
-write_csv(table2_new, output_table2_new)
+write_csv(table2_new, output_table2)
 
 table2_new %>%
   knitr::kable()
