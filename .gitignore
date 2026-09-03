@@ -1,0 +1,11 @@
+.DS_Store
+**/.DS_Store
+.Rproj.user
+outputs/cache/
+*_cache/
+*_files/
+/data/spatial/gshhg/
+/data/spatial/gshhg.zip
+/acer.csv
+/pev_acer_coordinates.csv
+/updated_conch_slides.pptx

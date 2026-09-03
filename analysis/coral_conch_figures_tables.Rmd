@@ -62,6 +62,8 @@ impact_kml <- "data/spatial/Impact_zones_Scenario 2.kml"
 nmfs_kml <- "data/spatial/Scenario2_NMFSConsiderationAreas.kml"
 kj_eca_gpkg <- "data/spatial/KJ_Coral_Aquatic_Preserve.gpkg"
 gshhg_full_coast_shp <- "data/spatial/gshhg/GSHHS_shp/f/GSHHS_f_L1.shp"
+gshhg_zip <- "data/spatial/gshhg.zip"
+gshhg_url <- "http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip"
 conch_xlsx <- "data/conch/PENIP_QueenConchSurveys.xlsx"
 berry_broad_xlsx <- "data/conch/Berry_Conch_per_site.xlsx"
 
@@ -415,7 +417,8 @@ fl_outline <- usa_states %>% filter(name == "Florida")
 kj_eca <- st_read(kj_eca_gpkg, quiet = TRUE) %>% st_transform(4326)
 
 if (!file.exists(gshhg_full_coast_shp)) {
-  stop("Could not find ", gshhg_full_coast_shp, call. = FALSE)
+  if (!file.exists(gshhg_zip)) utils::download.file(gshhg_url, gshhg_zip, mode = "wb")
+  unzip(gshhg_zip, exdir = dirname(dirname(dirname(gshhg_full_coast_shp))))
 }
 
 panel_a_bbox_sfc <- st_as_sfc(bbox_view)

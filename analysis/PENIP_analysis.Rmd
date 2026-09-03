@@ -1926,13 +1926,16 @@ bbox_pad["ymax"] <- bbox_view["ymax"] + pad
 gshhg_url <- "http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip"
 td <- "data/spatial"
 zipfile <- file.path(td, "gshhg.zip")
-if (!file.exists(zipfile)) utils::download.file(gshhg_url, zipfile, mode = "wb")
 unz_dir <- file.path(td, "gshhg")
-if (!dir.exists(unz_dir)) unzip(zipfile, exdir = unz_dir)
+gshhg_full_coast_shp <- file.path(unz_dir, "GSHHS_shp", "f", "GSHHS_f_L1.shp")
 
-# High-res coastline polygons (level 1 = coastlines; 'h' = high resolution)
-# Path inside the zip: GSHHS_shp/h/GSHHS_h_L1.shp
-gshhg_coast <- st_read(file.path(unz_dir, "GSHHS_shp", "f", "GSHHS_f_L1.shp"), quiet = TRUE) |>
+if (!file.exists(gshhg_full_coast_shp)) {
+  if (!file.exists(zipfile)) utils::download.file(gshhg_url, zipfile, mode = "wb")
+  unzip(zipfile, exdir = unz_dir)
+}
+
+# Full-resolution coastline polygons (level 1 = coastlines)
+gshhg_coast <- st_read(gshhg_full_coast_shp, quiet = TRUE) |>
   st_transform(4326)
 
 # 3) Crop to your SE Florida view and convert to outlines (boundaries)
