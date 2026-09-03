@@ -1,6 +1,7 @@
 .DS_Store
 **/.DS_Store
 .Rproj.user
+Rplots.pdf
 outputs/cache/
 *_cache/
 *_files/
@@ -9,3 +10,4 @@ outputs/cache/
 /acer.csv
 /pev_acer_coordinates.csv
 /updated_conch_slides.pptx
+archive/*
