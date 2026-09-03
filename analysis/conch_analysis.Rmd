@@ -83,8 +83,6 @@ age_class_levels <- c("Juvenile", "Sub-adult", "Adult")
 age_class_cols <- c("Juvenile" = "#2B8CBE", "Sub-adult" = "#31A354", "Adult" = "#D95F0E")
 keys_comparison_location_levels <- c("Port Everglades", "Rest of Florida Keys")
 
-output_data_collection_map <- "outputs/conch_data_collection_overview_map.png"
-output_drift_observation_map <- "outputs/conch_drift_observation_locations_map.png"
 output_kriging_map <- "outputs/conch_kriging_density_map.png"
 output_kriging_loocv_plot <- "outputs/conch_kriging_loocv.png"
 output_port_length_lip_histograms <- "outputs/conch_port_everglades_length_lip_histograms.png"
@@ -800,15 +798,6 @@ drift_observation_map <- ggplot() +
   )
 
 drift_observation_map
-
-ggsave(
-  output_drift_observation_map,
-  drift_observation_map,
-  width = 7,
-  height = 7,
-  dpi = 300,
-  bg = "white"
-)
 ```
 
 # Broad-Scale Survey Counts
@@ -961,8 +950,6 @@ data_collection_map <- ggplot() +
   survey_map_theme
 
 data_collection_map
-
-ggsave(output_data_collection_map, data_collection_map, width = 180, height = 90, units = "mm", dpi = 300, bg = "white")
 ```
 
 # Analysis Units and Prediction Grid

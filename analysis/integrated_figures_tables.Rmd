@@ -1257,7 +1257,7 @@ if (!file.exists(conch_kriging_impact_zone_totals_rds)) {
   dir.create(dirname(conch_kriging_impact_zone_totals_rds), recursive = TRUE, showWarnings = FALSE)
 
   conch_integrated_script <- tempfile(fileext = ".R")
-  knitr::purl("analysis/conch_integrated_analysis.Rmd", output = conch_integrated_script, quiet = TRUE)
+  knitr::purl("analysis/conch_analysis.Rmd", output = conch_integrated_script, quiet = TRUE)
   source(conch_integrated_script)
 
   saveRDS(
