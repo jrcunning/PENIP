@@ -53,7 +53,6 @@ library(xml2)
 conch_xlsx <- "data/conch/PENIP_QueenConchSurveys.xlsx"
 radial_counts_csv <- "data/conch/PENIP_circular_counts.csv"
 berry_broad_xlsx <- "data/conch/Berry_Conch_per_site.xlsx"
-roving_xlsx <- "data/conch/Roving Diver Survey Data Sept 2025.xlsx"
 port_everglades_workbook <- "data/conch/FLK_QueenConchSurveys_2023-2025_forNOAA.xlsx"
 polygons_rds <- "data/processed/polygons_final.rds"
 impact_kml <- "data/spatial/Impact_zones_Scenario 2.kml"
@@ -447,30 +446,7 @@ radial_breeding_activity_sites_sf_utm <- radial_abundance %>%
   st_transform(utm_crs) %>%
   select(breeding_activity_source, breeding_activity_type, geometry)
 
-roving_breeding_activity_sites_sf_utm <- readxl::read_xlsx(roving_xlsx, sheet = 1) %>%
-  mutate(
-    latitude = as.numeric(`Lat (dec deg)`),
-    longitude = as.numeric(`Long (dec deg)`),
-    comments_clean = str_squish(str_to_lower(replace_na(Comments, ""))),
-    eggs_observed = str_detect(comments_clean, "egg"),
-    mating_observed = str_detect(comments_clean, "mating|mate"),
-    breeding_activity_type = case_when(
-      eggs_observed & mating_observed ~ "Eggs and mating",
-      eggs_observed ~ "Eggs",
-      mating_observed ~ "Mating",
-      TRUE ~ NA_character_
-    ),
-    breeding_activity_source = "Roving diver survey"
-  ) %>%
-  filter(!is.na(latitude), !is.na(longitude), eggs_observed | mating_observed) %>%
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, remove = FALSE) %>%
-  st_transform(utm_crs) %>%
-  select(breeding_activity_source, breeding_activity_type, geometry)
-
-breeding_activity_sites_sf_utm <- bind_rows(
-  radial_breeding_activity_sites_sf_utm,
-  roving_breeding_activity_sites_sf_utm
-)
+breeding_activity_sites_sf_utm <- radial_breeding_activity_sites_sf_utm
 
 breeding_activity_summary <- breeding_activity_sites_sf_utm %>%
   st_drop_geometry() %>%
