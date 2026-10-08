@@ -1922,21 +1922,9 @@ bbox_pad["ymin"] <- bbox_view["ymin"] - pad
 bbox_pad["xmax"] <- bbox_view["xmax"] + pad
 bbox_pad["ymax"] <- bbox_view["ymax"] + pad
 
-# 2) Download GSHHG high-resolution shapefiles (once) and read coast polygons
-#    (URL version may update; if it 404s, search "gshhg shapefile download")
-gshhg_url <- "http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip"
-td <- "data/spatial"
-zipfile <- file.path(td, "gshhg.zip")
-unz_dir <- file.path(td, "gshhg")
-gshhg_full_coast_shp <- file.path(unz_dir, "GSHHS_shp", "f", "GSHHS_f_L1.shp")
-
-if (!file.exists(gshhg_full_coast_shp)) {
-  if (!file.exists(zipfile)) utils::download.file(gshhg_url, zipfile, mode = "wb")
-  unzip(zipfile, exdir = unz_dir)
-}
-
-# Full-resolution coastline polygons (level 1 = coastlines)
-gshhg_coast <- st_read(gshhg_full_coast_shp, quiet = TRUE) |>
+# 2) Read the bundled full-resolution regional coastline (GSHHG 2.3.7).
+# Source and crop bounds are documented in data/spatial/README.md.
+gshhg_coast <- st_read("data/spatial/SE_Florida_coast.gpkg", quiet = TRUE) |>
   st_transform(4326)
 
 # 3) Crop to your SE Florida view and convert to outlines (boundaries)
@@ -2002,7 +1990,7 @@ p_sef_map <- p_sef_gshhg +   # or p_sef_gshhg / p_sef_hi, etc.
     coord_sf(xlim = c(bbox_view["xmin"], bbox_view["xmax"]),
            ylim = c(bbox_view["ymin"], bbox_view["ymax"]),
            expand = FALSE) +
-  annotate("text", x = -80.05, y = 25.9, label = "Kristin Jacobs\nCoral Reef Ecosystem\nConservation Area",
+  annotate("text", x = -80.05, y = 25.9, label = "Kristin Jacobs\nCoral Aquatic Preserve",
            color = "#4B6CB7", hjust = 0, size = 2)
 
 #p_sef_map
