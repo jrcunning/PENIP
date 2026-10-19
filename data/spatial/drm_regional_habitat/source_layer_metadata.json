@@ -1,0 +1,1058 @@
+{
+  "currentVersion": 12,
+  "id": 0,
+  "name": "SE_FL_Benthic_Habitats_10Nov2015_PBunion",
+  "type": "Feature Layer",
+  "serviceItemId": "c3ee535700e4476c9e10b2c06df43a64",
+  "cacheMaxAge": 30,
+  "displayField": "Habitat",
+  "description": "&lt;p&gt;This shapefile is a combination of the most recent SE FL benthic habitat maps. The nearshore has been updated according to Walker and Klug 2014 (Hillsboro inlet to Fowey Rocks) and Cumming 2017 (Lake Worth inlet to Boynton inlet) combined with all previous mapping efforts. Cumming combined all hardbottom mapping from 2000 to present to obtain the total nearshore hardbottom extent. This habitat is variably exposed depending on temporal shifting sediment, beach nourishments, and large storm events. The Ecosystem regions were defiend in Walker 2012 and Walker and Gilliam 2013.The SE FL nearshore benthic habitats were mapped using the same combined technique approach as described in Walker, Riegl, and Dodge (2008). Polygons were created by outlining and defining the features at a 1:1,000 scale and minimum mapping unit of 0.1 ha within recent aerial photography and high resolution bathymetric survey data. Southeast Florida benthic habitat maps were produced by delineating seafloor features evident in multiple datasets including the GMR Aerial Surveys, Inc. dba Photo Scienceimagery collected for this purpose on March 8, 2013, 2008 Broward lidar, and 2009 NOAA bathymetry. This dataset built upon previous regional mapping efforts by Dr. Brian Walker at Nova Southeastern University. The habitats were classified according to established NOAA guidelines in coordination with the NOS Coral Mapping Program and use a similar classification scheme when possible.&lt;/p&gt;",
+  "copyrightText": "Thank you to Florida Department of Environmental Protection Southeast Office of\nCoastal and Aquatic Managed Areas, the U.S. Department of Commerce, National\nOceanic and Atmospheric Administration (NOAA) Coastal Services Center, and the\nSouth Florida Coral Reef Initiative for supporting this effort. Thanks to NOAA Office of\nCoast Survey, Broward County Natural Resources Planning and Management Division,\nand Coastal Planning and Engineering for supplying the LIDAR data.\nWe especially would like to thank Amanda Costaregni and Ian Rodericks of the Nova\nSoutheastern University Oceanographic Center (NSUOC) Geographic Information\nSystems and Spatial Ecology lab and Dr. David Gilliam and his NSUOC Coral Reef\nRestoration, Assessment & Monitoring Lab, for the many hours spent underwater to aid\nin the completion of data collection for this project, including Nicole D\u2019Antonio, Ariel\nHalperin, Chuck Walton, Kathryn Binder, Cody Bliss, Lystina Kabay, Mauricio Lopez\nPadierna, and Daniel Fahy. A final thank you to Captain Lance Robinson and Brian Buskirk for providing reliable\nvessels for our many field days. ",
+  "defaultVisibility": true,
+  "editingInfo": {
+    "lastEditDate": 1779993505404,
+    "schemaLastEditDate": 1775759207856,
+    "dataLastEditDate": 1775759207856
+  },
+  "relationships": [],
+  "isDataVersioned": false,
+  "hasContingentValuesDefinition": false,
+  "supportsAppend": true,
+  "supportsCalculate": true,
+  "supportsASyncCalculate": true,
+  "supportsTruncate": true,
+  "supportsAttachmentsByUploadId": true,
+  "supportsAttachmentsResizing": true,
+  "supportsRollbackOnFailureParameter": true,
+  "supportsStatistics": true,
+  "supportsExceedsLimitStatistics": true,
+  "supportsAdvancedQueries": true,
+  "supportsValidateSql": true,
+  "supportsCoordinatesQuantization": true,
+  "supportsLayerOverrides": true,
+  "supportsTilesAndBasicQueriesMode": true,
+  "supportsFieldDescriptionProperty": true,
+  "supportsQuantizationEditMode": true,
+  "supportsColumnStoreIndex": true,
+  "supportsApplyEditsWithGlobalIds": false,
+  "supportsMultiScaleGeometry": true,
+  "supportsReturningQueryGeometry": true,
+  "enableNullGeometry": false,
+  "hasGeometryProperties": true,
+  "geometryProperties": {
+    "shapeAreaFieldName": "Shape__Area",
+    "shapeLengthFieldName": "Shape__Length",
+    "units": "esriMeters"
+  },
+  "advancedQueryCapabilities": {
+    "supportsPagination": true,
+    "supportsPaginationOnAggregatedQueries": true,
+    "supportsQueryRelatedPagination": true,
+    "supportsQueryWithDistance": true,
+    "supportsOutDistance": true,
+    "supportsReturningQueryExtent": true,
+    "supportsStatistics": true,
+    "supportsOrderBy": true,
+    "supportsDistinct": true,
+    "supportsQueryWithResultType": true,
+    "supportsSqlExpression": true,
+    "supportsTimeRelation": true,
+    "supportsAdvancedQueryRelated": true,
+    "supportsCountDistinct": true,
+    "supportsPercentileStatistics": true,
+    "supportsApproxPercentileStatistics": true,
+    "supportsSpatialAggregationStatistics": true,
+    "supportsTrueCurve": true,
+    "supportedSpatialAggregationStatistics": [
+      "EnvelopeAggregate",
+      "CentroidAggregate",
+      "ConvexHullAggregate"
+    ],
+    "supportsLod": true,
+    "supportsQueryWithLodSR": false,
+    "supportedLodTypes": [
+      "geohash"
+    ],
+    "supportsReturningGeometryCentroid": true,
+    "supportsReturningGeometryEnvelope": true,
+    "supportsReturningGeometryProperties": true,
+    "supportsQueryWithDatumTransformation": true,
+    "supportsCurrentUserQueries": true,
+    "supportsHavingClause": true,
+    "supportsOutFieldSQLExpression": true,
+    "supportsMaxRecordCountFactor": true,
+    "supportsTopFeaturesQuery": true,
+    "supportsDisjointSpatialRel": true,
+    "supportsQueryWithCacheHint": true,
+    "supportedOperationsWithCacheHint": [
+      "query",
+      "queryTopFilter",
+      "queryAnalytics",
+      "queryAttachments",
+      "queryRelated",
+      "queryBins",
+      "queryPivot"
+    ],
+    "supportsQueryAnalytic": true,
+    "supportsQueryPivot": true,
+    "supportsQueryBins": true,
+    "supportsDefaultSR": true,
+    "supportsTranslations": false,
+    "supportsAggIds": true,
+    "supportsQueryWithCollation": true,
+    "supportsISODOW": true,
+    "supportsISOWeek": true,
+    "supportsFullTextSearch": true,
+    "fullTextSearchCapabilities": {
+      "supportsAccentSensitivity": true,
+      "supportsStopWords": true,
+      "supportsSearchOperator": true,
+      "supportsOperator": true
+    }
+  },
+  "advancedQueryAnalyticCapabilities": {
+    "supportsLinearRegression": true,
+    "supportsTrendlineRegression": true,
+    "supportsAsync": true,
+    "supportsPercentileAnalytic": true
+  },
+  "queryBinsCapabilities": {
+    "supportsAsync": true,
+    "supportsAutoIntervalBin": true,
+    "supportsFixedIntervalBin": true,
+    "supportsFixedBoundariesBin": true,
+    "supportsDateBin": true,
+    "supportsClassificationBin": true,
+    "supportsStackBy": true,
+    "supportsSplitBy": true,
+    "supportsFirstDayOfWeek": true,
+    "supportsSnapToData": true,
+    "supportsReturnFullIntervalBin": true,
+    "supportsReturnStackValueRange": true,
+    "supportsNormalization": true,
+    "supportedStatisticTypes": [
+      "COUNT",
+      "SUM",
+      "AVG",
+      "VAR",
+      "STDDEV",
+      "MIN",
+      "MAX",
+      "PERCENTILE_CONT",
+      "PERCENTILE_DISC",
+      "APPROX_PERCENTILE_CONT",
+      "APPROX_PERCENTILE_DISC",
+      "CentroidAggregate",
+      "EnvelopeAggregate",
+      "ConvexHullAggregate"
+    ],
+    "supportedNormalizationTypes": [
+      "boxCox",
+      "field",
+      "inverse",
+      "log",
+      "naturalLog",
+      "percentOfTotal",
+      "squareRoot"
+    ]
+  },
+  "supportedOperationsWithCollation": "query,addField,updateField",
+  "advancedEditingCapabilities": {
+    "supportedSqlFormatsInCalculate": [
+      "standard"
+    ],
+    "supportsAsyncApplyEdits": true,
+    "supportsReturnEditResults": true,
+    "supportsApplyEditsbyUploadID": true,
+    "supportedApplyEditsUploadIDFormats": "JSON,PBF",
+    "supportsTranslation": false,
+    "supportsMaxTranslations": 10
+  },
+  "infoInEstimates": [
+    "extent",
+    "count"
+  ],
+  "useStandardizedQueries": true,
+  "geometryType": "esriGeometryPolygon",
+  "minScale": 0,
+  "maxScale": 0,
+  "extent": {
+    "xmin": -8929076.08255247,
+    "ymin": 2945173.4584991937,
+    "xmax": -8903217.236269793,
+    "ymax": 3156631.7389225904,
+    "spatialReference": {
+      "wkid": 102100,
+      "latestWkid": 3857
+    }
+  },
+  "spatialReference": {
+    "wkid": 102100,
+    "latestWkid": 3857
+  },
+  "drawingInfo": {
+    "renderer": {
+      "type": "uniqueValue",
+      "field1": "Type2",
+      "uniqueValueGroups": [
+        {
+          "heading": "Type2",
+          "classes": [
+            {
+              "label": "Artificial Habitat",
+              "description": "Artificial Habitat",
+              "symbol": {
+                "type": "esriSFS",
+                "style": "esriSFSSolid",
+                "color": [
+                  168,
+                  0,
+                  0,
+                  255
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "style": "esriSLSNull",
+                  "color": [
+                    110,
+                    110,
+                    110,
+                    255
+                  ],
+                  "width": 0
+                }
+              },
+              "values": [
+                [
+                  "Artificial Habitat"
+                ]
+              ]
+            },
+            {
+              "label": "Coral Reef and Hard Bottom",
+              "description": "Coral Reef and Hard Bottom",
+              "symbol": {
+                "type": "esriSFS",
+                "style": "esriSFSSolid",
+                "color": [
+                  255,
+                  190,
+                  190,
+                  255
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "style": "esriSLSNull",
+                  "color": [
+                    110,
+                    110,
+                    110,
+                    255
+                  ],
+                  "width": 0
+                }
+              },
+              "values": [
+                [
+                  "Coral Reef and Hard Bottom"
+                ]
+              ]
+            },
+            {
+              "label": "Dredged/Excavated",
+              "description": "Dredged/Excavated",
+              "symbol": {
+                "type": "esriSFS",
+                "style": "esriSFSSolid",
+                "color": [
+                  178,
+                  178,
+                  178,
+                  255
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "style": "esriSLSNull",
+                  "color": [
+                    110,
+                    110,
+                    110,
+                    255
+                  ],
+                  "width": 0
+                }
+              },
+              "values": [
+                [
+                  "Dredged/Excavated"
+                ]
+              ]
+            },
+            {
+              "label": "Sand",
+              "description": "Sand",
+              "symbol": {
+                "type": "esriSFS",
+                "style": "esriSFSSolid",
+                "color": [
+                  255,
+                  235,
+                  190,
+                  255
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "style": "esriSLSNull",
+                  "color": [
+                    110,
+                    110,
+                    110,
+                    255
+                  ],
+                  "width": 0
+                }
+              },
+              "values": [
+                [
+                  "Sand"
+                ]
+              ]
+            },
+            {
+              "label": "Seagrass",
+              "description": "Seagrass",
+              "symbol": {
+                "type": "esriSFS",
+                "style": "esriSFSSolid",
+                "color": [
+                  56,
+                  168,
+                  0,
+                  255
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "style": "esriSLSNull",
+                  "color": [
+                    110,
+                    110,
+                    110,
+                    255
+                  ],
+                  "width": 0
+                }
+              },
+              "values": [
+                [
+                  "Seagrass"
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "uniqueValueInfos": [
+        {
+          "symbol": {
+            "type": "esriSFS",
+            "style": "esriSFSSolid",
+            "color": [
+              168,
+              0,
+              0,
+              255
+            ],
+            "outline": {
+              "type": "esriSLS",
+              "style": "esriSLSNull",
+              "color": [
+                110,
+                110,
+                110,
+                255
+              ],
+              "width": 0
+            }
+          },
+          "value": "Artificial Habitat",
+          "label": "Artificial Habitat"
+        },
+        {
+          "symbol": {
+            "type": "esriSFS",
+            "style": "esriSFSSolid",
+            "color": [
+              255,
+              190,
+              190,
+              255
+            ],
+            "outline": {
+              "type": "esriSLS",
+              "style": "esriSLSNull",
+              "color": [
+                110,
+                110,
+                110,
+                255
+              ],
+              "width": 0
+            }
+          },
+          "value": "Coral Reef and Hard Bottom",
+          "label": "Coral Reef and Hard Bottom"
+        },
+        {
+          "symbol": {
+            "type": "esriSFS",
+            "style": "esriSFSSolid",
+            "color": [
+              178,
+              178,
+              178,
+              255
+            ],
+            "outline": {
+              "type": "esriSLS",
+              "style": "esriSLSNull",
+              "color": [
+                110,
+                110,
+                110,
+                255
+              ],
+              "width": 0
+            }
+          },
+          "value": "Dredged/Excavated",
+          "label": "Dredged/Excavated"
+        },
+        {
+          "symbol": {
+            "type": "esriSFS",
+            "style": "esriSFSSolid",
+            "color": [
+              255,
+              235,
+              190,
+              255
+            ],
+            "outline": {
+              "type": "esriSLS",
+              "style": "esriSLSNull",
+              "color": [
+                110,
+                110,
+                110,
+                255
+              ],
+              "width": 0
+            }
+          },
+          "value": "Sand",
+          "label": "Sand"
+        },
+        {
+          "symbol": {
+            "type": "esriSFS",
+            "style": "esriSFSSolid",
+            "color": [
+              56,
+              168,
+              0,
+              255
+            ],
+            "outline": {
+              "type": "esriSLS",
+              "style": "esriSLSNull",
+              "color": [
+                110,
+                110,
+                110,
+                255
+              ],
+              "width": 0
+            }
+          },
+          "value": "Seagrass",
+          "label": "Seagrass"
+        }
+      ],
+      "fieldDelimiter": ",",
+      "authoringInfo": {
+        "colorRamp": {
+          "type": "multipart",
+          "colorRamps": [
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                244,
+                215,
+                252,
+                255
+              ],
+              "toColor": [
+                244,
+                215,
+                252,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                182,
+                252,
+                184,
+                255
+              ],
+              "toColor": [
+                182,
+                252,
+                184,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                252,
+                229,
+                194,
+                255
+              ],
+              "toColor": [
+                252,
+                229,
+                194,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                184,
+                248,
+                252,
+                255
+              ],
+              "toColor": [
+                184,
+                248,
+                252,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                252,
+                179,
+                180,
+                255
+              ],
+              "toColor": [
+                252,
+                179,
+                180,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                205,
+                179,
+                252,
+                255
+              ],
+              "toColor": [
+                205,
+                179,
+                252,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                179,
+                216,
+                252,
+                255
+              ],
+              "toColor": [
+                179,
+                216,
+                252,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                215,
+                252,
+                222,
+                255
+              ],
+              "toColor": [
+                215,
+                252,
+                222,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                252,
+                179,
+                244,
+                255
+              ],
+              "toColor": [
+                252,
+                179,
+                244,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                244,
+                252,
+                179,
+                255
+              ],
+              "toColor": [
+                244,
+                252,
+                179,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                252,
+                212,
+                212,
+                255
+              ],
+              "toColor": [
+                252,
+                212,
+                212,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                207,
+                199,
+                252,
+                255
+              ],
+              "toColor": [
+                207,
+                199,
+                252,
+                255
+              ]
+            },
+            {
+              "type": "algorithmic",
+              "algorithm": "esriCIELabAlgorithm",
+              "fromColor": [
+                252,
+                187,
+                220,
+                255
+              ],
+              "toColor": [
+                252,
+                187,
+                220,
+                255
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "scaleSymbols": true,
+    "transparency": 0,
+    "labelingInfo": null
+  },
+  "allowGeometryUpdates": true,
+  "trueCurveSupportMode": "OGC",
+  "supportedCurveTypes": [
+    "esriGeometryCircularArc"
+  ],
+  "supportedTrueCurvePbfFeatureEncodings": [
+    "esriCompressedShapeBuffer",
+    "esriDefault"
+  ],
+  "allowTrueCurvesUpdates": true,
+  "onlyAllowTrueCurveUpdatesByTrueCurveClients": false,
+  "hasAttachments": false,
+  "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+  "hasMetadata": true,
+  "hasM": false,
+  "hasZ": false,
+  "objectIdField": "FID",
+  "uniqueIdField": {
+    "name": "FID",
+    "isSystemMaintained": true
+  },
+  "globalIdField": "",
+  "typeIdField": "Type2",
+  "collation": {
+    "locale": "neutral",
+    "caseSensitive": false,
+    "accentSensitive": true
+  },
+  "fields": [
+    {
+      "name": "FID",
+      "type": "esriFieldTypeOID",
+      "alias": "FID",
+      "sqlType": "sqlTypeOther",
+      "nullable": false,
+      "editable": false,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "Habitat",
+      "type": "esriFieldTypeString",
+      "alias": "Habitat",
+      "sqlType": "sqlTypeOther",
+      "length": 50,
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "Modifier",
+      "type": "esriFieldTypeString",
+      "alias": "Modifier",
+      "sqlType": "sqlTypeOther",
+      "length": 50,
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "Region",
+      "type": "esriFieldTypeString",
+      "alias": "Region",
+      "sqlType": "sqlTypeOther",
+      "length": 50,
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "Type",
+      "type": "esriFieldTypeString",
+      "alias": "Type",
+      "sqlType": "sqlTypeOther",
+      "length": 50,
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "AREA_M",
+      "type": "esriFieldTypeDouble",
+      "alias": "AREA_M",
+      "sqlType": "sqlTypeOther",
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "AREA_KM",
+      "type": "esriFieldTypeDouble",
+      "alias": "AREA_KM",
+      "sqlType": "sqlTypeOther",
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "COUNT_",
+      "type": "esriFieldTypeDouble",
+      "alias": "COUNT",
+      "sqlType": "sqlTypeOther",
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "County",
+      "type": "esriFieldTypeString",
+      "alias": "County",
+      "sqlType": "sqlTypeOther",
+      "length": 25,
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "Type2",
+      "type": "esriFieldTypeString",
+      "alias": "Type2",
+      "sqlType": "sqlTypeOther",
+      "length": 50,
+      "nullable": true,
+      "editable": true,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "Shape__Area",
+      "type": "esriFieldTypeDouble",
+      "alias": "Shape__Area",
+      "sqlType": "sqlTypeDouble",
+      "nullable": true,
+      "editable": false,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "Shape__Length",
+      "type": "esriFieldTypeDouble",
+      "alias": "Shape__Length",
+      "sqlType": "sqlTypeDouble",
+      "nullable": true,
+      "editable": false,
+      "domain": null,
+      "defaultValue": null
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PK__SE_FLORI__C1BEA5A21184311B",
+      "fields": "FID",
+      "isAscending": true,
+      "isUnique": true,
+      "description": "",
+      "indexType": "Attribute"
+    },
+    {
+      "name": "user_16358.SE_FLORIDA_BENTHIC_HABITATS_SE_FL_BENTHIC_HABITATS_10NOV2015_PBUNION_Shape_sidx",
+      "fields": "Shape",
+      "isAscending": true,
+      "isUnique": false,
+      "description": "",
+      "indexType": "Spatial"
+    },
+    {
+      "name": "Shape__Area_Index",
+      "fields": "Shape__Area",
+      "isAscending": true,
+      "isUnique": false,
+      "description": "",
+      "indexType": "Attribute"
+    },
+    {
+      "name": "Shape__Length_Index",
+      "fields": "Shape__Length",
+      "isAscending": true,
+      "isUnique": false,
+      "description": "",
+      "indexType": "Attribute"
+    }
+  ],
+  "dateFieldsTimeReference": {
+    "timeZone": "UTC",
+    "timeZoneIANA": "Etc/UTC",
+    "respectsDaylightSaving": false
+  },
+  "preferredTimeReference": null,
+  "types": [
+    {
+      "id": "Artificial Habitat",
+      "name": "Artificial Habitat",
+      "domains": {},
+      "templates": [
+        {
+          "name": "Artificial Habitat",
+          "description": "",
+          "drawingTool": "esriFeatureEditToolPolygon",
+          "prototype": {
+            "attributes": {
+              "County": null,
+              "Type2": "Artificial Habitat",
+              "Habitat": null,
+              "Modifier": null,
+              "Region": null,
+              "Type": null,
+              "AREA_M": null,
+              "AREA_KM": null,
+              "COUNT_": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "Coral Reef and Hard Bottom",
+      "name": "Coral Reef and Hard Bottom",
+      "domains": {},
+      "templates": [
+        {
+          "name": "Coral Reef and Hard Bottom",
+          "description": "",
+          "drawingTool": "esriFeatureEditToolPolygon",
+          "prototype": {
+            "attributes": {
+              "County": null,
+              "Type2": "Coral Reef and Hard Bottom",
+              "Habitat": null,
+              "Modifier": null,
+              "Region": null,
+              "Type": null,
+              "AREA_M": null,
+              "AREA_KM": null,
+              "COUNT_": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "Dredged/Excavated",
+      "name": "Dredged/Excavated",
+      "domains": {},
+      "templates": [
+        {
+          "name": "Dredged/Excavated",
+          "description": "",
+          "drawingTool": "esriFeatureEditToolPolygon",
+          "prototype": {
+            "attributes": {
+              "County": null,
+              "Type2": "Dredged/Excavated",
+              "Habitat": null,
+              "Modifier": null,
+              "Region": null,
+              "Type": null,
+              "AREA_M": null,
+              "AREA_KM": null,
+              "COUNT_": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "Sand",
+      "name": "Sand",
+      "domains": {},
+      "templates": [
+        {
+          "name": "Sand",
+          "description": "",
+          "drawingTool": "esriFeatureEditToolPolygon",
+          "prototype": {
+            "attributes": {
+              "County": null,
+              "Type2": "Sand",
+              "Habitat": null,
+              "Modifier": null,
+              "Region": null,
+              "Type": null,
+              "AREA_M": null,
+              "AREA_KM": null,
+              "COUNT_": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "Seagrass",
+      "name": "Seagrass",
+      "domains": {},
+      "templates": [
+        {
+          "name": "Seagrass",
+          "description": "",
+          "drawingTool": "esriFeatureEditToolPolygon",
+          "prototype": {
+            "attributes": {
+              "County": null,
+              "Type2": "Seagrass",
+              "Habitat": null,
+              "Modifier": null,
+              "Region": null,
+              "Type": null,
+              "AREA_M": null,
+              "AREA_KM": null,
+              "COUNT_": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "templates": [],
+  "supportedQueryFormats": "JSON, geoJSON, PBF",
+  "supportedAppendFormats": "sqlite,geoPackage,shapefile,filegdb,featureCollection,geojson,csv,excel,jsonl,featureService,pbf",
+  "supportedAppendSourceFilterFormats": "sqlite,geoPackage,shapefile,filegdb,featureService",
+  "supportedExportFormats": "csv,shapefile,sqlite,geoPackage,filegdb,featureCollection,geojson,kml,excel,parquet",
+  "supportedConvertFileFormats": "JSON,PBF,Parquet",
+  "supportedConvertContentFormats": "LayerEditCollection,FeatureCollection",
+  "supportedSpatialRelationships": [
+    "esriSpatialRelIntersects",
+    "esriSpatialRelContains",
+    "esriSpatialRelCrosses",
+    "esriSpatialRelEnvelopeIntersects",
+    "esriSpatialRelIndexIntersects",
+    "esriSpatialRelOverlaps",
+    "esriSpatialRelTouches",
+    "esriSpatialRelWithin",
+    "esriSpatialRelDisjoint",
+    "esriSpatialRelRelation"
+  ],
+  "guidFormat": "",
+  "supportsContingentValues": true,
+  "supportsEditingContingentValues": true,
+  "supportedContingentValuesFormats": "JSON, PBF",
+  "supportsFieldGroups": true,
+  "supportedSyncDataOptions": 260,
+  "hasStaticData": false,
+  "maxRecordCount": 2000,
+  "standardMaxRecordCount": 2000,
+  "maxIdsCount": 1000000,
+  "standardMaxRecordCountNoGeometry": 32000,
+  "tileMaxRecordCount": 4000,
+  "maxRecordCountFactor": 1,
+  "capabilities": "Query"
+}

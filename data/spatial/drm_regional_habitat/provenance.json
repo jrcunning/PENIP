@@ -1,0 +1,7 @@
+{
+  "source_layer": "SE_FL_Benthic_Habitats_10Nov2015_PBunion",
+  "source_url": "https://services1.arcgis.com/nRHtyn3uE1kyzoYc/arcgis/rest/services/SE_Florida_Benthic_Habitats/FeatureServer/0",
+  "retrieved": "2026-10-19",
+  "scope": "93 complete source polygons intersecting the 179 Southeast Florida 2024 DRM site coordinates; not the entire regional map",
+  "sha256": "dabc5c7fb3852f3c871633382916006f043f45535d5107e9178906d89a52468a"
+}

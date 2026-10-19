@@ -1,0 +1,7 @@
+input,path,md5
+regional_counts,/Users/rcunning/Projects/PENIP/data/full_drm_2024/2024.RData,a32a97bd5ba7124512f431e58c0197db
+pev_model,/Users/rcunning/Projects/PENIP/data/processed/mod_nb3.7.rds,98b6f6a8b0f496ac395206ec6443d2db
+pev_counts,/Users/rcunning/Projects/PENIP/data/processed/all_coral_counts_processed.csv,50301d6f886d209245b9dc6922c95ed0
+pev_metadata,/Users/rcunning/Projects/PENIP/data/2024_shedd_drm/site_metadata.xlsx,c0a46ee722dada192ef99b1382af5fde
+polygons,/Users/rcunning/Projects/PENIP/data/spatial/drm_regional_habitat/habitat_polygons.geojson,c3b8943b2abdcd968f315530c1a451f6
+snapshot_coordinates,/Users/rcunning/Projects/PENIP/data/spatial/drm_regional_habitat/snapshot_site_coordinates.csv,74c227c772537040d28745bcdb3b6361

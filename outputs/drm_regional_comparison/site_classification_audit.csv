@@ -1,0 +1,180 @@
+site,latitude,longitude,subregion,drm_habitat,source_types,source_modifiers,n_reef_types,Type,is_pev,exclusion
+1019,27.018134,-80.069349,Martin,RGDP,Ridge,Ridge-Deep,0,NA,FALSE,Mapped category outside the four reef strata
+1020,27.013291,-80.068585,Martin,RGDP,Ridge,Ridge-Deep,0,NA,FALSE,Mapped category outside the four reef strata
+1063,26.615969,-80.023223,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+1064,26.614995,-80.023759,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+1065,26.607414,-80.023453,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+1066,26.600197,-80.024671,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+1071,26.561399,-80.027863,South Palm Beach,APRD,Aggregated Patch Reef,Aggregated Patch Reef-Deep,1,Outer Reef,FALSE,Retained
+1072,26.552349,-80.030451,South Palm Beach,PTCH,Patch Reef,Patch Reef,0,NA,FALSE,DRM PTCH: explicitly excluded
+1074,26.521214,-80.032971,South Palm Beach,CPDP,Outer Reef,Colonized Pavement-Deep,1,Outer Reef,FALSE,Retained
+1077,26.465805,-80.043716,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+1083,26.241249,-80.083107,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1084,26.237202,-80.08564,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1086,26.23089,-80.087189,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1087,26.228138,-80.0802,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1089,26.226822,-80.08622,Broward-Miami,RGSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1090,26.22366,-80.085747,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1091,26.223221,-80.087753,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1092,26.217794,-80.088824,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1094,26.202915,-80.089409,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1095,26.202894,-80.085907,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1096,26.191198,-80.092506,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1097,26.188919,-80.08902,Broward-Miami,RGSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1098,26.18891,-80.087517,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1099,26.186207,-80.088539,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1102,26.175322,-80.08062,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1104,26.170824,-80.08266,Broward-Miami,LIRM,Sand,Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+1108,26.162291,-80.090225,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1109,26.160942,-80.09124,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1110,26.153269,-80.091293,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1111,26.14834,-80.097336,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1113,26.139725,-80.0914,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1114,26.13889,-80.093697,Broward-Miami,CPSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1124,26.109669,-80.091848,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+1127,26.100054,-80.100204,Broward-Miami,CPSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1128,26.099588,-80.098213,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1130,26.088783,-80.102791,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1132,26.086096,-80.106316,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1133,26.085127,-80.095299,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+1134,26.08379,-80.098335,Broward-Miami,LIRI,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1137,26.076626,-80.107887,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1139,26.072102,-80.106422,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1141,26.067577,-80.104958,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+1149,26.041372,-80.101654,Broward-Miami,CPSH,Sand,Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+1152,26.028284,-80.102257,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1153,26.021967,-80.102806,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1154,26.013876,-80.10836,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1155,26.012957,-80.105865,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1156,26.010221,-80.101395,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1157,26.008459,-80.108398,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1158,26.005774,-80.112419,Broward-Miami,CPSH,Sand,Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+1159,25.999505,-80.095292,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1160,25.998951,-80.103973,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1161,25.998102,-80.112976,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1162,25.996229,-80.101997,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1163,25.995388,-80.112,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1164,25.995295,-80.097008,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1166,25.98134,-80.103607,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1167,25.975952,-80.108147,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1168,25.965652,-80.093951,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1169,25.965549,-80.105232,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1171,25.957443,-80.108284,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1172,25.956972,-80.105293,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1173,25.95618,-80.09909,Broward-Miami,PTCH,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,DRM PTCH: explicitly excluded
+1174,25.954613,-80.088829,Broward-Miami,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+1175,25.951584,-80.109825,Broward-Miami,RGSH,Acropora cervicornis,Acropora cervicornis,0,NA,FALSE,Mapped category outside the four reef strata
+1176,25.949341,-80.112343,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1177,25.949293,-80.104355,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1178,25.945692,-80.106377,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1179,25.944366,-80.110878,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1180,25.943899,-80.108391,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1181,25.940453,-80.102147,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1182,25.939398,-80.11042,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1183,25.938812,-80.088951,Broward-Miami,SPGR,Outer Reef,Spur and Groove,1,Outer Reef,FALSE,Retained
+1184,25.932644,-80.113464,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1185,25.919012,-80.099091,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1186,25.906393,-80.102684,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1187,25.901132,-80.09552,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1188,25.896439,-80.099258,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1189,25.887899,-80.105316,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1190,25.886063,-80.100342,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1191,25.88082,-80.10008,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1192,25.879761,-80.103378,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1194,25.87532,-80.10647,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1196,25.874331,-80.101425,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1197,25.863546,-80.109489,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1198,25.861854,-80.113935,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1199,25.861301,-80.111504,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1200,25.84795,-80.0925,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1201,25.84638,-80.10468,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1202,25.84545,-80.11055,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1203,25.8446,-80.1081,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1204,25.84093,-80.1107,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1205,25.83862,-80.10025,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1206,25.8355,-80.08878,Broward-Miami,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+1207,25.83197,-80.11172,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1208,25.82245,-80.10677,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1209,25.81383,-80.0979,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1210,25.80887,-80.08888,Broward-Miami,LIRO,Sand,Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+1211,25.80575,-80.10397,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1212,25.80167,-80.10047,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1213,25.79853,-80.1079,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1214,25.79375,-80.09687,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1215,25.78683,-80.11652,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1216,25.78542,-80.10415,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1217,25.78188,-80.10565,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1218,25.77865,-80.10117,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+1219,25.77765,-80.0966,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1220,25.77135,-80.08825,Broward-Miami,APRD,Aggregated Patch Reef,Aggregated Patch Reef-Deep,1,Outer Reef,FALSE,Retained
+1221,25.77095,-80.09667,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,FALSE,Retained
+1222,25.76708,-80.09403,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+1223,25.76637,-80.0893,Broward-Miami,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2009,27.018917,-80.066835,Martin,RGDP,Ridge,Ridge-Deep,0,NA,FALSE,Mapped category outside the four reef strata
+2010,27.017788,-80.068618,Martin,RGDP,Ridge,Ridge-Deep,0,NA,FALSE,Mapped category outside the four reef strata
+2011,27.010368,-80.068375,Martin,RGDP,Ridge,Ridge-Deep,0,NA,FALSE,Mapped category outside the four reef strata
+2037,26.709826,-80.015045,South Palm Beach,SPGR,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2039,26.705774,-80.016586,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2041,26.696699,-80.017907,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2047,26.675528,-80.019029,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2048,26.674639,-80.018364,South Palm Beach,SPGR,Outer Reef,Spur and Groove,1,Outer Reef,FALSE,Retained
+2049,26.673296,-80.019882,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2052,26.643642,-80.020693,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2053,26.623661,-80.022617,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2055,26.583751,-80.025421,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2056,26.570777,-80.026664,South Palm Beach,APRD,Aggregated Patch Reef,Aggregated Patch Reef-Deep,1,Outer Reef,FALSE,Retained
+2061,26.506169,-80.033966,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+2097,26.154205,-80.096794,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+2098,26.152846,-80.098598,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+2099,26.144722,-80.096367,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+2100,26.144281,-80.09787,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+2101,26.142031,-80.098885,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+2111,26.109543,-80.101639,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+2112,26.105465,-80.099167,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+2115,26.077469,-80.098381,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+2116,26.077074,-80.107384,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+2120,26.069349,-80.099442,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+2151,25.954735,-80.108307,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+2158,25.92765,-80.109009,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,FALSE,Retained
+3062,26.92409,-80.02596,North Palm Beach,DPRC,Ridge; Sand,Deep Ridge Complex; Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+3063,26.91335,-80.02398,North Palm Beach,DPRC,Ridge; Sand,Deep Ridge Complex; Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+3064,26.94327,-80.02805,North Palm Beach,DPRC,Sand,Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+3066,26.65525,-80.02232,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+3067,25.9586167,-80.0969333,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,FALSE,Retained
+3068,26.0954,-80.1012,Broward-Miami,RGSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3069,26.0981,-80.1011,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3070,26.0982,-80.0988,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3071,26.0954,-80.0957,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3074,26.0963,-80.0949,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3075,26.0982,-80.0939,Broward-Miami,LIRI,Sand,Sand-Shallow,0,NA,TRUE,PEV site: excluded from independent regional reference
+3077,26.0911,-80.1032,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3080,26.0922,-80.1001,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3081,26.0902,-80.1001,Broward-Miami,CPSH,Nearshore Ridge Complex,Colonized Pavement-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3082,26.092,-80.0962,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3083,26.0911,-80.0964,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3084,26.0902,-80.0966,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3085,26.0919,-80.0937,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3086,26.0911,-80.094,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3087,26.0902,-80.0941,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3088,26.0957,-80.0915,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,TRUE,PEV site: excluded from independent regional reference
+3089,26.0966,-80.0913,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,TRUE,PEV site: excluded from independent regional reference
+3090,26.0985,-80.091,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,TRUE,PEV site: excluded from independent regional reference
+3091,26.096800000000002,-80.0885,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,TRUE,PEV site: excluded from independent regional reference
+3092,26.0918,-80.0915,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,TRUE,PEV site: excluded from independent regional reference
+3093,26.0909,-80.0915,Broward-Miami,LIRM,Middle Reef,Linear Reef-Middle,1,Middle Reef,TRUE,PEV site: excluded from independent regional reference
+3094,26.099233,-80.10165,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3096,26.086131,-80.102996,Broward-Miami,RGSH,Nearshore Ridge Complex,Ridge-Shallow,1,Nearshore Ridge Complex,TRUE,PEV site: excluded from independent regional reference
+3098,26.590533,-80.025183,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+3099,26.5728,-80.025483,South Palm Beach,RGDP,Aggregated Patch Reef,Aggregated Patch Reef-Deep,1,Outer Reef,FALSE,Retained
+3100,26.5679,-80.026967,South Palm Beach,APRD,Aggregated Patch Reef,Aggregated Patch Reef-Deep,1,Outer Reef,FALSE,Retained
+3101,26.510883,-80.03375,South Palm Beach,CPDP,Outer Reef,Colonized Pavement-Deep,1,Outer Reef,FALSE,Retained
+3102,26.494733,-80.037,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+3103,26.448067000000002,-80.04645,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+3104,26.4413,-80.046983,South Palm Beach,SPGR,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+3105,26.436367,-80.047517,South Palm Beach,SPGR,Outer Reef,Spur and Groove,1,Outer Reef,FALSE,Retained
+3106,26.5195,-80.032283,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+3110,26.0985,-80.0959,Broward-Miami,LIRI,Inner Reef,Linear Reef-Inner,1,Inner Reef,TRUE,PEV site: excluded from independent regional reference
+3113,26.518,-80.032,South Palm Beach,LIRO,Outer Reef,Linear Reef-Outer,1,Outer Reef,FALSE,Retained
+3115,26.91127,-80.02545,North Palm Beach,DPRC,Ridge; Sand,Deep Ridge Complex; Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+3116,26.9261,-80.02557,North Palm Beach,DPRC,Sand,Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
+3117,26.92225,-80.02559,North Palm Beach,DPRC,Sand,Sand-Shallow,0,NA,FALSE,Mapped category outside the four reef strata
