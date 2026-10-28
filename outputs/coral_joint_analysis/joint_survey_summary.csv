@@ -1,0 +1,59 @@
+region,dataset,source,class,Type,sites,rows,colonies
+Broward-Miami,drm24,Added DRM2024 adults,>4cm,Inner Reef,15,255,658
+Broward-Miami,drm24,Added DRM2024 adults,>4cm,Middle Reef,10,170,218
+Broward-Miami,drm24,Added DRM2024 adults,>4cm,Nearshore Ridge Complex,63,1071,1455
+Broward-Miami,drm24,Added DRM2024 adults,>4cm,Outer Reef,5,85,114
+Broward-Miami,drm24,Added DRM2024 juveniles,<4cm,Inner Reef,15,60,124
+Broward-Miami,drm24,Added DRM2024 juveniles,<4cm,Middle Reef,10,40,38
+Broward-Miami,drm24,Added DRM2024 juveniles,<4cm,Nearshore Ridge Complex,63,252,98
+Broward-Miami,drm24,Added DRM2024 juveniles,<4cm,Outer Reef,5,20,16
+Broward-Miami,drm24,Original surveys,<4cm,Inner Reef,3,36,68
+Broward-Miami,drm24,Original surveys,<4cm,Nearshore Ridge Complex,7,84,373
+Broward-Miami,drm24,Original surveys,>4cm,Inner Reef,3,51,74
+Broward-Miami,drm24,Original surveys,>4cm,Nearshore Ridge Complex,7,119,109
+Broward-Miami,nsu11_esa,Original surveys,>4cm,Inner Reef,54,162,1544
+Broward-Miami,nsu11_esa,Original surveys,>4cm,Middle Reef,68,204,2517
+Broward-Miami,nsu11_esa,Original surveys,>4cm,Nearshore Ridge Complex,4,12,142
+Broward-Miami,nsu11_esa,Original surveys,>4cm,Outer Reef,78,234,1917
+PEV,dca17,Original surveys,<4cm,Inner Reef,22,264,473
+PEV,dca17,Original surveys,<4cm,Middle Reef,26,312,238
+PEV,dca17,Original surveys,<4cm,Nearshore Ridge Complex,62,744,2823
+PEV,dca17,Original surveys,<4cm,Outer Reef,85,1020,1306
+PEV,dca17,Original surveys,>4cm,Inner Reef,22,374,460
+PEV,dca17,Original surveys,>4cm,Middle Reef,26,442,453
+PEV,dca17,Original surveys,>4cm,Nearshore Ridge Complex,62,1054,853
+PEV,dca17,Original surveys,>4cm,Outer Reef,85,1445,2883
+PEV,dca17_esa,Original surveys,<4cm,Inner Reef,17,34,0
+PEV,dca17_esa,Original surveys,<4cm,Middle Reef,21,42,0
+PEV,dca17_esa,Original surveys,<4cm,Nearshore Ridge Complex,92,184,11
+PEV,dca17_esa,Original surveys,<4cm,Outer Reef,25,50,0
+PEV,dca17_esa,Original surveys,>4cm,Inner Reef,17,34,13
+PEV,dca17_esa,Original surveys,>4cm,Middle Reef,21,42,1
+PEV,dca17_esa,Original surveys,>4cm,Nearshore Ridge Complex,92,184,3574
+PEV,dca17_esa,Original surveys,>4cm,Outer Reef,25,50,21
+PEV,drm24,Original surveys,<4cm,Inner Reef,12,144,347
+PEV,drm24,Original surveys,<4cm,Middle Reef,6,72,167
+PEV,drm24,Original surveys,<4cm,Nearshore Ridge Complex,18,216,822
+PEV,drm24,Original surveys,>4cm,Inner Reef,12,204,279
+PEV,drm24,Original surveys,>4cm,Middle Reef,6,102,122
+PEV,drm24,Original surveys,>4cm,Nearshore Ridge Complex,18,306,205
+PEV,nsu11_esa,Original surveys,>4cm,Inner Reef,40,120,985
+PEV,nsu11_esa,Original surveys,>4cm,Middle Reef,15,45,115
+PEV,nsu11_esa,Original surveys,>4cm,Nearshore Ridge Complex,81,243,4411
+PEV,nsu11_esa,Original surveys,>4cm,Outer Reef,33,99,240
+PEV,tt21,Original surveys,<4cm,Inner Reef,6,72,141
+PEV,tt21,Original surveys,<4cm,Middle Reef,5,60,107
+PEV,tt21,Original surveys,<4cm,Nearshore Ridge Complex,7,84,297
+PEV,tt21,Original surveys,<4cm,Outer Reef,17,204,702
+PEV,tt21,Original surveys,>4cm,Inner Reef,6,102,115
+PEV,tt21,Original surveys,>4cm,Middle Reef,5,85,92
+PEV,tt21,Original surveys,>4cm,Nearshore Ridge Complex,7,119,155
+PEV,tt21,Original surveys,>4cm,Outer Reef,17,289,563
+PEV,tt23,Original surveys,<4cm,Inner Reef,19,209,333
+PEV,tt23,Original surveys,<4cm,Middle Reef,34,374,483
+PEV,tt23,Original surveys,<4cm,Nearshore Ridge Complex,81,891,1376
+PEV,tt23,Original surveys,<4cm,Outer Reef,38,418,1115
+PEV,tt23,Original surveys,>4cm,Inner Reef,19,304,357
+PEV,tt23,Original surveys,>4cm,Middle Reef,34,544,643
+PEV,tt23,Original surveys,>4cm,Nearshore Ridge Complex,81,1296,616
+PEV,tt23,Original surveys,>4cm,Outer Reef,38,608,768

@@ -1,0 +1,2 @@
+rule,crs_epsg,cutoff_m,channel_ymin_m,channel_ymax_m,pev_ymin_m,pev_ymax_m
+"PEV: <=1,200 m N/S of the nearest channel bounding edge",32617,1200,2886264.078867119,2886517.468244683,2885064.078867119,2887717.468244683

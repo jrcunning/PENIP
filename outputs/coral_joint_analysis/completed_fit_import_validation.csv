@@ -1,0 +1,5 @@
+check,pass
+Identical cell labels and indices,TRUE
+Identical likelihood and full prior parameterization,TRUE
+Identical sampling settings,TRUE
+Identical Stan model,TRUE

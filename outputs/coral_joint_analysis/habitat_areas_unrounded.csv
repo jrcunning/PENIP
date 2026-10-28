@@ -1,0 +1,37 @@
+Type,name,total_area_m2
+Nearshore Ridge Complex,Channel,451.49373295434634
+Inner Reef,Channel,517.3515141795797
+Middle Reef,Channel,29875.44705346052
+Outer Reef,Channel,54910.88230572184
+Nearshore Ridge Complex,Side Slopes,18834.664594742237
+Inner Reef,Side Slopes,881.2923596278997
+Middle Reef,Side Slopes,4696.376342178519
+Outer Reef,Side Slopes,801.3216692134447
+Nearshore Ridge Complex,Depth_10cm,44168.18504329788
+Inner Reef,Depth_10cm,12132.713685770519
+Middle Reef,Depth_10cm,9981.305144181766
+Outer Reef,Depth_10cm,10672.393422205932
+Nearshore Ridge Complex,Depth_5cm,45275.57041334836
+Inner Reef,Depth_5cm,11048.374037966772
+Middle Reef,Depth_5cm,9151.079793448851
+Outer Reef,Depth_5cm,11274.406148903072
+Nearshore Ridge Complex,Depth_1cm,219447.03052921063
+Inner Reef,Depth_1cm,49698.233079886166
+Middle Reef,Depth_1cm,40885.58018049257
+Outer Reef,Depth_1cm,44370.48913117312
+Nearshore Ridge Complex,Depth_0_5cm,149738.34272624066
+Inner Reef,Depth_0_5cm,28910.937112036438
+Middle Reef,Depth_0_5cm,27270.26358011877
+Outer Reef,Depth_0_5cm,29690.329768717405
+Nearshore Ridge Complex,Depth_0_1cm,384010.4967702771
+Inner Reef,Depth_0_1cm,110104.0576343186
+Middle Reef,Depth_0_1cm,50967.62351285468
+Outer Reef,Depth_0_1cm,70732.91309058163
+Nearshore Ridge Complex,Nearshore,62731.46167594631
+Outer Reef,North,59774.25676024213
+Outer Reef,East,37251.18321449048
+Outer Reef,South,26491.13608107879
+Nearshore Ridge Complex,Rest of Monitoring Area,1233822.7993694071
+Inner Reef,Rest of Monitoring Area,408457.5454055646
+Middle Reef,Rest of Monitoring Area,264250.4415464354
+Outer Reef,Rest of Monitoring Area,441475.78999349824

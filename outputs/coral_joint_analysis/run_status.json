@@ -1,0 +1,15 @@
+{
+  "status": "complete",
+  "fit": "/Users/rosscunning/Projects/PENIP/outputs/coral_joint_analysis/models/7e2169d606b6259fd362df86804b7731/posterior.rds",
+  "hash": "7e2169d606b6259fd362df86804b7731",
+  "settings": {
+    "chains": 4,
+    "warmup": 500,
+    "sampling": 500,
+    "threads": 2,
+    "adapt_delta": 0.95,
+    "max_treedepth": 11,
+    "seed": 20261026
+  },
+  "updated": "2026-10-26 18:35:26.568194"
+}

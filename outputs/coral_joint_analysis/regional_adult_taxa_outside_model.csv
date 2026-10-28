@@ -1,0 +1,6 @@
+site,transect_num,latitude,longitude,subregion,drm_habitat,species,width,height,taxon_group,taxon
+AA1185,1,25.919012,-80.099091,Broward-Miami,LIRM,SCOL,6,1,SCOL,SCOL
+AA1221,2,25.77095,-80.09667,Broward-Miami,LIRI,SCUB,5,1,SCOL,SCOL
+AA1196,1,25.874331,-80.101425,Broward-Miami,LIRI,HCUC,10,5,NA,HCUC
+AA1196,1,25.874331,-80.101425,Broward-Miami,LIRI,HCUC,4,6,NA,HCUC
+AA1213,1,25.79853,-80.1079,Broward-Miami,RGSH,ODIF,7,4,OCUL,OCUL

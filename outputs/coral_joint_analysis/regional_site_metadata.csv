@@ -1,0 +1,94 @@
+site,latitude,longitude,subregion,drm_habitat,source_types,n_reef_types,Type,in_original_metadata,exclusion,dir,ns_distance_from_channel_m,region
+AA1083,26.241249,-80.083107,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,16207.612738936208,Broward-Miami
+AA1084,26.237202,-80.08564,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,15757.595391460694,Broward-Miami
+AA1086,26.23089,-80.087189,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,15057.413438657764,Broward-Miami
+AA1087,26.228138,-80.0802,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,N,14757.548181072343,Broward-Miami
+AA1089,26.226822,-80.08622,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,14607.540686069988,Broward-Miami
+AA1090,26.22366,-80.085747,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,14257.664001696277,Broward-Miami
+AA1091,26.223221,-80.087753,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,14207.63073876407,Broward-Miami
+AA1092,26.217794,-80.088824,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,13605.807440940756,Broward-Miami
+AA1094,26.202915,-80.089409,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,11957.465876124334,Broward-Miami
+AA1095,26.202894,-80.085907,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,11957.600329753477,Broward-Miami
+AA1096,26.191198,-80.092506,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,10657.578803135082,Broward-Miami
+AA1097,26.188919,-80.08902,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,10407.60766835371,Broward-Miami
+AA1098,26.18891,-80.087517,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,10407.665694459341,Broward-Miami
+AA1099,26.186207,-80.088539,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,10107.577020716388,Broward-Miami
+AA1102,26.175322,-80.08062,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,N,8907.586166675668,Broward-Miami
+AA1108,26.162291,-80.090225,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,7457.580113642849,Broward-Miami
+AA1109,26.160942,-80.09124,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,7307.46207570564,Broward-Miami
+AA1110,26.153269,-80.091293,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,6457.604490280617,Broward-Miami
+AA1111,26.14834,-80.097336,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,5907.486910704989,Broward-Miami
+AA1113,26.139725,-80.0914,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,N,4957.470729154535,Broward-Miami
+AA1114,26.13889,-80.093697,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,4863.388482826296,Broward-Miami
+AA1152,26.028284,-80.102257,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,7139.143434299156,Broward-Miami
+AA1153,26.021967,-80.102806,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,7839.144416154362,Broward-Miami
+AA1154,26.013876,-80.10836,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,8739.047502382658,Broward-Miami
+AA1155,26.012957,-80.105865,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,8839.12211260153,Broward-Miami
+AA1156,26.010221,-80.101395,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,9139.070850505494,Broward-Miami
+AA1157,26.008459,-80.108398,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,9339.017902307678,Broward-Miami
+AA1159,25.999505,-80.095292,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,10321.677277234383,Broward-Miami
+AA1160,25.998951,-80.103973,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,10389.019547374919,Broward-Miami
+AA1161,25.998102,-80.112976,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,10489.1944724489,Broward-Miami
+AA1162,25.996229,-80.101997,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,10689.129322381224,Broward-Miami
+AA1163,25.995388,-80.112,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,10789.111740080174,Broward-Miami
+AA1164,25.995295,-80.097008,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,10789.131674000993,Broward-Miami
+AA1166,25.98134,-80.103607,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,12339.220667151269,Broward-Miami
+AA1167,25.975952,-80.108147,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,12939.057814582251,Broward-Miami
+AA1168,25.965652,-80.093951,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,14070.035063364077,Broward-Miami
+AA1169,25.965549,-80.105232,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,14089.213978135027,Broward-Miami
+AA1171,25.957443,-80.108284,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,14989.050762122497,Broward-Miami
+AA1172,25.956972,-80.105293,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,15039.171104340348,Broward-Miami
+AA1174,25.954613,-80.088829,Broward-Miami,LIRO,Outer Reef,1,Outer Reef,FALSE,Retained,S,15289.063098199666,Broward-Miami
+AA1176,25.949341,-80.112343,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,15889.119487978052,Broward-Miami
+AA1177,25.949293,-80.104355,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,15888.988573727198,Broward-Miami
+AA1178,25.945692,-80.106377,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,16289.187212304678,Broward-Miami
+AA1179,25.944366,-80.110878,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,16439.111146795098,Broward-Miami
+AA1180,25.943899,-80.108391,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,16489.138741239905,Broward-Miami
+AA1181,25.940453,-80.102147,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,16866.51570638502,Broward-Miami
+AA1182,25.939398,-80.11042,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,16989.011082771234,Broward-Miami
+AA1183,25.938812,-80.088951,Broward-Miami,SPGR,Outer Reef,1,Outer Reef,FALSE,Retained,S,17039.13357153302,Broward-Miami
+AA1184,25.932644,-80.113464,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,17739.08970226301,Broward-Miami
+AA1185,25.919012,-80.099091,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,19239.028988995124,Broward-Miami
+AA1186,25.906393,-80.102684,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,20639.061785379425,Broward-Miami
+AA1187,25.901132,-80.09552,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,21216.791778703686,Broward-Miami
+AA1188,25.896439,-80.099258,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,21739.121445272118,Broward-Miami
+AA1189,25.887899,-80.105316,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,22689.083181352355,Broward-Miami
+AA1190,25.886063,-80.100342,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,22889.014026771765,Broward-Miami
+AA1191,25.88082,-80.10008,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,23469.498448039405,Broward-Miami
+AA1192,25.879761,-80.103378,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,23589.044345210772,Broward-Miami
+AA1194,25.87532,-80.10647,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,24082.998464547563,Broward-Miami
+AA1196,25.874331,-80.101425,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,24189.080346690025,Broward-Miami
+AA1197,25.863546,-80.109489,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,25389.02454945445,Broward-Miami
+AA1198,25.861854,-80.113935,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,25579.42642875295,Broward-Miami
+AA1199,25.861301,-80.111504,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,25639.02551125968,Broward-Miami
+AA1200,25.84795,-80.0925,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,27104.630979749374,Broward-Miami
+AA1201,25.84638,-80.10468,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,27286.88115992397,Broward-Miami
+AA1202,25.84545,-80.11055,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,27393.873024157714,Broward-Miami
+AA1203,25.8446,-80.1081,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,27486.346207849216,Broward-Miami
+AA1204,25.84093,-80.1107,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,27894.562993830536,Broward-Miami
+AA1205,25.83862,-80.10025,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,28143.267449910752,Broward-Miami
+AA1206,25.8355,-80.08878,Broward-Miami,LIRO,Outer Reef,1,Outer Reef,FALSE,Retained,S,28480.888691083528,Broward-Miami
+AA1207,25.83197,-80.11172,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,28887.5696659619,Broward-Miami
+AA1208,25.82245,-80.10677,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,29938.543284704443,Broward-Miami
+AA1209,25.81383,-80.0979,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,30887.135820603464,Broward-Miami
+AA1211,25.80575,-80.10397,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,31786.14765924448,Broward-Miami
+AA1212,25.80167,-80.10047,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,32235.610907202587,Broward-Miami
+AA1213,25.79853,-80.1079,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,32588.432309973054,Broward-Miami
+AA1214,25.79375,-80.09687,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,33110.27313506557,Broward-Miami
+AA1215,25.78683,-80.11652,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,33890.02088353783,Broward-Miami
+AA1216,25.78542,-80.10415,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,34037.79819408571,Broward-Miami
+AA1217,25.78188,-80.10565,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,34430.87118594814,Broward-Miami
+AA1218,25.77865,-80.10117,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,34785.53232394997,Broward-Miami
+AA1219,25.77765,-80.0966,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,34893.146679903846,Broward-Miami
+AA1220,25.77135,-80.08825,Broward-Miami,APRD,Aggregated Patch Reef,1,Outer Reef,FALSE,Retained,S,35585.09732074756,Broward-Miami
+AA1221,25.77095,-80.09667,Broward-Miami,LIRI,Inner Reef,1,Inner Reef,FALSE,Retained,S,35635.21211722167,Broward-Miami
+AA1222,25.76708,-80.09403,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,36061.99257661821,Broward-Miami
+AA1223,25.76637,-80.0893,Broward-Miami,LIRO,Outer Reef,1,Outer Reef,FALSE,Retained,S,36137.35503148753,Broward-Miami
+AA2097,26.154205,-80.096794,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,6557.438195533119,Broward-Miami
+AA2098,26.152846,-80.098598,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,6405.671066496987,Broward-Miami
+AA2099,26.144722,-80.096367,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,5507.450368504971,Broward-Miami
+AA2100,26.144281,-80.09787,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,5457.564363929443,Broward-Miami
+AA2101,26.142031,-80.098885,Broward-Miami,CPSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,N,5207.663570900913,Broward-Miami
+AA2151,25.954735,-80.108307,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,15288.98107219208,Broward-Miami
+AA2158,25.92765,-80.109009,Broward-Miami,RGSH,Nearshore Ridge Complex,1,Nearshore Ridge Complex,FALSE,Retained,S,18289.15326844575,Broward-Miami
+AA3067,25.9586167,-80.0969333,Broward-Miami,LIRM,Middle Reef,1,Middle Reef,FALSE,Retained,S,14851.270071887877,Broward-Miami
