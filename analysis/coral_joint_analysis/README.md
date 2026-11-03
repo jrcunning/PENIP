@@ -1,47 +1,64 @@
-# Complete joint coral analysis
+# Joint coral analysis
 
-The entire executable pipeline is in **coral_joint_analysis.Rmd**, in the style
-and order of the original coral_analysis.Rmd. It reads source survey and GIS
-files directly and embeds the full joint Stan program. It does not source the
-old analysis or the experimental helper scripts.
+The current pipeline is **coral_joint_brms_analysis.Rmd**. Its figures, tables,
+diagnostics and HTML report are under
+`outputs/coral_joint_analysis/brms_2024_4000draws/`.
 
-Outputs are isolated in `outputs/coral_joint_analysis/`: Fig1–6 and FigA1–6 as
-PNG/PDF, Table1–2 and TableA1–A6, the expanded regional TableA3, intermediate
-data, diagnostics, paired posterior comparisons, cached model, and HTML report.
+[Open the report](../../outputs/coral_joint_analysis/brms_2024_4000draws/coral_joint_brms_analysis.html).
+[Read the fit assessment](../../outputs/coral_joint_analysis/brms_2024_4000draws/CONVERGENCE_RUN_ASSESSMENT.md).
 
-Render from the PENIP root:
+## Run or regenerate the analysis
+
+From the project root:
 
 ```r
-rmarkdown::render(
-  "analysis/coral_joint_analysis/coral_joint_analysis.Rmd",
-  output_dir = "outputs/coral_joint_analysis",
-  knit_root_dir = getwd()
-)
+source("analysis/coral_joint_analysis/run_4000_draw_comparison.R")
 ```
 
-Default settings validate/import the completed joint pilot, save a separate
-posterior copy, then reproduce all outputs. No new fit starts unless
-`allow_new_fit: true`. To run longer chains, change the YAML warmup/sampling
-settings and enable fitting. Settings/model/data changes use a different cache.
-The posterior is saved immediately after sampling, before downstream outputs.
+The Rmd and runner default to reusing the saved model, with new fitting disabled.
+The pipeline rebuilds its observations from shared source data; no archived
+script, prior model or pilot output is an input. All code for the current
+analysis, including annotated prior generation, is in the Rmd. The original
+`analysis/coral_analysis.Rmd`, conch analysis and integrated analysis are retained.
 
-Scientific conventions retained:
+The cached posterior is
+`outputs/coral_joint_analysis/brms_2024_4000draws/models/db9da5156777a9344ac26acd2b9ce2ac/brms_fit.rds`.
+Keep that local cache to avoid refitting. Fitted models, chain CSVs and generated
+data/intermediate caches are ignored by Git; the source, report, figures, tables
+and current diagnostics remain trackable. A fresh clone requires a separate
+copy of the local model cache or an explicitly enabled new fit.
 
-- 1,200 m north/south channel-edge PEV rule, all sources and both size classes.
-- Original adult/juvenile observations and baseline priors; broader DRM2024
-  adults and four surveyed juvenile groups; no regional DRM2023 in this model.
-- Shared source effects; region-specific density, zero inflation, shape and
-  direction effects, exactly as the evaluated full joint model.
-- PEV manuscript predictions explicitly select PEV. Direction effects zero;
-  source effects retained. Source-averaged and 2024 outputs remain distinct.
-- Original source-coverage averaging grid. Raw-versus-modeled data restricted
-  to PEV; legacy survey maps/Table1 describe the original survey cohort, with
-  an additional joint survey summary reporting current geographic membership.
-- Unrounded habitat areas for colony totals. Original Table2 Total-doubling
-  arithmetic corrected. Fixed manuscript taxon colors for treemaps.
-- Regional TableA3: paired differences/95%CrIs and both posterior sign
-  probabilities. No p-values, multiplicity adjustment or significance labels.
-  Unsupported juvenile/All regional entries blank. Adult total =17modeled taxa.
+## Current model and interpretation
 
-The imported posterior is a pilot. A complete report is not a claim that all
-model diagnostics pass or that final manuscript sampling has been completed.
+The shared-distribution brms model uses all original survey observations plus
+the 2024 Broward–Miami DRM data, four chains, 1,000 warmup and 1,000 sampling
+iterations per chain, five threads per chain, revised priors, adapt_delta .95
+and max_treedepth 11. It retains 4,000 draws. The model and numerical estimates
+are unchanged by the cleanup.
+
+PEV uses the 1,200 m north/south channel-edge definition. Manuscript predictions
+explicitly select PEV; regional comparisons use paired predictions for each
+region. Only comprehensively surveyed juvenile responses are compared, and
+adult totals sum the same 17 modeled taxa. Fig A1 explicitly orders habitats
+NRC, IR, MR, OR and matches abbreviations by habitat name.
+
+The current working fit remains provisional: maximum parameter Rhat 1.0189,
+minimum bulk ESS 266.3, zero divergences and depth hits. Principal density and
+contrast estimates are stable, but sparse ACER habitat-cell means retain long
+tails. Read CHECKPOINT.md and the assessment before further model work. No
+additional fit is running or authorized by this cleanup.
+
+## Archived development work
+
+Earlier separate regional models, joint Stan implementations, brms pilots,
+prior reviews and comparison-only outputs are kept locally under
+`old_working_files/coral_comparison_2026-10-28/` and
+`old_working_files/coral_comparison_2026-11-03/`.
+Each archive includes a manifest and checksums. The November archive also keeps
+the current source and full comparison report as they stood before cleanup.
+The active Rmd no longer runs those historical comparison sections.
+
+The entire `old_working_files/` directory is ignored by Git. Previously tracked
+draft paths are removed from the index; earlier committed versions remain in
+Git history. Shared raw/processed data and original manuscript outputs remain
+in place. The archives are local records, not a runtime dependency.

@@ -1,0 +1,11 @@
+check,pass
+All 554 archived/snapshot/recovered files match their recorded checksums,TRUE
+All 96 original/shared scientific files are unchanged,TRUE
+Current fitted model is unchanged,TRUE
+Current model/data/prior signature is unchanged,TRUE
+All five principal numerical outputs are unchanged,TRUE
+All 119 obsolete tracked paths are removed from the index,TRUE
+Local archive is ignored by Git,TRUE
+Current local model cache is ignored by Git,TRUE
+All six current pipeline validations pass,TRUE
+Current source has no historical comparison input paths,TRUE

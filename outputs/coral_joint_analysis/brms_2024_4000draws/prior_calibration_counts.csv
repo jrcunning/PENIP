@@ -1,0 +1,3 @@
+observations,rows,mean_positive_log_density,sd_positive_log_density,sd_positive_cell_means
+Original surveys,14387,-2.781251608780806,1.7868290597288923,1.3399807027380612
+Joint observations,16340,-2.726040221891997,1.7236382655108127,1.3012572075656568

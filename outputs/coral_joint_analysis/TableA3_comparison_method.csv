@@ -1,2 +1,0 @@
-dataset,direction_effects,habitat_weighting,posterior_draws,adult_taxa,surveyed_juvenile_groups,reported_comparisons,probability_definition,multiplicity_adjustment,decision_rule,interval,status
-drm24,zero,"Equal weights: NRC, IR, MR, OR",2000,17,4,24,Fraction of paired draws with PEV minus Broward-Miami >0 or <0,None; posterior summaries only,None; no significance flags or posterior probability cutoff,Pointwise equal-tailed 95% CrI,Pilot posterior; comparisons provisional

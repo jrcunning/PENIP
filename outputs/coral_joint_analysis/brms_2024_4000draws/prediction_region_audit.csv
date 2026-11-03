@@ -1,0 +1,8 @@
+purpose,region,rows,datasets,area_m2
+diagnostics_or_comparisons,PEV,116,drm24,1
+diagnostics_or_comparisons,Broward-Miami,116,drm24,1
+manuscript,PEV,455,dca17;dca17_esa;drm24;nsu11_esa;tt21;tt23,1
+manuscript,PEV,116,drm24,1
+manuscript,PEV,484,dca17;dca17_esa;drm24;nsu11_esa;tt21;tt23,1
+diagnostics_or_comparisons,PEV,116,drm24,1
+diagnostics_or_comparisons,Broward-Miami,116,drm24,1

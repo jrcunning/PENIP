@@ -1,0 +1,4 @@
+check,pass
+Conditional density matches brms expected value after removing direction,TRUE
+PEV prediction data explicitly encode PEV and regional=0,TRUE
+Regional prediction data explicitly encode Broward-Miami and regional=1,TRUE

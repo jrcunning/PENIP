@@ -11,3 +11,11 @@ outputs/cache/
 /pev_acer_coordinates.csv
 /updated_conch_slides.pptx
 archive/*
+
+# Retired exploratory analyses, reports and cached fits (kept locally).
+/old_working_files/
+
+# Current fitted model and generated caches stay local; figures/tables remain trackable.
+/outputs/coral_joint_analysis/brms_2024_4000draws/models/
+/outputs/coral_joint_analysis/brms_2024_4000draws/data/
+/outputs/coral_joint_analysis/brms_2024_4000draws/intermediate/

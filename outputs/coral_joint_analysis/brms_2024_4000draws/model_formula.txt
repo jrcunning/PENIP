@@ -1,0 +1,3 @@
+n ~ taxon:class * Type + regional:cell + (1 + Type | dataset) + (1 | dataset:taxon:class) + (1 | gr(direction_group, by = region)) + offset(log(transect_area_m2)) 
+zi ~ taxon:class * Type
+shape ~ taxon:class * Type

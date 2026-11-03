@@ -1,0 +1,10 @@
+check,pass
+Adult sum preserves draw-wise covariance,TRUE
+Adult total contrast equals direct sum of paired cell differences,TRUE
+Every adult taxon is compared,TRUE
+Only surveyed juvenile groups compared,TRUE
+MCAV All is compared,TRUE
+Unsupported regional values are blank,TRUE
+Directional probabilities account for every posterior draw,TRUE
+Both probabilities equal paired posterior sign frequencies,TRUE
+R predictions match independently checked brms expected densities,TRUE
