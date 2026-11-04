@@ -1,0 +1,12 @@
+setting,value
+fit_hash,db9da5156777a9344ac26acd2b9ce2ac
+r2_response_scale,Colony counts
+r2_posterior_draws,4000
+ppc_response_scale,Colonies/m2
+ppc_draws,1000
+ppc_random_effects,"All fitted effects, at each observation's actual region, dataset, direction and searched area"
+global_skewness,moments::skewness
+grouped_skewness,e1071::skewness(type=3)
+chi_squared,"Sum((density-expected_density)^2/expected_density), paired by posterior draw"
+grouped_tally,Observed-positive groups; flag PPP <0.05 or >0.95
+undefined_statistics,PPP left blank if observed or any replicated statistic is undefined

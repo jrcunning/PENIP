@@ -16,6 +16,6 @@ archive/*
 /old_working_files/
 
 # Current fitted model and generated caches stay local; figures/tables remain trackable.
-/outputs/coral_joint_analysis/brms_2024_4000draws/models/
-/outputs/coral_joint_analysis/brms_2024_4000draws/data/
-/outputs/coral_joint_analysis/brms_2024_4000draws/intermediate/
+/outputs/coral_analysis/models/
+/outputs/coral_analysis/data/
+/outputs/coral_analysis/intermediate/

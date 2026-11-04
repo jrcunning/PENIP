@@ -1,0 +1,1089 @@
+source_cohort,dataset,site,Type,retained_habitat
+Original surveys,nsu11_esa,7,Artificial,TRUE
+Original surveys,nsu11_esa,23,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,24,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,25,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,26,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,42,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,43,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,44,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,45,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,61,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,62,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,63,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,64,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,78,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,79,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,80,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,81,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,94,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,95,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,96,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,97,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,108,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,109,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,110,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,111,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,124,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,125,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,126,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,127,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,139,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,140,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,141,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,142,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,152,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,153,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,154,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,163,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,10,Inner Reef,TRUE
+Original surveys,nsu11_esa,11,Sand,FALSE
+Original surveys,nsu11_esa,27,Inner Reef,TRUE
+Original surveys,nsu11_esa,28,Inner Reef,TRUE
+Original surveys,nsu11_esa,29,Inner Reef,TRUE
+Original surveys,nsu11_esa,46,Inner Reef,TRUE
+Original surveys,nsu11_esa,47,Inner Reef,TRUE
+Original surveys,nsu11_esa,48,Inner Reef,TRUE
+Original surveys,nsu11_esa,65,Inner Reef,TRUE
+Original surveys,nsu11_esa,66,Inner Reef,TRUE
+Original surveys,nsu11_esa,67,Inner Reef,TRUE
+Original surveys,nsu11_esa,82,Inner Reef,TRUE
+Original surveys,nsu11_esa,83,Inner Reef,TRUE
+Original surveys,nsu11_esa,84,Inner Reef,TRUE
+Original surveys,nsu11_esa,98,Inner Reef,TRUE
+Original surveys,nsu11_esa,99,Inner Reef,TRUE
+Original surveys,nsu11_esa,100,Inner Reef,TRUE
+Original surveys,nsu11_esa,112,Scattered Rock in Unconsolidated Sediment,FALSE
+Original surveys,nsu11_esa,113,Inner Reef,TRUE
+Original surveys,nsu11_esa,114,Inner Reef,TRUE
+Original surveys,nsu11_esa,115,Inner Reef,TRUE
+Original surveys,nsu11_esa,128,Inner Reef,TRUE
+Original surveys,nsu11_esa,129,Inner Reef,TRUE
+Original surveys,nsu11_esa,130,Inner Reef,TRUE
+Original surveys,nsu11_esa,131,Inner Reef,TRUE
+Original surveys,nsu11_esa,143,Inner Reef,TRUE
+Original surveys,nsu11_esa,144,Inner Reef,TRUE
+Original surveys,nsu11_esa,145,Inner Reef,TRUE
+Original surveys,nsu11_esa,146,Inner Reef,TRUE
+Original surveys,nsu11_esa,155,Inner Reef,TRUE
+Original surveys,nsu11_esa,156,Inner Reef,TRUE
+Original surveys,nsu11_esa,157,Inner Reef,TRUE
+Original surveys,nsu11_esa,158,Inner Reef,TRUE
+Original surveys,nsu11_esa,164,Inner Reef,TRUE
+Original surveys,nsu11_esa,165,Inner Reef,TRUE
+Original surveys,nsu11_esa,166,Inner Reef,TRUE
+Original surveys,nsu11_esa,167,Inner Reef,TRUE
+Original surveys,nsu11_esa,172,Inner Reef,TRUE
+Original surveys,nsu11_esa,173,Inner Reef,TRUE
+Original surveys,nsu11_esa,174,Inner Reef,TRUE
+Original surveys,nsu11_esa,175,Inner Reef,TRUE
+Original surveys,nsu11_esa,180,Inner Reef,TRUE
+Original surveys,nsu11_esa,181,Inner Reef,TRUE
+Original surveys,nsu11_esa,182,Inner Reef,TRUE
+Original surveys,nsu11_esa,183,Inner Reef,TRUE
+Original surveys,nsu11_esa,187,Inner Reef,TRUE
+Original surveys,nsu11_esa,188,Inner Reef,TRUE
+Original surveys,nsu11_esa,189,Inner Reef,TRUE
+Original surveys,nsu11_esa,194,Inner Reef,TRUE
+Original surveys,nsu11_esa,195,Inner Reef,TRUE
+Original surveys,nsu11_esa,200,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,201,Inner Reef,TRUE
+Original surveys,nsu11_esa,202,Inner Reef,TRUE
+Original surveys,nsu11_esa,203,Inner Reef,TRUE
+Original surveys,nsu11_esa,207,Inner Reef,TRUE
+Original surveys,nsu11_esa,208,Inner Reef,TRUE
+Original surveys,nsu11_esa,209,Inner Reef,TRUE
+Original surveys,nsu11_esa,215,Inner Reef,TRUE
+Original surveys,nsu11_esa,216,Inner Reef,TRUE
+Original surveys,nsu11_esa,217,Inner Reef,TRUE
+Original surveys,nsu11_esa,224,Inner Reef,TRUE
+Original surveys,nsu11_esa,225,Inner Reef,TRUE
+Original surveys,nsu11_esa,231,Inner Reef,TRUE
+Original surveys,nsu11_esa,232,Inner Reef,TRUE
+Original surveys,nsu11_esa,239,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,240,Inner Reef,TRUE
+Original surveys,nsu11_esa,247,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,248,Inner Reef,TRUE
+Original surveys,nsu11_esa,254,Inner Reef,TRUE
+Original surveys,nsu11_esa,255,Sand,FALSE
+Original surveys,nsu11_esa,262,Inner Reef,TRUE
+Original surveys,nsu11_esa,263,Inner Reef,TRUE
+Original surveys,nsu11_esa,264,Inner Reef,TRUE
+Original surveys,nsu11_esa,271,Inner Reef,TRUE
+Original surveys,nsu11_esa,272,Inner Reef,TRUE
+Original surveys,nsu11_esa,273,Inner Reef,TRUE
+Original surveys,nsu11_esa,280,Inner Reef,TRUE
+Original surveys,nsu11_esa,281,Inner Reef,TRUE
+Original surveys,nsu11_esa,282,Inner Reef,TRUE
+Original surveys,nsu11_esa,289,Inner Reef,TRUE
+Original surveys,nsu11_esa,296,Inner Reef,TRUE
+Original surveys,nsu11_esa,303,Inner Reef,TRUE
+Original surveys,nsu11_esa,304,Inner Reef,TRUE
+Original surveys,nsu11_esa,305,Inner Reef,TRUE
+Original surveys,nsu11_esa,312,Inner Reef,TRUE
+Original surveys,nsu11_esa,314,Inner Reef,TRUE
+Original surveys,nsu11_esa,322,Inner Reef,TRUE
+Original surveys,nsu11_esa,330,Inner Reef,TRUE
+Original surveys,nsu11_esa,338,Inner Reef,TRUE
+Original surveys,nsu11_esa,339,Inner Reef,TRUE
+Original surveys,nsu11_esa,347,Inner Reef,TRUE
+Original surveys,nsu11_esa,355,Inner Reef,TRUE
+Original surveys,nsu11_esa,363,Inner Reef,TRUE
+Original surveys,nsu11_esa,370,Inner Reef,TRUE
+Original surveys,nsu11_esa,15,Outer Reef,TRUE
+Original surveys,nsu11_esa,33,Outer Reef,TRUE
+Original surveys,nsu11_esa,52,Outer Reef,TRUE
+Original surveys,nsu11_esa,69,Outer Reef,TRUE
+Original surveys,nsu11_esa,86,Outer Reef,TRUE
+Original surveys,nsu11_esa,101,Outer Reef,TRUE
+Original surveys,nsu11_esa,119,Outer Reef,TRUE
+Original surveys,nsu11_esa,135,Outer Reef,TRUE
+Original surveys,nsu11_esa,149,Outer Reef,TRUE
+Original surveys,nsu11_esa,160,Outer Reef,TRUE
+Original surveys,nsu11_esa,169,Outer Reef,TRUE
+Original surveys,nsu11_esa,177,Outer Reef,TRUE
+Original surveys,nsu11_esa,184,Outer Reef,TRUE
+Original surveys,nsu11_esa,220,Outer Reef,TRUE
+Original surveys,nsu11_esa,228,Outer Reef,TRUE
+Original surveys,nsu11_esa,236,Outer Reef,TRUE
+Original surveys,nsu11_esa,244,Outer Reef,TRUE
+Original surveys,nsu11_esa,251,Outer Reef,TRUE
+Original surveys,nsu11_esa,259,Outer Reef,TRUE
+Original surveys,nsu11_esa,277,Outer Reef,TRUE
+Original surveys,nsu11_esa,293,Outer Reef,TRUE
+Original surveys,nsu11_esa,300,Outer Reef,TRUE
+Original surveys,nsu11_esa,309,Outer Reef,TRUE
+Original surveys,nsu11_esa,319,Outer Reef,TRUE
+Original surveys,nsu11_esa,327,Outer Reef,TRUE
+Original surveys,nsu11_esa,335,Outer Reef,TRUE
+Original surveys,nsu11_esa,344,Outer Reef,TRUE
+Original surveys,nsu11_esa,352,Outer Reef,TRUE
+Original surveys,nsu11_esa,360,Outer Reef,TRUE
+Original surveys,nsu11_esa,367,Outer Reef,TRUE
+Original surveys,nsu11_esa,374,Outer Reef,TRUE
+Original surveys,nsu11_esa,210,Middle Reef,TRUE
+Original surveys,nsu11_esa,211,Middle Reef,TRUE
+Original surveys,nsu11_esa,218,Middle Reef,TRUE
+Original surveys,nsu11_esa,219,Middle Reef,TRUE
+Original surveys,nsu11_esa,226,Middle Reef,TRUE
+Original surveys,nsu11_esa,227,Middle Reef,TRUE
+Original surveys,nsu11_esa,233,Middle Reef,TRUE
+Original surveys,nsu11_esa,234,Middle Reef,TRUE
+Original surveys,nsu11_esa,235,Middle Reef,TRUE
+Original surveys,nsu11_esa,241,Middle Reef,TRUE
+Original surveys,nsu11_esa,242,Middle Reef,TRUE
+Original surveys,nsu11_esa,243,Middle Reef,TRUE
+Original surveys,nsu11_esa,249,Middle Reef,TRUE
+Original surveys,nsu11_esa,250,Middle Reef,TRUE
+Original surveys,nsu11_esa,256,Middle Reef,TRUE
+Original surveys,nsu11_esa,257,Middle Reef,TRUE
+Original surveys,nsu11_esa,258,Middle Reef,TRUE
+Original surveys,nsu11_esa,265,Middle Reef,TRUE
+Original surveys,nsu11_esa,266,Middle Reef,TRUE
+Original surveys,nsu11_esa,267,Middle Reef,TRUE
+Original surveys,nsu11_esa,274,Middle Reef,TRUE
+Original surveys,nsu11_esa,275,Middle Reef,TRUE
+Original surveys,nsu11_esa,276,Middle Reef,TRUE
+Original surveys,nsu11_esa,283,Middle Reef,TRUE
+Original surveys,nsu11_esa,284,Middle Reef,TRUE
+Original surveys,nsu11_esa,285,Middle Reef,TRUE
+Original surveys,nsu11_esa,290,Middle Reef,TRUE
+Original surveys,nsu11_esa,291,Middle Reef,TRUE
+Original surveys,nsu11_esa,292,Middle Reef,TRUE
+Original surveys,nsu11_esa,297,Middle Reef,TRUE
+Original surveys,nsu11_esa,298,Middle Reef,TRUE
+Original surveys,nsu11_esa,299,Middle Reef,TRUE
+Original surveys,nsu11_esa,306,Middle Reef,TRUE
+Original surveys,nsu11_esa,307,Middle Reef,TRUE
+Original surveys,nsu11_esa,308,Middle Reef,TRUE
+Original surveys,nsu11_esa,315,Middle Reef,TRUE
+Original surveys,nsu11_esa,316,Middle Reef,TRUE
+Original surveys,nsu11_esa,317,Middle Reef,TRUE
+Original surveys,nsu11_esa,323,Middle Reef,TRUE
+Original surveys,nsu11_esa,324,Middle Reef,TRUE
+Original surveys,nsu11_esa,325,Middle Reef,TRUE
+Original surveys,nsu11_esa,326,Middle Reef,TRUE
+Original surveys,nsu11_esa,331,Middle Reef,TRUE
+Original surveys,nsu11_esa,332,Middle Reef,TRUE
+Original surveys,nsu11_esa,333,Middle Reef,TRUE
+Original surveys,nsu11_esa,334,Middle Reef,TRUE
+Original surveys,nsu11_esa,340,Middle Reef,TRUE
+Original surveys,nsu11_esa,341,Middle Reef,TRUE
+Original surveys,nsu11_esa,342,Middle Reef,TRUE
+Original surveys,nsu11_esa,343,Middle Reef,TRUE
+Original surveys,nsu11_esa,348,Middle Reef,TRUE
+Original surveys,nsu11_esa,349,Middle Reef,TRUE
+Original surveys,nsu11_esa,350,Middle Reef,TRUE
+Original surveys,nsu11_esa,351,Middle Reef,TRUE
+Original surveys,nsu11_esa,356,Middle Reef,TRUE
+Original surveys,nsu11_esa,357,Middle Reef,TRUE
+Original surveys,nsu11_esa,358,Middle Reef,TRUE
+Original surveys,nsu11_esa,359,Middle Reef,TRUE
+Original surveys,nsu11_esa,364,Middle Reef,TRUE
+Original surveys,nsu11_esa,365,Middle Reef,TRUE
+Original surveys,nsu11_esa,366,Middle Reef,TRUE
+Original surveys,nsu11_esa,371,Middle Reef,TRUE
+Original surveys,nsu11_esa,372,Middle Reef,TRUE
+Original surveys,nsu11_esa,373,Middle Reef,TRUE
+Original surveys,nsu11_esa,313,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,318,Middle Reef,TRUE
+Original surveys,nsu11_esa,223,Inner Reef,TRUE
+Original surveys,nsu11_esa,190,Middle Reef,TRUE
+Original surveys,nsu11_esa,196,Middle Reef,TRUE
+Original surveys,nsu11_esa,116,Middle Reef,TRUE
+Original surveys,nsu11_esa,132,Middle Reef,TRUE
+Original surveys,nsu11_esa,147,Middle Reef,TRUE
+Original surveys,nsu11_esa,117,Middle Reef,TRUE
+Original surveys,nsu11_esa,118,Middle Reef,TRUE
+Original surveys,nsu11_esa,133,Middle Reef,TRUE
+Original surveys,nsu11_esa,134,Middle Reef,TRUE
+Original surveys,nsu11_esa,148,Middle Reef,TRUE
+Original surveys,nsu11_esa,159,Middle Reef,TRUE
+Original surveys,nsu11_esa,168,Middle Reef,TRUE
+Original surveys,nsu11_esa,176,Middle Reef,TRUE
+Original surveys,nsu11_esa,49,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,5,Artificial,TRUE
+Original surveys,nsu11_esa,6,Artificial,TRUE
+Original surveys,nsu11_esa,8,Artificial,TRUE
+Original surveys,nsu11_esa,9,Artificial,TRUE
+Original surveys,nsu11_esa,12,Inner Reef,TRUE
+Original surveys,nsu11_esa,30,Inner Reef,TRUE
+Original surveys,nsu11_esa,50,Inner Reef,TRUE
+Original surveys,nsu11_esa,68,Inner Reef,TRUE
+Original surveys,nsu11_esa,85,Inner Reef,TRUE
+Original surveys,nsu11_esa,2,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,3,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,4,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,21,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,22,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,40,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,41,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,59,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,60,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,76,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,77,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,92,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,93,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,106,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,107,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,122,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,123,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,138,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,1,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,18,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,19,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,20,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,36,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,37,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,38,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,39,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,55,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,56,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,57,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,58,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,72,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,73,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,74,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,75,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,89,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,90,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,91,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,104,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,105,Nearshore Ridge Complex,TRUE
+Original surveys,nsu11_esa,13,Middle Reef,TRUE
+Original surveys,nsu11_esa,31,Middle Reef,TRUE
+Original surveys,nsu11_esa,51,Middle Reef,TRUE
+Original surveys,nsu11_esa,14,Middle Reef,TRUE
+Original surveys,nsu11_esa,32,Middle Reef,TRUE
+Original surveys,nsu11_esa,121,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,137,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,151,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,162,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,171,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,179,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,186,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,193,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,199,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,206,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,214,Aggregated Patch Reef,TRUE
+Original surveys,nsu11_esa,16,Outer Reef,TRUE
+Original surveys,nsu11_esa,34,Outer Reef,TRUE
+Original surveys,nsu11_esa,53,Outer Reef,TRUE
+Original surveys,nsu11_esa,70,Outer Reef,TRUE
+Original surveys,nsu11_esa,87,Outer Reef,TRUE
+Original surveys,nsu11_esa,102,Outer Reef,TRUE
+Original surveys,nsu11_esa,191,Outer Reef,TRUE
+Original surveys,nsu11_esa,197,Outer Reef,TRUE
+Original surveys,nsu11_esa,204,Outer Reef,TRUE
+Original surveys,nsu11_esa,212,Outer Reef,TRUE
+Original surveys,nsu11_esa,221,Outer Reef,TRUE
+Original surveys,nsu11_esa,268,Outer Reef,TRUE
+Original surveys,nsu11_esa,278,Outer Reef,TRUE
+Original surveys,nsu11_esa,286,Outer Reef,TRUE
+Original surveys,nsu11_esa,294,Outer Reef,TRUE
+Original surveys,nsu11_esa,301,Outer Reef,TRUE
+Original surveys,nsu11_esa,310,Outer Reef,TRUE
+Original surveys,nsu11_esa,320,Outer Reef,TRUE
+Original surveys,nsu11_esa,336,Outer Reef,TRUE
+Original surveys,nsu11_esa,345,Outer Reef,TRUE
+Original surveys,nsu11_esa,353,Outer Reef,TRUE
+Original surveys,nsu11_esa,361,Outer Reef,TRUE
+Original surveys,nsu11_esa,368,Outer Reef,TRUE
+Original surveys,nsu11_esa,375,Outer Reef,TRUE
+Original surveys,nsu11_esa,17,Outer Reef,TRUE
+Original surveys,nsu11_esa,35,Outer Reef,TRUE
+Original surveys,nsu11_esa,54,Outer Reef,TRUE
+Original surveys,nsu11_esa,71,Outer Reef,TRUE
+Original surveys,nsu11_esa,88,Outer Reef,TRUE
+Original surveys,nsu11_esa,103,Outer Reef,TRUE
+Original surveys,nsu11_esa,120,Outer Reef,TRUE
+Original surveys,nsu11_esa,136,Outer Reef,TRUE
+Original surveys,nsu11_esa,150,Outer Reef,TRUE
+Original surveys,nsu11_esa,161,Outer Reef,TRUE
+Original surveys,nsu11_esa,170,Outer Reef,TRUE
+Original surveys,nsu11_esa,178,Outer Reef,TRUE
+Original surveys,nsu11_esa,185,Outer Reef,TRUE
+Original surveys,nsu11_esa,192,Outer Reef,TRUE
+Original surveys,nsu11_esa,198,Outer Reef,TRUE
+Original surveys,nsu11_esa,205,Outer Reef,TRUE
+Original surveys,nsu11_esa,213,Outer Reef,TRUE
+Original surveys,nsu11_esa,222,Outer Reef,TRUE
+Original surveys,nsu11_esa,229,Outer Reef,TRUE
+Original surveys,nsu11_esa,230,Outer Reef,TRUE
+Original surveys,nsu11_esa,237,Outer Reef,TRUE
+Original surveys,nsu11_esa,238,Outer Reef,TRUE
+Original surveys,nsu11_esa,245,Outer Reef,TRUE
+Original surveys,nsu11_esa,246,Outer Reef,TRUE
+Original surveys,nsu11_esa,252,Outer Reef,TRUE
+Original surveys,nsu11_esa,253,Outer Reef,TRUE
+Original surveys,nsu11_esa,260,Outer Reef,TRUE
+Original surveys,nsu11_esa,261,Outer Reef,TRUE
+Original surveys,nsu11_esa,269,Outer Reef,TRUE
+Original surveys,nsu11_esa,270,Outer Reef,TRUE
+Original surveys,nsu11_esa,279,Outer Reef,TRUE
+Original surveys,nsu11_esa,287,Outer Reef,TRUE
+Original surveys,nsu11_esa,288,Outer Reef,TRUE
+Original surveys,nsu11_esa,295,Outer Reef,TRUE
+Original surveys,nsu11_esa,302,Outer Reef,TRUE
+Original surveys,nsu11_esa,311,Outer Reef,TRUE
+Original surveys,nsu11_esa,321,Outer Reef,TRUE
+Original surveys,nsu11_esa,328,Outer Reef,TRUE
+Original surveys,nsu11_esa,329,Outer Reef,TRUE
+Original surveys,nsu11_esa,337,Outer Reef,TRUE
+Original surveys,nsu11_esa,346,Outer Reef,TRUE
+Original surveys,nsu11_esa,354,Outer Reef,TRUE
+Original surveys,nsu11_esa,362,Outer Reef,TRUE
+Original surveys,nsu11_esa,369,Outer Reef,TRUE
+Original surveys,nsu11_esa,376,Outer Reef,TRUE
+Original surveys,dca17_esa,37,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,49,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,38,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,39,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,40,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,41,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,42,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,43,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,50,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,51,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,52,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,53,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,54,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,55,Inner Reef,TRUE
+Original surveys,dca17_esa,44,Inner Reef,TRUE
+Original surveys,dca17_esa,45,Middle Reef,TRUE
+Original surveys,dca17_esa,46,Middle Reef,TRUE
+Original surveys,dca17_esa,56,Inner Reef,TRUE
+Original surveys,dca17_esa,57,Middle Reef,TRUE
+Original surveys,dca17_esa,58,Middle Reef,TRUE
+Original surveys,dca17_esa,47,Outer Reef,TRUE
+Original surveys,dca17_esa,59,Outer Reef,TRUE
+Original surveys,dca17_esa,60,Outer Reef,TRUE
+Original surveys,dca17_esa,14,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,26,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,15,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,16,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,17,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,18,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,19,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,20,Inner Reef,TRUE
+Original surveys,dca17_esa,27,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,28,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,29,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,30,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,31,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,32,Inner Reef,TRUE
+Original surveys,dca17_esa,21,Inner Reef,TRUE
+Original surveys,dca17_esa,22,Middle Reef,TRUE
+Original surveys,dca17_esa,23,Middle Reef,TRUE
+Original surveys,dca17_esa,33,Inner Reef,TRUE
+Original surveys,dca17_esa,34,Middle Reef,TRUE
+Original surveys,dca17_esa,35,Middle Reef,TRUE
+Original surveys,dca17_esa,24,Outer Reef,TRUE
+Original surveys,dca17_esa,25,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,36,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,99,Sand,FALSE
+Original surveys,dca17_esa,100,Middle Reef,TRUE
+Original surveys,dca17_esa,112,Middle Reef,TRUE
+Original surveys,dca17_esa,113,Middle Reef,TRUE
+Original surveys,dca17_esa,101,Sand,FALSE
+Original surveys,dca17_esa,102,Outer Reef,TRUE
+Original surveys,dca17_esa,103,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,114,Outer Reef,TRUE
+Original surveys,dca17_esa,115,Outer Reef,TRUE
+Original surveys,dca17_esa,116,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,61,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,62,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,63,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,64,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,65,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,66,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,67,Inner Reef,TRUE
+Original surveys,dca17_esa,68,Inner Reef,TRUE
+Original surveys,dca17_esa,69,Middle Reef,TRUE
+Original surveys,dca17_esa,70,Middle Reef,TRUE
+Original surveys,dca17_esa,84,Middle Reef,TRUE
+Original surveys,dca17_esa,71,Outer Reef,TRUE
+Original surveys,dca17_esa,72,Outer Reef,TRUE
+Original surveys,dca17_esa,73,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,85,Sand,FALSE
+Original surveys,dca17_esa,86,Outer Reef,TRUE
+Original surveys,dca17_esa,87,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,143,Middle Reef,TRUE
+Original surveys,dca17_esa,145,Outer Reef,TRUE
+Original surveys,dca17_esa,146,Outer Reef,TRUE
+Original surveys,dca17_esa,147,Outer Reef,TRUE
+Original surveys,dca17_esa,148,Ridge,FALSE
+Original surveys,dca17_esa,118,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,108,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,109,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,110,Inner Reef,TRUE
+Original surveys,dca17_esa,111,Inner Reef,TRUE
+Original surveys,dca17_esa,119,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,120,Artificial,TRUE
+Original surveys,dca17_esa,121,Artificial,TRUE
+Original surveys,dca17_esa,123,Inner Reef,TRUE
+Original surveys,dca17_esa,124,Inner Reef,TRUE
+Original surveys,dca17_esa,125,Middle Reef,TRUE
+Original surveys,dca17_esa,126,Middle Reef,TRUE
+Original surveys,dca17_esa,127,Middle Reef,TRUE
+Original surveys,dca17_esa,128,Outer Reef,TRUE
+Original surveys,dca17_esa,129,Outer Reef,TRUE
+Original surveys,dca17_esa,130,Outer Reef,TRUE
+Original surveys,dca17_esa,131,Ridge,FALSE
+Original surveys,dca17_esa,132,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,133,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,134,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,135,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,136,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,137,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,141,Inner Reef,TRUE
+Original surveys,dca17_esa,142,Inner Reef,TRUE
+Original surveys,dca17_esa,144,Middle Reef,TRUE
+Original surveys,dca17_esa,122,Artificial,TRUE
+Original surveys,dca17_esa,48,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,105,Artificial,TRUE
+Original surveys,dca17_esa,106,Sand,FALSE
+Original surveys,dca17_esa,107,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,94,Artificial,TRUE
+Original surveys,dca17_esa,95,Artificial,TRUE
+Original surveys,dca17_esa,96,Artificial,TRUE
+Original surveys,dca17_esa,90,Artificial,TRUE
+Original surveys,dca17_esa,91,Artificial,TRUE
+Original surveys,dca17_esa,92,Artificial,TRUE
+Original surveys,dca17_esa,93,Artificial,TRUE
+Original surveys,dca17_esa,88,Artificial,TRUE
+Original surveys,dca17_esa,89,Artificial,TRUE
+Original surveys,dca17_esa,97,Artificial,TRUE
+Original surveys,dca17_esa,98,Artificial,TRUE
+Original surveys,dca17_esa,81,Artificial,TRUE
+Original surveys,dca17_esa,82,Artificial,TRUE
+Original surveys,dca17_esa,78,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,79,Sand,FALSE
+Original surveys,dca17_esa,80,Artificial,TRUE
+Original surveys,dca17_esa,140,Artificial,TRUE
+Original surveys,dca17_esa,74,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,75,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,76,Artificial,TRUE
+Original surveys,dca17_esa,77,Artificial,TRUE
+Original surveys,dca17_esa,83,Artificial,TRUE
+Original surveys,dca17_esa,139,Artificial,TRUE
+Original surveys,dca17_esa,138,Artificial,TRUE
+Original surveys,dca17_esa,154,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,158,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,155,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,156,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,157,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,159,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,160,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,161,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,162,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,152,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,153,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,163,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,150,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,151,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,149,Sand,FALSE
+Original surveys,dca17_esa,117,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,104,Artificial,TRUE
+Original surveys,dca17_esa,2,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,3,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,4,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,5,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,6,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,7,Nearshore Ridge Complex,TRUE
+Original surveys,dca17_esa,8,Inner Reef,TRUE
+Original surveys,dca17_esa,9,Inner Reef,TRUE
+Original surveys,dca17_esa,10,Middle Reef,TRUE
+Original surveys,dca17_esa,11,Middle Reef,TRUE
+Original surveys,dca17_esa,12,Outer Reef,TRUE
+Original surveys,dca17_esa,13,Aggregated Patch Reef,TRUE
+Original surveys,dca17_esa,1,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-1-AR,Artificial,TRUE
+Original surveys,dca17,IN-10-AR,Artificial,TRUE
+Original surveys,dca17,IN-100-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-101-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-102-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-103-AR,Artificial,TRUE
+Original surveys,dca17,IN-104-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-105-AR,Artificial,TRUE
+Original surveys,dca17,IN-106-AR,Artificial,TRUE
+Original surveys,dca17,IN-107-AR,Artificial,TRUE
+Original surveys,dca17,IN-108-AR,Artificial,TRUE
+Original surveys,dca17,IN-109-AR,Artificial,TRUE
+Original surveys,dca17,IN-11-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-110-AR,Artificial,TRUE
+Original surveys,dca17,IN-111-AR,Artificial,TRUE
+Original surveys,dca17,IN-112-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-113-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-114-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-115-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-116-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-117-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-118-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-119-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-12-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-120-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-13-AR,Artificial,TRUE
+Original surveys,dca17,IN-14-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-15-AR,Artificial,TRUE
+Original surveys,dca17,IN-16-AR,Artificial,TRUE
+Original surveys,dca17,IN-17-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-171-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-172-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-173-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-174-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-175-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-176-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-177-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-178-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-179-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-18-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-180-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-19-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-193-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-194-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-195-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-2-AR,Artificial,TRUE
+Original surveys,dca17,IN-20-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-21-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-22-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-23-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-24-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-25-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-26-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-27-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-28-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-29-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-3-AR,Artificial,TRUE
+Original surveys,dca17,IN-30-LR,Inner Reef,TRUE
+Original surveys,dca17,IN-4-AR,Artificial,TRUE
+Original surveys,dca17,IN-5-AR,Artificial,TRUE
+Original surveys,dca17,IN-6-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-7-AR,Artificial,TRUE
+Original surveys,dca17,IN-8-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-81-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-82-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-83-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-84-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-85-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-86-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-87-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-88-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-89-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-9-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-90-RR,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-91-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-92-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-93-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-94-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-95-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-96-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-97-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,IN-98-AR,Artificial,TRUE
+Original surveys,dca17,IN-99-CP,Nearshore Ridge Complex,TRUE
+Original surveys,dca17,MI-121-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-122-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-123-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-124-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-125-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-126-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-127-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-128-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-129-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-130-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-181-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-182-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-183-AR,Artificial,TRUE
+Original surveys,dca17,MI-184-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-185-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-186-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-187-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-31-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-32-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-33-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-34-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-35-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-36-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-37-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-38-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-39-LR,Middle Reef,TRUE
+Original surveys,dca17,MI-40-LR,Middle Reef,TRUE
+Original surveys,dca17,OU-131-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-132-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-133-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-134-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-135-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-136-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-137-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-138-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-139-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-140-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-141-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-142-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-143-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-144-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-145-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-146-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-147-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-148-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-149-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-150-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-151-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-152-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-153-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-154-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-155-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-156-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-157-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-158-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-159-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-160-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-161-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-162-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-163-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-164-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-165-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-166-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-167-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-168-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-169-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-170-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-188-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-189-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-190-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-191-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-192-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-41-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-42-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-43-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-44-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-45-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-46-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-47-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-48-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-49-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-50-CP,Outer Reef,TRUE
+Original surveys,dca17,OU-51-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-52-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-53-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-54-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-55-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-56-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-57-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-58-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-59-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-60-LR,Outer Reef,TRUE
+Original surveys,dca17,OU-61-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-62-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-63-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-64-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-65-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-66-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-67-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-68-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-69-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-70-SG,Outer Reef,TRUE
+Original surveys,dca17,OU-71-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-72-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-73-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-74-PR,Outer Reef,TRUE
+Original surveys,dca17,OU-75-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-76-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-77-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-78-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-79-PR,Aggregated Patch Reef,TRUE
+Original surveys,dca17,OU-80-PR,Aggregated Patch Reef,TRUE
+Original surveys,tt21,12,Nearshore Ridge Complex,TRUE
+Original surveys,tt21,13,Inlet Channel,FALSE
+Original surveys,tt21,16,Inner Reef,TRUE
+Original surveys,tt21,17,Scattered Rock in Unconsolidated Sediment,FALSE
+Original surveys,tt21,1,Middle Reef,TRUE
+Original surveys,tt21,2,Middle Reef,TRUE
+Original surveys,tt21,3,Outer Reef,TRUE
+Original surveys,tt21,4,Outer Reef,TRUE
+Original surveys,tt21,5,Outer Reef,TRUE
+Original surveys,tt21,6,Outer Reef,TRUE
+Original surveys,tt21,7,Outer Reef,TRUE
+Original surveys,tt21,8,Aggregated Patch Reef,TRUE
+Original surveys,tt21,9,Aggregated Patch Reef,TRUE
+Original surveys,tt21,18,Nearshore Ridge Complex,TRUE
+Original surveys,tt21,19,Nearshore Ridge Complex,TRUE
+Original surveys,tt21,20,Inner Reef,TRUE
+Original surveys,tt21,21,Inner Reef,TRUE
+Original surveys,tt21,22,Middle Reef,TRUE
+Original surveys,tt21,23,Middle Reef,TRUE
+Original surveys,tt21,24,Outer Reef,TRUE
+Original surveys,tt21,25,Outer Reef,TRUE
+Original surveys,tt21,26,Outer Reef,TRUE
+Original surveys,tt21,27,Aggregated Patch Reef,TRUE
+Original surveys,tt21,28,Outer Reef,TRUE
+Original surveys,tt21,29,Aggregated Patch Reef,TRUE
+Original surveys,tt21,30,Aggregated Patch Reef,TRUE
+Original surveys,tt21,31,Nearshore Ridge Complex,TRUE
+Original surveys,tt21,32,Nearshore Ridge Complex,TRUE
+Original surveys,tt21,33,Inner Reef,TRUE
+Original surveys,tt21,34,Middle Reef,TRUE
+Original surveys,tt21,35,Outer Reef,TRUE
+Original surveys,tt21,36,Outer Reef,TRUE
+Original surveys,tt21,37,Aggregated Patch Reef,TRUE
+Original surveys,tt21,38,Nearshore Ridge Complex,TRUE
+Original surveys,tt21,39,Nearshore Ridge Complex,TRUE
+Original surveys,tt21,40,Inner Reef,TRUE
+Original surveys,tt21,41,Inner Reef,TRUE
+Original surveys,tt23,na1,Artificial,TRUE
+Original surveys,tt23,na2,Artificial,TRUE
+Original surveys,tt23,na3,Artificial,TRUE
+Original surveys,tt23,na4,Artificial,TRUE
+Original surveys,tt23,na5,Artificial,TRUE
+Original surveys,tt23,na6,Artificial,TRUE
+Original surveys,tt23,na7,Artificial,TRUE
+Original surveys,tt23,na8,Artificial,TRUE
+Original surveys,tt23,nb1,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb2,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb3,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb4,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb5,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb6,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb7,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb8,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb9,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb10,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb11,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb12,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb13,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb14,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb15,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb16,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb17,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb18,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb19,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb20,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb21,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb22,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb23,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nb24,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,nc1,Artificial,TRUE
+Original surveys,tt23,nc2,Artificial,TRUE
+Original surveys,tt23,nc3,Artificial,TRUE
+Original surveys,tt23,nd1,Inner Reef,TRUE
+Original surveys,tt23,nd2,Inner Reef,TRUE
+Original surveys,tt23,nd3,Inner Reef,TRUE
+Original surveys,tt23,nd4,Inner Reef,TRUE
+Original surveys,tt23,nd5,Inner Reef,TRUE
+Original surveys,tt23,nd6,Inner Reef,TRUE
+Original surveys,tt23,nd7,Inner Reef,TRUE
+Original surveys,tt23,nd8,Inner Reef,TRUE
+Original surveys,tt23,ne1,Middle Reef,TRUE
+Original surveys,tt23,ne2,Middle Reef,TRUE
+Original surveys,tt23,ne3,Middle Reef,TRUE
+Original surveys,tt23,ne4,Middle Reef,TRUE
+Original surveys,tt23,ne5,Middle Reef,TRUE
+Original surveys,tt23,ne6,Middle Reef,TRUE
+Original surveys,tt23,ne7,Middle Reef,TRUE
+Original surveys,tt23,ne8,Middle Reef,TRUE
+Original surveys,tt23,ne9,Middle Reef,TRUE
+Original surveys,tt23,ne10,Middle Reef,TRUE
+Original surveys,tt23,ne11,Middle Reef,TRUE
+Original surveys,tt23,nf1,Middle Reef,TRUE
+Original surveys,tt23,nf2,Middle Reef,TRUE
+Original surveys,tt23,nf3,Middle Reef,TRUE
+Original surveys,tt23,nf4,Middle Reef,TRUE
+Original surveys,tt23,nf7,Middle Reef,TRUE
+Original surveys,tt23,nf8,Middle Reef,TRUE
+Original surveys,tt23,ng1,Outer Reef,TRUE
+Original surveys,tt23,ng2,Outer Reef,TRUE
+Original surveys,tt23,ng3,Outer Reef,TRUE
+Original surveys,tt23,ng7,Outer Reef,TRUE
+Original surveys,tt23,ng8,Outer Reef,TRUE
+Original surveys,tt23,ng9,Outer Reef,TRUE
+Original surveys,tt23,nh1,Outer Reef,TRUE
+Original surveys,tt23,nh2,Outer Reef,TRUE
+Original surveys,tt23,nh3,Outer Reef,TRUE
+Original surveys,tt23,nh4,Outer Reef,TRUE
+Original surveys,tt23,nh5,Outer Reef,TRUE
+Original surveys,tt23,nh6,Outer Reef,TRUE
+Original surveys,tt23,nh7,Outer Reef,TRUE
+Original surveys,tt23,ni1,Outer Reef,TRUE
+Original surveys,tt23,ni2,Outer Reef,TRUE
+Original surveys,tt23,ni3,Outer Reef,TRUE
+Original surveys,tt23,ni4,Outer Reef,TRUE
+Original surveys,tt23,ni5,Outer Reef,TRUE
+Original surveys,tt23,ni6,Outer Reef,TRUE
+Original surveys,tt23,sa1,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sa2,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb1,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb2,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb3,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb4,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb5,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb6,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb7,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb8,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sb9,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc1,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc2,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc3,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc5,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc6,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc7,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc8,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc9,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc10,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc11,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc12,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc13,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc14,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc15,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc16,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sc17,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,sd1,Artificial,TRUE
+Original surveys,tt23,se1,Inner Reef,TRUE
+Original surveys,tt23,se2,Inner Reef,TRUE
+Original surveys,tt23,se3,Inner Reef,TRUE
+Original surveys,tt23,se4,Inner Reef,TRUE
+Original surveys,tt23,se5,Inner Reef,TRUE
+Original surveys,tt23,se6,Inner Reef,TRUE
+Original surveys,tt23,se7,Inner Reef,TRUE
+Original surveys,tt23,sf1,Middle Reef,TRUE
+Original surveys,tt23,sf2,Middle Reef,TRUE
+Original surveys,tt23,sf3,Middle Reef,TRUE
+Original surveys,tt23,sf4,Middle Reef,TRUE
+Original surveys,tt23,sg1,Middle Reef,TRUE
+Original surveys,tt23,sg2,Middle Reef,TRUE
+Original surveys,tt23,sg3,Middle Reef,TRUE
+Original surveys,tt23,sg4,Middle Reef,TRUE
+Original surveys,tt23,sg5,Middle Reef,TRUE
+Original surveys,tt23,sg6,Middle Reef,TRUE
+Original surveys,tt23,sg7,Middle Reef,TRUE
+Original surveys,tt23,sg8,Middle Reef,TRUE
+Original surveys,tt23,sg9,Middle Reef,TRUE
+Original surveys,tt23,sh3,Outer Reef,TRUE
+Original surveys,tt23,sh4,Outer Reef,TRUE
+Original surveys,tt23,sh5,Outer Reef,TRUE
+Original surveys,tt23,sh6,Outer Reef,TRUE
+Original surveys,tt23,sh7,Outer Reef,TRUE
+Original surveys,tt23,sh8,Outer Reef,TRUE
+Original surveys,tt23,sh9,Outer Reef,TRUE
+Original surveys,tt23,sh10,Outer Reef,TRUE
+Original surveys,tt23,si3,Outer Reef,TRUE
+Original surveys,tt23,si4,Outer Reef,TRUE
+Original surveys,tt23,si5,Outer Reef,TRUE
+Original surveys,tt23,si6,Outer Reef,TRUE
+Original surveys,tt23,si7,Outer Reef,TRUE
+Original surveys,tt23,sj1,Outer Reef,TRUE
+Original surveys,tt23,sj2,Outer Reef,TRUE
+Original surveys,tt23,sj3,Outer Reef,TRUE
+Original surveys,tt23,sj4,Outer Reef,TRUE
+Original surveys,tt23,sj5,Outer Reef,TRUE
+Original surveys,tt23,sj6,Outer Reef,TRUE
+Original surveys,tt23,lrin1,Inner Reef,TRUE
+Original surveys,tt23,lrin2,Inner Reef,TRUE
+Original surveys,tt23,lrmnw1,Middle Reef,TRUE
+Original surveys,tt23,lrmnw2,Middle Reef,TRUE
+Original surveys,tt23,cpsn1,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsn2,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsn3,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsn4,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,an1,Artificial,TRUE
+Original surveys,tt23,an2,Artificial,TRUE
+Original surveys,tt23,cpsse1,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsse2,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsse3,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsse4,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsse5,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsse6,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsse7,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,cpsse8,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,lrmsw1,Middle Reef,TRUE
+Original surveys,tt23,lrmsw2,Middle Reef,TRUE
+Original surveys,tt23,rss1,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,rss2,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,rss3,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,rss4,Nearshore Ridge Complex,TRUE
+Original surveys,tt23,lris1,Inner Reef,TRUE
+Original surveys,tt23,lris2,Inner Reef,TRUE
+Original surveys,drm24,1124,Inner Reef,TRUE
+Original surveys,drm24,1127,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1128,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1130,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1131,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1132,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1133,Inner Reef,TRUE
+Original surveys,drm24,1134,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1137,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1138,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1139,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,1141,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,2111,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,2112,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,2115,Inner Reef,TRUE
+Original surveys,drm24,2116,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,2117,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,2120,Inner Reef,TRUE
+Original surveys,drm24,3097,Sand,FALSE
+Original surveys,drm24,3068,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3069,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3070,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3071,Inner Reef,TRUE
+Original surveys,drm24,3072,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3110,Inner Reef,TRUE
+Original surveys,drm24,3073,Inner Reef,TRUE
+Original surveys,drm24,3074,Inner Reef,TRUE
+Original surveys,drm24,3075,Inner Reef,TRUE
+Original surveys,drm24,3076,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3077,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3078,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3079,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3080,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3081,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3082,Inner Reef,TRUE
+Original surveys,drm24,3083,Inner Reef,TRUE
+Original surveys,drm24,3084,Inner Reef,TRUE
+Original surveys,drm24,3085,Inner Reef,TRUE
+Original surveys,drm24,3086,Inner Reef,TRUE
+Original surveys,drm24,3087,Inner Reef,TRUE
+Original surveys,drm24,3095,Nearshore Ridge Complex,TRUE
+Original surveys,drm24,3088,Middle Reef,TRUE
+Original surveys,drm24,3089,Middle Reef,TRUE
+Original surveys,drm24,3090,Middle Reef,TRUE
+Original surveys,drm24,3091,Middle Reef,TRUE
+Original surveys,drm24,3092,Middle Reef,TRUE
+Original surveys,drm24,3093,Middle Reef,TRUE
+Broader DRM,drm24,AA1083,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1084,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1086,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1087,Inner Reef,TRUE
+Broader DRM,drm24,AA1089,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1090,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1091,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1092,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1094,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1095,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1096,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1097,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1098,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1099,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1102,Middle Reef,TRUE
+Broader DRM,drm24,AA1104,Sand,FALSE
+Broader DRM,drm24,AA1108,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1109,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1110,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1111,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1113,Inner Reef,TRUE
+Broader DRM,drm24,AA1114,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1149,Sand,FALSE
+Broader DRM,drm24,AA1152,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1153,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1154,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1155,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1156,Inner Reef,TRUE
+Broader DRM,drm24,AA1157,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1158,Sand,FALSE
+Broader DRM,drm24,AA1159,Middle Reef,TRUE
+Broader DRM,drm24,AA1160,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1161,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1162,Inner Reef,TRUE
+Broader DRM,drm24,AA1163,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1164,Middle Reef,TRUE
+Broader DRM,drm24,AA1166,Inner Reef,TRUE
+Broader DRM,drm24,AA1167,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1168,Middle Reef,TRUE
+Broader DRM,drm24,AA1169,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1171,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1172,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1174,Outer Reef,TRUE
+Broader DRM,drm24,AA1175,Acropora cervicornis,FALSE
+Broader DRM,drm24,AA1176,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1177,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1178,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1179,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1180,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1181,Inner Reef,TRUE
+Broader DRM,drm24,AA1182,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1183,Outer Reef,TRUE
+Broader DRM,drm24,AA1184,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1185,Middle Reef,TRUE
+Broader DRM,drm24,AA1186,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1187,Middle Reef,TRUE
+Broader DRM,drm24,AA1188,Middle Reef,TRUE
+Broader DRM,drm24,AA1189,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1190,Inner Reef,TRUE
+Broader DRM,drm24,AA1191,Inner Reef,TRUE
+Broader DRM,drm24,AA1192,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1194,Inner Reef,TRUE
+Broader DRM,drm24,AA1196,Inner Reef,TRUE
+Broader DRM,drm24,AA1197,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1198,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1199,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1200,Middle Reef,TRUE
+Broader DRM,drm24,AA1201,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1202,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1203,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1204,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1205,Inner Reef,TRUE
+Broader DRM,drm24,AA1206,Outer Reef,TRUE
+Broader DRM,drm24,AA1207,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1208,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1209,Inner Reef,TRUE
+Broader DRM,drm24,AA1210,Sand,FALSE
+Broader DRM,drm24,AA1211,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1212,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1213,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1214,Inner Reef,TRUE
+Broader DRM,drm24,AA1215,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1216,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1217,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1218,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA1219,Inner Reef,TRUE
+Broader DRM,drm24,AA1220,Outer Reef,TRUE
+Broader DRM,drm24,AA1221,Inner Reef,TRUE
+Broader DRM,drm24,AA1222,Middle Reef,TRUE
+Broader DRM,drm24,AA1223,Outer Reef,TRUE
+Broader DRM,drm24,AA2097,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA2098,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA2099,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA2100,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA2101,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA2151,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA2158,Nearshore Ridge Complex,TRUE
+Broader DRM,drm24,AA3067,Middle Reef,TRUE

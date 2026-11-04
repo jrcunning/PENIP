@@ -1,0 +1,2 @@
+response_scale,observations,posterior_draws,mean,sd,lower,upper
+Colony counts,16340,4000,0.24121499921295345,0.03925524833327235,0.1883544660437539,0.3406650811772165

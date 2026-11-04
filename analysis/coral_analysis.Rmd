@@ -1,18 +1,149 @@
 ---
-title: "Port Everglades Coral Survey Data Analysis"
+title: "Coral population density analysis"
 author: "R. Cunning"
-date: "2025-09-05"
-output: 
+date: "2026-11-03"
+output:
   html_document:
     toc: true
     toc_float: true
-    toc_depth: 2      
+    toc_depth: 2
     number_sections: true
+    code_folding: show
+    self_contained: true
+params:
+  output_directory: "outputs/coral_analysis"
+  allow_new_fit: false
+  regional_distributional_effects: false
+  prior_version: "revised"
+  chains: 4
+  warmup: 1000
+  sampling: 1000
+  threads_per_chain: 5
+  adapt_delta: 0.95
+  max_treedepth: 11
+  seed: 20261026
 ---
 
+<style>
+.main-container { max-width: 1250px; }
+table { display: block; overflow-x: auto; }
+th, td { white-space: nowrap; }
+pre { max-height: 650px; overflow-y: auto; }
+</style>
+
+This document contains the main coral analysis using the joint `brms` model.
+It rebuilds the same original adult/juvenile observations and the added 2024
+Broward–Miami DRM observations directly from raw inputs. Only surveyed responses
+enter the likelihood. PEV remains the 1,200 m north/south channel-edge band.
+
+The count family, searched-area offset, taxon × class × habitat structure and
+shared survey effects follow the original PEV framework. Regional count
+coefficients are specific to each taxon/class/habitat cell. Zero inflation and
+shape retain their taxon × class × habitat predictors. The
+`regional_distributional_effects` parameter controls whether they additionally
+allow regional departures; this run uses **`r if (params$regional_distributional_effects) "regional departures" else "shared zero inflation and shape across regions"`**.
+Direction variation has a
+separate SD in each region. Ordinary `brms` centering uses the combined dataset.
+This is a new fit, not a claim of exact equivalence to the cached Stan pilot.
+This run uses **`r params$prior_version` priors**. The revised candidate keeps
+the count priors and uses zero-centered zi/shape coefficients with an explicit
+Normal(−1, 1.5) prior for the centered log-shape intercept.
+
+**Every manuscript density prediction explicitly selects PEV.** Broward–Miami
+predictions are used for regional comparisons and model checks. Prediction
+averaging and 2024 targets are separate from fitting-time centering.
+
+This run uses `r params$chains` chains with `r params$warmup` warmup and
+`r params$sampling` sampling iterations each, with `r params$threads_per_chain`
+threads per chain.
+Sampling diagnostics below determine whether it is ready for manuscript inference.
+The report, coral-only outputs and cached fit stay in `r params$output_directory`.
+The manuscript coral figures and appendix tables are also published to `outputs/`.
+Run `analysis/integrated_figures_tables.Rmd` afterward to produce the combined
+coral–conch Fig 1, Table 1 and Table 2 in that directory. The original PEV
+analysis is preserved as `coral_analysis_original.Rmd` under
+`old_working_files/coral_analysis_original_2026-11-03/analysis/`.
+Shared source inputs and the archived original remain protected. Earlier
+model experiments are archived separately and are not runtime dependencies.
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE,
+                      fig.width = 10, fig.height = 7, out.width = "100%")
+options(knitr.kable.NA = "")
+options(knitr.graphics.rel_path = FALSE)
+defaults <- list(
+  output_directory = "outputs/coral_analysis", allow_new_fit = FALSE,
+  regional_distributional_effects = FALSE, prior_version = "revised",
+  chains = 4, warmup = 1000, sampling = 1000,
+  threads_per_chain = 5, adapt_delta = 0.95, max_treedepth = 11, seed = 20261026
+)
+if (!exists("params")) params <- defaults
+stopifnot(is.logical(params$regional_distributional_effects),
+          length(params$regional_distributional_effects) == 1L,
+          !is.na(params$regional_distributional_effects))
+stopifnot(length(params$prior_version) == 1L,
+          params$prior_version %in% c("original", "revised"))
+project_root <- normalizePath(getwd())
+while (!file.exists(file.path(project_root, "data/spatial/Habitat classifications.kml"))) {
+  parent <- dirname(project_root)
+  if (parent == project_root) stop("Open this document inside the PENIP project.")
+  project_root <- parent
+}
+knitr::opts_knit$set(root.dir = project_root)
+output_dir <- file.path(project_root, params$output_directory)
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+output_dir <- normalizePath(output_dir)
+stopifnot(startsWith(output_dir, paste0(project_root, "/outputs/")),
+          output_dir != file.path(project_root, "outputs"))
+output_file <- function(...) {
+  path <- file.path(output_dir, ...)
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  path
+}
+processed_file <- function(...) output_file("data", ...)
+show_table <- function(x, digits = 4) knitr::kable(x, digits = digits, row.names = FALSE)
+set.seed(params$seed)
+
+# Protect shared inputs, conch results and the archived original coral analysis.
+# The current coral products in outputs/ are intentionally regenerated below.
+protected_files <- c(
+  file.path(project_root, "analysis/conch_analysis.Rmd"),
+  file.path(project_root, "outputs", c("Fig7.png", "Fig8.png", "FigA7.png", "FigA8.png")),
+  list.files(file.path(project_root, "outputs/cache"), recursive = TRUE, full.names = TRUE),
+  list.files(file.path(project_root, "old_working_files/coral_analysis_original_2026-11-03"),
+             recursive = TRUE, full.names = TRUE),
+  list.files(file.path(project_root, "data"), recursive = TRUE, full.names = TRUE)
+)
+protected_files <- unique(protected_files[file.exists(protected_files) & !dir.exists(protected_files)])
+original_checksums <- data.frame(path = protected_files,
+                                md5 = unname(tools::md5sum(protected_files)))
+
+# Save manuscript figures in their original sizes and also provide vector PDFs.
+save_figure <- function(filename, plot = ggplot2::last_plot(), ...) {
+  stopifnot(startsWith(normalizePath(dirname(filename)), output_dir))
+  ggplot2::ggsave(filename = filename, plot = plot, ...)
+  if (grepl("(^|/)(Fig[1-6]|FigA[1-6]|coral_Fig1)[.]png$", filename)) {
+    arguments <- list(...)
+    arguments$dpi <- NULL
+    arguments$device <- if (Sys.info()[["sysname"]] == "Darwin") {
+      function(filename, width, height, bg = "white", ...) {
+        grDevices::quartz(type = "pdf", file = filename, width = width, height = height, bg = bg)
+      }
+    } else grDevices::cairo_pdf
+    do.call(ggplot2::ggsave, c(list(filename = sub("[.]png$", ".pdf", filename), plot = plot), arguments))
+  }
+  invisible(filename)
+}
 ```
+
+The first sections import all original surveys and the broader DRM observations,
+then apply a pooled taxon cutoff (>5 colonies), coverage-aware zero completion
+and shared habitat filtering. Original sites retain the local habitat layer;
+additional DRM sites use the regional layer, with PTCH excluded. Table 1 and
+the compilation totals describe the full dataset. Local survey-location panels
+retain the original cohort, and manuscript source-averaging grids retain their
+original availability conventions. The raw-versus-modeled density check uses
+only observations classified as PEV.
 
 # Setup
 ```{r libraries}
@@ -21,7 +152,6 @@ library(MASS)   # for fitdistr
 library(stats)  # for qlogis
 library(sf)
 library(xml2)
-library(brms)
 library(vegan)
 library(kableExtra)
 library(treemapify)
@@ -34,6 +164,10 @@ library(ggtext)
 library(patchwork)
 library(moments)
 library(colorspace)
+library(posterior)
+library(digest)
+library(jsonlite)
+library(brms)
 ```
 
 ```{r definitions}
@@ -126,7 +260,7 @@ names(dataset_labels) <- dataset_levels
 
 ## Coral survey data
 ### 2011 NSU ESA Survey
-```{r}
+```{r import-nsu-2011}
 # Import data
 nsu11_esa0 <- readxl::read_xlsx("data/2011_nsu_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx",
                            sheet = "2011_NSU_ESA survey") %>%
@@ -161,7 +295,7 @@ nsu11_esa_counts_ag <- nsu11_esa_counts %>%
 ```
 
 ### 2017 DCA ESA Survey
-```{r}
+```{r import-dca-esa-2017}
 # Site metadata
 dca17_esa_sitemd0 <- readxl::read_xlsx("data/2017_dca_esa/Port Everglades_NSU 2011and DCA 2017_ESA surveys.xlsx",
                                        sheet = "2017_DCA_ESA survey") %>% janitor::clean_names()
@@ -340,8 +474,6 @@ tt21_esa_sitemd <- tt21_esa_sitemd0 %>%
   # total sum transect length * length of recorded sediment * 4m width - 16m2 overlap (crossed design)
   mutate(area = ((200 - sum_of_no_rb_sed_segment_cover) * 4) - 16) %>%
   select(site, area)
-
-
 
 
 # Coral data - recon belt transects
@@ -674,11 +806,6 @@ t1t2juv_long_updated <- t1t2juv_long %>%
   select(-drm_site_id)
 
 
-
-
-
-
-
 # Combine all data
 drm24_long <- bind_rows(adults_long, juv_long, t1t2juv_long_updated) %>%
   mutate(team = "Shedd Aquarium")
@@ -824,6 +951,103 @@ drm24_counts_combined <- drm24_counts_combined %>%
 drm24_sitemd <- drm24_sitemd %>% filter(site %in% unique(drm24_counts_combined$site))
 ```
 
+### 2024 broader Broward–Miami DRM survey
+
+The additional adult observations come from the cleaned annual DRM2024 export.
+The four comprehensively surveyed juvenile groups come from the annual juvenile
+worksheet. Only Broward–Miami is imported. All Shedd metadata sites are removed
+from the additional import, including the targeted ACER sites and sites absent
+from the annual export, so observations cannot enter twice. The DRM PTCH
+exclusion is retained. Habitat selection happens below, after all imports.
+
+```{r import-regional-drm-2024}
+annual_environment <- new.env(parent = emptyenv())
+load("data/full_drm_2024/2024.RData", envir = annual_environment)
+stopifnot("df24" %in% ls(annual_environment))
+drm_regional <- annual_environment$df24 %>%
+  transmute(site = as.character(Site), transect_num = as.integer(Transect),
+            latitude = Latitude, longitude = Longitude,
+            subregion = as.character(Subregion), drm_habitat = as.character(Habitat),
+            species = as.character(Species), width = Width, height = Height) %>%
+  filter(subregion == "Broward-Miami")
+regional_site_coordinates <- drm_regional %>%
+  filter(transect_num %in% 1:2) %>%
+  distinct(site, latitude, longitude, subregion, drm_habitat)
+stopifnot(!anyDuplicated(regional_site_coordinates$site))
+all_pev_metadata_ids <- penipsites %>% pull(drm_site_id) %>% as.character()
+regional_import_audit <- regional_site_coordinates %>%
+  mutate(in_original_metadata = sub("^AA", "", site) %in% all_pev_metadata_ids,
+         import_exclusion = case_when(
+           in_original_metadata ~ "Original metadata site: do not add twice",
+           drm_habitat == "PTCH" ~ "DRM PTCH excluded",
+           TRUE ~ "Imported for habitat assignment"))
+regional_import_sites <- regional_import_audit %>%
+  filter(import_exclusion == "Imported for habitat assignment") %>%
+  arrange(site)
+write_csv(regional_import_audit, output_file("regional_import_audit.csv"))
+
+# Use the same adult genus lookup as the six original survey imports.
+target_species <- c("CNAT", "DSTO", "DLAB", "MMEA", "MANG", "MALI", "MFER", "MLAM", "PCLI", "PSTR")
+adult_records_imported <- drm_regional %>%
+  semi_join(regional_import_sites, by = "site") %>%
+  filter(!is.na(species), species != "", pmax(width, height, na.rm = TRUE) >= 4,
+         transect_num %in% 1:2 | (transect_num %in% 3:4 & species %in% target_species)) %>%
+  left_join(taxon_lookup, by = c("species" = "taxon")) %>%
+  mutate(taxon = coalesce(taxon_group, species))
+regional_adult_counts_imported <- adult_records_imported %>%
+  count(site, taxon, name = "n") %>%
+  mutate(class = ">4cm", transect_area_m2 = if_else(taxon %in% c(target_species, "MYCE"), 40, 20))
+
+# These responses were searched on every transect. Other regional juvenile
+# responses are absent from the import and are never filled with zeros.
+juvenile_fields <- c(MCAV = "montastraea_ct", MEAN = "meandrinidae_ct",
+                     MUSS = "mussinae_ct", FAVI = "faviinae_ct")
+juvenile_records_imported <- readxl::read_xlsx("data/2024_shedd_drm/2024ANU_JuvenileCoralData_Shedd.xlsx") %>%
+  janitor::clean_names() %>% filter(subregion == "Broward-Miami") %>%
+  mutate(site = as.character(site)) %>% semi_join(regional_import_sites, by = "site")
+missing_juvenile_transects <- anti_join(
+  crossing(site = regional_import_sites$site, transect_num = 1:4), juvenile_records_imported,
+  by = c("site", "transect_num")
+)
+stopifnot(nrow(missing_juvenile_transects) == 0,
+          !anyDuplicated(juvenile_records_imported[c("site", "transect_num")]),
+          all(vapply(juvenile_records_imported[unname(juvenile_fields)],
+                     function(x) all(is.finite(x) & x >= 0 & x == round(x)), logical(1))))
+juvenile_transect_counts_imported <- juvenile_records_imported %>%
+  select(site, transect_num, all_of(unname(juvenile_fields))) %>%
+  pivot_longer(all_of(unname(juvenile_fields)), names_to = "field", values_to = "n") %>%
+  mutate(taxon = names(juvenile_fields)[match(field, juvenile_fields)],
+         class = "<4cm", transect_area_m2 = 10)
+regional_juvenile_counts_imported <- juvenile_transect_counts_imported %>%
+  group_by(site, taxon, class) %>%
+  summarize(n = sum(n), transect_area_m2 = sum(transect_area_m2), .groups = "drop")
+regional_counts_imported <- bind_rows(regional_adult_counts_imported,
+                                     regional_juvenile_counts_imported) %>%
+  mutate(dataset = "drm24", source_cohort = "Broader DRM")
+```
+
+### Combine standardized survey observations
+
+All surveys now enter one compilation before habitat assignment or the pooled
+rare-taxon filter. Source-specific search rules and areas are retained. The
+original and additional DRM observations share the `drm24` model dataset; the
+cohort label records their origin for coverage checks and survey summaries.
+
+```{r combine-imported-observations}
+original_counts_imported <- bind_rows(.id = "dataset",
+  nsu11_esa = nsu11_esa_counts_ag,
+  dca17_esa = dca17_esa_counts_ag_full,
+  dca17 = dca17_counts_ag,
+  tt21 = tt21_counts_ag,
+  tt23 = tt23_counts_ag2,
+  drm24 = drm24_counts_combined
+)
+survey_counts_imported <- bind_rows(
+  mutate(original_counts_imported, source_cohort = "Original surveys"),
+  regional_counts_imported
+)
+```
+
 ## Spatial data
 ### Habitat types
 ```{r habitat_maps, fig.width = 10, fig.height = 10}
@@ -911,7 +1135,7 @@ polygons_final <- polygons_final %>%
 
 saveRDS(
   polygons_final,
-  file = "data/processed/polygons_final.rds"
+  file = processed_file("polygons_final.rds")
 )
 
 # Save a finer-scale habitat version using the KML Modifier field
@@ -920,12 +1144,12 @@ polygons_fine_final <- polygons_final %>%
 
 saveRDS(
   polygons_fine_final,
-  file = "data/processed/polygons_fine_final.rds"
+  file = processed_file("polygons_fine_final.rds")
 )
 ```
 
 #### Assign survey sites to habitats
-```{r}
+```{r assign-survey-habitats}
 # Combine site metadata, and assign north and south
 allsitemd <- bind_rows(.id = "dataset",
   nsu11_esa = nsu11_esa_sitemd,
@@ -956,11 +1180,54 @@ joined_df <- joined %>%
          latitude = st_coordinates(.)[,2]) %>%
   st_drop_geometry()
 
-allsitemd <- joined_df
+allsitemd_original <- joined_df
 
 # Add factor if survey was ESA coral species only
-allsitemd <- allsitemd %>%
+allsitemd_original <- allsitemd_original %>%
   mutate(ESAonly = if_else(dataset %in% c("nsu11_esa", "dca17_esa"), "ESA only", "All corals"))
+
+# Original surveys retain their local KML assignments. Map the additional
+# regional sites with the broader layer, using the same four reef classes.
+# Where polygons overlap, an accepted reef class takes precedence over Sand;
+# conflicting accepted reef classes are reported rather than silently chosen.
+regional_habitats <- st_read("data/spatial/drm_regional_habitat/habitat_polygons.geojson", quiet = TRUE) %>%
+  st_zm() %>% st_transform(32617) %>% st_make_valid()
+regional_points <- st_as_sf(regional_site_coordinates,
+                            coords = c("longitude", "latitude"), crs = 4326, remove = FALSE) %>%
+  st_transform(32617)
+regional_hits <- st_join(regional_points, select(regional_habitats, Type, Modifier),
+                         join = st_within) %>%
+  st_drop_geometry() %>%
+  mutate(mapped_type = case_when(Type == "Artificial" ~ "Nearshore Ridge Complex",
+                                Type == "Aggregated Patch Reef" ~ "Outer Reef",
+                                TRUE ~ as.character(Type)))
+regional_site_audit <- regional_hits %>%
+  group_by(site, latitude, longitude, subregion, drm_habitat) %>%
+  summarize(source_types = paste(sort(unique(na.omit(Type))), collapse = "; "),
+            reef_types = list(sort(unique(mapped_type[mapped_type %in% type_levels]))),
+            .groups = "drop") %>%
+  mutate(n_reef_types = lengths(reef_types),
+         Type = map_chr(reef_types, ~if (length(.x) == 1) .x else NA_character_),
+         in_original_metadata = sub("^AA", "", site) %in% all_pev_metadata_ids,
+         exclusion = case_when(
+           in_original_metadata ~ "Original metadata site: do not add twice",
+           drm_habitat == "PTCH" ~ "DRM PTCH excluded",
+           n_reef_types > 1 ~ "Conflicting reef classes",
+           n_reef_types == 0 ~ "Outside the four mapped reef strata",
+           TRUE ~ "Retained")) %>%
+  select(-reef_types)
+stopifnot(!any(regional_site_audit$n_reef_types > 1 & !regional_site_audit$in_original_metadata))
+write_csv(regional_site_audit, output_file("regional_site_classification_audit.csv"))
+regional_site_metadata <- regional_site_audit %>%
+  semi_join(regional_import_sites, by = "site") %>%
+  mutate(dataset = "drm24", dir = if_else(latitude > 26.093570, "N", "S"),
+         Type = coalesce(Type, na_if(source_types, "")),
+         source_cohort = "Broader DRM") %>%
+  select(dataset, site, latitude, longitude, Type, dir, source_cohort)
+allsitemd <- bind_rows(
+  mutate(allsitemd_original, source_cohort = "Original surveys"),
+  regional_site_metadata
+)
 
 # Get manual habitat Type fill colors
 typecols <- RColorBrewer::brewer.pal(nlevels(factor(polygons_final$Type)) + 1, "Set3")[-1]
@@ -985,7 +1252,7 @@ polyplot <- polygons_final %>%
 ```
 
 ### Impact zones
-```{r}
+```{r impact-and-monitoring-polygons}
 # Impact zone Scenario 2 and NMFS consideration areas
 # Define the extraction function once
 extract_placemark_info <- function(kml_file, source_label) {
@@ -1394,7 +1661,7 @@ tick_labels <- data.frame(
 ```
 
 #### Area of habitats in impact zones
-```{r}
+```{r habitat-areas-and-table-a1}
 polygons_final %>%
   st_make_valid() %>%
   st_intersection(all_zones_sf) %>%
@@ -1472,7 +1739,7 @@ area_summary_acres <- area_summary %>%
   # Round acres columns to 3 decimal places
   mutate(across(ends_with("_acres"), ~ round(.x, 3)))
 
-write_csv(area_summary_acres, file = "outputs/TableA1.csv")
+write_csv(area_summary_acres, file = output_file("TableA1.csv"))
 
 area_summary_acres
 ```
@@ -1481,15 +1748,10 @@ area_summary_acres
 
 ## Combine surveys datasets
 ```{r combine_data}
-# Combine all aggregated count data
-df <- bind_rows(.id = "dataset",
-  nsu11_esa = nsu11_esa_counts_ag,
-  dca17_esa = dca17_esa_counts_ag_full,
-  dca17 = dca17_counts_ag,
-  tt21 = tt21_counts_ag,
-  tt23 = tt23_counts_ag2,
-  drm24 = drm24_counts_combined     # use data aggregated to 1 pseudo-transect - already has transect_area_m2
-)
+# Imported observations have already been combined before mapping habitats.
+# Review original-survey size evidence separately because those surveys
+# supplied the NSU size-class convention.
+df <- original_counts_imported
 
 # Justify decision to class all NSU observations (ACER/DSTO/ORBI) as >4cm
 df %>%
@@ -1503,19 +1765,25 @@ df %>%
 ```
 
 ## Filter out rare taxa
-```{r}
-# Filter out taxa with very few observations
-# Drop taxa with very few observations
-sppcounts <- df %>%
+```{r taxon-coverage-and-effort}
+# Apply the same rarity rule to all imported, taxonomically harmonized
+# observations before habitat filtering: retain totals strictly greater than 5.
+sppcounts <- survey_counts_imported %>%
   group_by(taxon) %>%
-  summarize(total = sum(n), .groups = "drop") %>%
-  arrange(total) 
-sppcounts 
+  summarize(original_total = sum(n[source_cohort == "Original surveys"]),
+            regional_total = sum(n[source_cohort == "Broader DRM"]),
+            total = sum(n), .groups = "drop") %>%
+  mutate(retained = total > 5) %>%
+  arrange(total)
+show_table(sppcounts, digits = 0)
+write_csv(sppcounts, output_file("taxon_filter_audit.csv"))
+retained_taxa <- sppcounts %>% filter(retained) %>% pull(taxon)
+survey_counts_kept <- survey_counts_imported %>% filter(taxon %in% retained_taxa)
 
-df <- df %>%
-  filter(taxon %in% filter(sppcounts, total >= 5)$taxon)
-# Taxa with less than 5 total observations were filtered out, which included: FFRA, HCUC, PAME, SCOL, OCUL
-
+# Complete zeros only within each survey's actual response coverage. The
+# original surveys retain their established ESA/all-taxon search grids.
+df <- survey_counts_kept %>%
+  filter(source_cohort == "Original surveys") %>% select(-source_cohort)
 
 # Ensure explicit zeros are included for all taxa searched for but not observed (e.g., ACER never recorded in TT23 dataset)
 # Step 1: Get taxon:class combos from the full df (i.e., all combos ever observed anywhere)
@@ -1607,6 +1875,23 @@ df_completed <- df_completed %>%
     dataset == "tt23" & site %in% tt23v_sitemd$site ~ 10,  # vertical wall sites
     dataset == "tt23" ~ 20,                                # all other tt23 sites
     TRUE ~ transect_area_m2))
+
+# The added DRM adult search grid contains the retained adult taxa. Juvenile
+# rows are restricted to MCAV/MEAN/MUSS/FAVI, each searched across all 40 m².
+# Keeping these grids separate prevents zero-filling unsurveyed juveniles.
+df_completed_original <- df_completed
+adult_taxa <- sort(unique(df$taxon[df$class == ">4cm"]))
+regional_adults_completed <- expand_grid(site = regional_import_sites$site, taxon = adult_taxa) %>%
+  left_join(select(regional_adult_counts_imported, site, taxon, n), by = c("site", "taxon")) %>%
+  mutate(n = replace_na(n, 0L), class = ">4cm", dataset = "drm24",
+         transect_area_m2 = if_else(taxon %in% c(target_species, "MYCE"), 40, 20))
+regional_juveniles_completed <- regional_juvenile_counts_imported %>%
+  filter(taxon %in% retained_taxa) %>% mutate(dataset = "drm24")
+df_completed <- bind_rows(
+  mutate(df_completed_original, source_cohort = "Original surveys"),
+  mutate(regional_adults_completed, source_cohort = "Broader DRM"),
+  mutate(regional_juveniles_completed, source_cohort = "Broader DRM")
+)
 ```
 
 ## Filter by habitat
@@ -1626,9 +1911,15 @@ excluded %>%
   count(dataset, Type)
 
 
+# Apply the common habitat selection to the complete combined compilation.
+# Duplicate original metadata sites and regional PTCH sites were excluded
+# during import; they cannot re-enter through habitat pooling.
 # Filter dataset to just selected sites
 dff0 <- df_completed %>% inner_join(selected)
 dff <- df_completed %>% inner_join(selected)
+write_csv(allsitemd %>% distinct(source_cohort, dataset, site, Type) %>%
+            mutate(retained_habitat = Type %in% c(type_levels, "Artificial", "Aggregated Patch Reef")),
+          output_file("all_survey_habitat_filter_audit.csv"))
 ```
 
 Shedd dataset has some sites in the NRC south that are further from the channel relative to other datasets. Are these similar enough to the NRC south sites that are closer to the channel that they can be reasonably included?
@@ -1789,14 +2080,14 @@ dff[dff$Type == "Artificial", "Type"] <- "Nearshore Ridge Complex"
 
 
 Combine 'Aggregated Patch Reef' with 'Outer Reef', following previous studies (DCA)
-```{r}
+```{r pool-patch-and-outer-reef}
 dff[dff$Type == "Aggregated Patch Reef", "Type"] <- "Outer Reef"
 
 dff <- dff %>% mutate(Type = factor(Type, levels = type_levels))
 ```
 
 Remove ACER (zeros) from tt23 dataset
-```{r}
+```{r exclude-unsurveyed-tt23-acer}
 dstax <- dff %>%
   filter(!dataset %in% c("nsu11_esa", "dca17_esa")) %>%
   filter(n > 0) %>%
@@ -1815,14 +2106,25 @@ dstax %>%
 ## remove ACER from tt23 dff
 dff <- dff %>%
   filter(!(taxon == "ACER" & dataset == "tt23"))
+
+survey_counts <- dff
+dff <- survey_counts %>% filter(source_cohort == "Original surveys") %>% select(-source_cohort)
+selected_original <- selected %>% filter(source_cohort == "Original surveys") %>% select(-source_cohort)
 ```
 
 
 
 # Summarize combined dataset
-```{r}
+```{r combined-survey-summary-table1}
+# Report original survey efforts and the added regional DRM effort as separate
+# rows without creating another model dataset level.
+summary_counts <- survey_counts %>%
+  mutate(dataset = if_else(source_cohort == "Broader DRM", "drm24_regional", as.character(dataset)))
+summary_levels <- c(dataset_levels, "drm24_regional")
+summary_labels <- c(unname(dataset_labels), "2024 / Broward–Miami DRM")
+
 # Count number of sites per habitat
-nsites <- dff %>%
+nsites <- summary_counts %>%
   group_by(dataset, Type) %>%
   summarize(n = n_distinct(site)) %>%
   mutate(Type = factor(Type, levels = type_levels)) %>%
@@ -1831,20 +2133,20 @@ nsites <- dff %>%
   janitor::adorn_totals(where = "col", name = "Total Sites")
 
 # Get area surveyed per transect and total area surveyed
-area_per_site <- dff %>%
+area_per_site <- summary_counts %>%
   group_by(dataset) %>%
   summarise(
     area_per_site = {
       r <- range(transect_area_m2)
       if (r[1] == r[2]) as.character(r[1]) else paste(r, collapse = " - ")})
 
-total_area <- dff %>%
+total_area <- summary_counts %>%
   group_by(dataset, site) %>%
   summarize(max_area = max(transect_area_m2)) %>%
   summarize(total_area = round(sum(max_area), 0))
 
 # Get total number of corals counted
-total_corals <- dff %>%
+total_corals <- summary_counts %>%
   group_by(dataset) %>%
   summarize(total_n = sum(n))
 
@@ -1853,51 +2155,60 @@ survey_summary <- reduce(
   full_join,
   by = "dataset"
 ) %>%
-  mutate(dataset = factor(dataset, levels = dataset_levels)) %>%
+  mutate(dataset = factor(dataset, levels = summary_levels)) %>%
   arrange(dataset) %>% 
   janitor::adorn_totals(where = "row") %>%
-  mutate(dataset2 = c(dataset_labels, "Total"))
+  mutate(dataset2 = c(summary_labels, "Total"))
 
-dir.create("outputs/intermediate", recursive = TRUE, showWarnings = FALSE)
-write_csv(survey_summary, file = "outputs/intermediate/coral_Table1.csv")
+dir.create(output_file("intermediate"), recursive = TRUE, showWarnings = FALSE)
+write_csv(survey_summary, file = output_file("intermediate/coral_Table1.csv"))
 
 survey_summary %>% knitr::kable()
-
-
 
 
 # Summarize count data
 # Just get columns we need for modeling
 dfftaxon <- dff %>% select(dataset, Type, dir, site, transect_area_m2, taxon, class, n)
-write_csv(dfftaxon, file = "data/processed/all_coral_counts_processed.csv")
+all_coral_counts <- survey_counts %>%
+  select(dataset, Type, dir, site, transect_area_m2, taxon, class, n, source_cohort)
+write_csv(all_coral_counts, file = processed_file("all_coral_counts_processed.csv"))
+write_csv(dfftaxon, file = processed_file("original_coral_counts_processed.csv"))
+compilation_summary <- tibble(
+  observations = nrow(all_coral_counts), colonies = sum(all_coral_counts$n),
+  taxa = n_distinct(all_coral_counts$taxon),
+  survey_sites = n_distinct(interaction(all_coral_counts$dataset, all_coral_counts$site)),
+  added_regional_sites = n_distinct(all_coral_counts$site[all_coral_counts$source_cohort == "Broader DRM"])
+)
+write_csv(compilation_summary, output_file("compilation_summary.csv"))
+show_table(compilation_summary, digits = 0)
 
 # Number of observations/counts
-nrow(dfftaxon)
+nrow(all_coral_counts)
 
 # Number of colonies counted
-sum(dfftaxon$n)
+sum(all_coral_counts$n)
 
 # Number of taxa observed
-n_distinct(dfftaxon$taxon)
+n_distinct(all_coral_counts$taxon)
 
 # Number of sites surveyed
-n_distinct(interaction(dfftaxon$dataset, dfftaxon$site))
+n_distinct(interaction(all_coral_counts$dataset, all_coral_counts$site))
 
 
 
 # Zero-inflation / Number of zeros
-table(dfftaxon$n == 0)
+table(all_coral_counts$n == 0)
 
 # Overdispersion
-mean_count <- mean(dfftaxon$n)
-var_count <- var(dfftaxon$n)
+mean_count <- mean(all_coral_counts$n)
+var_count <- var(all_coral_counts$n)
 var_count / mean_count
 
-# Data are highly zero-inflated and overdispersed -- use zero-inflated negative binomial models. 
+# Data are highly zero-inflated and overdispersed -- use zero-inflated negative binomial models.
 ```
 
 # Map surveys & impact zones
-```{r}
+```{r regional-coastline-map}
 # High-resolution SE Florida coastline with GSHHG (no counties), plus ports & study box
 # ------------------------------------------------------------------------------------
 # Install if needed:
@@ -2002,7 +2313,8 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 
 # 1) Get a simple USA states outline
-usa_states <- ne_states(country = "United States of America", returnclass = "sf")
+# Use the bundled Natural Earth state layer: no network download.
+usa_states <- st_as_sf(rnaturalearthdata::states50)
 fl_outline <- usa_states %>% filter(name == "Florida")
 
 # 2) Define a Florida-wide bbox for inset
@@ -2063,14 +2375,7 @@ base_theme <- theme_minimal(base_size = 8) +
   )
 
 # Reorder survey datasets
-selected <- selected %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")))
-
-
-
-
-
-
-
+selected_original <- selected_original %>% mutate(dataset = factor(dataset, levels = c("nsu11_esa", "dca17_esa", "dca17", "tt21", "tt23", "drm24")))
 
 
 # Left panel: faceted survey locations
@@ -2080,7 +2385,7 @@ pp2 <- ggplot(polygons_final) +
 
   geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
   geom_point(
-    data = selected,
+    data = selected_original,
     aes(x = longitude, y = latitude),
     pch = 4, alpha = 0.6, size = 0.65, stroke = 0.3, inherit.aes = FALSE
   ) +
@@ -2140,11 +2445,11 @@ iz_plot_clean <- p +
   ) +
   theme(plot.margin = margin(0,0,0,0))
 
-dir.create("outputs/intermediate", recursive = TRUE, showWarnings = FALSE)
-saveRDS(p_final_with_inset, "outputs/intermediate/coral_fig1_panel_a_ggplot.rds")
-saveRDS(iz_plot_clean, "outputs/intermediate/coral_fig1_panel_c_ggplot.rds")
-ggsave(
-  "outputs/intermediate/coral_fig1_panel_c.png",
+dir.create(output_file("intermediate"), recursive = TRUE, showWarnings = FALSE)
+saveRDS(p_final_with_inset, output_file("intermediate/coral_fig1_panel_a_ggplot.rds"))
+saveRDS(iz_plot_clean, output_file("intermediate/coral_fig1_panel_c_ggplot.rds"))
+save_figure(
+  output_file("intermediate/coral_fig1_panel_c.png"),
   iz_plot_clean,
   width = 85,
   height = 120,
@@ -2210,8 +2515,8 @@ bottom_row <- plot_grid(NULL, fill_legend, ncol = 2, rel_widths = c(0.2, 0.6))
 final_final_fig <- plot_grid(final_fig, bottom_row, ncol = 1, rel_heights = c(0.92, 0.08))
 
 # Save output
-ggsave(
-  filename = "outputs/intermediate/coral_Fig1.png",
+save_figure(
+  filename = output_file("intermediate/coral_Fig1.png"),
   plot = final_final_fig,
   width = 220,
   height = 125,
@@ -2223,314 +2528,1428 @@ ggsave(
 ```
 
 
+# Joint adult and juvenile model
+
+## Geographic membership and original observations
+
+All survey observations have been imported and filtered above. The original
+survey subset is retained as the manuscript's source-availability reference;
+regional observations do not change those averaging weights. Region is assigned from coordinates, not
+survey team or file membership. Distances are in UTM 17N and measured north or
+south from the nearest channel bounding edge, not radially from the inlet.
+
+```{r joint-geography}
+original_survey_counts <- dfftaxon %>%
+  mutate(across(c(dataset, site, taxon, class, Type, dir), as.character),
+         original_pev_row = row_number())
+original_coordinates <- allsitemd_original %>%
+  select(dataset, site, latitude, longitude) %>%
+  distinct() %>%
+  semi_join(original_survey_counts, by = c("dataset", "site"))
+stopifnot(!anyDuplicated(original_coordinates[c("dataset", "site")]))
+channel_utm <- channel_poly %>% st_zm() %>% st_transform(32617) %>% st_make_valid()
+channel_bounds <- st_bbox(channel_utm)
+classify_region <- function(x) {
+  stopifnot(all(is.finite(x$latitude)), all(is.finite(x$longitude)))
+  points_utm <- st_as_sf(x, coords = c("longitude", "latitude"), crs = 4326) %>%
+    st_transform(32617)
+  northing <- st_coordinates(points_utm)[, 2]
+  x$ns_distance_from_channel_m <- pmax(channel_bounds[["ymin"]] - northing,
+                                      northing - channel_bounds[["ymax"]], 0)
+  x$region <- ifelse(x$ns_distance_from_channel_m <= 1200, "PEV", "Broward-Miami")
+  x
+}
+original_joint_counts <- original_survey_counts %>%
+  left_join(original_coordinates, by = c("dataset", "site")) %>%
+  classify_region() %>%
+  mutate(source = "Original surveys")
+write_csv(original_joint_counts, output_file("original_survey_geographic_assignments.csv"))
+geographic_rule <- data.frame(
+  rule = "PEV: <=1,200 m N/S of the nearest channel bounding edge",
+  crs_epsg = 32617, cutoff_m = 1200,
+  channel_ymin_m = channel_bounds[["ymin"]], channel_ymax_m = channel_bounds[["ymax"]],
+  pev_ymin_m = channel_bounds[["ymin"]] - 1200,
+  pev_ymax_m = channel_bounds[["ymax"]] + 1200
+)
+write_csv(geographic_rule, output_file("geographic_definition.csv"))
+
+# Both subsets come from the already combined, habitat-filtered survey_counts.
+# These origin labels are retained for audits; they do not define region.
+regional_sites <- regional_site_audit %>%
+  filter(exclusion == "Retained") %>%
+  mutate(dir = if_else(latitude > 26.093570, "N", "S")) %>% classify_region()
+write_csv(regional_sites, output_file("regional_site_metadata.csv"))
+show_table(count(regional_site_audit, exclusion))
+show_table(count(regional_sites, region, Type))
+regional_counts_columns <- c("site", "taxon", "n", "class", "dataset", "transect_area_m2", "Type", "dir")
+regional_adults <- survey_counts %>%
+  filter(source_cohort == "Broader DRM", class == ">4cm") %>%
+  select(all_of(regional_counts_columns)) %>% mutate(across(c(taxon, class, Type, dir), as.character)) %>%
+  left_join(select(regional_sites, site, latitude, longitude, region, ns_distance_from_channel_m), by = "site") %>%
+  mutate(source = "Added DRM2024 adults")
+regional_juveniles <- survey_counts %>%
+  filter(source_cohort == "Broader DRM", class == "<4cm") %>%
+  select(all_of(regional_counts_columns)) %>% mutate(across(c(taxon, class, Type, dir), as.character)) %>%
+  left_join(select(regional_sites, site, latitude, longitude, region, ns_distance_from_channel_m), by = "site") %>%
+  mutate(source = "Added DRM2024 juveniles")
+```
+
+## Survey coverage and raw-data quality control
+
+All surveys have already been imported, assigned habitats and filtered above.
+These checks report the retained regional transects, searched areas and raw
+versus cleaned adult records. The annual adult export is authoritative; the
+two fully recently dead worksheet colonies remain excluded.
+
+```{r regional-coverage-quality-control}
+regional_records <- drm_regional %>% semi_join(regional_sites, by = "site")
+adult_records <- adult_records_imported %>% semi_join(regional_sites, by = "site")
+adult_taxa <- sort(unique(original_survey_counts$taxon[original_survey_counts$class == ">4cm"]))
+write_csv(filter(adult_records, !taxon %in% adult_taxa),
+          output_file("regional_adult_taxa_outside_model.csv"))
+missing_sizes <- regional_records %>% filter(!is.na(species), is.na(width) & is.na(height))
+unexpected_extra_transects <- regional_records %>%
+  filter(transect_num %in% 3:4, !is.na(species), !species %in% target_species)
+write_csv(missing_sizes, output_file("adult_colonies_missing_sizes.csv"))
+write_csv(unexpected_extra_transects, output_file("adult_nontarget_T3_T4_records.csv"))
+stopifnot(nrow(missing_sizes) == 0, nrow(unexpected_extra_transects) == 0,
+          all(regional_adults$transect_area_m2[regional_adults$taxon == "MYCE"] == 40))
+juvenile_transect_counts <- juvenile_transect_counts_imported %>%
+  semi_join(regional_sites, by = "site")
+juvenile_audit <- juvenile_transect_counts %>%
+  group_by(taxon, transect_num) %>%
+  summarize(sites = n_distinct(site), colonies = sum(n), searched_m2 = sum(transect_area_m2),
+            .groups = "drop")
+write_csv(juvenile_transect_counts, output_file("regional_juvenile_transect_counts.csv"))
+write_csv(juvenile_audit, output_file("juvenile_transect_audit.csv"))
+show_table(juvenile_audit)
+adult_worksheet_files <- file.path("data/2024_shedd_drm", c(
+  "2024ANU_RawCoralDataTransect1and2_Shedd.xlsx",
+  "2024ANU_RawCoralDataTransect3and4_Shedd.xlsx"
+))
+adult_worksheet <- map_dfr(adult_worksheet_files, ~readxl::read_xlsx(.x, guess_max = 50000) %>%
+                            janitor::clean_names()) %>%
+  filter(subregion == "Broward-Miami") %>% mutate(site = as.character(site)) %>%
+  semi_join(regional_sites, by = "site")
+missing_adult_transects <- anti_join(crossing(site = regional_sites$site, transect_num = 1:4),
+                                    distinct(adult_worksheet, site, transect_num),
+                                    by = c("site", "transect_num"))
+stopifnot(nrow(missing_adult_transects) == 0)
+adult_audit <- adult_worksheet %>% group_by(transect_num) %>%
+  summarize(sites = n_distinct(site), raw_rows = n(), recorded_colonies = sum(!is.na(species)),
+            .groups = "drop")
+comparison_keys <- c("site", "transect_num", "species", "width", "height")
+adult_record_comparison <- full_join(
+  adult_worksheet %>% filter(!is.na(species)) %>% count(across(all_of(comparison_keys)), name = "worksheet_rows"),
+  regional_records %>% filter(!is.na(species)) %>% count(across(all_of(comparison_keys)), name = "annual_rows"),
+  by = comparison_keys
+) %>% mutate(across(c(worksheet_rows, annual_rows), ~replace_na(.x, 0L)),
+             difference = worksheet_rows - annual_rows)
+adult_record_differences <- filter(adult_record_comparison, difference != 0)
+stopifnot(nrow(adult_record_differences) == 2,
+          setequal(paste(adult_record_differences$site, adult_record_differences$transect_num,
+                         adult_record_differences$species), c("AA1083 2 SRAD", "AA1159 4 MALI")))
+write_csv(adult_audit, output_file("adult_transect_audit.csv"))
+write_csv(adult_record_comparison, output_file("adult_raw_multiset_validation.csv"))
+write_csv(adult_record_differences, output_file("adult_raw_vs_cleaned_differences.csv"))
+show_table(adult_audit)
+show_table(adult_record_differences)
+```
+
+## Assemble the full likelihood and check the spatial footprint
+
+```{r joint-likelihood-data}
+model_columns <- c("dataset", "site", "taxon", "class", "Type", "dir", "n",
+                   "transect_area_m2", "region", "source", "latitude", "longitude",
+                   "ns_distance_from_channel_m")
+joint_counts <- bind_rows(select(original_joint_counts, all_of(model_columns)),
+                          select(regional_adults, all_of(model_columns)),
+                          select(regional_juveniles, all_of(model_columns)))
+stopifnot(!anyDuplicated(joint_counts[c("dataset", "site", "taxon", "class")]),
+          all(joint_counts$n >= 0 & joint_counts$n == round(joint_counts$n)),
+          all(joint_counts$transect_area_m2 > 0))
+write_csv(joint_counts, output_file("joint_model_inputs.csv"))
+joint_survey_summary <- joint_counts %>% group_by(region, dataset, source, class, Type) %>%
+  summarize(sites = n_distinct(site), rows = n(), colonies = sum(n), .groups = "drop")
+write_csv(joint_survey_summary, output_file("joint_survey_summary.csv"))
+show_table(joint_survey_summary)
+
+# The geometric outlines differ, but all modeled sites must classify identically.
+zone_union <- st_union(st_transform(st_make_valid(all_zones_sf), 32617))
+geographic_sites <- distinct(joint_counts, dataset, site, region, latitude, longitude)
+geographic_points <- st_as_sf(geographic_sites, coords = c("longitude", "latitude"),
+                              crs = 4326, remove = FALSE) %>% st_transform(32617)
+geographic_sites$inside_original_polygon_union <- lengths(st_covered_by(geographic_points, zone_union)) > 0
+geographic_sites$inside_ns_band <- geographic_sites$region == "PEV"
+write_csv(geographic_sites, output_file("spatial_classification_crosscheck.csv"))
+stopifnot(all(geographic_sites$inside_original_polygon_union == geographic_sites$inside_ns_band))
+pev_raw_counts <- joint_counts %>% filter(region == "PEV")
+
+# Freeze the original source-coverage grid for manuscript source averaging.
+# These are weights/grids, not reuse of the old fitted posterior.
+prediction_reference <- dfftaxon
+```
+
+## Specify the joint model in brms
+
+This candidate keeps the same observed likelihood rows and scientific targets
+as the previous joint pilot. The following choices are explicit:
+
+| Component | brms candidate |
+|:--|:--|
+| Observations | Identical counts, effort, site/source, taxon/class/habitat and regional assignments |
+| Family and offset | Zero-inflated negative binomial; log searched area |
+| Baseline structure | Original taxon:class * Type for counts, zi and shape |
+| Baseline coefficient priors | Selected explicitly by prior_version; count priors retained in both versions |
+| Intercept centering | Ordinary combined-data brms centering, including regional count columns |
+| Regional count differences | One normal(0, 1.5) coefficient on the log NB mean per taxon/class/habitat cell |
+| Regional zi/shape differences | Optional independent cell slopes; disabled in the shared-distribution pilot |
+| Shared survey effects | Original survey/habitat and survey/taxon/class grouping and priors |
+| Direction | Taxon/class/habitat/direction groups; separate exponential(4) SDs by region |
+| Manuscript predictions | Explicit PEV; survey effects retained and direction effects zero |
+| Regional comparisons | Explicit paired PEV and Broward–Miami predictions for drm24; equal habitat weights |
+
+The combined centering changes the intercept's meaning and the induced prior
+covariance, particularly its relationship with regional count coefficients.
+This is an intentional prior parameterization choice, not an assertion that
+all cell-density priors are identical to the previous fit. The conditional
+prior predictive checks expose the resulting density scales. The original
+priors put nonzero means on zi/shape coefficients; the revised version puts
+these coefficients around zero and explicitly calibrates the log-shape intercept.
 
 
+`regional` is 0 for PEV and 1 for Broward–Miami. The count term
+`regional:cell` gives every taxon × class × habitat cell its own regional
+coefficient on the log NB mean. When `regional_distributional_effects` is true,
+the zero-inflation and shape terms use a regional random slope for each cell,
+with separate half-normal(0, 0.75) SD priors. When it is false, both parameters
+are shared across regions within each taxon/class/habitat cell; the regional
+count coefficients remain. Shared source effects retain
+the original structure, and `by = region` permits different direction SDs.
 
+```{r joint-model-data}
+taxon_class_grid <- original_survey_counts %>% distinct(taxon, class) %>%
+  arrange(taxon, class) %>% mutate(tc_id = row_number())
+cell_grid <- crossing(taxon_class_grid, Type = type_levels) %>%
+  arrange(tc_id, match(Type, type_levels)) %>%
+  mutate(cell_id = row_number(), habitat_id = match(Type, type_levels))
+joint_counts <- joint_counts %>%
+  left_join(select(cell_grid, taxon, class, Type, cell_id, tc_id),
+            by = c("taxon", "class", "Type"))
+for (variable in c("taxon", "class", "Type")) {
+  levels_used <- if (is.factor(prediction_reference[[variable]])) {
+    levels(prediction_reference[[variable]])
+  } else sort(unique(prediction_reference[[variable]]))
+  joint_counts[[variable]] <- factor(joint_counts[[variable]], levels = levels_used)
+}
+joint_counts <- joint_counts %>%
+  mutate(region = factor(region, levels = c("PEV", "Broward-Miami")),
+         dataset = factor(dataset, levels = dataset_levels),
+         regional = as.integer(region == "Broward-Miami"),
+         cell = factor(cell_id, levels = cell_grid$cell_id,
+                       labels = paste(cell_grid$taxon, cell_grid$class, cell_grid$Type, sep = "__")),
+         direction_group = interaction(region, taxon, class, Type, dir, drop = TRUE))
+stopifnot(!anyNA(joint_counts[c("n", "regional", "cell", "direction_group", "transect_area_m2")]),
+          all(joint_counts$transect_area_m2 > 0))
+model_data <- as.data.frame(joint_counts)
+prepared <- list(counts = joint_counts, grid = cell_grid, tc = taxon_class_grid,
+                 datasets = dataset_levels, original_data = prediction_reference,
+                 data = list(K = nrow(cell_grid), target_dataset = match("drm24", dataset_levels)))
+saveRDS(prepared, processed_file("prepared_joint_inputs.rds"))
+show_table(data.frame(original_rows = nrow(original_survey_counts),
+                     added_adult_rows = nrow(regional_adults), added_juvenile_rows = nrow(regional_juveniles),
+                     model_rows = nrow(joint_counts), taxon_class_habitat_cells = nrow(cell_grid)))
+```
 
-
-
-# Statistical modeling 
+```{r joint-model-formula}
+joint_formula <- bf(
+  n ~ taxon:class * Type + regional:cell +
+    (1 + Type | dataset) +
+    (1 | dataset:taxon:class) +
+    (1 | gr(direction_group, by = region)) +
+    offset(log(transect_area_m2)),
+  zi ~ taxon:class * Type,
+  shape ~ taxon:class * Type
+)
+# Retain the earlier flexible pilot as an explicitly selectable benchmark.
+if (params$regional_distributional_effects) {
+  joint_formula <- bf(
+    n ~ taxon:class * Type + regional:cell +
+      (1 + Type | dataset) +
+      (1 | dataset:taxon:class) +
+      (1 | gr(direction_group, by = region)) +
+      offset(log(transect_area_m2)),
+    zi ~ taxon:class * Type + (0 + regional | cell),
+    shape ~ taxon:class * Type + (0 + regional | cell)
+  )
+}
+joint_family <- zero_inflated_negbinomial()
+```
 
 ## Generate data-informed priors
-```{r}
-# Generate some data-informed priors to use in ZINB models
 
-# Filter for valid, non-zero counts for count model summaries
-df_pos <- dfftaxon %>%
+This section follows the four descriptive calculations in
+the archived `coral_analysis_original.Rmd`, now using all observations entering
+the joint likelihood.
+The original observations are summarized alongside the joint data to show what
+changed when the regional surveys were added. These calculations inform broad,
+rounded prior choices; they do not automatically replace the chosen constants
+each time the document is rendered. The same observations inform calibration
+and the likelihood, so these are data-informed regularization choices, not
+independent external prior evidence or estimates of hyperparameter uncertainty.
+
+### Count intercept and taxon/class/habitat effects
+
+```{r generate-count-priors}
+# Repeat the original positive-density summaries on the joint observations.
+# Area is the actual search effort for that taxon and size class at each site.
+df_pos <- model_data %>%
   filter(n > 0) %>%
   mutate(density = n / transect_area_m2,
          log_density = log(density))
+summary(df_pos$log_density)
+sd(df_pos$log_density)
 
-# PRIOR FOR INTERCEPT (count model log mean density, class = "Intercept")
-summary_log_density <- summary(df_pos$log_density)
-summary_log_density
-# Output: 
- #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- # -8.189  -3.401  -2.708  -2.781  -1.609   2.046 
-
-# Prior choice:
-# Center at ~mean or median (e.g., -2.8 ≈ exp(-2.8) ≈ 0.06/m²)
-# SD wide enough to cover most observed log densities
-# => normal(-2.8, 1.8)
-# This covers ~log densities from -6.5 to 1.5 => densities from ~0.0015 to ~4.5
-
-# PRIOR FOR FIXED EFFECTS (class = "b")
 group_effects <- df_pos %>%
   group_by(taxon, class, Type) %>%
   summarize(mean_log_density = mean(log_density), .groups = "drop")
+sd(group_effects$mean_log_density)
 
-sd_group_effects <- sd(group_effects$mean_log_density)
-sd_group_effects
-summary(group_effects$mean_log_density)
+# Compare with the reconstructed original PEV survey cohort, before adding DRM.
+original_positive <- original_survey_counts %>%
+  filter(n > 0) %>%
+  mutate(log_density = log(n / transect_area_m2))
+original_group_effects <- original_positive %>%
+  group_by(taxon, class, Type) %>%
+  summarize(mean_log_density = mean(log_density), .groups = "drop")
+count_prior_calibration <- data.frame(
+  observations = c("Original surveys", "Joint observations"),
+  rows = c(nrow(original_survey_counts), nrow(model_data)),
+  mean_positive_log_density = c(mean(original_positive$log_density), mean(df_pos$log_density)),
+  sd_positive_log_density = c(sd(original_positive$log_density), sd(df_pos$log_density)),
+  sd_positive_cell_means = c(sd(original_group_effects$mean_log_density),
+                            sd(group_effects$mean_log_density))
+)
+write_csv(count_prior_calibration, output_file("prior_calibration_counts.csv"))
+show_table(count_prior_calibration, digits = 3)
 
-# Prior choice:
-# Effects likely centered near 0 (mean difference from Intercept)
-# Use a bit wider SD to regularize: normal(0, 2.0)
+# PRIOR CHOICES (declared explicitly in joint_priors below):
+# Count Intercept: normal(-2.8, 1.8), retained from the original analysis.
+# Count b effects: normal(0, 2), retained as a broad, symmetric effect prior.
+```
 
-# PRIOR FOR ZERO-INFLATION (logit of zero probability)
-zi_est <- dfftaxon %>%
+The joint positive log-density mean is about −2.73 with SD 1.72, close to the
+original −2.78 and 1.79. This supports retaining `normal(-2.8, 1.8)` as a rough
+count-intercept anchor. However, it describes positive observations; the
+negative-binomial mean also governs NB-generated zeros. The fitted intercept
+uses the combined-data predictor centering in brms, so this empirical location
+is a heuristic, not a direct estimate of that intercept or of PEV density.
+
+Positive cell means have SD about 1.30 versus 1.34 originally. Their spread is
+not the SD of an individual coded coefficient, and all-zero cells are omitted
+from this positive-only calculation. We therefore retain `normal(0, 2)` for
+the count coefficients rather than tightening it mechanically to 1.30.
+Expected density also includes zero inflation; the prior predictive checks
+below evaluate the priors induced on that actual prediction target.
+
+### Zero inflation
+
+```{r generate-zero-inflation-priors}
+# Repeat the original observed-zero calculation, including all-zero cells.
+# Clipping only makes this descriptive logit finite; it does not alter data.
+zi_est <- model_data %>%
   group_by(taxon, class, Type) %>%
   summarize(p_zero = mean(n == 0), .groups = "drop") %>%
   mutate(logit_p_zero = qlogis(pmin(pmax(p_zero, 1e-4), 1 - 1e-4)))
+mean(zi_est$logit_p_zero)
+sd(zi_est$logit_p_zero)
 
-mean_logit_zi <- mean(zi_est$logit_p_zero)
-sd_logit_zi <- sd(zi_est$logit_p_zero)
-# Prior choice:
-# Centered at mean with reasonable spread => normal(1.5, 2.5)
+# Relate variation across cells to the scale of the coded coefficients.
+# Independent coefficient SD=1 induces this predictor-spread multiplier across
+# equally weighted taxon/class/habitat cells. Intercept uncertainty is excluded.
+prior_cell_grid <- cell_grid
+for (variable in c("taxon", "class", "Type")) {
+  prior_cell_grid[[variable]] <- factor(prior_cell_grid[[variable]],
+                                       levels = levels(model_data[[variable]]))
+}
+prior_cell_design <- model.matrix(~ taxon:class * Type, data = prior_cell_grid)
+prior_design_multiplier <- sqrt(sum(apply(prior_cell_design[, -1, drop = FALSE], 2, var)))
+zero_prior_calibration <- data.frame(
+  mean_observed_zero_logit = mean(zi_est$logit_p_zero),
+  sd_observed_zero_logit = sd(zi_est$logit_p_zero),
+  design_spread_multiplier = prior_design_multiplier,
+  descriptive_coefficient_sd = sd(zi_est$logit_p_zero) / prior_design_multiplier
+)
+write_csv(zero_prior_calibration, output_file("prior_calibration_zero_inflation.csv"))
+show_table(zero_prior_calibration, digits = 3)
 
-# PRIOR FOR SHAPE PARAMETER (dispersion)
-vmr_summary <- dfftaxon %>%
+# PRIOR CHOICES:
+# zi Intercept: logistic(0, 1), retaining the original brms default explicitly.
+# zi b effects: normal(0, 2), symmetric contributions to the logit predictor.
+```
+
+The observed zero-logit SD is about 2.79. With this design, coefficient SD 1
+produces cell-to-cell predictor spread about 1.51; 2.79 / 1.51 is about 1.84.
+This provides a rough scale check for the rounded `normal(0, 2)` coefficient
+prior. It is not a fit of the zero-inflation model. In a ZINB distribution,
+
+\[
+\Pr(Y=0)=zi+(1-zi)\left(\frac{\phi}{\phi+\mu}\right)^\phi,
+\]
+
+so the observed fraction of zeros is not the structural zero-inflation
+probability `zi`. We do not center every coefficient on the observed zero-logit
+mean. Centering coefficients at zero avoids imposing a preferred direction
+on the coded effects. The separate `logistic(0, 1)` intercept prior is broad:
+its inverse-logit transformation is uniform on (0, 1), before adding effects.
+
+### Negative-binomial shape
+
+```{r generate-shape-priors}
+# Repeat the original pseudo-count variance-to-mean recipe for comparability.
+# More than five positive rows are required for this descriptive calculation.
+vmr_summary <- model_data %>%
   mutate(dens = n / transect_area_m2) %>%
   group_by(taxon, class, Type) %>%
-  filter(sum(dens > 0, na.rm = TRUE) > 5) %>%     # filter for well-observed taxa for prior estimation
-  mutate(
-    dens_min = min(dens[dens > 0], na.rm = TRUE),  # min nonzero density
-    pseudo_n = round(dens / dens_min)
-  ) %>%
-  summarize(
-    mean_n = mean(pseudo_n),
-    var_n  = var(pseudo_n),
-    .groups = "drop"
-  ) %>%
-  mutate(
-    vmr      = var_n / mean_n,
-    phi_est  = ifelse(vmr > 1, mean_n / (vmr - 1), NA_real_),
-    log_phi  = log(phi_est)
-  )
-
-# Summary
+  filter(sum(dens > 0) > 5) %>%
+  mutate(dens_min = min(dens[dens > 0]),
+         pseudo_n = round(dens / dens_min)) %>%
+  summarize(mean_n = mean(pseudo_n), var_n = var(pseudo_n), .groups = "drop") %>%
+  mutate(vmr = var_n / mean_n,
+         phi_est = ifelse(vmr > 1, mean_n / (vmr - 1), NA_real_),
+         log_phi = log(phi_est))
 summary(vmr_summary$log_phi)
 sd(vmr_summary$log_phi, na.rm = TRUE)
-
-# Prior choice:
-# normal(-0.9, 1)
-```
-
-## Fit model
-```{r}
-# mod_nb3.7 <- brm(
-#   bf(
-#     n ~ taxon:class * Type +
-#       (1 + Type | dataset) +                     # temporal/dataset intercept, varies by habitat
-#       (1 | dataset:taxon:class) +                       # taxon-specific dataset offsets
-#       (1 | taxon:class:Type:dir) +               # taxon × class × Type × dir (shared geography)
-#       offset(log(transect_area_m2)),
-#     zi ~ taxon:class * Type,
-#     shape ~ taxon:class * Type
-#   ),
-#   data = dfftaxon,
-#   family = zero_inflated_negbinomial(),
-#   prior = c(
-#     # Effects on log density (taxon:class * Type)
-#     prior(normal(0, 2), class = "b"),
-#     # Centered on global mean log-density
-#     prior(normal(-2.8, 1.8), class = "Intercept"),
-#     # Informed by logit(p_zero) distribution
-#     prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
-#     # Matches empirical shape estimates
-#     prior(normal(-0.9, 1), class = "b", dpar = "shape"),
-#     # Regularize random effects to prevent overfitting (important for PPP)
-#     prior(exponential(4), class = "sd")     # shrinks dataset/site/dir SDs toward 0 if not supported
-#   ),
-#   chains = 4, cores = 4, threads = threading(5),
-#   iter = 6000, warmup = 3000, thin = 1,
-#   backend = "cmdstanr",
-#   control = list(adapt_delta = 0.99),
-#   seed = 20240717
-# )
-# saveRDS(mod_nb3.7, file = "data/processed/mod_nb3.7.rds")
-mod_nb3.7 <- readRDS("data/processed/mod_nb3.7.rds")
-```
-
-
-## Model evaluation
-
-```{r, eval = F}
-# Convergence check
-#summary(mod_nb3.7)  # confirm Rhat ≈ 1.00, no divergences
-
-# R²
-bayes_R2(mod_nb3.7)
-```
-
-### Posterior predictive checks
-
-#### Global PPP
-```{r, eval = F}
-
-# GLOBAL POSTERIOR PREDICTIVE PLOTS ------------------------------------
-# Extract observed data and predicted draws
-area <- mod_nb3.7$data$transect_area_m2
-
-y <- mod_nb3.7$data$n / area
-set.seed(124)
-yrep  <- posterior_predict(mod_nb3.7, ndraws = 1000)
-yrep <- sweep(yrep, 2, area, FUN = "/")
-set.seed(124)
-mu    <- posterior_epred(mod_nb3.7, ndraws = 1000)  # matrix: draws x observations
-mu   <- sweep(mu,   2, area, FUN = "/")
-
-
-
-
-# Example discrepancy statistics
-discrepancy_stats <- list(
-  mean        = apply(yrep, 1, mean),
-  variance    = apply(yrep, 1, var),
-  zero_prop   = apply(yrep, 1, function(x) mean(x == 0)),
-  skewness    = apply(yrep, 1, function(x) moments::skewness(x)),
-  chi_squared = map_dbl(1:nrow(yrep), ~ {
-    mu_row <- mu[.x, ]
-    yrep_row <- yrep[.x, ]
-    valid <- mu_row > 0
-    sum((yrep_row[valid] - mu_row[valid])^2 / mu_row[valid])
-  })
+shape_prior_calibration <- data.frame(
+  mean_pseudo_log_shape = mean(vmr_summary$log_phi, na.rm = TRUE),
+  sd_pseudo_log_shape = sd(vmr_summary$log_phi, na.rm = TRUE),
+  design_spread_multiplier = prior_design_multiplier,
+  descriptive_coefficient_sd = sd(vmr_summary$log_phi, na.rm = TRUE) / prior_design_multiplier
 )
+write_csv(vmr_summary, output_file("prior_calibration_pseudo_dispersion_cells.csv"))
+write_csv(shape_prior_calibration, output_file("prior_calibration_shape.csv"))
+show_table(shape_prior_calibration, digits = 3)
 
-# Observed statistics
-T_obs <- list(
-  mean        = mean(y),
-  variance    = var(y),
-  zero_prop   = mean(y == 0),
-  skewness    = moments::skewness(y),
-  chi_squared = {
-    mu_mean <- colMeans(mu)
-    valid <- mu_mean > 0
-    sum((y[valid] - mu_mean[valid])^2 / mu_mean[valid])
+# PRIOR CHOICES (shape has a log link):
+# Centered log-shape Intercept: normal(-1, 1.5).
+# Log-shape b effects: normal(0, 1).
+```
+
+The joint pseudo-log-shape mean is about −0.94, close to the original −0.89.
+We use its rounded location −1 as a rough anchor for the centered log-shape
+intercept, with broad SD 1.5. The pseudo-log-shape SD is about 1.29; dividing
+by the design multiplier gives about 0.85, supporting coefficient SD 1 as a
+rounded, broad choice. Coefficients are centered at zero because their
+contributions are distinct from the overall log-shape location.
+
+These proxies mix search effort, sources, years, directions and zero inflation.
+They are not direct estimates of conditional ZINB shape, and the pseudo-count
+conversion itself changes the count scale. The pseudo-counts are used only
+here to repeat the original calibration recipe; the fitted likelihood always
+uses the actual integer colony counts and their searched-area offsets.
+
+### Regional effects and random-effect regularization
+
+```{r generate-regional-prior-check}
+# Check that the regional count prior is broad relative to well-observed raw
+# adult comparisons. These are descriptive rates, not fitted regional effects.
+regional_prior_rates <- model_data %>%
+  filter(dataset == "drm24", class == ">4cm") %>%
+  group_by(region, taxon, Type) %>%
+  summarize(sites = n_distinct(site), positives = sum(n > 0),
+            colonies = sum(n), area = sum(transect_area_m2), .groups = "drop") %>%
+  mutate(density = colonies / area)
+regional_prior_pairs <- inner_join(
+  filter(regional_prior_rates, region == "PEV"),
+  filter(regional_prior_rates, region == "Broward-Miami"),
+  by = c("taxon", "Type"), suffix = c("_PEV", "_BM")) %>%
+  filter(sites_PEV >= 5, sites_BM >= 5, positives_PEV >= 3, positives_BM >= 3) %>%
+  mutate(raw_ratio_BM_to_PEV = density_BM / density_PEV)
+regional_prior_calibration <- regional_prior_pairs %>%
+  summarize(cells = n(), smallest_raw_ratio = min(raw_ratio_BM_to_PEV),
+            largest_raw_ratio = max(raw_ratio_BM_to_PEV)) %>%
+  mutate(prior_ratio_lower_95 = exp(qnorm(.025, 0, 1.5)),
+         prior_ratio_upper_95 = exp(qnorm(.975, 0, 1.5)))
+write_csv(regional_prior_pairs, output_file("prior_calibration_regional_pairs.csv"))
+write_csv(regional_prior_calibration, output_file("prior_calibration_regional.csv"))
+show_table(regional_prior_calibration, digits = 3)
+
+# PRIOR CHOICES:
+# Regional count b effects: normal(0, 1.5), symmetric on the log NB-mean scale.
+# Random-effect SDs: exponential(4), retaining original regularization.
+# Dataset-effect correlations: lkj(1), explicitly retaining the brms default.
+```
+
+The well-observed adult cells have raw regional ratios about 0.37–3.45.
+The regional coefficient prior `normal(0, 1.5)` permits NB-mean ratios about
+1/19–19 in its central 95% interval. This is a broad symmetric regularization
+choice, not an estimate centered on the observed difference. The raw check
+omits sparse cells and does not adjust direction or standardize habitats.
+
+The original `exponential(4)` SD prior has mean 0.25 and 95th percentile about
+0.75 on the random-effect coefficient scale. It regularizes source and
+direction variation, including the separate regional direction SDs. It was a
+regularization choice rather than an output of the four empirical summaries.
+`lkj(1)` is uniform over the dataset-effect correlation matrices. In the
+selected model, zi and shape are shared across regions within a
+taxon/class/habitat cell, so there are no regional zi/shape departure SD priors.
+
+### Declare the selected priors
+
+Count priors stay the same in both versions: `normal(-2.8, 1.8)` for the
+centered intercept, `normal(0, 2)` for baseline coefficients and
+`normal(0, 1.5)` for regional count coefficients. The revised version follows
+the prior review: zi coefficients `normal(0, 2)`, log-shape coefficients
+`normal(0, 1)` and log-shape intercept `normal(-1, 1.5)`. The zi intercept
+retains `logistic(0, 1)`. Original priors remain selectable for cached benchmarks.
+No fitted posterior is used as a prior and no density draws are discarded.
+
+```{r joint-model-priors}
+joint_priors <- c(
+  prior(normal(-2.8, 1.8), class = "Intercept"),
+  prior(normal(0, 2), class = "b"),
+  prior(normal(0, 2), class = "b", dpar = "zi"),
+  prior(logistic(0, 1), class = "Intercept", dpar = "zi"),
+  prior(normal(0, 1), class = "b", dpar = "shape"),
+  prior(normal(-1, 1.5), class = "Intercept", dpar = "shape"),
+  prior(exponential(4), class = "sd"),
+  prior(lkj(1), class = "cor")
+)
+if (params$prior_version == "original") {
+  joint_priors <- c(
+    prior(normal(-2.8, 1.8), class = "Intercept"),
+    prior(normal(0, 2), class = "b"),
+    prior(normal(1.5, 2.5), class = "b", dpar = "zi"),
+    prior(logistic(0, 1), class = "Intercept", dpar = "zi"),
+    prior(normal(-0.9, 1), class = "b", dpar = "shape"),
+    prior(student_t(3, 0, 2.5), class = "Intercept", dpar = "shape"),
+    prior(exponential(4), class = "sd"),
+    prior(lkj(1), class = "cor")
+  )
+}
+if (params$regional_distributional_effects) {
+  joint_priors <- c(joint_priors,
+    prior(normal(0, 0.75), class = "sd", group = "cell", dpar = "zi"),
+    prior(normal(0, 0.75), class = "sd", group = "cell", dpar = "shape"))
+}
+available_priors <- get_prior(joint_formula, data = model_data, family = joint_family)
+regional_coefficients <- available_priors$coef[
+  available_priors$class == "b" & available_priors$dpar == "" &
+    grepl("^regional:cell", available_priors$coef)
+]
+stopifnot(length(regional_coefficients) == nrow(cell_grid))
+for (coefficient in regional_coefficients) {
+  joint_priors <- c(joint_priors,
+                    set_prior("normal(0, 1.5)", class = "b", coef = coefficient))
+}
+write_csv(as.data.frame(joint_priors), output_file("model_priors.csv"))
+writeLines(capture.output(joint_formula), output_file("model_formula.txt"))
+```
+
+## Prior predictive checks
+
+These checks sample directly from the specified priors before using the counts
+in the likelihood. They describe densities and replicated counts conditional
+on zero source and direction effects. Regional zero-inflation/shape slopes
+are included only when the fitted model contains them. These are targeted checks of the density priors, rather than full
+simulations of survey-to-survey variation. Intercept centering is calculated from
+the combined design matrix exactly as in brms. No draws are removed by density.
+
+```{r prior-predictive-checks}
+set.seed(20261028)
+prior_draw_count <- 4000L
+prior_grid <- bind_rows(mutate(cell_grid, region = "PEV"),
+                         mutate(cell_grid, region = "Broward-Miami")) %>%
+  mutate(regional = as.integer(region == "Broward-Miami"),
+         cell = factor(cell_id, levels = cell_grid$cell_id, labels = levels(model_data$cell)))
+for (v in c("taxon", "class", "Type")) {
+  prior_grid[[v]] <- factor(prior_grid[[v]], levels = levels(model_data[[v]]))
+}
+count_fixed <- ~ taxon:class * Type + regional:cell
+baseline_fixed <- ~ taxon:class * Type
+# brms reorders interaction columns internally. Match terms by their factors,
+# then verify the entire training matrix before simulating from the priors.
+canonical_term <- function(x) vapply(strsplit(gsub("[ ()]", "", x), ":", fixed = TRUE),
+                                     function(z) paste(sort(z), collapse = ":"), character(1))
+prior_standata <- make_standata(joint_formula, data = model_data,
+                                family = joint_family, prior = joint_priors)
+align_design <- function(formula, target) {
+  train <- model.matrix(formula, model_data)
+  fresh <- model.matrix(formula, prior_grid)
+  j <- match(canonical_term(colnames(target)), canonical_term(colnames(train)))
+  stopifnot(!anyNA(j), identical(dim(train[, j]), dim(target)),
+            isTRUE(all.equal(unname(train[, j]), unname(target), check.attributes = FALSE)))
+  sweep(fresh[, j[-1], drop = FALSE], 2, colMeans(target[, -1, drop = FALSE]), "-")
+}
+X_count_new <- align_design(count_fixed, prior_standata$X)
+X_base_new <- align_design(baseline_fixed, prior_standata$X_zi)
+stopifnot(isTRUE(all.equal(unname(prior_standata$X_zi),
+                            unname(prior_standata$X_shape), check.attributes = FALSE)))
+S <- prior_draw_count
+beta_count <- matrix(rnorm(S * ncol(X_count_new), 0, 2), S)
+regional_columns <- grepl("^regional:cell", colnames(X_count_new))
+beta_count[, regional_columns] <- rnorm(S * sum(regional_columns), 0, 1.5)
+beta_zi <- if (params$prior_version == "revised") {
+  matrix(rnorm(S * ncol(X_base_new), 0, 2), S)
+} else matrix(rnorm(S * ncol(X_base_new), 1.5, 2.5), S)
+beta_shape <- if (params$prior_version == "revised") {
+  matrix(rnorm(S * ncol(X_base_new), 0, 1), S)
+} else matrix(rnorm(S * ncol(X_base_new), -0.9, 1), S)
+prior_log_mu <- sweep(beta_count %*% t(X_count_new), 1, rnorm(S, -2.8, 1.8), "+")
+prior_zi_logit <- sweep(beta_zi %*% t(X_base_new), 1, qlogis(runif(S)), "+")
+shape_intercept_draws <- if (params$prior_version == "revised") {
+  rnorm(S, -1, 1.5)
+} else 2.5 * rt(S, df = 3)
+prior_log_shape <- sweep(beta_shape %*% t(X_base_new), 1, shape_intercept_draws, "+")
+K <- nrow(cell_grid)
+if (params$regional_distributional_effects) {
+  prior_zi_logit[, K + seq_len(K)] <- prior_zi_logit[, K + seq_len(K)] +
+    sweep(matrix(rnorm(S * K), S), 1, abs(rnorm(S, 0, 0.75)), "*")
+  prior_log_shape[, K + seq_len(K)] <- prior_log_shape[, K + seq_len(K)] +
+    sweep(matrix(rnorm(S * K), S), 1, abs(rnorm(S, 0, 0.75)), "*")
+} else {
+  stopifnot(identical(unname(prior_zi_logit[, seq_len(K)]),
+                      unname(prior_zi_logit[, K + seq_len(K)])),
+            identical(unname(prior_log_shape[, seq_len(K)]),
+                      unname(prior_log_shape[, K + seq_len(K)])))
+}
+prior_log_density <- prior_log_mu + plogis(-prior_zi_logit, log.p = TRUE)
+prior_area <- joint_counts %>% filter(dataset == "drm24") %>%
+  group_by(taxon, class) %>% summarize(area = median(transect_area_m2), .groups = "drop")
+prior_grid <- left_join(prior_grid, prior_area, by = c("taxon", "class"))
+prior_mu_counts <- exp(sweep(prior_log_mu, 2, log(prior_grid$area), "+"))
+prior_counts <- matrix(rnbinom(length(prior_mu_counts), mu = prior_mu_counts,
+                               size = exp(prior_log_shape)), S)
+prior_counts[matrix(runif(length(prior_counts)), S) < plogis(prior_zi_logit)] <- 0
+prior_summary <- bind_rows(lapply(seq_len(nrow(prior_grid)), function(i) {
+  z <- prior_log_density[, i]
+  y <- prior_counts[, i]
+  q <- exp(quantile(z, c(0.025, 0.5, 0.975)))
+  cbind(prior_grid[i, ], data.frame(lower = q[1], median = q[2], upper = q[3],
+    probability_density_gt_1 = mean(z > 0),
+    probability_density_gt_10 = mean(z > log(10)),
+    probability_density_gt_100 = mean(z > log(100)),
+    replicated_zero_fraction = mean(y == 0, na.rm = TRUE),
+    replicated_count_975 = unname(quantile(y, 0.975, na.rm = TRUE)),
+    numerical_failure_fraction = mean(!is.finite(y))))
+})) %>% mutate(regional_full_survey_support = region == "PEV" | class == ">4cm" |
+                 taxon %in% c("MCAV", "MEAN", "MUSS", "FAVI"))
+write_csv(prior_summary, output_file("prior_predictive_conditional_summary.csv"))
+saveRDS(list(grid = prior_grid, log_density = prior_log_density, counts = prior_counts),
+        processed_file("prior_predictive_conditional_draws.rds"))
+prior_plot <- prior_summary %>% filter(class == ">4cm", taxon %in% c("ACER", "AGAR", "MCAV", "ORBI", "SIDE")) %>%
+  ggplot(aes(taxon, median, color = region)) +
+  geom_pointrange(aes(ymin = lower, ymax = upper), position = position_dodge(width = 0.4)) +
+  scale_y_log10() + facet_wrap(~Type, nrow = 1) + theme_minimal() +
+  labs(x = NULL, y = "Prior density: median and 95% interval (colonies/m²)",
+       title = "Conditional prior predictive densities",
+       subtitle = if (params$regional_distributional_effects) {
+         "Source and direction effects zero; regional distributional departures retained"
+       } else "Source and direction effects zero; zi and shape shared across regions")
+ggsave(output_file("prior_predictive_densities.png"), prior_plot, width = 13, height = 5, dpi = 220, bg = "white")
+show_table(prior_summary %>% filter(taxon == "ACER", class == ">4cm"), digits = 4)
+knitr::include_graphics(output_file("prior_predictive_densities.png"))
+rm(beta_count, beta_zi, beta_shape, prior_log_mu, prior_zi_logit,
+   prior_log_shape, prior_log_density, prior_counts, prior_mu_counts, prior_standata)
+```
+
+## Fit and save the model
+
+`allow_new_fit` defaults to false to protect the saved pilot. Enable it only
+when intentionally fitting a new model or changing the sampling settings.
+
+Each distinct model, data and sampling specification receives a separate
+cache folder. The complete `brmsfit` is saved immediately after fitting and
+reused on subsequent renders. Compilation details below only accommodate the
+local macOS toolchain; they do not alter the statistical model.
+
+<details>
+<summary>Saved-fit identification and local compiler compatibility</summary>
+
+```{r fit-settings}
+fit_settings <- list(
+  chains = as.integer(params$chains), warmup = as.integer(params$warmup),
+  sampling = as.integer(params$sampling), threads = as.integer(params$threads_per_chain),
+  adapt_delta = params$adapt_delta, max_treedepth = as.integer(params$max_treedepth),
+  seed = as.integer(params$seed)
+)
+# Simple R names used in the fitting call below.
+chains <- fit_settings$chains
+warmup <- fit_settings$warmup
+sampling <- fit_settings$sampling
+threads_per_chain <- fit_settings$threads
+adapt_delta <- fit_settings$adapt_delta
+max_treedepth <- fit_settings$max_treedepth
+seed <- fit_settings$seed
+stan_code <- make_stancode(joint_formula, data = model_data, family = joint_family,
+                           prior = joint_priors, threads = threading(fit_settings$threads))
+signature_columns <- c("n", "taxon", "class", "Type", "region", "regional", "cell",
+                       "dataset", "dir", "direction_group", "transect_area_m2")
+fit_signature <- list(data = model_data[signature_columns],
+                      priors = as.data.frame(joint_priors), settings = fit_settings,
+                      stan = stan_code, brms_version = as.character(packageVersion("brms")))
+fit_hash <- digest::digest(fit_signature, algo = "md5")
+fit_directory <- output_file("models", fit_hash)
+dir.create(fit_directory, recursive = TRUE, showWarnings = FALSE)
+fit_file <- file.path(fit_directory, "brms_fit.rds")
+cmdstan_directory <- file.path(fit_directory, "cmdstan")
+dir.create(cmdstan_directory, showWarnings = FALSE)
+saveRDS(fit_signature, file.path(fit_directory, "signature.rds"))
+writeLines(stan_code, file.path(fit_directory, "brms_generated_model.stan"))
+fit_status <- function(status) {
+  jsonlite::write_json(list(status = status, fit = fit_file, hash = fit_hash,
+                            chain_output_directory = cmdstan_directory, initialization = 0,
+                            settings = fit_settings, prior_version = params$prior_version,
+                            regional_distributional_effects = params$regional_distributional_effects,
+                            updated = as.character(Sys.time())),
+                       output_file("run_status.json"), auto_unbox = TRUE, pretty = TRUE)
+}
+```
+
+```{r compiler-functions}
+compatible_cpp_options <- function() {
+    if (!identical(Sys.info()[["sysname"]], "Darwin")) 
+        return(list())
+    probe_dir <- tempfile("regional-cxx-")
+    dir.create(probe_dir)
+    on.exit(unlink(probe_dir, recursive = TRUE), add = TRUE)
+    source_file <- file.path(probe_dir, "check.cpp")
+    executable <- file.path(probe_dir, "check")
+    writeLines(c("#include <iostream>", "int main() { std::cout << \"C++ link OK\\n\"; }"), source_file)
+    probe <- function(flags = character()) suppressWarnings(system2("clang++", c("-std=c++17", flags, 
+        shQuote(source_file), "-o", shQuote(executable)), stdout = TRUE, stderr = TRUE))
+    default_check <- probe()
+    if (is.null(attr(default_check, "status"))) 
+        return(list())
+    if (!any(grepl("unknown architecture", default_check, fixed = TRUE)) || !any(grepl("arm64e.x1", 
+        default_check, fixed = TRUE))) 
+        stop(paste(default_check, collapse = "\n"), call. = FALSE)
+    sdk <- suppressWarnings(system2("xcrun", c("--sdk", "macosx26.5", "--show-sdk-path"), stdout = TRUE, 
+        stderr = TRUE))
+    if (!is.null(attr(sdk, "status")) || length(sdk) != 1L || !dir.exists(sdk)) 
+        stop("The compatible macOS 26.5 SDK is unavailable.", call. = FALSE)
+    sdk_flags <- c("-isysroot", shQuote(normalizePath(sdk, mustWork = TRUE)))
+    fallback_check <- probe(sdk_flags)
+    if (!is.null(attr(fallback_check, "status"))) 
+        stop(paste(fallback_check, collapse = "\n"), call. = FALSE)
+    message("Using compatible macOS SDK for this model: ", sdk)
+    list(CXX = paste(c("clang++", sdk_flags), collapse = " "))
+}
+
+# Keep Stan's iteration messages visible while knitr captures the fit chunk.
+# This changes logging only; the expression returns the ordinary brms fit.
+with_progress_log <- function(path, expression) {
+  progress_connection <- file(path, open = "wt")
+  sink(progress_connection, split = TRUE)
+  on.exit({ sink(); close(progress_connection) }, add = TRUE)
+  force(expression)
+}
+
+```
+
+</details>
+
+```{r fit-joint-model}
+if (file.exists(fit_file)) {
+  joint_fit <- readRDS(fit_file)
+  fit_status("posterior_reused")
+} else {
+  if (!isTRUE(params$allow_new_fit)) stop("No matching cache; enable allow_new_fit to run the model.")
+  fit_status("compiling_and_sampling")
+  compiler_options <- compatible_cpp_options()
+  joint_fit <- with_progress_log(file.path(fit_directory, "fit_progress.log"), brm(
+    formula = joint_formula,
+    data = model_data,
+    family = zero_inflated_negbinomial(),
+    prior = joint_priors,
+    chains = chains, cores = chains,
+    iter = warmup + sampling, warmup = warmup,
+    threads = threading(threads_per_chain),
+    backend = "cmdstanr",
+    control = list(adapt_delta = adapt_delta, max_treedepth = max_treedepth),
+    seed = seed,
+    init = 0,
+    output_dir = cmdstan_directory,
+    stan_model_args = list(cpp_options = compiler_options),
+    refresh = 25,
+    file = sub("[.]rds$", "", fit_file), file_refit = "never",
+    save_pars = save_pars(all = TRUE)
+  ))
+  saveRDS(joint_fit, fit_file)
+  fit_status("posterior_saved")
+}
+```
+
+```{r fit-runtime}
+fit_runtime <- tryCatch(as.data.frame(rstan::get_elapsed_time(joint_fit$fit)),
+                        error = function(e) NULL)
+if (!is.null(fit_runtime)) {
+  fit_runtime$chain <- seq_len(nrow(fit_runtime))
+  write_csv(fit_runtime, output_file("fit_runtime_by_chain.csv"))
+}
+```
+
+## Expected-density predictions
+
+Expected density includes zero inflation: \(E[n/A]=(1-zi)\mu/A\).
+PEV predictions explicitly select the PEV cells; regional predictions explicitly
+select Broward–Miami cells. Both use the same joint posterior. Survey/source
+effects remain included and direction effects are set to zero, matching the
+original conditional prediction convention. Zero direction is not an
+arithmetic average of the north and south predicted densities.
+
+```{r predictions-functions}
+# Keep the original manuscript convention: survey effects included, direction
+# effects zero. The region indicator is always rebuilt from an explicit argument.
+source_effects <- ~ (1 + Type | dataset) + (1 | dataset:taxon:class)
+density_effects <- if (params$regional_distributional_effects) {
+  ~ (1 + Type | dataset) + (1 | dataset:taxon:class) + (0 + regional | cell)
+} else source_effects
+prediction_audit <- tibble(purpose = character(), region = character(), rows = integer(),
+                           datasets = character(), area_m2 = numeric())
+
+prediction_data <- function(prepared, newdata, region) {
+  stopifnot(length(region) == 1L, region %in% c("PEV", "Broward-Miami"))
+  d <- as.data.frame(newdata)
+  d$region <- factor(rep(region, nrow(d)), levels = levels(model_data$region))
+  d$regional <- as.integer(d$region == "Broward-Miami")
+  k <- match(paste(d$taxon, d$class, d$Type),
+             paste(prepared$grid$taxon, prepared$grid$class, prepared$grid$Type))
+  stopifnot(!anyNA(k))
+  d$cell <- factor(k, levels = prepared$grid$cell_id, labels = levels(model_data$cell))
+  for (v in c("taxon", "class", "Type", "dataset")) {
+    d[[v]] <- factor(d[[v]], levels = levels(model_data[[v]]))
   }
+  # An observed placeholder is supplied only for brms data validation. Direction
+  # effects are excluded from mu below, so its identity cannot affect density.
+  reference_group <- as.character(model_data$direction_group[which(model_data$region == region)[1]])
+  d$direction_group <- factor(rep(reference_group, nrow(d)), levels = levels(model_data$direction_group))
+  d$transect_area_m2 <- 1
+  stopifnot(!anyNA(d[c("taxon", "class", "Type", "dataset", "cell", "region")]),
+            all(as.character(d$region) == region),
+            all(d$regional == as.integer(region == "Broward-Miami")))
+  d
+}
+
+expected_density_draws <- function(prepared, fit, newdata, region,
+                                   purpose = "diagnostics_or_comparisons") {
+  d <- prediction_data(prepared, newdata, region)
+  # Retain source effects and, when fitted, regional zi/shape slopes.
+  # Direction effects are excluded in both model variants.
+  result <- posterior_epred(fit, newdata = d, re_formula = density_effects)
+  prediction_audit <<- bind_rows(prediction_audit,
+    tibble(purpose = purpose, region = region, rows = nrow(d),
+           datasets = paste(sort(unique(as.character(d$dataset))), collapse = ";"), area_m2 = 1))
+  result
+}
+
+summarize_density_draws <- function(draw_matrix, g) cbind(g, as.data.frame(t(apply(draw_matrix,
+  2, function(x) c(mean = mean(x), median = median(x), lower = unname(quantile(x, 0.025)),
+                  upper = unname(quantile(x, 0.975)), maximum = max(x),
+                  largest_draw_share = max(x)/sum(x))))))
+```
+
+```{r prediction-draw-interface}
+joint_epred_draws <- function(newdata, region = "PEV", ndraws = NULL) {
+  # This interface feeds manuscript figures/tables only; regional comparisons
+  # call expected_density_draws() separately with an explicit regional target.
+  stopifnot(identical(region, "PEV"))
+  prediction_matrix <- expected_density_draws(prepared, joint_fit, newdata, region,
+                                             purpose = "manuscript")
+  draw_ids <- seq_len(nrow(prediction_matrix))
+  if (!is.null(ndraws) && ndraws < length(draw_ids)) {
+    set.seed(params$seed)
+    draw_ids <- sort(sample(draw_ids, ndraws))
+    prediction_matrix <- prediction_matrix[draw_ids, , drop = FALSE]
+  }
+  draws_per_row <- nrow(prediction_matrix)
+  tibble(newdata[rep(seq_len(nrow(newdata)), each = draws_per_row), , drop = FALSE]) %>%
+    mutate(.row = rep(seq_len(nrow(newdata)), each = draws_per_row),
+           .draw = rep(draw_ids, times = nrow(newdata)),
+           .epred = as.vector(prediction_matrix))
+}
+```
+
+## Sampling diagnostics and posterior predictive checks
+
+Checks retain each observation's searched area, source, region and direction.
+Expected densities are independently checked against native brms predictions.
+PPCs check density, zero fraction, positive sites and maximum counts by
+region/source/taxon/class/habitat. No posterior draws are trimmed by density.
+
+```{r evaluation-functions}
+distributional_diagnostics <- function(prepared, fit) {
+  nd <- mutate(prepared$grid, dataset = "drm24")
+  draw_shape <- dim(posterior::as_draws_array(fit))[1:2]
+  rows <- list()
+  for (region in c("PEV", "Broward-Miami")) {
+    d <- prediction_data(prepared, nd, region)
+    components <- list(
+      log_mu = posterior_linpred(fit, newdata = d, re_formula = source_effects),
+      zi_logit = posterior_linpred(fit, newdata = d, dpar = "zi", re_formula = NULL),
+      log_shape = posterior_linpred(fit, newdata = d, dpar = "shape", re_formula = NULL))
+    for (component in names(components)) {
+      x <- components[[component]]
+      colnames(x) <- paste0("cell", seq_len(ncol(x)))
+      ar <- array(x, dim = c(draw_shape, ncol(x)), dimnames = list(NULL, NULL, colnames(x)))
+      stats <- posterior::summarise_draws(posterior::as_draws_array(ar),
+                 "mean", "mcse_mean", "rhat", "ess_bulk", "ess_tail")
+      rows[[paste(region, component)]] <- bind_cols(prepared$grid, stats) %>%
+        mutate(region = region, component = component)
+    }
+  }
+  bind_rows(rows) %>% mutate(regional_full_survey_support = region == "PEV" | class == ">4cm" |
+                               taxon %in% c("MCAV", "MEAN", "MUSS", "FAVI"))
+}
+
+summarize_joint_fit <- function(prepared, fit, output_dir) {
+  draws <- posterior::as_draws_array(fit)
+  parameters <- posterior::summarise_draws(draws)
+  sampler <- rstan::get_sampler_params(fit$fit, inc_warmup = FALSE)
+  diagnostics <- data.frame(
+    max_rhat = max(parameters$rhat, na.rm = TRUE),
+    min_bulk_ess = min(parameters$ess_bulk, na.rm = TRUE),
+    min_tail_ess = min(parameters$ess_tail, na.rm = TRUE),
+    divergences = sum(vapply(sampler, function(x) sum(x[, "divergent__"]), numeric(1))),
+    treedepth_hits = sum(vapply(sampler, function(x) sum(x[, "treedepth__"] >= fit_settings$max_treedepth), numeric(1)))
+  )
+  diagnostics$pass <- with(diagnostics, max_rhat < 1.01 & min_bulk_ess > 400 &
+                            min_tail_ess > 400 & divergences == 0 & treedepth_hits == 0)
+  write_csv(arrange(parameters, desc(rhat)), file.path(output_dir, "parameter_diagnostics.csv"))
+  write_csv(diagnostics, file.path(output_dir, "sampling_diagnostics.csv"))
+  K <- nrow(prepared$grid)
+  nd <- mutate(prepared$grid, dataset = "drm24")
+  den <- cbind(expected_density_draws(prepared, fit, nd, "PEV"),
+               expected_density_draws(prepared, fit, nd, "Broward-Miami"))
+  grid <- bind_rows(mutate(nd, region = "PEV"), mutate(nd, region = "Broward-Miami"))
+  density <- left_join(summarize_density_draws(den, grid),
+    prepared$counts %>% filter(dataset == "drm24") %>%
+      group_by(region, taxon, class, Type) %>%
+      summarise(rows = n(), positive_rows = sum(n > 0), colonies = sum(n),
+                searched_m2 = sum(transect_area_m2), .groups = "drop"),
+    by = c("region", "taxon", "class", "Type"))
+  write_csv(density, file.path(output_dir, "density_2024_all_cells.csv"))
+  # Diagnose each habitat cell as well as the habitat-averaged estimates below.
+  cell_labels <- with(grid, paste(taxon, class, Type, region, sep = "|"))
+  cell_array <- array(den, dim = c(dim(draws)[1:2], ncol(den)),
+                      dimnames = list(NULL, NULL, cell_labels))
+  cell_diagnostics <- posterior::summarise_draws(posterior::as_draws_array(cell_array),
+    "mean", "mcse_mean", "rhat", "ess_bulk", "ess_tail") %>%
+    mutate(relative_mcse = mcse_mean / pmax(abs(mean), 1e-12)) %>%
+    left_join(mutate(grid, variable = cell_labels), by = "variable") %>%
+    mutate(regional_full_survey_support = region == "PEV" | class == ">4cm" |
+             taxon %in% c("MCAV", "MEAN", "MUSS", "FAVI"))
+  write_csv(cell_diagnostics, file.path(output_dir, "density_cell_diagnostics.csv"))
+
+  # Split each chain into two consecutive blocks to expose unstable tail means.
+  iterations <- dim(draws)[1]
+  chain_blocks <- bind_rows(lapply(seq_len(dim(draws)[2]), function(chain) {
+    bind_rows(lapply(split(seq_len(iterations), ceiling(seq_len(iterations) / ceiling(iterations/2))),
+      function(i) {
+        block <- den[(chain - 1L) * iterations + i, , drop = FALSE]
+        data.frame(variable = cell_labels, chain = chain, first_iteration = min(i),
+          last_iteration = max(i), mean = colMeans(block),
+          median = apply(block, 2, median),
+          largest_draw_share = apply(block, 2, max) / colSums(block))
+      }))
+  }))
+  write_csv(chain_blocks, file.path(output_dir, "density_chain_block_stability.csv"))
+  tail_review <- density %>%
+    filter(region == "PEV" | class == ">4cm" | taxon %in% c("MCAV", "MEAN", "MUSS", "FAVI")) %>%
+    mutate(mean_to_median = mean/median, maximum_to_upper_95 = maximum/upper) %>%
+    arrange(desc(largest_draw_share))
+  write_csv(tail_review, file.path(output_dir, "density_tail_review.csv"))
+  average <- function(z) vapply(seq_len(nrow(prepared$tc)), function(i) {
+    rowMeans(z[, prepared$grid$tc_id == i, drop = FALSE])
+  }, numeric(nrow(z)))
+  pev <- average(den[, seq_len(K)])
+  regional <- average(den[, K + seq_len(K)])
+  contrast <- mutate(summarize_density_draws(pev - regional, prepared$tc),
+    probability_pev_gt_regional = colMeans(pev > regional),
+    probability_pev_lt_regional = colMeans(pev < regional))
+  eligible <- prepared$tc$class == ">4cm" | prepared$tc$taxon %in% c("MCAV", "FAVI", "MEAN", "MUSS")
+  contrast$regional_full_survey_support <- eligible
+  for (v in c("mean", "median", "lower", "upper", "maximum", "largest_draw_share",
+              "probability_pev_gt_regional", "probability_pev_lt_regional")) contrast[[v]][!eligible] <- NA
+  write_csv(contrast, file.path(output_dir, "habitat_averaged_2024_contrasts.csv"))
+  z <- cbind(pev, regional, pev - regional)
+  colnames(z) <- c(paste(prepared$tc$taxon, prepared$tc$class, "PEV", sep = ":"),
+                   paste(prepared$tc$taxon, prepared$tc$class, "regional", sep = ":"),
+                   paste(prepared$tc$taxon, prepared$tc$class, "difference", sep = ":"))
+  ar <- array(z, dim = c(dim(draws)[1:2], ncol(z)), dimnames = list(NULL, NULL, colnames(z)))
+  derived <- posterior::summarise_draws(posterior::as_draws_array(ar),
+    "mean", "mcse_mean", "rhat", "ess_bulk", "ess_tail") %>%
+    mutate(relative_mcse = mcse_mean/pmax(abs(mean), 1e-12))
+  write_csv(derived, file.path(output_dir, "prediction_diagnostics.csv"))
+  component_checks <- distributional_diagnostics(prepared, fit)
+  write_csv(component_checks, file.path(output_dir, "distributional_prediction_diagnostics.csv"))
+
+  # PPCs include each observed region, source, direction and actual searched area.
+  d <- prepared$counts
+  set.seed(20261028)
+  take <- sort(sample(seq_len(nrow(posterior::as_draws_matrix(fit))), 250))
+  yrep <- posterior_predict(fit, newdata = d, re_formula = NULL, draw_ids = take)
+  stopifnot(all(is.finite(yrep)))
+  # Verify the fitted count likelihood independently in R, including effort,
+  # region, source, direction, zero inflation and negative-binomial shape.
+  audit_draws <- take[round(seq(1, length(take), length.out = 10))]
+  count_eta <- posterior_linpred(fit, newdata = d, re_formula = NULL, draw_ids = audit_draws)
+  count_zi <- posterior_linpred(fit, newdata = d, dpar = "zi", re_formula = NULL, draw_ids = audit_draws)
+  count_shape <- posterior_linpred(fit, newdata = d, dpar = "shape", re_formula = NULL,
+                                   transform = TRUE, draw_ids = audit_draws)
+  manual_log_lik <- matrix(dnbinom(rep(d$n, each = length(audit_draws)),
+                                   mu = exp(count_eta), size = count_shape, log = TRUE),
+                            nrow = length(audit_draws)) + plogis(-count_zi, log.p = TRUE)
+  zero_columns <- d$n == 0
+  a <- plogis(count_zi[, zero_columns, drop = FALSE], log.p = TRUE)
+  b <- manual_log_lik[, zero_columns, drop = FALSE]
+  m <- pmax(a, b)
+  manual_log_lik[, zero_columns] <- m + log(exp(a - m) + exp(b - m))
+  native_log_lik <- log_lik(fit, newdata = d, re_formula = NULL, draw_ids = audit_draws)
+  likelihood_error <- max(abs(manual_log_lik - native_log_lik))
+  write_csv(data.frame(maximum_absolute_log_likelihood_error = likelihood_error,
+                       pass = likelihood_error < 1e-8), file.path(output_dir, "likelihood_validation.csv"))
+  stopifnot(likelihood_error < 1e-8)
+  rm(count_eta, count_zi, count_shape, manual_log_lik, native_log_lik, a, b, m)
+  groups <- split(seq_len(nrow(d)), interaction(d$region, d$dataset, d$taxon, d$class, d$Type, drop = TRUE))
+  ppc <- bind_rows(lapply(groups, function(ix) {
+    observed <- c(density = mean(d$n[ix]/d$transect_area_m2[ix]),
+                  zero_fraction = mean(d$n[ix] == 0), maximum = max(d$n[ix]),
+                  positive_sites = sum(d$n[ix] > 0))
+    predicted <- list(
+      density = rowMeans(sweep(yrep[, ix, drop = FALSE], 2, d$transect_area_m2[ix], "/")),
+      zero_fraction = rowMeans(yrep[, ix, drop = FALSE] == 0),
+      maximum = apply(yrep[, ix, drop = FALSE], 1, max),
+      positive_sites = rowSums(yrep[, ix, drop = FALSE] > 0))
+    bind_rows(lapply(names(predicted), function(metric) {
+      x <- predicted[[metric]]
+      lo <- unname(quantile(x, 0.025)); hi <- unname(quantile(x, 0.975))
+      data.frame(d[ix[1], c("region", "dataset", "taxon", "class", "Type")],
+                 metric = metric, observed = observed[[metric]], predicted_median = median(x),
+                 lower = lo, upper = hi, outside_95 = observed[[metric]] < lo | observed[[metric]] > hi)
+    }))
+  }))
+  write_csv(ppc, file.path(output_dir, "posterior_predictive_checks.csv"))
+  ppc_summary <- ppc %>% group_by(region, dataset, class, metric) %>%
+    summarize(cells = n(), outside_95 = sum(outside_95), .groups = "drop")
+  write_csv(ppc_summary, file.path(output_dir, "posterior_predictive_check_summary.csv"))
+
+  # Independent checks against brms's full expected-value calculation.
+  audit <- d[!duplicated(d[c("region", "taxon", "class", "Type")]), , drop = FALSE]
+  audit$transect_area_m2 <- 1
+  mu_full <- posterior_linpred(fit, newdata = audit, re_formula = NULL)
+  mu_zero_direction <- posterior_linpred(fit, newdata = audit, re_formula = source_effects)
+  zi <- posterior_linpred(fit, newdata = audit, dpar = "zi", re_formula = NULL)
+  epred_full <- posterior_epred(fit, newdata = audit, re_formula = NULL)
+  expected <- exp(mu_zero_direction + plogis(-zi, log.p = TRUE))
+  independent <- epred_full * exp(mu_zero_direction - mu_full)
+  native_conditional <- posterior_epred(fit, newdata = audit, re_formula = density_effects)
+  error <- max(abs(expected - independent)/pmax(1, abs(independent)),
+               abs(native_conditional - independent)/pmax(1, abs(independent)))
+  # Changing an excluded direction identifier must not change predictions.
+  validation <- data.frame(
+    check = c("Conditional density matches brms expected value after removing direction",
+              "PEV prediction data explicitly encode PEV and regional=0",
+              "Regional prediction data explicitly encode Broward-Miami and regional=1"),
+    pass = c(error < 1e-10,
+             all(prediction_data(prepared, nd, "PEV")$regional == 0L),
+             all(prediction_data(prepared, nd, "Broward-Miami")$regional == 1L)))
+  stopifnot(all(validation$pass))
+  write_csv(validation, file.path(output_dir, "prediction_validation.csv"))
+  plot_data <- filter(ppc, dataset == "drm24", metric == "density")
+  g <- ggplot(plot_data, aes(observed, predicted_median, color = region)) +
+    geom_abline(slope = 1, intercept = 0, color = "gray60") +
+    geom_errorbar(aes(ymin = lower, ymax = upper), alpha = 0.25, width = 0) +
+    geom_point(size = 1) + facet_grid(class ~ Type, scales = "free") + theme_minimal() +
+    labs(x = "Observed site-mean colonies/m²", y = "Replicated median and 95% interval",
+         title = "2024 posterior predictive checks")
+  ggsave(file.path(output_dir, "posterior_predictive_density.png"), g,
+         width = 12, height = 6, dpi = 250, bg = "white")
+  result <- list(diagnostic = diagnostics, density = density, contrast = contrast,
+                 derived = derived, components = component_checks, ppc = ppc,
+                 posterior_file = fit_file, hash = fit_hash)
+  saveRDS(result, file.path(output_dir, "evaluation.rds"))
+  result
+}
+```
+
+```{r evaluate-joint-model}
+joint_evaluation <- summarize_joint_fit(prepared, joint_fit, output_dir)
+show_table(joint_evaluation$diagnostic)
+show_table(head(joint_evaluation$derived[order(-joint_evaluation$derived$rhat), ], 15))
+show_table(joint_evaluation$components %>% filter(regional_full_survey_support) %>%
+  group_by(component, region) %>% summarize(max_rhat = max(rhat),
+    min_bulk_ess = min(ess_bulk), min_tail_ess = min(ess_tail), .groups = "drop"), digits = 3)
+knitr::include_graphics(output_file("posterior_predictive_density.png"))
+show_table(joint_evaluation$ppc %>%
+  filter(dataset == "drm24", taxon == "ACER", class == ">4cm") %>%
+  select(region, Type, metric, observed, predicted_median, lower, upper, outside_95), digits = 4)
+show_table(read_csv(output_file("density_tail_review.csv"), show_col_types = FALSE) %>%
+  slice_head(n = 12) %>%
+  mutate(largest_draw_percent = 100 * largest_draw_share) %>%
+  select(taxon, class, Type, region, mean, median, upper, maximum, largest_draw_percent), digits = 4)
+```
+
+### Bayesian R-squared and original posterior predictive checks
+
+These checks retain the original analysis framework. Bayesian R-squared uses
+colony counts, as in the original `bayes_R2()` call. Posterior predictive
+statistics use densities (counts divided by each observation's actual searched
+area). Replications retain every observation's dataset, region and direction
+and include all fitted random effects; they are not the direction-zero,
+1 m² predictions used for manuscript density estimates.
+
+The global checks compare mean, variance, zero proportion, skewness and a
+chi-squared discrepancy. Grouped checks compare mean, standard deviation,
+zero proportion and skewness within taxon–size-class–habitat combinations.
+Both are reported for all observations and separately for PEV and Broward–Miami.
+The existing finer checks by dataset and region remain above.
+
+```{r original-framework-predictive-draws}
+# Reuse the saved posterior: these calculations never fit a new model.
+# R² uses all 4,000 draws. PPCs use 1,000 selected draws, as in the original.
+stopifnot(requireNamespace("e1071", quietly = TRUE))
+check_draw_count <- min(1000L, posterior::ndraws(joint_fit))
+check_signature <- list(
+  fit_hash = fit_hash, draws = check_draw_count, seed = 124L,
+  version = "original_framework_v1", brms = as.character(packageVersion("brms"))
 )
-
-# Compute PPP values
-ppp_vals <- map2_dbl(discrepancy_stats, T_obs, ~ mean(.x >= .y))
-ppp_vals
-
-# Assemble plots
-stat_names <- names(discrepancy_stats)
-
-plot_list <- map(stat_names, function(stat) {
-  df <- tibble(T_rep = discrepancy_stats[[stat]])
-  ggplot(df, aes(x = T_rep)) +
-    geom_histogram(bins = 50, fill = "gray80", color = "black") +
-    geom_vline(xintercept = T_obs[[stat]], color = "red", linetype = "dashed", linewidth = 1) +
-    labs(
-      title = glue::glue("{stat} (PPP = {round(ppp_vals[stat], 3)})"),
-      x = "Replicated Statistic",
-      y = "Frequency"
-    ) +
-    theme_minimal()
-})
-
-# Display in grid
-plot_grid(plotlist = plot_list, ncol = 1)
+check_cache <- processed_file(paste0("original_framework_draws_",
+                                     digest::digest(check_signature), ".rds"))
+if (file.exists(check_cache)) {
+  original_check_draws <- readRDS(check_cache)
+  stopifnot(identical(original_check_draws$signature, check_signature))
+} else {
+  # Native brms R², using the fitted count response and all random effects.
+  r2_draws <- as.numeric(bayes_R2(joint_fit, summary = FALSE, re_formula = NULL))
+  set.seed(124)
+  check_draw_ids <- sort(sample(seq_len(posterior::ndraws(joint_fit)), check_draw_count))
+  replicated_counts <- posterior_predict(
+    joint_fit, newdata = model_data, re_formula = NULL, draw_ids = check_draw_ids
+  )
+  expected_counts <- posterior_epred(
+    joint_fit, newdata = model_data, re_formula = NULL, draw_ids = check_draw_ids
+  )
+  original_check_draws <- list(signature = check_signature, r2 = r2_draws,
+    draw_ids = check_draw_ids, replicated_counts = replicated_counts,
+    expected_counts = expected_counts)
+  saveRDS(original_check_draws, check_cache)
+}
+stopifnot(identical(as.numeric(model_data$n), as.numeric(joint_fit$data$n)),
+          identical(as.numeric(model_data$transect_area_m2),
+                    as.numeric(joint_fit$data$transect_area_m2)),
+          all(is.finite(original_check_draws$expected_counts)),
+          all(original_check_draws$expected_counts > 0),
+          all(is.finite(original_check_draws$replicated_counts)),
+          ncol(original_check_draws$replicated_counts) == nrow(model_data))
+observed_density <- model_data$n / model_data$transect_area_m2
+replicated_density <- sweep(original_check_draws$replicated_counts, 2,
+                             model_data$transect_area_m2, "/")
+expected_density <- sweep(original_check_draws$expected_counts, 2,
+                           model_data$transect_area_m2, "/")
+check_scopes <- list(
+  `All observations` = seq_len(nrow(model_data)),
+  PEV = which(model_data$region == "PEV"),
+  `Broward-Miami` = which(model_data$region == "Broward-Miami")
+)
+r2_summary <- data.frame(
+  response_scale = "Colony counts", observations = nrow(model_data),
+  posterior_draws = length(original_check_draws$r2),
+  mean = mean(original_check_draws$r2), sd = sd(original_check_draws$r2),
+  lower = unname(quantile(original_check_draws$r2, 0.025)),
+  upper = unname(quantile(original_check_draws$r2, 0.975))
+)
+write_csv(r2_summary, output_file("bayesian_r2.csv"))
+write_csv(data.frame(draw = seq_along(original_check_draws$r2),
+                     r2 = original_check_draws$r2), output_file("bayesian_r2_draws.csv"))
+show_table(r2_summary)
 ```
 
-#### Grouped PPP
-```{r, eval = F}
-# GROUPED POSTERIOR PREDICTIVE PLOTS ------------------------------------
+#### Global posterior predictive checks
 
-# Create taxon_class column
-dfftaxon <- dfftaxon %>%
-  mutate(taxon_class = paste(taxon, class, sep = "_"))
+For the chi-squared discrepancy, observed and replicated densities are compared
+with the same expected densities **within each posterior draw**. This corrects
+the original code, which used posterior-average expected densities for the
+observed discrepancy but draw-specific expectations for replications. The
+quantity is a predictive discrepancy, not a classical chi-squared test.
 
-# Draw predicted counts
-ppreds <- add_predicted_draws(mod_nb3.7, newdata = dfftaxon, ndraws = 1000) %>%
-  mutate(.prediction = .prediction / transect_area_m2)    # CONVERT TO DENSITY
-
-# Summarize predicted statistics by taxon_class and draw
-pp_stats <- ppreds %>%
-  group_by(taxon_class, Type, .draw) %>%
-  summarize(
-    mean_pred = mean(.prediction),
-    sd_pred = sd(.prediction),
-    p_zero_pred = mean(.prediction == 0),
-    skew_pred = e1071::skewness(.prediction),
-    .groups = "drop"
+```{r original-global-posterior-checks}
+global_check_draws <- bind_rows(lapply(names(check_scopes), function(scope) {
+  ix <- check_scopes[[scope]]
+  y <- observed_density[ix]
+  yrep <- replicated_density[, ix, drop = FALSE]
+  mu <- expected_density[, ix, drop = FALSE]
+  observed <- c(mean = mean(y), variance = var(y), zero_prop = mean(y == 0),
+                skewness = moments::skewness(y))
+  replicated <- data.frame(
+    draw = original_check_draws$draw_ids,
+    mean = rowMeans(yrep), variance = apply(yrep, 1, var),
+    zero_prop = rowMeans(yrep == 0),
+    skewness = apply(yrep, 1, moments::skewness)
   )
+  # Pair both discrepancies with the same posterior draw of mu.
+  observed_chi <- vapply(seq_len(nrow(mu)), function(i)
+    sum((y - mu[i, ])^2 / mu[i, ]), numeric(1))
+  replicated$chi_squared <- vapply(seq_len(nrow(mu)), function(i)
+    sum((yrep[i, ] - mu[i, ])^2 / mu[i, ]), numeric(1))
+  replicated %>% pivot_longer(-draw, names_to = "statistic", values_to = "replicated") %>%
+    mutate(scope = scope, observations = length(ix),
+           observed = if_else(statistic == "chi_squared",
+                              observed_chi[match(draw, original_check_draws$draw_ids)],
+                              unname(observed[statistic])))
+}))
+global_checks <- global_check_draws %>%
+  group_by(scope, observations, statistic) %>%
+  summarize(observed_mean = mean(observed),
+            replicated_mean = mean(replicated),
+            replicated_lower = quantile(replicated, 0.025),
+            replicated_upper = quantile(replicated, 0.975),
+            posterior_predictive_probability = mean(replicated >= observed),
+            predictive_draws = n(), .groups = "drop")
+write_csv(global_checks, output_file("posterior_predictive_global.csv"))
+write_csv(global_check_draws, output_file("posterior_predictive_global_draws.csv"))
+show_table(global_checks %>% select(scope, statistic, posterior_predictive_probability))
 
-# Summarize observed statistics
-obs_stats <- dfftaxon %>%
-  mutate(n = n / transect_area_m2) %>%     # convert to density
-  group_by(taxon_class, Type) %>%
-  summarize(
-    mean_obs = mean(n),
-    sd_obs = sd(n),
-    p_zero_obs = mean(n == 0),
-    skew_obs = e1071::skewness(n),
-    .groups = "drop"
-  )
-
-# Plot function
-plot_stat2 <- function(stat_name, stat_label) {
-  ggplot(pp_stats, aes_string(x = "Type", y = paste0(stat_name, "_pred"))) +
-    stat_halfeye(fill = "orange", alpha = 0.6) +
-    facet_wrap(~taxon_class, scales = "free_y") +
-    geom_point(data = obs_stats, aes_string(y = paste0(stat_name, "_obs")), color = "red", size = 1) +
-    labs(
-      y = stat_label,
-      x = "Taxon and size class",
-      title = paste("Observed vs predicted", tolower(stat_label), "by taxon:class")
-    ) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+plot_global_checks <- function(scope) {
+  plots <- lapply(c("mean", "variance", "zero_prop", "skewness", "chi_squared"), function(stat) {
+    d <- filter(global_check_draws, .data$scope == .env$scope, statistic == stat)
+    stopifnot(nrow(d) == check_draw_count, all(d$scope == scope))
+    ppp <- mean(d$replicated >= d$observed)
+    # The chi discrepancy has a draw-specific observed value, so plot paired
+    # differences with reference zero. Other panels retain the original style.
+    chi <- stat == "chi_squared"
+    d$plot_value <- if (chi) d$replicated - d$observed else d$replicated
+    reference <- if (chi) 0 else d$observed[1]
+    ggplot(d, aes(plot_value)) +
+      geom_histogram(bins = 40, fill = "gray80", color = "white") +
+      geom_vline(xintercept = reference, color = "red", linetype = "dashed") +
+      labs(title = paste0(scope, ": ", stat, " (PPP = ", round(ppp, 3), ")"),
+           x = if (chi) "Replicated minus observed discrepancy" else "Replicated statistic",
+           y = "Posterior replications") + theme_minimal(base_size = 10)
+  })
+  cowplot::plot_grid(plotlist = plots, ncol = 1)
 }
-
-
-# Generate plots
-plot_stat2("mean", "Mean") 
-plot_stat2("sd", "Standard Deviation")
-plot_stat2("p_zero", "Proportion Zeros")
-plot_stat2("skew", "Skewness")
-
-
-
-### grouped ppps
-
-# Compute PPP per stat per group
-compute_ppp <- function(pred_col, obs_col) {
-  pp_stats %>%
-    select(taxon_class, Type, .draw, !!sym(pred_col)) %>%
-    left_join(
-      obs_stats %>%
-        select(taxon_class, Type, obs = !!sym(obs_col)),
-      by = c("taxon_class", "Type")
-    ) %>%
-    group_by(taxon_class, Type) %>%
-    summarize(
-      ppp = mean(!!sym(pred_col) >= obs),
-      .groups = "drop"
-    ) %>%
-    mutate(statistic = obs_col)
-}
-
-ppp_mean <- compute_ppp("mean_pred", "mean_obs")
-ppp_sd <- compute_ppp("sd_pred", "sd_obs")
-ppp_zero <- compute_ppp("p_zero_pred", "p_zero_obs")
-ppp_skew <- compute_ppp("skew_pred", "skew_obs")
-
-# Combine
-ppp_summary_grouped <- bind_rows(ppp_mean, ppp_sd, ppp_zero, ppp_skew) 
-
-# Compare observed to predicted values for taxon-class-habitat groups that were actually observed
-observed_combos <- dfftaxon %>% filter(n > 0) %>% distinct(taxon, class, Type) %>%
-  mutate(taxon_class = paste(taxon, class, sep = "_"))
-
-ppp_summary_grouped_obs <- ppp_summary_grouped %>%
-  semi_join(observed_combos, by = c("taxon_class", "Type"))
-
-ppp_summary_grouped_obs_ext <- ppp_summary_grouped_obs %>%
-  filter(ppp < 0.05 | ppp > 0.95) %>%
-  pivot_wider(names_from = statistic, values_from = ppp)
-
-ppp_summary_grouped_obs_ex
-nrow(ppp_summary_grouped_obs)
+ggsave(output_file("ppc_global_density.png"), plot_global_checks("All observations"),
+       width = 8, height = 12, dpi = 180, bg = "white")
+ggsave(output_file("ppc_global_density_by_region.png"),
+       cowplot::plot_grid(plot_global_checks("PEV"), plot_global_checks("Broward-Miami"), ncol = 2),
+       width = 14, height = 12, dpi = 180, bg = "white")
+knitr::include_graphics(c(output_file("ppc_global_density.png"),
+                          output_file("ppc_global_density_by_region.png")))
 ```
 
+#### Grouped posterior predictive checks
 
-### Final density estimates
+These repeat the original four grouped statistics, including its separate
+skewness conventions (`moments` globally and `e1071`, type 3, within groups).
+All groups are saved, including all-zero groups. As in the original manuscript
+summary, the main tally includes groups with at least one observed colony.
+Undefined statistics are identified explicitly: skewness is undefined for a
+constant sample and standard deviation is undefined for a single observation.
+A PPP is left blank if its observed value or any replicated value is undefined,
+rather than assigning a value to those cases or silently dropping replications.
 
+```{r original-grouped-posterior-checks}
+group_results <- unlist(lapply(names(check_scopes), function(scope) {
+  ix <- check_scopes[[scope]]
+  groups <- split(ix, interaction(model_data$taxon[ix], model_data$class[ix],
+                                  model_data$Type[ix], drop = TRUE))
+  lapply(groups, function(j) {
+    y <- observed_density[j]
+    yrep <- replicated_density[, j, drop = FALSE]
+    id <- data.frame(scope = scope, taxon = as.character(model_data$taxon[j[1]]),
+                     class = as.character(model_data$class[j[1]]),
+                     Type = as.character(model_data$Type[j[1]]))
+    observed <- bind_cols(id, data.frame(observations = length(j),
+      positive_sites = sum(y > 0), mean = mean(y), sd = sd(y),
+      zero_prop = mean(y == 0), skewness = e1071::skewness(y, type = 3))) %>%
+      pivot_longer(c(mean, sd, zero_prop, skewness), names_to = "statistic", values_to = "observed")
+    replicated <- bind_cols(id[rep(1, nrow(yrep)), ], data.frame(
+      draw = original_check_draws$draw_ids, mean = rowMeans(yrep),
+      sd = apply(yrep, 1, sd), zero_prop = rowMeans(yrep == 0),
+      skewness = apply(yrep, 1, e1071::skewness, type = 3))) %>%
+      pivot_longer(c(mean, sd, zero_prop, skewness), names_to = "statistic", values_to = "replicated")
+    list(observed = observed, replicated = replicated)
+  })
+}), recursive = FALSE)
+group_observed <- bind_rows(lapply(group_results, `[[`, "observed"))
+group_check_draws <- bind_rows(lapply(group_results, `[[`, "replicated")) %>%
+  left_join(group_observed, by = c("scope", "taxon", "class", "Type", "statistic"))
+grouped_checks <- group_check_draws %>%
+  group_by(scope, taxon, class, Type, statistic, observations, positive_sites) %>%
+  summarize(observed = first(observed), predictive_draws = n(),
+            defined_replicates = sum(is.finite(replicated)),
+            replicated_median = if (any(is.finite(replicated))) median(replicated[is.finite(replicated)]) else NA_real_,
+            replicated_lower = if (any(is.finite(replicated))) quantile(replicated[is.finite(replicated)], 0.025) else NA_real_,
+            replicated_upper = if (any(is.finite(replicated))) quantile(replicated[is.finite(replicated)], 0.975) else NA_real_,
+            posterior_predictive_probability = if (is.finite(first(observed)) && all(is.finite(replicated)))
+              mean(replicated >= first(observed)) else NA_real_, .groups = "drop") %>%
+  mutate(in_original_style_tally = positive_sites > 0,
+         defined = is.finite(posterior_predictive_probability),
+         extreme = if_else(defined, posterior_predictive_probability < 0.05 |
+                                      posterior_predictive_probability > 0.95, NA))
+grouped_check_summary <- grouped_checks %>% filter(in_original_style_tally) %>%
+  group_by(scope) %>%
+  summarize(statistics = n(), defined_statistics = sum(defined),
+            undefined_statistics = sum(!defined), extreme_statistics = sum(extreme, na.rm = TRUE),
+            .groups = "drop")
+write_csv(grouped_checks, output_file("posterior_predictive_grouped.csv"), na = "")
+write_csv(grouped_check_summary, output_file("posterior_predictive_grouped_summary.csv"))
+write_csv(filter(grouped_checks, in_original_style_tally, extreme),
+          output_file("posterior_predictive_grouped_extreme.csv"))
+show_table(grouped_check_summary, digits = 0)
+show_table(filter(grouped_checks, in_original_style_tally, extreme) %>%
+             select(scope, taxon, class, Type, statistic, posterior_predictive_probability))
+
+# Reproduce the four original pooled, faceted diagnostic plots and save them.
+check_habitat_labels <- c("Nearshore Ridge Complex" = "NRC", "Inner Reef" = "IR",
+                          "Middle Reef" = "MR", "Outer Reef" = "OR")
+check_statistic_labels <- c(mean = "Mean density (colonies/m²)",
+                            sd = "Density SD (colonies/m²)",
+                            zero_prop = "Proportion zeros", skewness = "Skewness")
+for (stat in c("mean", "sd", "zero_prop", "skewness")) {
+  d <- group_check_draws %>%
+    filter(scope == "All observations", statistic == stat, is.finite(replicated)) %>%
+    mutate(Type = factor(Type, levels = names(check_habitat_labels)),
+           taxon_class = paste(taxon, class))
+  observed <- group_observed %>%
+    filter(scope == "All observations", statistic == stat, is.finite(observed)) %>%
+    mutate(Type = factor(Type, levels = names(check_habitat_labels)),
+           taxon_class = paste(taxon, class))
+  p <- ggplot(d, aes(Type, replicated)) +
+    tidybayes::stat_halfeye(fill = "orange", alpha = 0.6, .width = c(0.5, 0.95),
+                           normalize = "panels") +
+    geom_point(data = observed, aes(y = observed), color = "red", size = 1) +
+    facet_wrap(~ taxon_class, scales = "free_y", ncol = 5) +
+    scale_x_discrete(labels = check_habitat_labels, drop = FALSE) +
+    labs(x = "Habitat", y = check_statistic_labels[[stat]],
+         title = paste("Observed and replicated density summaries:", stat),
+         caption = "All regions and surveys pooled. Orange: replications; red: observed. Skewness is undefined for constant samples.") +
+    theme_minimal(base_size = 9) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  ggsave(output_file(paste0("ppc_grouped_", stat, ".png")), p,
+         width = 14, height = 14, dpi = 180, bg = "white")
+}
+knitr::include_graphics(vapply(c("mean", "sd", "zero_prop", "skewness"),
+  function(stat) output_file(paste0("ppc_grouped_", stat, ".png")), character(1)))
+```
+
+#### Fit-check definitions and validation
+
+PPP is the fraction of replications whose statistic is at least as large as
+its observed counterpart. The diagnostic flag repeats the original thresholds
+PPP <0.05 or >0.95; it is not a significance test or a multiplicity-adjusted
+p-value. The grouped tally reports the number of defined statistics explicitly.
+A discrete statistic can have a PPP of one because of ties (for example, when
+the observed zero proportion is zero); inspect the predictive distribution
+rather than treating the flag alone as evidence of poor fit.
+A successful predictive check does not establish sampler convergence.
+
+```{r original-framework-check-validation}
+# Independently verify native count-scale R² on the selected posterior draws.
+check_r2 <- vapply(seq_len(check_draw_count), function(i) {
+  mu <- original_check_draws$expected_counts[i, ]
+  var(mu) / (var(mu) + var(model_data$n - mu))
+}, numeric(1))
+r2_error <- max(abs(check_r2 - original_check_draws$r2[original_check_draws$draw_ids]))
+# The chi-squared PPP must use paired differences, not the posterior mean mu.
+chi_checks <- global_check_draws %>% filter(statistic == "chi_squared") %>%
+  group_by(scope) %>% summarize(ppp = mean(replicated - observed >= 0), .groups = "drop") %>%
+  left_join(filter(global_checks, statistic == "chi_squared"), by = "scope")
+check_validation <- data.frame(
+  check = c("Native count-scale R-squared matches independently calculated residual-variance R-squared",
+            "Observed and replicated chi-squared discrepancies are paired by posterior draw",
+            "Global probabilities lie in [0,1] and use all selected replications",
+            "Regional observation subsets partition the fitted data",
+            "Undefined grouped statistics are not assigned diagnostic probabilities",
+            "All scientific posterior draws are retained"),
+  pass = c(r2_error < 1e-10,
+           max(abs(chi_checks$ppp - chi_checks$posterior_predictive_probability)) < 1e-12,
+           all(is.finite(global_checks$posterior_predictive_probability) &
+                 global_checks$posterior_predictive_probability >= 0 &
+                 global_checks$posterior_predictive_probability <= 1 &
+                 global_checks$predictive_draws == check_draw_count),
+           identical(sort(c(check_scopes$PEV, check_scopes$`Broward-Miami`)),
+                     check_scopes$`All observations`),
+           all(is.na(grouped_checks$posterior_predictive_probability[!grouped_checks$defined])),
+           length(original_check_draws$r2) == posterior::ndraws(joint_fit))
+)
+write_csv(check_validation, output_file("original_framework_check_validation.csv"))
+stopifnot(all(check_validation$pass))
+write_csv(data.frame(
+  setting = c("fit_hash", "r2_response_scale", "r2_posterior_draws", "ppc_response_scale", "ppc_draws",
+              "ppc_random_effects", "global_skewness", "grouped_skewness", "chi_squared",
+              "grouped_tally", "undefined_statistics"),
+  value = c(fit_hash, "Colony counts", length(original_check_draws$r2), "Colonies/m2", check_draw_count,
+            "All fitted effects, at each observation's actual region, dataset, direction and searched area",
+            "moments::skewness", "e1071::skewness(type=3)",
+            "Sum((density-expected_density)^2/expected_density), paired by posterior draw",
+            "Observed-positive groups; flag PPP <0.05 or >0.95",
+            "PPP left blank if observed or any replicated statistic is undefined")
+), output_file("original_framework_check_method.csv"))
+show_table(check_validation)
+# Keep the compact summaries; release large predictive matrices before figures.
+rm(original_check_draws, replicated_density, expected_density, group_results,
+   group_check_draws, group_observed, global_check_draws)
+```
+
+### Chain energy and mixing checks
+
+Energy exploration and trace plots supplement R-hat and effective sample size.
+An E-BFMI below 0.3 is a flag for review, rather than evidence that a larger
+iteration count alone will solve the problem. These diagnostics follow
+[Stan's guidance](https://mc-stan.org/learn-stan/diagnostics-warnings.html).
+
+```{r sampler-health-checks}
+sampler_health_draws <- rstan::get_sampler_params(joint_fit$fit, inc_warmup = FALSE)
+sampler_health <- bind_rows(lapply(seq_along(sampler_health_draws), function(chain) {
+  x <- sampler_health_draws[[chain]]
+  data.frame(chain = chain, sampling_iterations = nrow(x),
+    ebfmi = mean(diff(x[, "energy__"])^2) / var(x[, "energy__"]),
+    mean_acceptance = mean(x[, "accept_stat__"]),
+    mean_leapfrog_steps = mean(x[, "n_leapfrog__"]),
+    divergences = sum(x[, "divergent__"]),
+    treedepth_hits = sum(x[, "treedepth__"] >= max_treedepth))
+}))
+write_csv(sampler_health, output_file("sampler_health_by_chain.csv"))
+show_table(sampler_health, digits = 3)
+
+# Show the five slowest-mixing parameters and the joint log posterior.
+trace_parameters <- read_csv(output_file("parameter_diagnostics.csv"), show_col_types = FALSE) %>%
+  filter(variable != "lp__") %>% slice_head(n = 5) %>% pull(variable)
+trace_parameters <- c(trace_parameters, "lp__")
+trace_array <- posterior::as_draws_array(joint_fit)[, , trace_parameters, drop = FALSE]
+trace_data <- as_tibble(posterior::as_draws_df(trace_array)) %>%
+  select(.chain, .iteration, all_of(trace_parameters)) %>%
+  pivot_longer(all_of(trace_parameters), names_to = "parameter", values_to = "value") %>%
+  mutate(parameter = factor(parameter, levels = trace_parameters), chain = factor(.chain))
+trace_plot <- ggplot(trace_data, aes(.iteration, value, color = chain)) +
+  geom_line(linewidth = .25, alpha = .75) +
+  facet_wrap(~parameter, scales = "free_y", ncol = 2) + theme_minimal() +
+  labs(x = "Post-warmup iteration", y = NULL, color = "Chain",
+       title = "Post-warmup traces for the slowest-mixing parameters")
+ggsave(output_file("sampler_trace_review.png"), trace_plot,
+       width = 12, height = 8, dpi = 180, bg = "white")
+knitr::include_graphics(output_file("sampler_trace_review.png"))
+```
+
+```{r diagnostic-status, echo=FALSE, results='asis'}
+if (!isTRUE(joint_evaluation$diagnostic$pass)) {
+  cat("**This fit does not pass every sampling criterion; manuscript figures and tables below remain provisional.**\n\n")
+}
+cat("Posterior saved at: `", fit_file, "`. Rerunning matching inputs reuses it.\n", sep = "")
+```
+
+## Final PEV density estimates
+
+Survey-averaged outputs give equal weight to each source available in the
+original taxon/class/habitat prediction grid. The 2024 outputs instead set
+`dataset = "drm24"`. Habitats are given equal weight for regional comparisons;
+impact-zone colony totals multiply PEV habitat densities by the **unrounded**
+mapped habitat areas computed above. Adult/juvenile sums and species totals
+are always calculated within posterior draws before interval summaries.
 #### Datasets equal-weighted
 
-```{r}
+```{r pev-survey-averaged-predictions}
 # Equal weighting datasets
 
 # Create newdata for prediction — dataset level only (site & dir not needed)
@@ -2540,12 +3959,8 @@ newdata <- dfftaxon %>%
 
 # Get predictions from the model
 # - Dataset RE included
-# - Dir RE marginalized out
-preds <- add_epred_draws(
-  mod_nb3.7,
-  newdata = newdata,
-  re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
-)
+# - Direction effects set to zero on the log scale
+preds <- joint_epred_draws(newdata = newdata, region = "PEV")
 
 # Equal-weight datasets so no dataset dominates
 draws_equal_weighted <- preds %>%
@@ -2611,7 +4026,7 @@ summary_equal_weighted_combined <- summary_equal_weighted_combined %>%
 ```
 
 #### 2024-specific estimates
-```{r}
+```{r pev-2024-predictions}
 newdata_drm24 <- dfftaxon %>%
   distinct(taxon, class, Type) %>% 
   mutate(transect_area_m2 = 1)  %>%
@@ -2619,11 +4034,7 @@ newdata_drm24 <- dfftaxon %>%
            fill = list(transect_area_m2 = 1)) %>%
   mutate(dataset = "drm24")
 
-preds_drm24 <- add_epred_draws(
-  mod_nb3.7,
-  newdata = newdata_drm24,
-  re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
-)
+preds_drm24 <- joint_epred_draws(newdata = newdata_drm24, region = "PEV")
 
 summary_drm24 <- preds_drm24 %>%
   group_by(taxon, class, Type) %>%
@@ -2669,7 +4080,7 @@ summary_drm24_combined <- summary_drm24_combined %>%
 ## Densities
 
 ### Taxon densities
-```{r, fig.width = 10, fig.height = 10}
+```{r taxon-density-figures-and-tables, fig.width = 10, fig.height = 10}
 ##### Function to plot densities of all taxon:class:habitat combinations with provided data frame
 
 make_taxon_density_plot <- function(densities, output_path, width, height) {
@@ -2733,7 +4144,7 @@ make_taxon_density_plot <- function(densities, output_path, width, height) {
     scale_y_continuous(limits = c(0, NA))
   
   # Save and return the plot
-  ggsave(filename = output_path, plot = fig, 
+  save_figure(filename = output_path, plot = fig, 
          width = width, height = height, 
          units = "mm", dpi = 300)
   return(fig)
@@ -2742,12 +4153,12 @@ make_taxon_density_plot <- function(densities, output_path, width, height) {
 
 # Create plot for dataset-averaged densities
 make_taxon_density_plot(densities = summary_equal_weighted_combined, 
-                        output_path = "outputs/Fig2.png",
+                        output_path = output_file("Fig2.png"),
                         width = 170, height = 170)
 
 # Create plot for current/2024 densities
 make_taxon_density_plot(densities = summary_drm24_combined, 
-                        output_path = "outputs/FigA2.png",
+                        output_path = output_file("FigA2.png"),
                         width = 170, height = 170)
 
 
@@ -2786,18 +4197,18 @@ make_taxon_density_table <- function(densities, output_path) {
 
 # Create table for dataset-averaged densities
 make_taxon_density_table(densities = summary_equal_weighted_combined, 
-                         output_path = "outputs/TableA2.csv")
+                         output_path = output_file("TableA2.csv"))
 
 # Create table for current/2024 densities
 make_taxon_density_table(densities = summary_drm24_combined, 
-                         output_path = "outputs/TableA3.csv")
+                         output_path = output_file("TableA3.csv"))
 ```
 
 ### Raw vs. modeled taxon densities
 
-```{r}
+```{r raw-versus-modeled-figure-a1}
 # Average density per dataset-taxon-class-Type group
-raw_density_summary <- dfftaxon %>%
+raw_density_summary <- pev_raw_counts %>%
   mutate(density = n / transect_area_m2) %>%
   group_by(dataset, taxon, class, Type) %>%
   summarize(
@@ -2813,8 +4224,11 @@ raw_density_summary <- dfftaxon %>%
     raw_density_upper = raw_density_mean + t_crit * raw_density_se
   )
 
-all <- raw_density_summary %>% left_join(summary_equal_weighted_combined) %>%
-  mutate(taxon_class = paste(taxon, class))
+all <- raw_density_summary %>%
+  left_join(summary_equal_weighted_combined, by = c("taxon", "class", "Type")) %>%
+  # Joining raw character labels to modeled factors can lose the habitat order.
+  mutate(Type = factor(Type, levels = type_levels),
+         taxon_class = paste(taxon, class))
 
 all_long <- all %>%
   select(dataset, taxon, class, Type, raw_density_mean, raw_density_lower, raw_density_upper,
@@ -2846,7 +4260,7 @@ raw_vs_mod <- ggplot(all_long, aes(x = Type, y = density)) +
   facet_wrap(~ taxon_class, scales = "free", ncol = 5) +
   scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0))) +
   coord_cartesian(clip = "off") +
-  scale_x_discrete(labels = c("NRC", "IR", "MR", "OR")) +
+  scale_x_discrete(limits = type_levels, labels = type_labels, drop = FALSE) +
   scale_color_manual(
     name = "",
     values = c(
@@ -2910,12 +4324,13 @@ figA1 <- raw_vs_mod + theme_minimal() +
     axis.line = element_blank() # keep ticks but don't draw duplicate axis lines
   )
 
-ggsave(filename = "outputs/FigA1.png", width = 190, height = 250, units = "mm")
+save_figure(filename = output_file("FigA1.png"), plot = figA1,
+            width = 190, height = 250, units = "mm")
 ```
 
 ### Total densities by size and SCTLD-susceptibility
 
-```{r}
+```{r total-density-figures}
 make_combined_density_figure <- function(draws, table = FALSE,
                                          output_path,
                                          y_limits = c(0, 2.8)) {
@@ -3055,7 +4470,7 @@ make_combined_density_figure <- function(draws, table = FALSE,
   )
   
   if (table == FALSE) {
-    ggsave(filename = output_path, plot = combined_plot, width = 180, height = 80, units = "mm", dpi = 300)
+    save_figure(filename = output_path, plot = combined_plot, width = 180, height = 80, units = "mm", dpi = 300)
     return(combined_plot)
   } else {
     return(list(summary_sus, summary_class, summary_total))
@@ -3063,12 +4478,12 @@ make_combined_density_figure <- function(draws, table = FALSE,
 }
 
 make_combined_density_figure(draws = draws_equal_weighted,
-                             output_path = "outputs/Fig3.png")
+                             output_path = output_file("Fig3.png"))
 make_combined_density_figure(draws = draws_equal_weighted, table = TRUE)
 
 make_combined_density_figure(draws = draws_drm24_combined,
                              y_limits = c(0, 5.2),
-                             output_path = "outputs/FigA3.png")
+                             output_path = output_file("FigA3.png"))
 
 
 
@@ -3094,7 +4509,7 @@ post_summ
 
 ## Temporal trends
 
-```{r}
+```{r temporal-trend-estimates}
 # Prediction grid
 newdata <- dfftaxon %>%     
   distinct(dataset, Type, taxon, class) %>%
@@ -3106,12 +4521,8 @@ newdata <- dfftaxon %>%
   ungroup()
 
 # Predictions (same as before)
-preds <- add_epred_draws(
-  mod_nb3.7,
-  ndraws = 2000,
-  newdata = newdata,
-  re_formula = ~(1 + Type | dataset) + (1 | dataset:taxon:class)
-)
+# Retain every posterior draw for final temporal-trend summaries.
+preds <- joint_epred_draws(newdata = newdata, region = "PEV")
 
 # Average across habitat types per draw
 preds_avg <- preds %>%
@@ -3212,7 +4623,13 @@ trends_summary <- trends_combined %>%
   mean_qi(slope, abs_change, pct_change, .width = 0.95, na.rm = TRUE) %>%
   as_tibble()
 
-# Identify significant changes (interval not overlapping zero)
+# Derive the previously interactive ordering object explicitly.
+trends_summary_subset <- trends_summary %>%
+  group_by(taxon) %>%
+  filter(if (any(class == "All")) class == "All" else TRUE) %>%
+  ungroup() %>% mutate(taxon = fct_reorder(taxon, -abs(abs_change)))
+
+# Identify temporal changes whose pointwise interval excludes zero
 preds_combined <- preds_combined %>%
   left_join(
     trends_summary %>%
@@ -3226,9 +4643,6 @@ preds_combined <- preds_combined %>%
 
 trends_summary <- trends_summary %>%
   mutate(taxon = factor(taxon, levels = levels(trends_summary_subset$taxon)))
-
-
-
 
 
 # Taxon × class summary
@@ -3315,7 +4729,7 @@ trends_summary <- trends_summary %>%
 ```
 
 ### Plot trajectories
-```{r}
+```{r temporal-trajectories-figure4}
 # Final Figure 5 trends plot
 
 alltax <- ggplot(summary_datasets %>% filter(taxon == "All"), aes(x = year, y = mean_epred)) +
@@ -3480,19 +4894,19 @@ final_plot <- alltax + p_others[[1]] + p_others[[2]] + p_others[[3]] +
 
 final_plot
 
-ggsave(filename = "outputs/Fig4.png", width = 180, height = 180, units = "mm", dpi = 300)
+save_figure(filename = output_file("Fig4.png"), width = 180, height = 180, units = "mm", dpi = 300)
 
 
 figz <- (alltax + theme(axis.title.y = element_text(margin = margin(r = 0)))) +
   p_others[[which(taxa_other == "ACER")]] +
   p_others[[which(taxa_other == "ORBI")]] +
   plot_layout(ncol = 3)
-ggsave(filename = "outputs/Trends_all_acer_orbi.png", width = 170, height = 70, units = "mm")
+save_figure(filename = output_file("Trends_all_acer_orbi.png"), width = 170, height = 70, units = "mm")
 ```
 
 
 ### Plot abs. changes
-```{r}
+```{r temporal-changes-figure5}
 # Final figure 6 trends plot
 
 # Custom signed log-like transform
@@ -3562,13 +4976,19 @@ ggplot(trends_summary_trans, aes(x = abs_change_trans, y = taxon)) +
         legend.spacing.y = unit(0.1, "cm"),    # vertical space between items
         legend.spacing.x = unit(0.1, "cm"))    # horizontal space between items)
 
-ggsave(filename = "outputs/Fig5.png", width = 140, height = 120, units = "mm", dpi = 300)
+save_figure(filename = output_file("Fig5.png"), width = 140, height = 120, units = "mm", dpi = 300)
+```
+
+
+```{r stable-taxon-colors}
+# Fixed manuscript color identity, independent of the new fitted abundance ranking.
+taxon_palette_order <- c("SIDE", "PORI", "SINT", "MCAV", "MADR", "AGAR", "SOLE", "MMEA", "DSTO", "ACER", "MEAN", "PSTR", "EFAS", "MYCE", "FAVI", "MUSS", "PCLI", "DLAB", "ORBI", "CNAT")
 ```
 
 ## Totals in impact zones
 
 ### Equal-weighted estimates
-```{r}
+```{r survey-averaged-impact-tables}
 format_count <- function(x) {
   format(round(x), big.mark = ",", scientific = FALSE, trim = TRUE)
 }
@@ -3652,7 +5072,7 @@ tab2 <- make_taxclass_zone_interval_table(tot2_draws)
 tab2 %>%
   knitr::kable(caption = "Total number of colonies in each impact zone - surveys (years) equal-weighted")
 
-write_csv(tab2, file = "outputs/TableA4.csv")
+write_csv(tab2, file = output_file("TableA4.csv"))
 
 
 # Calculate total ESA and non-ESA corals per impact zone
@@ -3673,7 +5093,6 @@ tot3 <- tot3_draws %>%
     Total = round(mean(Total)),
     .groups = "drop"
   ) %>%
-  janitor::adorn_totals(where = "col") %>%
   mutate(cum_ACER = cumsum(ACER),
          cum_ORBI = cumsum(ORBI),
          cum_non_ESA = cumsum(`non-ESA`),
@@ -3683,8 +5102,8 @@ tot3 <- tot3_draws %>%
 tot3 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones")
 
-dir.create("outputs/intermediate", recursive = TRUE, showWarnings = FALSE)
-write_csv(tot3, file = "outputs/intermediate/coral_Table2.csv")
+dir.create(output_file("intermediate"), recursive = TRUE, showWarnings = FALSE)
+write_csv(tot3, file = output_file("intermediate/coral_Table2.csv"))
 
 tot3_total_draws <- tot3_draws %>%
   group_by(.draw) %>%
@@ -3734,7 +5153,7 @@ tot3_intervals <- bind_rows(tot3_draws, tot3_total_draws) %>%
 tot3_intervals %>%
   knitr::kable(caption = "Total coral colonies in all impact zones with 95% posterior intervals")
 
-write_csv(tot3_intervals, file = "outputs/intermediate/coral_Table2_intervals.csv")
+write_csv(tot3_intervals, file = output_file("intermediate/coral_Table2_intervals.csv"))
 ```
 
 
@@ -3749,7 +5168,7 @@ tot4 <- tot2 %>%
 # Assign a base color per taxon
 set.seed(3)
 base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
-names(base_colors) <- unique(tot4$taxon)
+names(base_colors) <- taxon_palette_order
 
 # Define shading function
 get_shades <- function(base_col, class, all_classes) {
@@ -3850,7 +5269,7 @@ p +
   ) +
   labs(title = "Total corals in scenario 2 zones + NMFS areas, surveys (all years) equal-weighted")
   
-ggsave(filename = "outputs/Fig6.png", width = 180, height = 130, units = "mm", dpi = 600)
+save_figure(filename = output_file("Fig6.png"), width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
 #### Treemap plot - Full monitoring area
@@ -3863,7 +5282,7 @@ tot4 <- tot2 %>%
 # Assign a base color per taxon
 set.seed(3)
 base_colors <- sample(ggsci::pal_d3("category20")(20), 20)
-names(base_colors) <- unique(tot4$taxon)
+names(base_colors) <- taxon_palette_order
 
 # Define shading function
 get_shades <- function(base_col, class, all_classes) {
@@ -3962,13 +5381,13 @@ p +
   ) +
   labs(title = "Total corals in full impact monitoring area, surveys (all years) equal-weighted")
   
-ggsave(filename = "outputs/FigA4.png", width = 180, height = 130, units = "mm", dpi = 600)
+save_figure(filename = output_file("FigA4.png"), width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
 
 ### 2024 estimates
 
-```{r}
+```{r 2024-impact-tables}
 # TOTAL COLONIES IN EACH IMPACT ZONE
 densities_tot_2024_draws <- draws_drm24_combined %>% filter(class != "All")
 
@@ -3994,7 +5413,7 @@ tab2_2024 <- make_taxclass_zone_interval_table(tot2_2024_draws)
 tab2_2024 %>%
   knitr::kable(caption = "Total number of colonies in each impact zone - 2024 estimates")
 
-write_csv(tab2_2024, file = "outputs/TableA5.csv")
+write_csv(tab2_2024, file = output_file("TableA5.csv"))
 
 
 ## SUM ESA and non-ESA corals
@@ -4038,11 +5457,11 @@ tot3_2024 <- tot3_2024_draws %>%
 tot3_2024 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones, 2024 estimates")
 
-write_csv(tot3_2024, file = "outputs/TableA6.csv")
+write_csv(tot3_2024, file = output_file("TableA6.csv"))
 ```
 
 #### Treemap plot - Scenario2+NMFS
-```{r}
+```{r 2024-scenario-treemap-a5}
 # Aggregate total abundance by taxon + class
 tot4_2024 <- tot2_2024 %>%
   filter(name != "Rest of Monitoring Area") %>%
@@ -4123,12 +5542,12 @@ p +
   ) +
   labs(title = "Total corals in scenario 2 zones + NMFS areas, 2024 estimates")
   
-ggsave(filename = "outputs/FigA5.png", width = 180, height = 130, units = "mm", dpi = 600)
+save_figure(filename = output_file("FigA5.png"), width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
 
 #### Treemap plot - Full monitoring area
-```{r}
+```{r 2024-full-monitoring-treemap-a6}
 # TOTAL COLONIES IN EACH IMPACT ZONE
 densities_tot_2024 <- summary_drm24_combined %>% filter(class != "All")
 
@@ -4224,10 +5643,10 @@ p +
   ) +
   labs(title = "Total corals in full impact monitoring area, 2024 estimates")
   
-ggsave(filename = "outputs/FigA6.png", width = 180, height = 130, units = "mm", dpi = 600)
+save_figure(filename = output_file("FigA6.png"), width = 180, height = 130, units = "mm", dpi = 600)
 
 
-#ggsave(filename = "outputs/FigA62.png", width = 180, height = 90, units = "mm", dpi = 600)
+#save_figure(filename = output_file("FigA62.png"), width = 180, height = 90, units = "mm", dpi = 600)
 
 ```
 
@@ -4236,7 +5655,7 @@ ggsave(filename = "outputs/FigA6.png", width = 180, height = 130, units = "mm", 
 pp3 <- ggplot(polygons_final) +
     geom_sf(aes(fill = Type), color = NA, size = 0.1, alpha = 0.5) +
     geom_point(
-        data = selected,
+        data = selected_original,
         aes(x = longitude, y = latitude),
         pch = 4, alpha = 0.6, size = 1, stroke = 0.4, inherit.aes = FALSE
     ) +
@@ -4283,23 +5702,23 @@ pp3 <- ggplot(polygons_final) +
         strip.clip = "off")
 
 
-ggsave(pp3, filename = "outputs/survey_locations.png", width = 180, height = 220, units = "mm", dpi = 300, bg = "white")
+save_figure(pp3, filename = output_file("survey_locations.png"), width = 180, height = 220, units = "mm", dpi = 300, bg = "white")
 ```
 
 ```{r more_extrafigs}
 # Create plot for just ACER/ORBI
 make_taxon_density_plot(densities = summary_equal_weighted_combined %>%
                           filter(taxon %in% c("ACER", "ORBI")),
-                        output_path = "outputs/ACERORBI.png",
+                        output_path = output_file("ACERORBI.png"),
                         width = 120, height = 70)
 
 make_taxon_density_plot(densities = summary_drm24_combined %>%
                           filter(taxon %in% c("ACER", "ORBI")),
-                        output_path = "outputs/ACERORBI_2024.png",
+                        output_path = output_file("ACERORBI_2024.png"),
                         width = 120, height = 70)
 ```
 
-```{r}
+```{r zone-detail-map}
 iz_plot_clean2 <- iz_plot_clean +
   coord_sf(xlim = c(-80.1116, -80.077), 
            ylim = c(26.0675, 26.112), expand = FALSE) +
@@ -4330,5 +5749,398 @@ zonefig <- plot_grid(iz_plot_clean2, fill_legend2, ncol = 1, rel_heights = c(0.9
 
 
 zonefig
-ggsave(zonefig, filename = "outputs/zonefig.png", width = 110, height = 170, units = "mm", bg = "white")
+save_figure(zonefig, filename = output_file("zonefig.png"), width = 110, height = 170, units = "mm", bg = "white")
 ```
+# 2024 PEV versus the rest of Broward–Miami
+
+The following comparisons use paired predictions from this one joint model,
+with `dataset = "drm24"`, area 1 m², and direction effects set to zero. Each
+habitat receives weight 1/4 in each region. The first four Table A3 density
+columns remain PEV-specific; the regional columns compare the same target year
+and habitat weighting. Species sums and adult-plus-juvenile sums retain their
+within-draw covariance.
+
+```{r regional-comparison-functions}
+make_regional_table <- function(prepared, fit, output_dir) {
+    habitats <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Outer Reef")
+    juvenile_groups <- c("MCAV", "MEAN", "MUSS", "FAVI")
+    nd <- mutate(prepared$grid, dataset = "drm24")
+    draw_matrix <- posterior::as_draws_matrix(fit)
+    pev <- expected_density_draws(prepared, fit, nd, "PEV")
+    regional <- expected_density_draws(prepared, fit, nd, "Broward-Miami")
+    stopifnot(all(is.finite(pev)), all(is.finite(regional)), all(table(paste(nd$taxon, nd$class)) == 
+        length(habitats)), prepared$datasets[prepared$data$target_dataset] == "drm24")
+    prediction_checks <- read_csv(file.path(output_dir, "prediction_validation.csv"), show_col_types = FALSE)
+    brms_prediction_checks_pass <- all(prediction_checks$pass)
+    tc <- mutate(distinct(prepared$grid, taxon, class), row_type = "Taxon")
+    combined <- transmute(filter(count(tc, taxon), n > 1), taxon, class = "All", row_type = "Taxon")
+    rows <- arrange(bind_rows(tc, combined), taxon, match(class, c("<4cm", ">4cm", "All")))
+    rows <- bind_rows(rows, data.frame(taxon = "Total modeled taxa", class = c("<4cm", ">4cm", "All"), 
+        row_type = "Total"), data.frame(taxon = "Surveyed juvenile groups (4)", class = "<4cm", 
+        row_type = "Surveyed juvenile subtotal"))
+    rows$row_id <- seq_len(nrow(rows))
+    members <- lapply(seq_len(nrow(rows)), function(i) {
+        x <- rows[i, ]
+        if (x$row_type == "Taxon") 
+            which(prepared$tc$taxon == x$taxon & (x$class == "All" | prepared$tc$class == x$class))
+        else if (x$row_type == "Total") 
+            which(x$class == "All" | prepared$tc$class == x$class)
+        else which(prepared$tc$class == "<4cm" & prepared$tc$taxon %in% juvenile_groups)
+    })
+    supported_tc <- prepared$tc$class == ">4cm" | prepared$tc$taxon %in% juvenile_groups
+    rows$regional_full_survey_support <- vapply(members, function(ix) all(supported_tc[ix]), logical(1))
+    rows$component_count <- lengths(members)
+    rows$component_taxa <- vapply(members, function(ix) paste(prepared$tc$taxon[ix], collapse = " + "), 
+        character(1))
+    cell_grid <- mutate(rows[rep(seq_len(nrow(rows)), each = length(habitats)), ], Type = rep(habitats, 
+        nrow(rows)))
+    sum_cells <- function(z) vapply(seq_len(nrow(cell_grid)), function(i) {
+        ids <- prepared$tc$tc_id[members[[cell_grid$row_id[i]]]]
+        rowSums(z[, prepared$grid$tc_id %in% ids & prepared$grid$Type == cell_grid$Type[i], drop = FALSE])
+    }, numeric(nrow(z)))
+    a <- sum_cells(pev)
+    b <- sum_cells(regional)
+    average <- function(z) vapply(rows$row_id, function(i) rowMeans(z[, cell_grid$row_id == i, drop = FALSE]), 
+        numeric(nrow(z)))
+    pa <- average(a)
+    ra <- average(b)
+    difference <- pa - ra
+    describe <- function(z, prefix) {
+        ans <- as.data.frame(t(apply(z, 2, function(x) c(mean = mean(x), median = median(x), lower = unname(quantile(x, 
+            0.025)), upper = unname(quantile(x, 0.975))))))
+        names(ans) <- paste0(prefix, names(ans))
+        ans
+    }
+    numeric <- bind_cols(rows, describe(pa, "pev_"), describe(ra, "regional_"), describe(difference, 
+        "difference_"))
+    numeric$probability_pev_gt_regional <- colMeans(difference > 0)
+    numeric$probability_pev_lt_regional <- colMeans(difference < 0)
+    numeric$probability_difference_zero <- colMeans(difference == 0)
+    numeric$draws_pev_gt_regional <- colSums(difference > 0)
+    numeric$draws_pev_lt_regional <- colSums(difference < 0)
+    numeric$support_note <- ifelse(rows$regional_full_survey_support, "", "Juvenile component not surveyed in the added broader Broward-Miami DRM surveys; regional estimate and comparison omitted.")
+    diag_matrix <- cbind(pa[, rows$regional_full_survey_support, drop = FALSE], ra[, rows$regional_full_survey_support, 
+        drop = FALSE], difference[, rows$regional_full_survey_support, drop = FALSE])
+    labels <- paste(rows$taxon[rows$regional_full_survey_support], rows$class[rows$regional_full_survey_support], 
+        sep = ":")
+    colnames(diag_matrix) <- c(paste0(labels, ":PEV"), paste0(labels, ":regional"), paste0(labels, 
+        ":difference"))
+    ar <- array(diag_matrix, dim = c(dim(posterior::as_draws_array(fit))[1:2], ncol(diag_matrix)), dimnames = list(NULL, 
+        NULL, colnames(diag_matrix)))
+    diagnostics <- posterior::summarise_draws(posterior::as_draws_array(ar), "mean", "mcse_mean", 
+        "rhat", "ess_bulk", "ess_tail")
+    # Precision of posterior directional probabilities, retaining chain order.
+    # An event observed in every/no draw has no estimable mixing diagnostic;
+    # do not interpret a zero estimated MCSE as certainty about its probability.
+    event <- 1 * (difference[, rows$regional_full_survey_support, drop = FALSE] < 0)
+    event_constant <- apply(event, 2, function(x) all(x == x[1]))
+    probability_diagnostics <- data.frame(variable = labels,
+      probability_pev_lt_regional = colMeans(event), constant_event = event_constant)
+    if (any(!event_constant)) {
+      event_array <- array(event[, !event_constant, drop = FALSE],
+        dim = c(dim(posterior::as_draws_array(fit))[1:2], sum(!event_constant)),
+        dimnames = list(NULL, NULL, labels[!event_constant]))
+      event_diagnostics <- posterior::summarise_draws(posterior::as_draws_array(event_array),
+        "mcse_mean", "rhat", "ess_bulk", "ess_tail")
+      probability_diagnostics <- left_join(probability_diagnostics, event_diagnostics, by = "variable")
+    }
+    write_csv(probability_diagnostics, file.path(output_dir, "TableA3_probability_diagnostics.csv"))
+    unavailable <- !rows$regional_full_survey_support
+    for (n in c(paste0("regional_", c("mean", "median", "lower", "upper")), paste0("difference_", 
+        c("mean", "median", "lower", "upper")), "probability_pev_gt_regional", "probability_pev_lt_regional", 
+        "probability_difference_zero", "draws_pev_gt_regional", "draws_pev_lt_regional")) numeric[[n]][unavailable] <- NA
+    fmt <- function(x, digits = 2) paste0(formatC(mean(x), format = "fg", digits = digits, flag = "#"), 
+        " [", formatC(quantile(x, 0.025), format = "fg", digits = digits, flag = "#"), "–", formatC(quantile(x, 
+            0.975), format = "fg", digits = digits, flag = "#"), "]")
+    habitat_table <- pivot_wider(select(mutate(cell_grid, estimate = vapply(seq_len(ncol(a)), function(i) fmt(a[, 
+        i]), character(1))), row_id, Type, estimate), names_from = Type, values_from = estimate)
+    formatted <- select(mutate(left_join(select(rows, row_id, taxon, class), habitat_table, by = "row_id"), 
+        PEV_habitat_averaged = vapply(seq_len(ncol(pa)), function(i) fmt(pa[, i], 3), character(1)), 
+        Broward_Miami_habitat_averaged = vapply(seq_len(ncol(ra)), function(i) if (unavailable[i]) 
+            ""
+        else fmt(ra[, i], 3), character(1)), PEV_minus_Broward_Miami = vapply(seq_len(ncol(difference)), 
+            function(i) if (unavailable[i]) 
+                ""
+            else fmt(difference[, i], 3), character(1)), Pr_PEV_gt_Broward_Miami = ifelse(unavailable, 
+            "", sprintf("%.4f", numeric$probability_pev_gt_regional)), Pr_PEV_lt_Broward_Miami = ifelse(unavailable, 
+            "", sprintf("%.4f", numeric$probability_pev_lt_regional)), regional_juvenile_full_DRM_support = rows$regional_full_survey_support, 
+        support_note = numeric$support_note), -row_id)
+    cell_summary <- bind_rows(mutate(bind_cols(cell_grid, describe(a, "")), region = "PEV"), mutate(bind_cols(cell_grid, 
+        describe(b, "")), region = "Broward-Miami"))
+    for (n in c("mean", "median", "lower", "upper")) cell_summary[[n]][cell_summary$region == "Broward-Miami" & 
+        !cell_summary$regional_full_survey_support] <- NA
+    averages <- bind_rows(mutate(rename_with(select(numeric, taxon, class, starts_with("pev_")), 
+        ~sub("^pev_", "", .x), starts_with("pev_")), region = "PEV"), mutate(rename_with(select(select(numeric, 
+        taxon, class, starts_with("regional_")), -regional_full_survey_support), ~sub("^regional_", 
+        "", .x), starts_with("regional_")), region = "Broward-Miami"))
+    adult <- prepared$grid$class == ">4cm"
+    adult_row <- which(rows$taxon == "Total modeled taxa" & rows$class == ">4cm")
+    mcav_all <- which(rows$taxon == "MCAV" & rows$class == "All")
+    err_sum <- max(abs(pa[, adult_row] - rowSums(pev[, adult, drop = FALSE])/4), abs(ra[, adult_row] - 
+        rowSums(regional[, adult, drop = FALSE])/4))
+    err_diff <- max(abs(difference[, adult_row] - (rowSums(pev[, adult, drop = FALSE]) - rowSums(regional[, 
+        adult, drop = FALSE]))/4))
+    eligible <- which(rows$regional_full_survey_support)
+    settings <- data.frame(dataset = "drm24", direction_effects = "zero", habitat_weighting = "Equal weights: NRC, IR, MR, OR", 
+        posterior_draws = nrow(draw_matrix), adult_taxa = sum(prepared$tc$class == ">4cm"), surveyed_juvenile_groups = length(juvenile_groups), 
+        reported_comparisons = length(eligible), probability_definition = "Fraction of paired draws with PEV minus Broward-Miami >0 or <0", 
+        multiplicity_adjustment = "None; posterior summaries only", decision_rule = "None; no significance flags or posterior probability cutoff", 
+        interval = "Pointwise equal-tailed 95% CrI", status = if (isTRUE(joint_evaluation$diagnostic$pass))
+          "Sampling criteria pass; model fit and tail review still required" else
+          "Sampling criteria not all passed; comparisons provisional")
+    validation <- data.frame(check = c("Adult sum preserves draw-wise covariance", "Adult total contrast equals direct sum of paired cell differences", 
+        "Every adult taxon is compared", "Only surveyed juvenile groups compared", "MCAV All is compared", 
+        "Unsupported regional values are blank", "Directional probabilities account for every posterior draw", 
+        "Both probabilities equal paired posterior sign frequencies", "R predictions match independently checked brms expected densities"), 
+        pass = c(err_sum < 1e-12, err_diff < 1e-12, all(rows$regional_full_survey_support[rows$class == 
+            ">4cm"]), all(rows$taxon[rows$class == "<4cm" & rows$regional_full_survey_support] %in% 
+            c(juvenile_groups, "Surveyed juvenile groups (4)")), length(mcav_all) == 1 && rows$regional_full_survey_support[mcav_all], 
+            all(formatted$Broward_Miami_habitat_averaged[unavailable] == "") && all(formatted$PEV_minus_Broward_Miami[unavailable] == 
+                "") && all(formatted$Pr_PEV_gt_Broward_Miami[unavailable] == "") && all(formatted$Pr_PEV_lt_Broward_Miami[unavailable] == 
+                ""), all(abs(numeric$probability_pev_gt_regional[eligible] + numeric$probability_pev_lt_regional[eligible] + 
+                numeric$probability_difference_zero[eligible] - 1) < 1e-12), all(numeric$probability_pev_gt_regional[eligible] == 
+                numeric$draws_pev_gt_regional[eligible]/nrow(draw_matrix)) && all(numeric$probability_pev_lt_regional[eligible] == 
+                numeric$draws_pev_lt_regional[eligible]/nrow(draw_matrix)), brms_prediction_checks_pass))
+    stopifnot(all(validation$pass), sum(rows$class == ">4cm" & rows$row_type == "Taxon") == 17L)
+    write_csv(numeric, file.path(output_dir, "TableA3_regional_comparisons_numeric.csv"), na = "")
+    legacy_contrast <- transmute(left_join(filter(numeric, row_type == "Taxon", class != "All"), 
+        prepared$tc, by = c("taxon", "class")), taxon, class, tc_id, mean = difference_mean, median = difference_median, 
+        lower = difference_lower, upper = difference_upper, probability_pev_gt_regional, probability_pev_lt_regional, 
+        regional_full_survey_support)
+    write_csv(legacy_contrast, file.path(output_dir, "habitat_averaged_2024_contrasts.csv"), na = "")
+    evaluation_file <- file.path(output_dir, "evaluation.rds")
+    if (file.exists(evaluation_file)) {
+        evaluation <- readRDS(evaluation_file)
+        evaluation$contrast <- legacy_contrast
+        evaluation$regional_comparison_method <- settings
+        saveRDS(evaluation, evaluation_file)
+    }
+    write_csv(formatted, file.path(output_dir, "TableA3_extended.csv"), na = "")
+    write_csv(formatted, file.path(output_dir, "TableA3.csv"), na = "")
+    write_csv(formatted[rows$row_type == "Taxon", c("taxon", "class", habitats)], file.path(output_dir, 
+        "TableA3_PEV_habitats.csv"), na = "")
+    write_csv(averages, file.path(output_dir, "TableA3_habitat_averages_numeric.csv"), na = "")
+    write_csv(cell_summary, file.path(output_dir, "TableA3_regional_comparison_cells.csv"), na = "")
+    write_csv(settings, file.path(output_dir, "TableA3_comparison_method.csv"))
+    write_csv(diagnostics, file.path(output_dir, "TableA3_comparison_diagnostics.csv"))
+    write_csv(validation, file.path(output_dir, "TableA3_comparison_validation.csv"))
+    writeLines(c("Table A3. PEV and Broward-Miami coral densities predicted for DRM2024.", "Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].", 
+        "Both regional means give each of NRC, IR, MR and OR weight 1/4 and set direction effects to zero.", 
+        "All size classes, species sums and contrasts are calculated within each shared posterior draw before summarizing.", 
+        "The adult total sums 17 modeled adult taxa. The full juvenile and All totals have no regional comparison.", 
+        "Regional juvenile and All entries are blank where a juvenile component was not surveyed in the added broad DRM surveys.", 
+        "Only MCAV, MEAN, MUSS and FAVI juveniles have complete added regional coverage; only MCAV has a survey-supported taxon-specific All row.", 
+        "Surveyed juvenile groups (4) sums those four groups only, not the full juvenile community.", 
+        "Pr_PEV_gt_Broward_Miami = Pr(PEV minus Broward-Miami >0 | data, model); Pr_PEV_lt_Broward_Miami = Pr(difference <0 | data, model).", 
+        "Both columns report the observed fraction of paired posterior draws; they are not p-values and have no multiplicity adjustment.", 
+        "No significance flags or posterior probability decision thresholds are applied. Intervals are pointwise, not simultaneous.", 
+        sprintf("Probabilities are Monte Carlo estimates from %d pilot draws, displayed to four decimals (draw resolution %.4f).", 
+            nrow(draw_matrix), 1/nrow(draw_matrix)), "A displayed 0.0000 or 1.0000 means no opposite-sign draw was observed, not certainty about the population difference.", 
+        "The model fit and all reported comparisons remain provisional pending final sampling."), 
+        file.path(output_dir, "TableA3_notes.txt"))
+    manifest_file <- file.path(output_dir, "requested_outputs.csv")
+    if (file.exists(manifest_file)) {
+        manifest <- read_csv(manifest_file, show_col_types = FALSE)
+        new_paths <- file.path(output_dir, c("TableA3.csv", "TableA3_extended.csv", "TableA3_PEV_habitats.csv", 
+            "TableA3_regional_comparisons_numeric.csv", "TableA3_notes.txt"))
+        manifest <- mutate(distinct(bind_rows(select(manifest, path), data.frame(path = new_paths)), 
+            path), bytes = file.info(path)$size)
+        write_csv(manifest, manifest_file)
+    }
+    list(numeric = numeric, formatted = formatted, cells = cell_summary, settings = settings, diagnostics = diagnostics, 
+        validation = validation)
+}
+
+
+```
+
+```{r regional-comparisons}
+regional_comparison <- make_regional_table(prepared, joint_fit, output_dir)
+regional_comparison$formatted %>%
+  select(-regional_juvenile_full_DRM_support, -support_note) %>%
+  show_table(digits = 4)
+show_table(regional_comparison$validation)
+```
+
+Define \(\Delta=\text{PEV density}-\text{Broward–Miami density}\).
+The probability columns are the observed fractions of posterior draws with
+\(\Delta>0\) and \(\Delta<0\), conditional on the data and model. They are not
+p-values and are not adjusted. No significance threshold or asterisks are
+applied. The 95% credible intervals are pointwise, not simultaneous.
+Probabilities displayed as 0.0000 or 1.0000 mean no opposite-sign draw was
+observed; they do not establish certainty about the population difference.
+
+The added broad DRM surveys comprehensively count only MCAV, MEAN, MUSS and
+FAVI juveniles. Regional cells for other juveniles and their "All" rows are
+blank, while valid PEV estimates remain visible. MCAV "All" is comparable.
+The full juvenile and adult-plus-juvenile totals have no regional comparison;
+the separately labeled four-group juvenile subtotal is not the whole juvenile
+community. The adult total sums the 17 modeled adult taxa.
+
+# Numerical results and reproducibility
+
+```{r save-numerical-results}
+write_csv(summary_equal_weighted_combined, output_file("survey_averaged_densities.csv"))
+write_csv(summary_drm24_combined, output_file("PEV_2024_densities.csv"))
+write_csv(trends_summary, output_file("temporal_trends.csv"))
+write_csv(summary_datasets, output_file("temporal_source_densities.csv"))
+write_csv(area_summary, output_file("habitat_areas_unrounded.csv"))
+write_csv(tot3_intervals, output_file("Table2_intervals.csv"))
+write_csv(tot3, output_file("Table2.csv"))
+file.copy(output_file("intermediate/coral_Table1.csv"), output_file("Table1.csv"), overwrite = TRUE)
+file.copy(output_file("intermediate/coral_Fig1.png"), output_file("Fig1.png"), overwrite = TRUE)
+file.copy(output_file("intermediate/coral_Fig1.pdf"), output_file("Fig1.pdf"), overwrite = TRUE)
+saveRDS(list(survey = draws_equal_weighted, year2024 = draws_drm24_combined,
+             trends = trends_combined, impact_survey = tot2_draws, impact_2024 = tot2_2024_draws),
+        processed_file("manuscript_posterior_draws.rds"))
+```
+
+Table 2 uses `Total = ACER + ORBI + non-ESA` exactly once. The original
+analysis's extra `adorn_totals(where = "col")` step double-counted an already
+present Total column; that arithmetic error is corrected here. All habitat
+areas are kept unrounded for colony-total calculations, while Table A1 retains
+its original display rounding.
+
+# Model assessment
+
+```{r model-assessment, results='asis', echo=FALSE}
+if (!isTRUE(joint_evaluation$diagnostic$pass)) {
+  cat("**This fit does not yet meet all criteria for final manuscript inference.** Some distributional parameters have not mixed adequately. Expected densities can be more stable than the separate mean, zero-inflation and shape components because those components can compensate for each other. Agreement of density estimates alone does not establish convergence.\n\n")
+  cat("Review the remaining parameter mixing and sparse-cell tail precision before final inference. A further change should preserve the observation model, biological mean structure and PEV prediction targets; it should not trim posterior tails or silently simplify regional contrasts.\n\n")
+}
+cat("The count priors remain broad. Review the sparse-cell tail table alongside sampling diagnostics; no draws have been filtered. Earlier model experiments and comparisons are archived under old_working_files/coral_comparison_2026-11-03/; they are not inputs to this analysis.\n\n")
+```
+
+```{r final-validation}
+required_outputs <- c(paste0("Fig", 1:6, ".png"), paste0("FigA", 1:6, ".png"),
+                      paste0("Fig", 1:6, ".pdf"), paste0("FigA", 1:6, ".pdf"),
+                      "Table1.csv", "Table2.csv", paste0("TableA", 1:6, ".csv"),
+                      "TableA3_notes.txt", "TableA3_regional_comparisons_numeric.csv",
+                      "survey_locations.png", "zonefig.png", "ACERORBI.png", "ACERORBI_2024.png",
+                      "bayesian_r2.csv", "posterior_predictive_global.csv",
+                      "posterior_predictive_grouped.csv", "posterior_predictive_grouped_summary.csv",
+                      "original_framework_check_validation.csv", "ppc_global_density.png",
+                      "ppc_global_density_by_region.png",
+                      paste0("ppc_grouped_", c("mean", "sd", "zero_prop", "skewness"), ".png"))
+output_inventory <- data.frame(output = required_outputs,
+                               path = file.path(output_dir, required_outputs)) %>%
+  mutate(exists = file.exists(path), bytes = file.info(path)$size)
+write_csv(output_inventory, output_file("output_inventory.csv"))
+current_checksums <- unname(tools::md5sum(original_checksums$path))
+preservation <- original_checksums %>% mutate(current_md5 = current_checksums,
+                                              unchanged = md5 == current_md5)
+write_csv(preservation, output_file("original_files_preserved.csv"))
+adult_total_check <- regional_comparison$numeric %>%
+  filter(row_type == "Total", class == ">4cm")
+write_csv(prediction_audit, output_file("prediction_region_audit.csv"))
+stopifnot(sum(prediction_audit$purpose == "manuscript") >= 3L,
+          all(prediction_audit$region[prediction_audit$purpose == "manuscript"] == "PEV"))
+final_validation <- data.frame(
+  check = c("All manuscript prediction requests explicitly target PEV",
+            "All original manuscript figure/table products generated",
+            "Archived original, shared data and conch outputs unchanged",
+            "Table 2 totals equal category sums",
+            "Regional comparison predictions and paired sums validated",
+            "The complete posterior is saved",
+            "Original-framework fit checks pass independent validation"),
+  pass = c(all(prediction_audit$region[prediction_audit$purpose == "manuscript"] == "PEV"),
+           all(output_inventory$exists & output_inventory$bytes > 0),
+           all(preservation$unchanged),
+           max(abs(tot3_intervals$Total - tot3_intervals$ACER - tot3_intervals$ORBI - tot3_intervals$`non-ESA`)) < 1e-6,
+           all(regional_comparison$validation$pass), file.exists(fit_file),
+           all(check_validation$pass))
+)
+write_csv(final_validation, output_file("final_validation.csv"))
+stopifnot(all(final_validation$pass))
+show_table(final_validation)
+show_table(output_inventory %>% select(output, exists, bytes), digits = 0)
+fit_status("complete")
+writeLines(capture.output(sessionInfo()), output_file("sessionInfo.txt"))
+```
+
+## Publish manuscript outputs
+
+The main `outputs/` directory contains the final manuscript set. This step
+updates the coral figures and appendix tables there. Combined Fig 1, Table 1
+and Table 2 are produced by `integrated_figures_tables.Rmd`, using the current
+coral intermediates and the existing conch results. Coral-only versions remain
+in `outputs/coral_analysis/` for reference.
+
+```{r publish-manuscript-products}
+manuscript_products <- c(
+  paste0("Fig", 2:6, ".png"), paste0("Fig", 2:6, ".pdf"),
+  paste0("FigA", 1:6, ".png"), paste0("FigA", 1:6, ".pdf"),
+  paste0("TableA", 1:6, ".csv"), "TableA3_notes.txt", "zonefig.png"
+)
+manuscript_sources <- file.path(output_dir, manuscript_products)
+manuscript_destinations <- file.path(project_root, "outputs", manuscript_products)
+stopifnot(all(file.exists(manuscript_sources)))
+stopifnot(all(file.copy(manuscript_sources, manuscript_destinations, overwrite = TRUE)))
+publication_inventory <- data.frame(
+  product = manuscript_products,
+  source = manuscript_sources,
+  manuscript_path = manuscript_destinations,
+  identical = unname(tools::md5sum(manuscript_sources)) ==
+              unname(tools::md5sum(manuscript_destinations))
+)
+stopifnot(all(publication_inventory$identical))
+write_csv(publication_inventory, output_file("manuscript_publication_inventory.csv"))
+```
+
+## Sampling configuration and interpretation
+
+The current run uses the configuration selected in the document parameters.
+The saved short pilots remain available separately. The authorized convergence
+run uses 1,000 warmup plus 1,000 sampling iterations in each of four chains,
+with five threads per chain, while keeping the revised-prior model unchanged.
+
+| Setting | This run |
+|:--|--:|
+| Parallel chains | `r params$chains` |
+| Warmup iterations per chain | `r params$warmup` |
+| Sampling iterations per chain | `r params$sampling` |
+| Total iterations per chain (`iter` in brm) | `r params$warmup + params$sampling` |
+| Total retained posterior draws across chains | `r params$chains * params$sampling` |
+| Threads per chain | `r params$threads_per_chain` |
+| adapt_delta | `r params$adapt_delta` |
+| max_treedepth | `r params$max_treedepth` |
+
+This configuration records initialization as zero and keeps individual
+CmdStan chain files permanently. A matching saved fit is reused on subsequent
+renders. Measured per-chain elapsed times are saved in
+`fit_runtime_by_chain.csv`; report generation is additional work. Threading
+does not imply a proportional speedup, because adaptation, scheduling and
+other work also contribute to elapsed time.
+
+The iteration target does not guarantee convergence. Review R-hat below 1.01,
+bulk/tail ESS of at least 400, no divergences, energy exploration and trace
+plots, following [Stan's diagnostic guidance](https://mc-stan.org/learn-stan/diagnostics-warnings.html).
+Also check Monte Carlo precision for the reported densities, credible limits
+and regional sign probabilities, and assess rare-cell tail stability across
+chains. Increasing sampling does not remove a genuinely long posterior tail.
+All density, trend and regional-comparison summaries use the retained draws;
+the PPC simulations and algebra-validation checks use their own smaller draw
+subsets to manage prediction cost.
+
+The existing data and prediction audits remain essential: only surveyed
+juvenile responses enter the likelihood, unsupported regional juvenile/All
+comparisons remain blank, effort includes eligible transects 3 and 4, and
+all manuscript predictions explicitly select PEV. PEV has no 2024 Outer Reef
+observations; those predictions borrow information from older surveys and
+the joint model. More iterations do not create observations for that habitat.
+
+To render from the project root:
+
+```{r render-instructions, eval=FALSE}
+rmarkdown::render(
+  "analysis/coral_analysis.Rmd",
+  output_dir = "outputs/coral_analysis",
+  knit_root_dir = getwd()
+)
+```
+
+For a longer manuscript fit, change `warmup`, `sampling` and any sampler
+controls in the YAML parameters, set `allow_new_fit: true`, and optionally
+choose another `output_directory`. Matching cached fits are always reused.
+The posterior is saved immediately on sampling completion, before any
+downstream figure or report can fail.

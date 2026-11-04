@@ -1,0 +1,7 @@
+check,pass
+Native count-scale R-squared matches independently calculated residual-variance R-squared,TRUE
+Observed and replicated chi-squared discrepancies are paired by posterior draw,TRUE
+"Global probabilities lie in [0,1] and use all selected replications",TRUE
+Regional observation subsets partition the fitted data,TRUE
+Undefined grouped statistics are not assigned diagnostic probabilities,TRUE
+All scientific posterior draws are retained,TRUE

@@ -1,0 +1,5 @@
+"check","pass"
+"Every fitted model column and factor encoding is identical",TRUE
+"Complete model-input CSV is byte-identical",TRUE
+"Compilation has 16340 observations, 38130 colonies and 1069 sites",TRUE
+"Regional juvenile responses contain only surveyed groups",TRUE

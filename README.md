@@ -13,3 +13,15 @@ In this report, we integrate survey datasets and statistical modeling to estimat
 - **data/** – Raw and processed survey data, site metadata, and spatial layers  
 - **analysis/** – Scripts for all data processing, analysis, and visualization
 - **outputs/** – Figures and tables generated from analyses  
+
+
+The main coral pipeline is [analysis/coral_analysis.Rmd](analysis/coral_analysis.Rmd),
+using the joint PEV and Broward–Miami model. Its report and cached fit are under
+`outputs/coral_analysis/`. Run it before
+[analysis/integrated_figures_tables.Rmd](analysis/integrated_figures_tables.Rmd)
+to regenerate the combined coral–conch manuscript outputs in `outputs/`.
+See [the run instructions](analysis/coral_analysis/README.md).
+
+The original PEV-only analysis is preserved locally as `coral_analysis_original.Rmd`
+under `old_working_files/coral_analysis_original_2026-11-03/`, together with its
+previous figures and tables. The archive is excluded from Git.

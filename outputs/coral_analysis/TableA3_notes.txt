@@ -1,0 +1,14 @@
+Table A3. PEV and Broward-Miami coral densities predicted for DRM2024.
+Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].
+Both regional means give each of NRC, IR, MR and OR weight 1/4 and set direction effects to zero.
+All size classes, species sums and contrasts are calculated within each shared posterior draw before summarizing.
+The adult total sums 17 modeled adult taxa. The full juvenile and All totals have no regional comparison.
+Regional juvenile and All entries are blank where a juvenile component was not surveyed in the added broad DRM surveys.
+Only MCAV, MEAN, MUSS and FAVI juveniles have complete added regional coverage; only MCAV has a survey-supported taxon-specific All row.
+Surveyed juvenile groups (4) sums those four groups only, not the full juvenile community.
+Pr_PEV_gt_Broward_Miami = Pr(PEV minus Broward-Miami >0 | data, model); Pr_PEV_lt_Broward_Miami = Pr(difference <0 | data, model).
+Both columns report the observed fraction of paired posterior draws; they are not p-values and have no multiplicity adjustment.
+No significance flags or posterior probability decision thresholds are applied. Intervals are pointwise, not simultaneous.
+Probabilities are Monte Carlo estimates from 4000 pilot draws, displayed to four decimals (draw resolution 0.0003).
+A displayed 0.0000 or 1.0000 means no opposite-sign draw was observed, not certainty about the population difference.
+The model fit and all reported comparisons remain provisional pending final sampling.

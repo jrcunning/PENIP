@@ -1,0 +1,14 @@
+check,pass,details
+All archived original files match recorded checksums,True,52
+"Shared data, original saved PEV model and conch files unchanged",True,"{""files"": 66, ""changed"": []}"
+"Current fit, signature and chain files unchanged",True,"{""files"": 15, ""changed"": []}"
+All recorded current numerical results unchanged,True,"{""files"": 16, ""changed"": []}"
+Published coral manuscript figures and tables match current outputs,True,30
+Integrated Table 1 uses current coral survey rows,True,6
+Integrated Table 2 uses current coral means and credible intervals,True,13
+Integrated Table 2 retains previous conch estimates,True,4
+Complete main manuscript set exists,True,24
+Renamed coral pipeline finished from the saved fit,True,"""db9da5156777a9344ac26acd2b9ce2ac"""
+Both HTML reports exist,True,"""coral_analysis.html; integrated_figures_tables.html"""
+All coral pipeline validation checks pass,True,6
+Old active source/output directory names are retired,True,"""analysis/coral_joint_analysis; outputs/coral_joint_analysis"""

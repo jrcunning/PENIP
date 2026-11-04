@@ -1,0 +1,16 @@
+check,pass,details
+"Saved fit, signature and all chain files unchanged",True,15
+Full model-input CSV is byte-identical,True,16340
+All existing numerical results and regional/coverage audits unchanged,True,"{""files"": 69, ""changed"": []}"
+All coral figure PNGs unchanged,True,22
+Conch analysis and cached results unchanged,True,3
+Integrated Table 2 unchanged,True,"""all coral and conch estimates"""
+Integrated Fig 1 unchanged,True,"""original local survey panels preserved"""
+Coral Table 1 includes the 93 added DRM sites and full compilation totals,True,"{""additional_sites"": 93, ""all_coral_sites"": 1069, ""coral_colonies"": 38130}"
+Integrated Table 1 includes the updated coral row,True,"""drm24_regional"""
+Integrated Table 1 conch rows unchanged,True,3
+Pooled taxon cutoff is strictly greater than five,True,27
+Both survey cohorts enter the shared habitat filter,True,19
+Preflight fitted columns and factor encodings match exactly,True,4
+All main-pipeline checks pass,True,6
+Cached-only coral render completed,True,"""db9da5156777a9344ac26acd2b9ce2ac"""
