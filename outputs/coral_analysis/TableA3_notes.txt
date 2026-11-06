@@ -1,6 +1,10 @@
 Table A3. PEV and Broward-Miami coral densities predicted for DRM2024.
 Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].
-Both regional means give each of NRC, IR, MR and OR weight 1/4 and set direction effects to zero.
+The first four columns are habitat-specific PEV densities. The two regional mean columns average NRC, IR, MR and OR equally (1/4 each) in both regions; direction effects are zero.
+The primary comparison standardizes habitat composition between regions; it is not weighted by habitat areas or numbers of surveyed sites.
+Own-area results are retained separately in TableA3_own_area_sensitivity_numeric.csv and regional_weighting_sensitivity.csv, not used for the main regional comparison.
+For that sensitivity only, PEV weights use unrounded Table A1 project / monitoring-zone areas, and broader Broward-Miami weights use the complete FDEP map region outside the 1,200 m north/south PEV band. These two PEV footprints are not identical; mapped areas are fixed.
+Sensitivity habitat areas and proportions are in regional_habitat_area_weights.csv. Artificial is pooled with NRC and Aggregated Patch Reef with OR; other habitat classes are excluded.
 All size classes, species sums and contrasts are calculated within each shared posterior draw before summarizing.
 The adult total sums 17 modeled adult taxa. The full juvenile and All totals have no regional comparison.
 Regional juvenile and All entries are blank where a juvenile component was not surveyed in the added broad DRM surveys.
@@ -9,6 +13,6 @@ Surveyed juvenile groups (4) sums those four groups only, not the full juvenile 
 Pr_PEV_gt_Broward_Miami = Pr(PEV minus Broward-Miami >0 | data, model); Pr_PEV_lt_Broward_Miami = Pr(difference <0 | data, model).
 Both columns report the observed fraction of paired posterior draws; they are not p-values and have no multiplicity adjustment.
 No significance flags or posterior probability decision thresholds are applied. Intervals are pointwise, not simultaneous.
-Probabilities are Monte Carlo estimates from 4000 pilot draws, displayed to four decimals (draw resolution 0.0003).
+Probabilities are Monte Carlo estimates from all 4000 retained draws, displayed to four decimals (draw resolution 0.0003).
 A displayed 0.0000 or 1.0000 means no opposite-sign draw was observed, not certainty about the population difference.
-The model fit and all reported comparisons remain provisional pending final sampling.
+The model fit and reported comparisons retain the documented convergence and sparse-cell tail caveats.

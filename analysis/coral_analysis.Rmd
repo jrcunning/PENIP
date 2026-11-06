@@ -1,7 +1,7 @@
 ---
 title: "Coral population density analysis"
 author: "R. Cunning"
-date: "2026-11-03"
+date: "2026-11-06"
 output:
   html_document:
     toc: true
@@ -52,6 +52,13 @@ Normal(−1, 1.5) prior for the centered log-shape intercept.
 **Every manuscript density prediction explicitly selects PEV.** Broward–Miami
 predictions are used for regional comparisons and model checks. Prediction
 averaging and 2024 targets are separate from fitting-time centering.
+The primary regional comparison gives NRC, IR, MR and OR equal weight (1/4)
+in both regions. Overall PEV density summaries and temporal trends use the
+same equal habitat weights. These are habitat-standardized estimates rather
+than mean densities across each region's actual habitat areas. Own-area
+weighting is retained as a separately labeled sensitivity comparison.
+Habitat-specific PEV figures and abundance extrapolations retain their existing
+definitions. Survey/source averaging remains a separate step.
 
 This run uses `r params$chains` chains with `r params$warmup` warmup and
 `r params$sampling` sampling iterations each, with `r params$threads_per_chain`
@@ -2707,7 +2714,7 @@ as the previous joint pilot. The following choices are explicit:
 | Shared survey effects | Original survey/habitat and survey/taxon/class grouping and priors |
 | Direction | Taxon/class/habitat/direction groups; separate exponential(4) SDs by region |
 | Manuscript predictions | Explicit PEV; survey effects retained and direction effects zero |
-| Regional comparisons | Explicit paired PEV and Broward–Miami predictions for drm24; equal habitat weights |
+| Regional comparisons | Explicit paired PEV and Broward–Miami predictions for drm24; equal weights for NRC, IR, MR and OR |
 
 The combined centering changes the intercept's meaning and the induced prior
 covariance, particularly its relationship with regional count coefficients.
@@ -3370,6 +3377,104 @@ joint_epred_draws <- function(newdata, region = "PEV", ndraws = NULL) {
 }
 ```
 
+## Habitat-area weights for the sensitivity comparison
+
+The primary regional comparison and temporal trends give each modeled reef
+habitat weight 1/4. The following area calculations are used only for the
+own-area sensitivity results. That alternative weights each habitat by its
+area divided by the region's total NRC + IR + MR + OR area, allowing habitat
+composition as well as habitat-specific density to contribute to the regional
+contrast. The primary equal-habitat comparison standardizes habitat composition
+between regions and years; neither calculation averages survey sites.
+
+PEV areas are the existing unrounded project/monitoring-area habitat totals
+from Table A1 (Scenario 2, NMFS consideration areas and the rest of the
+monitoring area). Broader Broward–Miami areas use the complete FDEP habitat
+map's `Region = "Broward-Miami"`, outside the 1,200 m north/south PEV band.
+Biscayne, Deerfield, Palm Beach and Martin map regions are excluded. The PEV
+project footprint and the model's classification band are not identical
+geometries. These area choices reproduce the reviewed own-area sensitivity
+test; they do not change observation membership or habitat assignments.
+
+Both area calculations pool Artificial with NRC and Aggregated Patch Reef
+with OR, and exclude other habitat classes. The regional input contains all
+1,868 Broward–Miami source polygons, rather than just those intersecting
+survey sites. Within-class regional overlaps are dissolved; small areas with
+conflicting reef-class labels are omitted from all regional classes. PEV
+areas retain the existing Table A1 convention. Map boundaries and areas are
+treated as fixed; mapping uncertainty is not propagated into the intervals.
+
+```{r regional-habitat-area-weights}
+area_habitats <- c("Nearshore Ridge Complex", "Inner Reef", "Middle Reef", "Outer Reef")
+area_source <- "data/spatial/drm_regional_habitat/broward_miami_full_region.gpkg"
+area_provenance <- read_json(
+  "data/spatial/drm_regional_habitat/broward_miami_full_region_provenance.json",
+  simplifyVector = TRUE)
+stopifnot(identical(digest(file = area_source, algo = "sha256"), area_provenance$sha256))
+regional_area_source <- st_read(area_source, quiet = TRUE) %>%
+  st_zm(drop = TRUE) %>% st_transform(32617) %>% st_make_valid()
+regional_area_source <- st_sf(st_drop_geometry(regional_area_source),
+                             geometry = st_geometry(regional_area_source))
+stopifnot(nrow(regional_area_source) == 1868L,
+          all(regional_area_source$Region == "Broward-Miami"))
+
+# Check that the complete map region covers every raw Broward–Miami DRM site.
+area_site_audit <- regional_site_coordinates %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>% st_transform(32617) %>%
+  st_join(select(regional_area_source, map_region = Region)) %>%
+  st_drop_geometry() %>% distinct(site, map_region)
+stopifnot(n_distinct(area_site_audit$site) == 138L,
+          !anyNA(area_site_audit$map_region), all(area_site_audit$map_region == "Broward-Miami"))
+write_csv(area_site_audit, output_file("regional_habitat_area_site_audit.csv"))
+
+regional_dissolved <- regional_area_source %>%
+  mutate(Type = case_when(Type == "Artificial" ~ area_habitats[1],
+                         Type == "Aggregated Patch Reef" ~ area_habitats[4], TRUE ~ Type)) %>%
+  filter(Type %in% area_habitats) %>% group_by(Type) %>% summarize(.groups = "drop")
+cross_class_intersections <- lapply(combn(seq_len(nrow(regional_dissolved)), 2,
+  simplify = FALSE), function(pair) suppressWarnings(st_intersection(
+    st_geometry(regional_dissolved[pair[1], ]), st_geometry(regional_dissolved[pair[2], ]))))
+ambiguous_reef_area <- st_union(do.call(c, cross_class_intersections))
+ambiguous_m2 <- sum(as.numeric(st_area(ambiguous_reef_area)))
+regional_union_m2 <- sum(as.numeric(st_area(st_union(regional_dissolved))))
+stopifnot(ambiguous_m2 / regional_union_m2 < 0.001)
+regional_clean <- suppressWarnings(st_difference(regional_dissolved, ambiguous_reef_area))
+stopifnot(abs(sum(as.numeric(st_area(regional_clean))) -
+  sum(as.numeric(st_area(st_union(regional_clean))))) < 0.01)
+
+area_bbox <- st_bbox(regional_clean)
+pev_area_band <- st_as_sfc(st_bbox(c(xmin = area_bbox[["xmin"]] - 1,
+  xmax = area_bbox[["xmax"]] + 1, ymin = geographic_rule$pev_ymin_m,
+  ymax = geographic_rule$pev_ymax_m), crs = st_crs(regional_clean)))
+regional_area_polygons <- suppressWarnings(st_difference(regional_clean, pev_area_band))
+regional_habitat_weights <- bind_rows(
+  area_summary %>% group_by(Type) %>% summarize(area_m2 = sum(total_area_m2), .groups = "drop") %>%
+    mutate(region = "PEV"),
+  regional_area_polygons %>% mutate(area_m2 = as.numeric(st_area(geometry))) %>%
+    st_drop_geometry() %>% mutate(region = "Broward-Miami")
+) %>% group_by(region) %>% mutate(weight = area_m2 / sum(area_m2)) %>% ungroup() %>%
+  mutate(habitat = c("NRC", "IR", "MR", "OR")[match(Type, area_habitats)],
+         area_km2 = area_m2 / 1e6) %>% arrange(region, match(Type, area_habitats))
+stopifnot(nrow(regional_habitat_weights) == 8L, all(regional_habitat_weights$weight > 0),
+  all(abs(tapply(regional_habitat_weights$weight, regional_habitat_weights$region, sum) - 1) < 1e-12))
+write_csv(regional_habitat_weights, output_file("regional_habitat_area_weights.csv"))
+write_csv(data.frame(ambiguous_map_area_m2 = ambiguous_m2,
+  regional_source_union_m2 = regional_union_m2,
+  ambiguous_fraction = ambiguous_m2 / regional_union_m2,
+  treatment = "Omitted from every regional reef class; observations unchanged"),
+  output_file("regional_habitat_area_overlap_audit.csv"))
+st_write(regional_area_polygons, processed_file("regional_habitat_area_polygons.gpkg"),
+         delete_dsn = TRUE, quiet = TRUE)
+
+habitat_area_weights <- function(types, target_region) {
+  w <- filter(regional_habitat_weights, region == target_region)
+  answer <- w$weight[match(as.character(types), w$Type)]
+  stopifnot(!anyNA(answer))
+  answer
+}
+show_table(regional_habitat_weights %>% select(region, habitat, area_km2, weight), digits = 4)
+```
+
 ## Sampling diagnostics and posterior predictive checks
 
 Checks retain each observation's searched area, source, region and direction.
@@ -3459,11 +3564,12 @@ summarize_joint_fit <- function(prepared, fit, output_dir) {
     mutate(mean_to_median = mean/median, maximum_to_upper_95 = maximum/upper) %>%
     arrange(desc(largest_draw_share))
   write_csv(tail_review, file.path(output_dir, "density_tail_review.csv"))
-  average <- function(z) vapply(seq_len(nrow(prepared$tc)), function(i) {
-    rowMeans(z[, prepared$grid$tc_id == i, drop = FALSE])
+  average <- function(z, target_region) vapply(seq_len(nrow(prepared$tc)), function(i) {
+    cells <- prepared$grid$tc_id == i
+    rowMeans(z[, cells, drop = FALSE])
   }, numeric(nrow(z)))
-  pev <- average(den[, seq_len(K)])
-  regional <- average(den[, K + seq_len(K)])
+  pev <- average(den[, seq_len(K)], "PEV")
+  regional <- average(den[, K + seq_len(K)], "Broward-Miami")
   contrast <- mutate(summarize_density_draws(pev - regional, prepared$tc),
     probability_pev_gt_regional = colMeans(pev > regional),
     probability_pev_lt_regional = colMeans(pev < regional))
@@ -3943,8 +4049,11 @@ cat("Posterior saved at: `", fit_file, "`. Rerunning matching inputs reuses it.\
 
 Survey-averaged outputs give equal weight to each source available in the
 original taxon/class/habitat prediction grid. The 2024 outputs instead set
-`dataset = "drm24"`. Habitats are given equal weight for regional comparisons;
-impact-zone colony totals multiply PEV habitat densities by the **unrounded**
+`dataset = "drm24"`. Regional comparisons, overall PEV densities and temporal
+trends average NRC, IR, MR and OR equally. The same four weights (1/4 each)
+apply in both regions and every survey year. Own-area estimates are retained
+as a sensitivity comparison.
+Impact-zone colony totals multiply PEV habitat densities by the **unrounded**
 mapped habitat areas computed above. Adult/juvenile sums and species totals
 are always calculated within posterior draws before interval summaries.
 #### Datasets equal-weighted
@@ -4487,21 +4596,35 @@ make_combined_density_figure(draws = draws_drm24_combined,
 
 
 
-# Size class overall averages
-post_summ <- draws_equal_weighted %>%
-  group_by(.draw, Type, class) %>%
-  summarise(total_epred = sum(n_m2), .groups = "drop") %>%
-  group_by(.draw, class) %>%
-  summarise(avg_total_epred = mean(total_epred), .groups = "drop") %>%
-  group_by(class) %>%
-  summarise(
-    mean = mean(avg_total_epred),
-    sd_post = sd(avg_total_epred),          # posterior SD of the mean
-    # optional: 95% CrI if you still want it for comparison
-    lower = quantile(avg_total_epred, 0.025),
-    upper = quantile(avg_total_epred, 0.975),
-    n_draws = dplyr::n()
-  )
+# Overall PEV densities: sum taxa within habitat, then give habitats equal weight.
+# Available sources are still equally averaged within each habitat cell.
+summarize_pev_overall_density <- function(draws, prediction_target, own_area = FALSE) {
+  habitat_totals <- draws %>% filter(class != "All") %>%
+    group_by(.draw, Type, class) %>%
+    summarise(total_epred = sum(n_m2), .groups = "drop") %>%
+    mutate(habitat_weight = if (own_area) habitat_area_weights(Type, "PEV") else 1/4)
+  coverage <- habitat_totals %>% group_by(.draw, class) %>%
+    summarise(total_weight = sum(habitat_weight), habitats = n(), .groups = "drop")
+  stopifnot(all(coverage$habitats == 4L), all(abs(coverage$total_weight - 1) < 1e-12))
+  by_class <- habitat_totals %>% group_by(.draw, class) %>%
+    summarise(avg_total_epred = sum(total_epred * habitat_weight), .groups = "drop")
+  combined <- by_class %>% group_by(.draw) %>%
+    summarise(avg_total_epred = sum(avg_total_epred), .groups = "drop") %>% mutate(class = "All")
+  bind_rows(by_class, combined) %>% group_by(class) %>%
+    summarise(mean = mean(avg_total_epred), sd_post = sd(avg_total_epred),
+      lower = quantile(avg_total_epred, 0.025), upper = quantile(avg_total_epred, 0.975),
+      n_draws = n(), .groups = "drop") %>%
+    mutate(prediction_target, region = "PEV", habitat_weighting = if (own_area)
+      "PEV mapped reef-habitat area proportions (sensitivity)" else "Equal weights: NRC, IR, MR, OR (primary)")
+}
+post_summ <- summarize_pev_overall_density(draws_equal_weighted, "Survey-averaged")
+pev_overall_density <- bind_rows(post_summ,
+  summarize_pev_overall_density(draws_drm24_combined, "2024"))
+write_csv(pev_overall_density, output_file("PEV_overall_equal_habitat_densities.csv"))
+write_csv(bind_rows(
+  summarize_pev_overall_density(draws_equal_weighted, "Survey-averaged", own_area = TRUE),
+  summarize_pev_overall_density(draws_drm24_combined, "2024", own_area = TRUE)),
+  output_file("PEV_overall_area_weighted_densities.csv"))
 post_summ
 
 
@@ -4524,11 +4647,22 @@ newdata <- dfftaxon %>%
 # Retain every posterior draw for final temporal-trend summaries.
 preds <- joint_epred_draws(newdata = newdata, region = "PEV")
 
-# Average across habitat types per draw
+# Give the four habitats equal weight in every survey year.
 preds_avg <- preds %>%
+  mutate(habitat_weight = 1/4) %>%
   group_by(.draw, dataset, taxon, class) %>%
-  summarize(mean_epred = mean(.epred), .groups = "drop") %>%
+  summarize(mean_epred = sum(.epred * habitat_weight), .groups = "drop") %>%
   mutate(year = parse_number(as.character(dataset)))
+temporal_weight_check <- preds %>% distinct(dataset, taxon, class, Type) %>%
+  mutate(habitat_weight = 1/4) %>%
+  group_by(dataset, taxon, class) %>%
+  summarize(total_weight = sum(habitat_weight), habitats = n(),
+    minimum_weight = min(habitat_weight), maximum_weight = max(habitat_weight), .groups = "drop")
+stopifnot(all(temporal_weight_check$minimum_weight == 1/4),
+          all(temporal_weight_check$maximum_weight == 1/4),
+          all(temporal_weight_check$habitats == 4L),
+          all(abs(temporal_weight_check$total_weight - 1) < 1e-12))
+write_csv(temporal_weight_check, output_file("temporal_habitat_weight_validation.csv"))
 
 # Helper function for slopes + modeled changes
 compute_trends <- function(data, group_vars, value_col) {
@@ -4622,6 +4756,33 @@ trends_summary <- trends_combined %>%
   group_by(level, taxon, class) %>%
   mean_qi(slope, abs_change, pct_change, .width = 0.95, na.rm = TRUE) %>%
   as_tibble()
+
+# Sensitivity only: repeat the same source/year regressions with fixed PEV area weights.
+preds_avg_area <- preds %>%
+  mutate(habitat_weight = habitat_area_weights(Type, "PEV")) %>%
+  group_by(.draw, dataset, taxon, class) %>%
+  summarize(mean_epred = sum(.epred * habitat_weight), .groups = "drop") %>%
+  mutate(year = parse_number(as.character(dataset)))
+area_trends_taxon_class <- compute_trends(preds_avg_area, c("taxon", "class"), "mean_epred")
+area_trends_taxon <- preds_avg_area %>% group_by(taxon) %>%
+  filter(n_distinct(class) > 1) %>% ungroup() %>%
+  group_by(.draw, dataset, taxon, year) %>% summarize(total_epred = sum(mean_epred), .groups = "drop") %>%
+  compute_trends("taxon", "total_epred") %>% mutate(class = "All")
+area_broad <- preds_avg_area %>% filter(dataset %in% c("dca17", "tt21", "tt23", "drm24"))
+area_trends_all <- bind_rows(
+  area_broad %>% group_by(.draw, dataset, year) %>%
+    summarize(total_epred = sum(mean_epred), .groups = "drop") %>%
+    compute_trends(character(0), "total_epred") %>% mutate(class = "All"),
+  area_broad %>% group_by(.draw, dataset, year, class) %>%
+    summarize(total_epred = sum(mean_epred), .groups = "drop") %>%
+    compute_trends("class", "total_epred")) %>% mutate(taxon = "All")
+area_trends_summary <- bind_rows(
+  mutate(area_trends_taxon_class, level = "taxon_class"),
+  mutate(area_trends_taxon, level = "taxon"), mutate(area_trends_all, level = "all")) %>%
+  group_by(level, taxon, class) %>%
+  mean_qi(slope, abs_change, pct_change, .width = 0.95, na.rm = TRUE) %>%
+  mutate(habitat_weighting = "Fixed PEV mapped reef-habitat area proportions (sensitivity)")
+write_csv(area_trends_summary, output_file("temporal_trends_own_area_sensitivity.csv"))
 
 # Derive the previously interactive ordering object explicitly.
 trends_summary_subset <- trends_summary %>%
@@ -5755,10 +5916,14 @@ save_figure(zonefig, filename = output_file("zonefig.png"), width = 110, height 
 
 The following comparisons use paired predictions from this one joint model,
 with `dataset = "drm24"`, area 1 m², and direction effects set to zero. Each
-habitat receives weight 1/4 in each region. The first four Table A3 density
-columns remain PEV-specific; the regional columns compare the same target year
-and habitat weighting. Species sums and adult-plus-juvenile sums retain their
-within-draw covariance.
+region's mean gives NRC, IR, MR and OR equal weight (1/4). The first four
+Table A3 density columns remain habitat-specific PEV predictions. Its regional
+columns report habitat-standardized means, their paired difference and
+posterior sign probabilities. Species sums and adult-plus-juvenile sums retain
+their within-draw covariance. Own-area weighting is saved separately as a
+sensitivity comparison, using the footprints defined above. Temporal figures
+and overall PEV density summaries use the same equal habitat weights.
+Habitat-specific density and abundance figures retain their existing estimands.
 
 ```{r regional-comparison-functions}
 make_regional_table <- function(prepared, fit, output_dir) {
@@ -5800,10 +5965,16 @@ make_regional_table <- function(prepared, fit, output_dir) {
     }, numeric(nrow(z)))
     a <- sum_cells(pev)
     b <- sum_cells(regional)
-    average <- function(z) vapply(rows$row_id, function(i) rowMeans(z[, cell_grid$row_id == i, drop = FALSE]), 
-        numeric(nrow(z)))
+    average <- function(z) vapply(rows$row_id, function(i)
+        rowMeans(z[, cell_grid$row_id == i, drop = FALSE]), numeric(nrow(z)))
+    average_area <- function(z, target_region) vapply(rows$row_id, function(i) {
+        cells <- cell_grid$row_id == i
+        drop(z[, cells, drop = FALSE] %*% habitat_area_weights(cell_grid$Type[cells], target_region))
+    }, numeric(nrow(z)))
     pa <- average(a)
     ra <- average(b)
+    pa_area <- average_area(a, "PEV")
+    ra_area <- average_area(b, "Broward-Miami")
     difference <- pa - ra
     describe <- function(z, prefix) {
         ans <- as.data.frame(t(apply(z, 2, function(x) c(mean = mean(x), median = median(x), lower = unname(quantile(x, 
@@ -5819,6 +5990,16 @@ make_regional_table <- function(prepared, fit, output_dir) {
     numeric$draws_pev_gt_regional <- colSums(difference > 0)
     numeric$draws_pev_lt_regional <- colSums(difference < 0)
     numeric$support_note <- ifelse(rows$regional_full_survey_support, "", "Juvenile component not surveyed in the added broader Broward-Miami DRM surveys; regional estimate and comparison omitted.")
+    numeric$habitat_weighting <- "Equal weights: NRC, IR, MR, OR (primary)"
+    area_numeric <- bind_cols(rows, describe(pa_area, "pev_"), describe(ra_area, "regional_"),
+      describe(pa_area - ra_area, "difference_")) %>%
+      mutate(probability_pev_gt_regional = colMeans(pa_area > ra_area),
+             probability_pev_lt_regional = colMeans(pa_area < ra_area),
+             probability_difference_zero = colMeans(pa_area == ra_area),
+             draws_pev_gt_regional = colSums(pa_area > ra_area),
+             draws_pev_lt_regional = colSums(pa_area < ra_area),
+             support_note = numeric$support_note,
+             habitat_weighting = "Each region's own mapped reef-habitat area proportions (sensitivity)")
     diag_matrix <- cbind(pa[, rows$regional_full_survey_support, drop = FALSE], ra[, rows$regional_full_survey_support, 
         drop = FALSE], difference[, rows$regional_full_survey_support, drop = FALSE])
     labels <- paste(rows$taxon[rows$regional_full_survey_support], rows$class[rows$regional_full_survey_support], 
@@ -5848,15 +6029,18 @@ make_regional_table <- function(prepared, fit, output_dir) {
     unavailable <- !rows$regional_full_survey_support
     for (n in c(paste0("regional_", c("mean", "median", "lower", "upper")), paste0("difference_", 
         c("mean", "median", "lower", "upper")), "probability_pev_gt_regional", "probability_pev_lt_regional", 
-        "probability_difference_zero", "draws_pev_gt_regional", "draws_pev_lt_regional")) numeric[[n]][unavailable] <- NA
+        "probability_difference_zero", "draws_pev_gt_regional", "draws_pev_lt_regional")) {
+        numeric[[n]][unavailable] <- NA
+        area_numeric[[n]][unavailable] <- NA
+    }
     fmt <- function(x, digits = 2) paste0(formatC(mean(x), format = "fg", digits = digits, flag = "#"), 
         " [", formatC(quantile(x, 0.025), format = "fg", digits = digits, flag = "#"), "–", formatC(quantile(x, 
             0.975), format = "fg", digits = digits, flag = "#"), "]")
     habitat_table <- pivot_wider(select(mutate(cell_grid, estimate = vapply(seq_len(ncol(a)), function(i) fmt(a[, 
         i]), character(1))), row_id, Type, estimate), names_from = Type, values_from = estimate)
     formatted <- select(mutate(left_join(select(rows, row_id, taxon, class), habitat_table, by = "row_id"), 
-        PEV_habitat_averaged = vapply(seq_len(ncol(pa)), function(i) fmt(pa[, i], 3), character(1)), 
-        Broward_Miami_habitat_averaged = vapply(seq_len(ncol(ra)), function(i) if (unavailable[i]) 
+        PEV_habitat_averaged = vapply(seq_len(ncol(pa)), function(i) fmt(pa[, i], 3), character(1)),
+        Broward_Miami_habitat_averaged = vapply(seq_len(ncol(ra)), function(i) if (unavailable[i])
             ""
         else fmt(ra[, i], 3), character(1)), PEV_minus_Broward_Miami = vapply(seq_len(ncol(difference)), 
             function(i) if (unavailable[i]) 
@@ -5876,12 +6060,25 @@ make_regional_table <- function(prepared, fit, output_dir) {
     adult <- prepared$grid$class == ">4cm"
     adult_row <- which(rows$taxon == "Total modeled taxa" & rows$class == ">4cm")
     mcav_all <- which(rows$taxon == "MCAV" & rows$class == "All")
-    err_sum <- max(abs(pa[, adult_row] - rowSums(pev[, adult, drop = FALSE])/4), abs(ra[, adult_row] - 
-        rowSums(regional[, adult, drop = FALSE])/4))
-    err_diff <- max(abs(difference[, adult_row] - (rowSums(pev[, adult, drop = FALSE]) - rowSums(regional[, 
-        adult, drop = FALSE]))/4))
+    direct_adult_pev <- rowSums(pev[, adult, drop = FALSE]) / length(habitats)
+    direct_adult_regional <- rowSums(regional[, adult, drop = FALSE]) / length(habitats)
+    err_sum <- max(abs(pa[, adult_row] - direct_adult_pev),
+                   abs(ra[, adult_row] - direct_adult_regional))
+    err_diff <- max(abs(difference[, adult_row] - (direct_adult_pev - direct_adult_regional)))
+    # Independently verify the arithmetic mean of the four habitat-cell means.
+    err_mean <- max(vapply(rows$row_id, function(i) {
+      cells <- cell_grid$row_id == i
+      max(abs(mean(pa[, i]) - mean(colMeans(a[, cells, drop = FALSE]))),
+          abs(mean(ra[, i]) - mean(colMeans(b[, cells, drop = FALSE]))))
+    }, numeric(1)))
     eligible <- which(rows$regional_full_survey_support)
-    settings <- data.frame(dataset = "drm24", direction_effects = "zero", habitat_weighting = "Equal weights: NRC, IR, MR, OR", 
+    settings <- data.frame(dataset = "drm24", direction_effects = "zero",
+        habitat_weighting = "Equal weights: NRC, IR, MR, OR (primary)",
+        habitat_weights = "NRC=0.25; IR=0.25; MR=0.25; OR=0.25 in both regions",
+        sensitivity_weighting = "Each region's own mapped reef-habitat area proportions",
+        sensitivity_pev_area_footprint = "Table A1 project / monitoring zones",
+        sensitivity_regional_area_footprint = "Complete map Region=Broward-Miami outside 1,200 m N/S PEV band",
+        sensitivity_habitat_area_uncertainty = "Mapped areas treated as fixed",
         posterior_draws = nrow(draw_matrix), adult_taxa = sum(prepared$tc$class == ">4cm"), surveyed_juvenile_groups = length(juvenile_groups), 
         reported_comparisons = length(eligible), probability_definition = "Fraction of paired draws with PEV minus Broward-Miami >0 or <0", 
         multiplicity_adjustment = "None; posterior summaries only", decision_rule = "None; no significance flags or posterior probability cutoff", 
@@ -5891,18 +6088,25 @@ make_regional_table <- function(prepared, fit, output_dir) {
     validation <- data.frame(check = c("Adult sum preserves draw-wise covariance", "Adult total contrast equals direct sum of paired cell differences", 
         "Every adult taxon is compared", "Only surveyed juvenile groups compared", "MCAV All is compared", 
         "Unsupported regional values are blank", "Directional probabilities account for every posterior draw", 
-        "Both probabilities equal paired posterior sign frequencies", "R predictions match independently checked brms expected densities"), 
+        "Both probabilities equal paired posterior sign frequencies", "R predictions match independently checked brms expected densities",
+        "Primary means equal the arithmetic means of four habitat-cell means", "Each primary habitat weight is exactly one quarter in both regions"),
         pass = c(err_sum < 1e-12, err_diff < 1e-12, all(rows$regional_full_survey_support[rows$class == 
             ">4cm"]), all(rows$taxon[rows$class == "<4cm" & rows$regional_full_survey_support] %in% 
             c(juvenile_groups, "Surveyed juvenile groups (4)")), length(mcav_all) == 1 && rows$regional_full_survey_support[mcav_all], 
-            all(formatted$Broward_Miami_habitat_averaged[unavailable] == "") && all(formatted$PEV_minus_Broward_Miami[unavailable] == 
+            all(formatted$Broward_Miami_habitat_averaged[unavailable] == "") && all(formatted$PEV_minus_Broward_Miami[unavailable] ==
                 "") && all(formatted$Pr_PEV_gt_Broward_Miami[unavailable] == "") && all(formatted$Pr_PEV_lt_Broward_Miami[unavailable] == 
                 ""), all(abs(numeric$probability_pev_gt_regional[eligible] + numeric$probability_pev_lt_regional[eligible] + 
                 numeric$probability_difference_zero[eligible] - 1) < 1e-12), all(numeric$probability_pev_gt_regional[eligible] == 
                 numeric$draws_pev_gt_regional[eligible]/nrow(draw_matrix)) && all(numeric$probability_pev_lt_regional[eligible] == 
-                numeric$draws_pev_lt_regional[eligible]/nrow(draw_matrix)), brms_prediction_checks_pass))
+                numeric$draws_pev_lt_regional[eligible]/nrow(draw_matrix)), brms_prediction_checks_pass,
+            err_mean < 1e-12, length(habitats) == 4L &&
+              all(vapply(rows$row_id, function(i) sum(cell_grid$row_id == i) == 4L, logical(1)))))
     stopifnot(all(validation$pass), sum(rows$class == ">4cm" & rows$row_type == "Taxon") == 17L)
     write_csv(numeric, file.path(output_dir, "TableA3_regional_comparisons_numeric.csv"), na = "")
+    write_csv(area_numeric, file.path(output_dir, "TableA3_own_area_sensitivity_numeric.csv"), na = "")
+    write_csv(bind_rows(mutate(numeric, comparison = "Equal habitats (primary)"),
+                        mutate(area_numeric, comparison = "Own-area weights (sensitivity)")),
+              file.path(output_dir, "regional_weighting_sensitivity.csv"), na = "")
     legacy_contrast <- transmute(left_join(filter(numeric, row_type == "Taxon", class != "All"), 
         prepared$tc, by = c("taxon", "class")), taxon, class, tc_id, mean = difference_mean, median = difference_median, 
         lower = difference_lower, upper = difference_upper, probability_pev_gt_regional, probability_pev_lt_regional, 
@@ -5924,8 +6128,12 @@ make_regional_table <- function(prepared, fit, output_dir) {
     write_csv(settings, file.path(output_dir, "TableA3_comparison_method.csv"))
     write_csv(diagnostics, file.path(output_dir, "TableA3_comparison_diagnostics.csv"))
     write_csv(validation, file.path(output_dir, "TableA3_comparison_validation.csv"))
-    writeLines(c("Table A3. PEV and Broward-Miami coral densities predicted for DRM2024.", "Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].", 
-        "Both regional means give each of NRC, IR, MR and OR weight 1/4 and set direction effects to zero.", 
+    writeLines(c("Table A3. PEV and Broward-Miami coral densities predicted for DRM2024.", "Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].",
+        "The first four columns are habitat-specific PEV densities. The two regional mean columns average NRC, IR, MR and OR equally (1/4 each) in both regions; direction effects are zero.",
+        "The primary comparison standardizes habitat composition between regions; it is not weighted by habitat areas or numbers of surveyed sites.",
+        "Own-area results are retained separately in TableA3_own_area_sensitivity_numeric.csv and regional_weighting_sensitivity.csv, not used for the main regional comparison.",
+        "For that sensitivity only, PEV weights use unrounded Table A1 project / monitoring-zone areas, and broader Broward-Miami weights use the complete FDEP map region outside the 1,200 m north/south PEV band. These two PEV footprints are not identical; mapped areas are fixed.",
+        "Sensitivity habitat areas and proportions are in regional_habitat_area_weights.csv. Artificial is pooled with NRC and Aggregated Patch Reef with OR; other habitat classes are excluded.",
         "All size classes, species sums and contrasts are calculated within each shared posterior draw before summarizing.", 
         "The adult total sums 17 modeled adult taxa. The full juvenile and All totals have no regional comparison.", 
         "Regional juvenile and All entries are blank where a juvenile component was not surveyed in the added broad DRM surveys.", 
@@ -5934,9 +6142,9 @@ make_regional_table <- function(prepared, fit, output_dir) {
         "Pr_PEV_gt_Broward_Miami = Pr(PEV minus Broward-Miami >0 | data, model); Pr_PEV_lt_Broward_Miami = Pr(difference <0 | data, model).", 
         "Both columns report the observed fraction of paired posterior draws; they are not p-values and have no multiplicity adjustment.", 
         "No significance flags or posterior probability decision thresholds are applied. Intervals are pointwise, not simultaneous.", 
-        sprintf("Probabilities are Monte Carlo estimates from %d pilot draws, displayed to four decimals (draw resolution %.4f).", 
+        sprintf("Probabilities are Monte Carlo estimates from all %d retained draws, displayed to four decimals (draw resolution %.4f).",
             nrow(draw_matrix), 1/nrow(draw_matrix)), "A displayed 0.0000 or 1.0000 means no opposite-sign draw was observed, not certainty about the population difference.", 
-        "The model fit and all reported comparisons remain provisional pending final sampling."), 
+        "The model fit and reported comparisons retain the documented convergence and sparse-cell tail caveats."),
         file.path(output_dir, "TableA3_notes.txt"))
     manifest_file <- file.path(output_dir, "requested_outputs.csv")
     if (file.exists(manifest_file)) {
@@ -5947,7 +6155,7 @@ make_regional_table <- function(prepared, fit, output_dir) {
             path), bytes = file.info(path)$size)
         write_csv(manifest, manifest_file)
     }
-    list(numeric = numeric, formatted = formatted, cells = cell_summary, settings = settings, diagnostics = diagnostics, 
+    list(numeric = numeric, area_numeric = area_numeric, formatted = formatted, cells = cell_summary, settings = settings, diagnostics = diagnostics,
         validation = validation)
 }
 
@@ -5960,6 +6168,60 @@ regional_comparison$formatted %>%
   select(-regional_juvenile_full_DRM_support, -support_note) %>%
   show_table(digits = 4)
 show_table(regional_comparison$validation)
+```
+
+## Regional densities and paired differences
+
+The figure uses the same equal-habitat estimates and paired posterior differences
+as Table A3. Points are posterior means and intervals are pointwise 95% CrIs.
+No significance flags or posterior-probability cutoffs are applied. The total
+includes the 17 modeled adult taxa. This regional-comparison figure is saved
+separately from the existing numbered PEV manuscript figures.
+
+```{r regional-density-comparison-figure, fig.width=11, fig.height=9}
+adult_comparison <- regional_comparison$numeric %>%
+  filter(class == ">4cm", row_type %in% c("Taxon", "Total")) %>%
+  mutate(target = if_else(row_type == "Total", "All adult taxa", as.character(taxon)))
+taxon_order <- adult_comparison %>% filter(row_type == "Taxon") %>%
+  arrange(desc(pev_mean + regional_mean)) %>% pull(target)
+target_levels <- rev(c("All adult taxa", taxon_order))
+target_labels <- c(taxon_labels, "All adult taxa" = 'bold("All adult taxa")')
+adult_comparison <- adult_comparison %>% mutate(y = match(target, target_levels))
+regional_density_plot_data <- bind_rows(
+  adult_comparison %>% transmute(target, y, region = "PEV", mean = pev_mean,
+                                 lower = pev_lower, upper = pev_upper),
+  adult_comparison %>% transmute(target, y, region = "Broward–Miami", mean = regional_mean,
+                                 lower = regional_lower, upper = regional_upper)
+) %>% mutate(y = y + if_else(region == "PEV", 0.14, -0.14))
+region_colors <- c("PEV" = "#D55E00", "Broward–Miami" = "#0072B2")
+density_panel <- ggplot(regional_density_plot_data, aes(y = y, color = region)) +
+  geom_segment(aes(x = lower, xend = upper, yend = y), linewidth = .6) +
+  geom_point(aes(x = mean), size = 2) + scale_x_log10() +
+  scale_y_continuous(breaks = seq_along(target_levels),
+    labels = function(x) parse(text = target_labels[target_levels[x]])) +
+  scale_color_manual(values = region_colors) +
+  labs(x = expression("Density (colonies " * m^{-2} * "; log scale)"), y = NULL,
+       color = NULL, title = "2024 regional densities") + theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank(), legend.position = "bottom")
+contrast_panel <- ggplot(adult_comparison, aes(y = y)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_segment(aes(x = difference_lower, xend = difference_upper, yend = y), linewidth = .6) +
+  geom_point(aes(x = difference_mean), size = 2) +
+  scale_y_continuous(breaks = seq_along(target_levels), labels = NULL) +
+  labs(x = expression("PEV minus Broward–Miami (colonies " * m^{-2} * ")"), y = NULL,
+       title = "Paired density differences") + theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank())
+regional_density_figure <- (density_panel | contrast_panel) +
+  plot_layout(widths = c(1.2, 1), guides = "collect") +
+  plot_annotation(title = "2024 adult coral densities: equal habitat weights",
+    caption = "Posterior means and 95% credible intervals; all 4,000 draws. Survey effects retained; direction effects zero.") &
+  theme(legend.position = "bottom")
+save_figure(output_file("regional_density_comparison.png"), regional_density_figure,
+            width = 11, height = 9, dpi = 220, bg = "white")
+save_figure(output_file("regional_density_comparison.pdf"), regional_density_figure,
+            width = 11, height = 9, device = grDevices::pdf,
+            encoding = "WinAnsi.enc", useDingbats = FALSE, bg = "white")
+regional_density_figure
 ```
 
 Define \(\Delta=\text{PEV density}-\text{Broward–Miami density}\).
@@ -6016,6 +6278,11 @@ required_outputs <- c(paste0("Fig", 1:6, ".png"), paste0("FigA", 1:6, ".png"),
                       paste0("Fig", 1:6, ".pdf"), paste0("FigA", 1:6, ".pdf"),
                       "Table1.csv", "Table2.csv", paste0("TableA", 1:6, ".csv"),
                       "TableA3_notes.txt", "TableA3_regional_comparisons_numeric.csv",
+                      "TableA3_own_area_sensitivity_numeric.csv", "regional_weighting_sensitivity.csv",
+                      "regional_habitat_area_weights.csv", "regional_habitat_area_site_audit.csv",
+                      "regional_density_comparison.png", "regional_density_comparison.pdf",
+                      "PEV_overall_equal_habitat_densities.csv", "PEV_overall_area_weighted_densities.csv",
+                      "temporal_trends_own_area_sensitivity.csv", "temporal_habitat_weight_validation.csv",
                       "survey_locations.png", "zonefig.png", "ACERORBI.png", "ACERORBI_2024.png",
                       "bayesian_r2.csv", "posterior_predictive_global.csv",
                       "posterior_predictive_grouped.csv", "posterior_predictive_grouped_summary.csv",
@@ -6070,7 +6337,8 @@ in `outputs/coral_analysis/` for reference.
 manuscript_products <- c(
   paste0("Fig", 2:6, ".png"), paste0("Fig", 2:6, ".pdf"),
   paste0("FigA", 1:6, ".png"), paste0("FigA", 1:6, ".pdf"),
-  paste0("TableA", 1:6, ".csv"), "TableA3_notes.txt", "zonefig.png"
+  paste0("TableA", 1:6, ".csv"), "TableA3_notes.txt", "zonefig.png",
+  "regional_habitat_area_weights.csv", "regional_density_comparison.png", "regional_density_comparison.pdf"
 )
 manuscript_sources <- file.path(output_dir, manuscript_products)
 manuscript_destinations <- file.path(project_root, "outputs", manuscript_products)

@@ -79,6 +79,37 @@ predictions for 2024. Only comprehensively surveyed juvenile responses are
 compared, and adult totals sum the same 17 modeled taxa. Fig A1 explicitly
 orders habitats NRC, IR, MR, OR with labels matched by habitat name.
 
+## Equal habitat weighting for primary density comparisons and trends
+
+The primary regional comparison, overall PEV density summaries and temporal
+trends give NRC, IR, MR and OR weight 1/4 each. Regional Table A3 predictions
+select 2024 (drm24) in both regions; temporal predictions use the same four
+weights in every year. These are habitat-standardized summaries, not mean
+densities over the actual mapped habitat composition of each region. Available
+survey/source predictions remain equally averaged within each habitat.
+
+Table A3, its notes, regional_density_comparison.png/.pdf, Figs 4–5 and their
+numeric summaries were regenerated from the saved 4,000 draws. The adult
+regional difference is −0.276153 [95% CrI −0.569296, 0.029876] colonies/m²,
+Pr(PEV < BM)=0.95975; the interval includes zero. Current primary overall
+summaries are in PEV_overall_equal_habitat_densities.csv.
+
+Own-area weighting is retained separately in
+TableA3_own_area_sensitivity_numeric.csv, regional_weighting_sensitivity.csv,
+PEV_overall_area_weighted_densities.csv and
+temporal_trends_own_area_sensitivity.csv. Its areas/proportions remain in
+regional_habitat_area_weights.csv: PEV uses unrounded Table A1 project/monitoring
+areas, and broader Broward–Miami uses the complete FDEP map region outside the
+1,200 m north/south band. Those PEV footprint conventions differ; these areas
+do not weight the primary comparisons. The complete regional source and its
+provenance are retained under data/spatial/drm_regional_habitat/.
+
+Habitat-specific density figures and area-based colony abundance extrapolations
+keep their existing calculations. The fitted posterior, input data, priors and
+fit checks are unchanged. Validation is recorded in
+equal_habitat_restoration_validation.csv and
+equal_habitat_restoration_preservation.csv.
+
 The working fit remains provisional: maximum parameter Rhat 1.0189, minimum
 bulk ESS 266.3, zero divergences and depth hits. Principal density and contrast
 estimates mix well, but some sparse ACER habitat-cell means retain long tails.
@@ -110,6 +141,12 @@ manuscript figures. Matching predictive draws are cached under the ignored
 `outputs/coral_analysis/data/` directory. No additional model fit is needed.
 
 ## Original analysis and development archive
+
+Standalone habitat-weighting/maps and taxon-by-habitat temporal explorations
+were moved to `old_working_files/manuscript_explorations_2026-11-06/`, with
+their outputs and exploratory caches. Every moved file's checksum was verified.
+They are not required by the main analysis; the main area-sensitivity outputs
+and complete regional habitat input remain in place.
 
 The original source is preserved as
 `old_working_files/coral_analysis_original_2026-11-03/analysis/coral_analysis_original.Rmd`.

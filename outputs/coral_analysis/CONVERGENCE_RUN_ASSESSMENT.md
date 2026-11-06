@@ -1,5 +1,110 @@
 # Assessment of the 4,000-draw joint coral run
 
+## Current decision — equal habitat weighting restored, 6 November 2026
+
+The user explicitly restored equal NRC/IR/MR/OR weights (1/4 each) for both
+regional comparisons and temporal trends. Overall PEV habitat-averaged density
+summaries use the same equal weights. Own-area weighting is retained only as a
+labeled sensitivity. This decision supersedes the earlier area-weighting notes
+below. The model, likelihood, data, priors, PEV classification, prediction target
+and all 4,000 posterior draws are unchanged; no model was refit.
+
+- Table A3 and regional_density_comparison.png/.pdf use equal habitat weights
+  in both regions, with dataset=drm24, source effects retained and direction zero.
+- Adult total: PEV 1.031393 [0.831459, 1.279704], Broward–Miami 1.307546
+  [1.107882, 1.547714] colonies/m². Paired difference −0.276153
+  [−0.569296, 0.029876]; Pr(PEV < BM)=0.95975. Its 95% CrI includes zero.
+- Adult ACER, CNAT, ORBI and PCLI have negative regional-difference intervals
+  excluding zero. All unsupported regional juvenile/All entries remain blank.
+- Figs 4–5 again show equal-habitat temporal trends. Community increases are
+  +96.9483% [59.3563%, 147.5706%] for juveniles, +28.6896%
+  [9.3601%, 53.7987%] for adults and +61.2311% [39.1686%, 89.8206%]
+  combined. These are regressions of source-specific predictions, not a new
+  numeric-year model term.
+- PEV_overall_equal_habitat_densities.csv is the primary overall summary.
+  Survey-averaged adult/juvenile/combined means are .861288/1.085263/1.946550;
+  do not confuse them with the 2024 adult total 1.031393.
+- Area-weighted sensitivity outputs: TableA3_own_area_sensitivity_numeric.csv,
+  regional_weighting_sensitivity.csv, temporal_trends_own_area_sensitivity.csv,
+  and PEV_overall_area_weighted_densities.csv. The separate habitat maps and
+  taxon-by-habitat review remain supporting records, not new main estimands.
+- Habitat-specific densities, colony abundance extrapolations, fit checks,
+  original surveys and integrated Fig 1 / Tables 1–2 are unchanged.
+- Current equal-habitat Table A3 derived diagnostics: max Rhat 1.003599,
+  min bulk ESS 3970.156, min tail ESS 2779.426. The pre-existing
+  parameter-mixing and sparse-cell tail caveats remain applicable.
+- Validation: equal_habitat_restoration_validation.csv and
+  equal_habitat_restoration_preservation.csv. New fitting remains disabled.
+- Pre-restoration main source/results are saved locally at
+  /Users/rosscunning/Projects/PENIP/old_working_files/coral_equal_habitat_restoration_2026-11-06_152157.
+
+The manuscript is edited manually by the user. Resume Discussion revisions
+with equal-habitat estimates; revisit the recently drafted regional Results:
+the adult-total 95% CrI now includes zero, and CNAT joins the three other adult
+taxa with negative difference intervals. Describe these primary estimates as
+habitat-standardized, not weighted by each region's actual habitat areas.
+
+The area-weighted implementation described next is retained as a historical
+sensitivity record. The restored primary equal-habitat numerical results also
+appear later in this assessment. No posterior was refit or altered.
+
+**Update, 6 November 2026:** the primary regional estimand now uses each
+region's own mapped habitat-area proportions. The posterior and convergence
+assessment are unchanged. The equal-habitat results from the original fit
+assessment are retained below as historical sensitivity results.
+
+## Earlier own-area regional comparison — now sensitivity
+
+All main manuscript averages across habitats now use mapped habitat-area
+proportions, including overall PEV densities and temporal predictions. The
+same PEV proportions are used in every survey year. Survey/source averaging
+within habitat is unchanged. Current survey-averaged PEV adult, juvenile and
+combined densities are .739574 [.667023, .821265], 1.284870
+[1.001932, 1.655288] and 2.024445 [1.730345, 2.411552] colonies/m².
+Their 2024 values are .854835 [.689256, 1.055283], 1.648241
+[1.193971, 2.257376] and 2.503076 [1.979953, 3.163077].
+See `PEV_overall_area_weighted_densities.csv`.
+
+Area-weighted 2017–2024 changes are +80.35% [44.38%, 129.22%] for juveniles,
++14.39% [−2.92%, 35.77%] for adults and +50.76% [28.46%, 79.33%] combined.
+The adult-total change interval now includes zero. Figs 4–5 were regenerated;
+the other numbered habitat and abundance figures are unchanged. The saved fit
+and regional comparisons below remain unchanged. All nine transition checks
+in `all_habitat_area_transition_validation.csv` passed.
+
+Table A3 now uses 4.004754 km² of PEV project / monitoring reef habitats and
+79.849767 km² of broader mapped Broward–Miami reef habitats outside the 1,200 m
+north/south PEV classification band. Those two PEV footprint conventions are
+not identical. NRC/IR/MR/OR area proportions are
+.538979/.155253/.109140/.196628 at PEV and
+.578469/.137876/.109905/.173750 in the broader region. Mapped areas are fixed.
+Predictions still select drm24, retain source effects, set direction effects
+to zero and use all 4,000 paired draws.
+
+| 2024 target | PEV mean [95% CrI] | Broward–Miami mean [95% CrI] | Pr(PEV < BM) |
+|:--|:--|:--|--:|
+| Adult total | 0.854835 [0.689256, 1.055283] | 1.196432 [1.008739, 1.424450] | 0.9920 |
+| Adult ACER | 0.012188 [0.003802, 0.030018] | 0.050252 [0.019854, 0.114071] | 0.9885 |
+
+The adult total difference is −0.341597 [−0.609288, −0.075792] colonies/m².
+The ACER difference is −0.038064 [−0.101886, −0.005097]. The comparison includes
+habitat-composition differences as well as differences within habitats.
+Current own-area targets have maximum Rhat 1.005712, minimum bulk ESS 3881.876
+and minimum tail ESS 2869.872; adult-total sign-probability MCSE is .00154.
+These derived diagnostics do not resolve the model's parameter-level caveat.
+
+All 24 supported primary comparisons reproduce the previously reviewed
+own-area sensitivity within 2.3e-16. The saved equal-habitat sensitivity
+reproduces the earlier Table A3 exactly. The cached fit, all 12 numbered coral
+PNG figures and the audited unaffected PEV/temporal/abundance/PPC numerical
+summaries were unchanged at the initial regional-only transition; the later
+overall/temporal area-weighting correction is described above. The new regional figure is
+`regional_density_comparison.png/.pdf`; Table A3, its notes and weights are
+also published to the manuscript output directory. Main and integrated reports
+were regenerated. See `own_area_transition_validation.csv`.
+
+## Original sampling-run assessment (3 November 2026)
+
 Completed 3 November 2026. The authorized run and all downstream products are
 finished. No sampler or render remains running. This is a useful improvement
 over the short pilot, and the main manuscript results are stable. It is still
@@ -48,7 +153,7 @@ or intercepts have bulk ESS below 400. Chain energy diagnostics are reassuring
 ACER's zi/shape parameters. The fitted ACER NRC zi and log-shape combinations
 also have R-hat around 1.02. The overall sampling check therefore remains FALSE.
 
-The actual habitat-averaged Table A3 densities and paired differences mix much
+The original equal-habitat Table A3 densities and paired differences mixed much
 better: maximum R-hat 1.0036, minimum bulk ESS about 3,970 and minimum tail ESS
 about 2,779. These results support stability of the principal estimands, but do
 not establish stability of every sparse habitat-cell mean.
@@ -59,7 +164,7 @@ metrics are inside their 95% replication intervals. Across every dataset/class,
 remain. Broad posterior predictive intervals and checks using the fitted data
 cannot by themselves prove adequate identification or convergence.
 
-## Main results
+## Restored primary equal-habitat results
 
 These are drm24 predictions with explicit region selection, equal weights for
 the four habitats, source effects retained and direction effects zero. They

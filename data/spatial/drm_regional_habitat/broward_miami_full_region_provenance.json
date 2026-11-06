@@ -1,0 +1,17 @@
+{
+  "source_url": "https://services1.arcgis.com/nRHtyn3uE1kyzoYc/arcgis/rest/services/SE_Florida_Benthic_Habitats/FeatureServer/0",
+  "source_layer": "SE_FL_Benthic_Habitats_10Nov2015_PBunion",
+  "retrieved_utc": "2026-10-20T19:39:23.286684+00:00",
+  "scope": "Complete source polygons labeled Region=Broward-Miami, all habitat classes, before reef pooling or PEV-band removal; not a site-intersection subset",
+  "feature_count": 1868,
+  "sha256": "0ce0a7dfa1b8f17a5161ccde227f9f825175c09b6aa8faa7db0c47b4a8466585",
+  "source_editing_info": {
+    "lastEditDate": 1779993505404,
+    "schemaLastEditDate": 1775759207856,
+    "dataLastEditDate": 1775759207856
+  },
+  "matches_analysis_snapshot_editing_info": true,
+  "full_layer_feature_count": 9110,
+  "full_layer_sha256": "52c2ba530f80663b57bc7b8e92c25d65d3cc822da1c0a40a8d25544053b3da31",
+  "subset_saved_date": "2026-11-06"
+}

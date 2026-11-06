@@ -29,3 +29,6 @@ TableA5.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/TableA5.csv
 TableA6.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/TableA6.csv,/Users/rosscunning/Projects/PENIP/outputs/TableA6.csv,TRUE
 TableA3_notes.txt,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/TableA3_notes.txt,/Users/rosscunning/Projects/PENIP/outputs/TableA3_notes.txt,TRUE
 zonefig.png,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/zonefig.png,/Users/rosscunning/Projects/PENIP/outputs/zonefig.png,TRUE
+regional_habitat_area_weights.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_habitat_area_weights.csv,/Users/rosscunning/Projects/PENIP/outputs/regional_habitat_area_weights.csv,TRUE
+regional_density_comparison.png,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_density_comparison.png,/Users/rosscunning/Projects/PENIP/outputs/regional_density_comparison.png,TRUE
+regional_density_comparison.pdf,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_density_comparison.pdf,/Users/rosscunning/Projects/PENIP/outputs/regional_density_comparison.pdf,TRUE

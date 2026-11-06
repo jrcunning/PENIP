@@ -8,3 +8,5 @@ Unsupported regional values are blank,TRUE
 Directional probabilities account for every posterior draw,TRUE
 Both probabilities equal paired posterior sign frequencies,TRUE
 R predictions match independently checked brms expected densities,TRUE
+Primary means equal the arithmetic means of four habitat-cell means,TRUE
+Each primary habitat weight is exactly one quarter in both regions,TRUE

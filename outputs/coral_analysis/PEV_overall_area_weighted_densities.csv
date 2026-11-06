@@ -1,0 +1,7 @@
+class,mean,sd_post,lower,upper,n_draws,prediction_target,region,habitat_weighting
+<4cm,1.2848704815339749,0.16602793198478522,1.0019324386164719,1.655288496660193,4000,Survey-averaged,PEV,PEV mapped reef-habitat area proportions (sensitivity)
+>4cm,0.7395743130544292,0.039272062136655135,0.667022997232149,0.8212653262831847,4000,Survey-averaged,PEV,PEV mapped reef-habitat area proportions (sensitivity)
+All,2.0244447945884043,0.17267880102804395,1.7303450403212772,2.4115520062462448,4000,Survey-averaged,PEV,PEV mapped reef-habitat area proportions (sensitivity)
+<4cm,1.648241212680547,0.27429353324739264,1.1939711642757338,2.2573762522296215,4000,2024,PEV,PEV mapped reef-habitat area proportions (sensitivity)
+>4cm,0.8548348778493751,0.09318796196295993,0.6892558718499001,1.0552826945543228,4000,2024,PEV,PEV mapped reef-habitat area proportions (sensitivity)
+All,2.5030760905299223,0.3019526254919027,1.9799526884849874,3.163077328640822,4000,2024,PEV,PEV mapped reef-habitat area proportions (sensitivity)

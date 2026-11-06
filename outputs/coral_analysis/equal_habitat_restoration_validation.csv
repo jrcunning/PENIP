@@ -1,0 +1,14 @@
+check,pass,detail
+All primary regional estimates reproduce the previous equal-habitat results,True,0
+Own-area regional sensitivity preserves previous primary estimates,True,0
+Own-area temporal sensitivity preserves previous primary estimates,True,0
+All primary temporal estimates reproduce independent habitat-specific regression results,True,1.1107204045401886e-09
+Restored temporal estimates match the archived pre-area-weighting analysis,True,9.663381206337363e-13
+Every temporal habitat weight is exactly 0.25,True,
+Primary Table A3 specifies equal weights,True,
+All 4000 draws retained in overall summaries,True,
+"Model, inputs, habitat densities, abundance totals, fit checks and unaffected figures remain identical",True,32 files
+Updated Table A3 and regional figure published to manuscript directory,True,
+final_validation.csv passes,True,
+TableA3_comparison_validation.csv passes,True,
+original_framework_check_validation.csv passes,True,
