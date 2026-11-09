@@ -6176,50 +6176,105 @@ The figure uses the same equal-habitat estimates and paired posterior difference
 as Table A3. Points are posterior means and intervals are pointwise 95% CrIs.
 No significance flags or posterior-probability cutoffs are applied. The total
 includes the 17 modeled adult taxa. This regional-comparison figure is saved
-separately from the existing numbered PEV manuscript figures.
+separately from the existing numbered PEV manuscript figures. The right-hand
+column has three stacked sections with linear x-axis limits of +/-0.60,
++/-0.10 and +/-0.01 colonies per square metre. Taxa are grouped by the range
+needed to display their complete 95% CrIs, not by whether a contrast excludes
+zero. Each row appears once, all intervals are complete, and zero is aligned
+across sections. The density scale is identical across the left-hand sections,
+and species rows align between the two columns.
 
-```{r regional-density-comparison-figure, fig.width=11, fig.height=9}
+```{r regional-density-comparison-figure, fig.width=11, fig.height=10}
 adult_comparison <- regional_comparison$numeric %>%
   filter(class == ">4cm", row_type %in% c("Taxon", "Total")) %>%
-  mutate(target = if_else(row_type == "Total", "All adult taxa", as.character(taxon)))
+  mutate(target = if_else(row_type == "Total", "All adult taxa", as.character(taxon)),
+         interval_extent = pmax(abs(difference_lower), abs(difference_upper)),
+         section = case_when(interval_extent > 0.10 ~ "larger",
+                             interval_extent > 0.01 ~ "intermediate",
+                             TRUE ~ "smaller"))
 taxon_order <- adult_comparison %>% filter(row_type == "Taxon") %>%
   arrange(desc(pev_mean + regional_mean)) %>% pull(target)
 target_levels <- rev(c("All adult taxa", taxon_order))
 target_labels <- c(taxon_labels, "All adult taxa" = 'bold("All adult taxa")')
-adult_comparison <- adult_comparison %>% mutate(y = match(target, target_levels))
+section_specs <- tibble::tibble(
+  section = c("larger", "intermediate", "smaller"),
+  limit = c(0.60, 0.10, 0.01),
+  step = c(0.30, 0.05, 0.005),
+  accuracy = c(0.1, 0.01, 0.001)
+)
+section_counts <- vapply(section_specs$section,
+  function(s) sum(adult_comparison$section == s), integer(1))
+# Explicit limits must contain every plotted mean and complete interval.
+row_limits <- section_specs$limit[match(adult_comparison$section, section_specs$section)]
+stopifnot(all(section_counts > 0L),
+          all(adult_comparison$interval_extent <= row_limits),
+          all(abs(adult_comparison$difference_mean) <= row_limits))
 regional_density_plot_data <- bind_rows(
-  adult_comparison %>% transmute(target, y, region = "PEV", mean = pev_mean,
+  adult_comparison %>% transmute(target, section, region = "PEV", mean = pev_mean,
                                  lower = pev_lower, upper = pev_upper),
-  adult_comparison %>% transmute(target, y, region = "Broward–Miami", mean = regional_mean,
+  adult_comparison %>% transmute(target, section, region = "Broward–Miami", mean = regional_mean,
                                  lower = regional_lower, upper = regional_upper)
-) %>% mutate(y = y + if_else(region == "PEV", 0.14, -0.14))
+)
+density_x_limits <- range(c(regional_density_plot_data$lower,
+                            regional_density_plot_data$upper))
 region_colors <- c("PEV" = "#D55E00", "Broward–Miami" = "#0072B2")
-density_panel <- ggplot(regional_density_plot_data, aes(y = y, color = region)) +
-  geom_segment(aes(x = lower, xend = upper, yend = y), linewidth = .6) +
-  geom_point(aes(x = mean), size = 2) + scale_x_log10() +
-  scale_y_continuous(breaks = seq_along(target_levels),
-    labels = function(x) parse(text = target_labels[target_levels[x]])) +
-  scale_color_manual(values = region_colors) +
-  labs(x = expression("Density (colonies " * m^{-2} * "; log scale)"), y = NULL,
-       color = NULL, title = "2024 regional densities") + theme_minimal(base_size = 11) +
-  theme(panel.grid.minor = element_blank(), legend.position = "bottom")
-contrast_panel <- ggplot(adult_comparison, aes(y = y)) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
-  geom_segment(aes(x = difference_lower, xend = difference_upper, yend = y), linewidth = .6) +
-  geom_point(aes(x = difference_mean), size = 2) +
-  scale_y_continuous(breaks = seq_along(target_levels), labels = NULL) +
-  labs(x = expression("PEV minus Broward–Miami (colonies " * m^{-2} * ")"), y = NULL,
-       title = "Paired density differences") + theme_minimal(base_size = 11) +
-  theme(panel.grid.minor = element_blank())
-regional_density_figure <- (density_panel | contrast_panel) +
-  plot_layout(widths = c(1.2, 1), guides = "collect") +
+
+make_comparison_section <- function(i) {
+  spec <- section_specs[i, ]
+  contrasts <- adult_comparison %>% filter(section == spec$section)
+  local_levels <- target_levels[target_levels %in% contrasts$target]
+  contrasts <- contrasts %>% mutate(y = match(target, local_levels))
+  densities <- regional_density_plot_data %>% filter(section == spec$section) %>%
+    mutate(y = match(target, local_levels) + if_else(region == "PEV", 0.14, -0.14))
+  y_limits <- c(0.5, length(local_levels) + 0.5)
+  bottom_section <- i == nrow(section_specs)
+
+  density_panel <- ggplot(densities, aes(y = y, color = region)) +
+    geom_segment(aes(x = lower, xend = upper, yend = y), linewidth = .6) +
+    geom_point(aes(x = mean), size = 2) +
+    scale_x_log10(limits = density_x_limits, breaks = c(0.001, 0.01, 0.1, 1)) +
+    scale_y_continuous(breaks = seq_along(local_levels), limits = y_limits,
+      expand = expansion(mult = 0),
+      labels = function(y) parse(text = target_labels[local_levels[y]])) +
+    scale_color_manual(values = region_colors) +
+    labs(x = if (bottom_section) expression("Density (colonies " * m^{-2} * "; log scale)"),
+         y = NULL, color = NULL,
+         title = if (i == 1L) "2024 regional densities") +
+    theme_minimal(base_size = 11) +
+    theme(panel.grid.minor = element_blank(), legend.position = "bottom")
+  if (!bottom_section) {
+    density_panel <- density_panel + theme(axis.text.x = element_blank(),
+                                           axis.ticks.x = element_blank())
+  }
+
+  contrast_panel <- ggplot(contrasts, aes(y = y)) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+    geom_segment(aes(x = difference_lower, xend = difference_upper, yend = y), linewidth = .6) +
+    geom_point(aes(x = difference_mean), size = 2) +
+    scale_x_continuous(limits = c(-spec$limit, spec$limit),
+      breaks = seq(-spec$limit, spec$limit, by = spec$step),
+      labels = scales::label_number(accuracy = spec$accuracy), expand = expansion(mult = 0.03)) +
+    scale_y_continuous(breaks = seq_along(local_levels), labels = NULL,
+      limits = y_limits, expand = expansion(mult = 0)) +
+    labs(x = if (bottom_section) expression("PEV minus Broward–Miami (colonies " * m^{-2} * ")"),
+         y = NULL, title = if (i == 1L) "Paired density differences") +
+    theme_minimal(base_size = 11) +
+    theme(panel.grid.minor = element_blank())
+  list(density = density_panel, contrast = contrast_panel)
+}
+section_panels <- lapply(seq_len(nrow(section_specs)), make_comparison_section)
+regional_density_figure <- wrap_plots(
+  unlist(section_panels, recursive = FALSE), ncol = 2, byrow = TRUE,
+  widths = c(1.2, 1), heights = section_counts, guides = "collect"
+) +
   plot_annotation(title = "2024 adult coral densities: equal habitat weights",
-    caption = "Posterior means and 95% credible intervals; all 4,000 draws. Survey effects retained; direction effects zero.") &
+    caption = paste0("Posterior means and 95% credible intervals; all 4,000 draws. Survey effects retained; direction effects zero.\n",
+                     "Right column: three separate linear x-axis ranges; zero aligned and all intervals complete. Left column: one common log scale.")) &
   theme(legend.position = "bottom")
 save_figure(output_file("regional_density_comparison.png"), regional_density_figure,
-            width = 11, height = 9, dpi = 220, bg = "white")
+            width = 11, height = 10, dpi = 220, bg = "white")
 save_figure(output_file("regional_density_comparison.pdf"), regional_density_figure,
-            width = 11, height = 9, device = grDevices::pdf,
+            width = 11, height = 10, device = grDevices::pdf,
             encoding = "WinAnsi.enc", useDingbats = FALSE, bg = "white")
 regional_density_figure
 ```

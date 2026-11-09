@@ -37,8 +37,8 @@ TableA3_own_area_sensitivity_numeric.csv,/Users/rosscunning/Projects/PENIP/outpu
 regional_weighting_sensitivity.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_weighting_sensitivity.csv,TRUE,32216
 regional_habitat_area_weights.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_habitat_area_weights.csv,TRUE,711
 regional_habitat_area_site_audit.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_habitat_area_site_audit.csv,TRUE,2914
-regional_density_comparison.png,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_density_comparison.png,TRUE,170077
-regional_density_comparison.pdf,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_density_comparison.pdf,TRUE,10303
+regional_density_comparison.png,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_density_comparison.png,TRUE,185121
+regional_density_comparison.pdf,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/regional_density_comparison.pdf,TRUE,10850
 PEV_overall_equal_habitat_densities.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/PEV_overall_equal_habitat_densities.csv,TRUE,942
 PEV_overall_area_weighted_densities.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/PEV_overall_area_weighted_densities.csv,TRUE,1015
 temporal_trends_own_area_sensitivity.csv,/Users/rosscunning/Projects/PENIP/outputs/coral_analysis/temporal_trends_own_area_sensitivity.csv,TRUE,11569
