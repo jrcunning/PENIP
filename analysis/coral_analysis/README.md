@@ -24,10 +24,10 @@ rmarkdown::render(
 ```
 
 The coral analysis reuses the saved 4,000-draw posterior; new fitting is disabled
-by default. It publishes Fig 2–6, Fig A1–A6 and Table A1–A6 to `outputs/`.
+by default. It publishes Fig 2–6, Fig S1–S7 and Table S1–S6 to `outputs/`.
 The integrated analysis then combines the current coral intermediates with the
 existing conch results to produce Fig 1, Table 1 and Table 2 there. Conch Fig 7–8
-and Fig A7–A8 remain in place. Coral-only Fig 1 and Table 1–2 remain in the coral
+and Fig S8–S9 remain in place. Coral-only Fig 1 and Table 1–2 remain in the coral
 subdirectory and do not overwrite the combined manuscript versions.
 
 The cached model is
@@ -76,29 +76,29 @@ change the model, posterior draws or numerical results.
 Manuscript predictions explicitly select PEV, using the 1,200 m north/south
 channel-edge definition. Regional comparisons use paired region-specific
 predictions for 2024. Only comprehensively surveyed juvenile responses are
-compared, and adult totals sum the same 17 modeled taxa. Fig A1 explicitly
+compared, and adult totals sum the same 17 modeled taxa. Fig S1 explicitly
 orders habitats NRC, IR, MR, OR with labels matched by habitat name.
 
 ## Equal habitat weighting for primary density comparisons and trends
 
 The primary regional comparison, overall PEV density summaries and temporal
-trends give NRC, IR, MR and OR weight 1/4 each. Regional Table A3 predictions
+trends give NRC, IR, MR and OR weight 1/4 each. Regional Table S3 predictions
 select 2024 (drm24) in both regions; temporal predictions use the same four
 weights in every year. These are habitat-standardized summaries, not mean
 densities over the actual mapped habitat composition of each region. Available
 survey/source predictions remain equally averaged within each habitat.
 
-Table A3, its notes, regional_density_comparison.png/.pdf, Figs 4–5 and their
+Table S3, its notes, FigS5.png, Figs 4–5 and their
 numeric summaries were regenerated from the saved 4,000 draws. The adult
 regional difference is −0.276153 [95% CrI −0.569296, 0.029876] colonies/m²,
 Pr(PEV < BM)=0.95975; the interval includes zero. Current primary overall
 summaries are in PEV_overall_equal_habitat_densities.csv.
 
 Own-area weighting is retained separately in
-TableA3_own_area_sensitivity_numeric.csv, regional_weighting_sensitivity.csv,
+TableS3_own_area_sensitivity_numeric.csv, regional_weighting_sensitivity.csv,
 PEV_overall_area_weighted_densities.csv and
 temporal_trends_own_area_sensitivity.csv. Its areas/proportions remain in
-regional_habitat_area_weights.csv: PEV uses unrounded Table A1 project/monitoring
+regional_habitat_area_weights.csv: PEV uses unrounded Table S1 project/monitoring
 areas, and broader Broward–Miami uses the complete FDEP map region outside the
 1,200 m north/south band. Those PEV footprint conventions differ; these areas
 do not weight the primary comparisons. The complete regional source and its
@@ -159,3 +159,7 @@ Earlier experiments remain under
 `old_working_files/coral_comparison_2026-11-03/`.
 All archives are local, ignored by Git and not runtime dependencies. Shared
 data and the conch analysis remain in their existing locations.
+
+## Journal supplementary numbering
+
+Figures use PNG only. Fig S1–S4 retain former A1–A4; the regional density comparison is Fig S5; former A5–A8 are Fig S6–S9. Tables S1–S6 retain the former table numbers. Diagnostic filenames beginning with TableS3 follow the same naming convention.

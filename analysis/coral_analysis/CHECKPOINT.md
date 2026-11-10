@@ -1,3 +1,7 @@
+## Journal supplementary numbering (2026-11-10)
+
+Current outputs use Fig S1–S9 and Table S1–S6. The regional density comparison is Fig S5; former A5–A8 are S6–S9. Figures are PNG only. Earlier entries below retain historical names.
+
 # Main coral analysis — 6 November 2026
 
 ## Current decision — equal habitat weighting restored, 6 November 2026

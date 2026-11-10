@@ -1,9 +1,9 @@
-Table A3. PEV and Broward-Miami coral densities predicted for DRM2024.
+Table S3. PEV and Broward-Miami coral densities predicted for DRM2024.
 Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].
 The first four columns are habitat-specific PEV densities. The two regional mean columns average NRC, IR, MR and OR equally (1/4 each) in both regions; direction effects are zero.
 The primary comparison standardizes habitat composition between regions; it is not weighted by habitat areas or numbers of surveyed sites.
-Own-area results are retained separately in TableA3_own_area_sensitivity_numeric.csv and regional_weighting_sensitivity.csv, not used for the main regional comparison.
-For that sensitivity only, PEV weights use unrounded Table A1 project / monitoring-zone areas, and broader Broward-Miami weights use the complete FDEP map region outside the 1,200 m north/south PEV band. These two PEV footprints are not identical; mapped areas are fixed.
+Own-area results are retained separately in TableS3_own_area_sensitivity_numeric.csv and regional_weighting_sensitivity.csv, not used for the main regional comparison.
+For that sensitivity only, PEV weights use unrounded Table S1 project / monitoring-zone areas, and broader Broward-Miami weights use the complete FDEP map region outside the 1,200 m north/south PEV band. These two PEV footprints are not identical; mapped areas are fixed.
 Sensitivity habitat areas and proportions are in regional_habitat_area_weights.csv. Artificial is pooled with NRC and Aggregated Patch Reef with OR; other habitat classes are excluded.
 All size classes, species sums and contrasts are calculated within each shared posterior draw before summarizing.
 The adult total sums 17 modeled adult taxa. The full juvenile and All totals have no regional comparison.

@@ -65,7 +65,7 @@ This run uses `r params$chains` chains with `r params$warmup` warmup and
 threads per chain.
 Sampling diagnostics below determine whether it is ready for manuscript inference.
 The report, coral-only outputs and cached fit stay in `r params$output_directory`.
-The manuscript coral figures and appendix tables are also published to `outputs/`.
+The manuscript coral figures and supplementary tables are also published to `outputs/`.
 Run `analysis/integrated_figures_tables.Rmd` afterward to produce the combined
 coral–conch Fig 1, Table 1 and Table 2 in that directory. The original PEV
 analysis is preserved as `coral_analysis_original.Rmd` under
@@ -115,7 +115,7 @@ set.seed(params$seed)
 # The current coral products in outputs/ are intentionally regenerated below.
 protected_files <- c(
   file.path(project_root, "analysis/conch_analysis.Rmd"),
-  file.path(project_root, "outputs", c("Fig7.png", "Fig8.png", "FigA7.png", "FigA8.png")),
+  file.path(project_root, "outputs", c("Fig7.png", "Fig8.png", "FigS8.png", "FigS9.png")),
   list.files(file.path(project_root, "outputs/cache"), recursive = TRUE, full.names = TRUE),
   list.files(file.path(project_root, "old_working_files/coral_analysis_original_2026-11-03"),
              recursive = TRUE, full.names = TRUE),
@@ -125,20 +125,11 @@ protected_files <- unique(protected_files[file.exists(protected_files) & !dir.ex
 original_checksums <- data.frame(path = protected_files,
                                 md5 = unname(tools::md5sum(protected_files)))
 
-# Save manuscript figures in their original sizes and also provide vector PDFs.
+# Save PNG figures at their requested sizes; no PDF companions are generated.
 save_figure <- function(filename, plot = ggplot2::last_plot(), ...) {
-  stopifnot(startsWith(normalizePath(dirname(filename)), output_dir))
+  stopifnot(startsWith(normalizePath(dirname(filename)), output_dir),
+            grepl("[.]png$", filename))
   ggplot2::ggsave(filename = filename, plot = plot, ...)
-  if (grepl("(^|/)(Fig[1-6]|FigA[1-6]|coral_Fig1)[.]png$", filename)) {
-    arguments <- list(...)
-    arguments$dpi <- NULL
-    arguments$device <- if (Sys.info()[["sysname"]] == "Darwin") {
-      function(filename, width, height, bg = "white", ...) {
-        grDevices::quartz(type = "pdf", file = filename, width = width, height = height, bg = bg)
-      }
-    } else grDevices::cairo_pdf
-    do.call(ggplot2::ggsave, c(list(filename = sub("[.]png$", ".pdf", filename), plot = plot), arguments))
-  }
   invisible(filename)
 }
 ```
@@ -1746,7 +1737,7 @@ area_summary_acres <- area_summary %>%
   # Round acres columns to 3 decimal places
   mutate(across(ends_with("_acres"), ~ round(.x, 3)))
 
-write_csv(area_summary_acres, file = output_file("TableA1.csv"))
+write_csv(area_summary_acres, file = output_file("TableS1.csv"))
 
 area_summary_acres
 ```
@@ -3388,7 +3379,7 @@ contrast. The primary equal-habitat comparison standardizes habitat composition
 between regions and years; neither calculation averages survey sites.
 
 PEV areas are the existing unrounded project/monitoring-area habitat totals
-from Table A1 (Scenario 2, NMFS consideration areas and the rest of the
+from Table S1 (Scenario 2, NMFS consideration areas and the rest of the
 monitoring area). Broader Broward–Miami areas use the complete FDEP habitat
 map's `Region = "Broward-Miami"`, outside the 1,200 m north/south PEV band.
 Biscayne, Deerfield, Palm Beach and Martin map regions are excluded. The PEV
@@ -3401,7 +3392,7 @@ with OR, and exclude other habitat classes. The regional input contains all
 1,868 Broward–Miami source polygons, rather than just those intersecting
 survey sites. Within-class regional overlaps are dissolved; small areas with
 conflicting reef-class labels are omitted from all regional classes. PEV
-areas retain the existing Table A1 convention. Map boundaries and areas are
+areas retain the existing Table S1 convention. Map boundaries and areas are
 treated as fixed; mapping uncertainty is not propagated into the intervals.
 
 ```{r regional-habitat-area-weights}
@@ -4267,7 +4258,7 @@ make_taxon_density_plot(densities = summary_equal_weighted_combined,
 
 # Create plot for current/2024 densities
 make_taxon_density_plot(densities = summary_drm24_combined, 
-                        output_path = output_file("FigA2.png"),
+                        output_path = output_file("FigS2.png"),
                         width = 170, height = 170)
 
 
@@ -4306,11 +4297,11 @@ make_taxon_density_table <- function(densities, output_path) {
 
 # Create table for dataset-averaged densities
 make_taxon_density_table(densities = summary_equal_weighted_combined, 
-                         output_path = output_file("TableA2.csv"))
+                         output_path = output_file("TableS2.csv"))
 
 # Create table for current/2024 densities
 make_taxon_density_table(densities = summary_drm24_combined, 
-                         output_path = output_file("TableA3.csv"))
+                         output_path = output_file("TableS3.csv"))
 ```
 
 ### Raw vs. modeled taxon densities
@@ -4433,7 +4424,7 @@ figA1 <- raw_vs_mod + theme_minimal() +
     axis.line = element_blank() # keep ticks but don't draw duplicate axis lines
   )
 
-save_figure(filename = output_file("FigA1.png"), plot = figA1,
+save_figure(filename = output_file("FigS1.png"), plot = figA1,
             width = 190, height = 250, units = "mm")
 ```
 
@@ -4592,7 +4583,7 @@ make_combined_density_figure(draws = draws_equal_weighted, table = TRUE)
 
 make_combined_density_figure(draws = draws_drm24_combined,
                              y_limits = c(0, 5.2),
-                             output_path = output_file("FigA3.png"))
+                             output_path = output_file("FigS3.png"))
 
 
 
@@ -5233,7 +5224,7 @@ tab2 <- make_taxclass_zone_interval_table(tot2_draws)
 tab2 %>%
   knitr::kable(caption = "Total number of colonies in each impact zone - surveys (years) equal-weighted")
 
-write_csv(tab2, file = output_file("TableA4.csv"))
+write_csv(tab2, file = output_file("TableS4.csv"))
 
 
 # Calculate total ESA and non-ESA corals per impact zone
@@ -5542,7 +5533,7 @@ p +
   ) +
   labs(title = "Total corals in full impact monitoring area, surveys (all years) equal-weighted")
   
-save_figure(filename = output_file("FigA4.png"), width = 180, height = 130, units = "mm", dpi = 600)
+save_figure(filename = output_file("FigS4.png"), width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
 
@@ -5574,7 +5565,7 @@ tab2_2024 <- make_taxclass_zone_interval_table(tot2_2024_draws)
 tab2_2024 %>%
   knitr::kable(caption = "Total number of colonies in each impact zone - 2024 estimates")
 
-write_csv(tab2_2024, file = output_file("TableA5.csv"))
+write_csv(tab2_2024, file = output_file("TableS5.csv"))
 
 
 ## SUM ESA and non-ESA corals
@@ -5618,7 +5609,7 @@ tot3_2024 <- tot3_2024_draws %>%
 tot3_2024 %>%
   knitr::kable(caption = "Total coral colonies in all impact zones, 2024 estimates")
 
-write_csv(tot3_2024, file = output_file("TableA6.csv"))
+write_csv(tot3_2024, file = output_file("TableS6.csv"))
 ```
 
 #### Treemap plot - Scenario2+NMFS
@@ -5703,7 +5694,7 @@ p +
   ) +
   labs(title = "Total corals in scenario 2 zones + NMFS areas, 2024 estimates")
   
-save_figure(filename = output_file("FigA5.png"), width = 180, height = 130, units = "mm", dpi = 600)
+save_figure(filename = output_file("FigS6.png"), width = 180, height = 130, units = "mm", dpi = 600)
 ```
 
 
@@ -5804,10 +5795,9 @@ p +
   ) +
   labs(title = "Total corals in full impact monitoring area, 2024 estimates")
   
-save_figure(filename = output_file("FigA6.png"), width = 180, height = 130, units = "mm", dpi = 600)
+save_figure(filename = output_file("FigS7.png"), width = 180, height = 130, units = "mm", dpi = 600)
 
 
-#save_figure(filename = output_file("FigA62.png"), width = 180, height = 90, units = "mm", dpi = 600)
 
 ```
 
@@ -5917,7 +5907,7 @@ save_figure(zonefig, filename = output_file("zonefig.png"), width = 110, height 
 The following comparisons use paired predictions from this one joint model,
 with `dataset = "drm24"`, area 1 m², and direction effects set to zero. Each
 region's mean gives NRC, IR, MR and OR equal weight (1/4). The first four
-Table A3 density columns remain habitat-specific PEV predictions. Its regional
+Table S3 density columns remain habitat-specific PEV predictions. Its regional
 columns report habitat-standardized means, their paired difference and
 posterior sign probabilities. Species sums and adult-plus-juvenile sums retain
 their within-draw covariance. Own-area weighting is saved separately as a
@@ -6025,7 +6015,7 @@ make_regional_table <- function(prepared, fit, output_dir) {
         "mcse_mean", "rhat", "ess_bulk", "ess_tail")
       probability_diagnostics <- left_join(probability_diagnostics, event_diagnostics, by = "variable")
     }
-    write_csv(probability_diagnostics, file.path(output_dir, "TableA3_probability_diagnostics.csv"))
+    write_csv(probability_diagnostics, file.path(output_dir, "TableS3_probability_diagnostics.csv"))
     unavailable <- !rows$regional_full_survey_support
     for (n in c(paste0("regional_", c("mean", "median", "lower", "upper")), paste0("difference_", 
         c("mean", "median", "lower", "upper")), "probability_pev_gt_regional", "probability_pev_lt_regional", 
@@ -6076,7 +6066,7 @@ make_regional_table <- function(prepared, fit, output_dir) {
         habitat_weighting = "Equal weights: NRC, IR, MR, OR (primary)",
         habitat_weights = "NRC=0.25; IR=0.25; MR=0.25; OR=0.25 in both regions",
         sensitivity_weighting = "Each region's own mapped reef-habitat area proportions",
-        sensitivity_pev_area_footprint = "Table A1 project / monitoring zones",
+        sensitivity_pev_area_footprint = "Table S1 project / monitoring zones",
         sensitivity_regional_area_footprint = "Complete map Region=Broward-Miami outside 1,200 m N/S PEV band",
         sensitivity_habitat_area_uncertainty = "Mapped areas treated as fixed",
         posterior_draws = nrow(draw_matrix), adult_taxa = sum(prepared$tc$class == ">4cm"), surveyed_juvenile_groups = length(juvenile_groups), 
@@ -6102,8 +6092,8 @@ make_regional_table <- function(prepared, fit, output_dir) {
             err_mean < 1e-12, length(habitats) == 4L &&
               all(vapply(rows$row_id, function(i) sum(cell_grid$row_id == i) == 4L, logical(1)))))
     stopifnot(all(validation$pass), sum(rows$class == ">4cm" & rows$row_type == "Taxon") == 17L)
-    write_csv(numeric, file.path(output_dir, "TableA3_regional_comparisons_numeric.csv"), na = "")
-    write_csv(area_numeric, file.path(output_dir, "TableA3_own_area_sensitivity_numeric.csv"), na = "")
+    write_csv(numeric, file.path(output_dir, "TableS3_regional_comparisons_numeric.csv"), na = "")
+    write_csv(area_numeric, file.path(output_dir, "TableS3_own_area_sensitivity_numeric.csv"), na = "")
     write_csv(bind_rows(mutate(numeric, comparison = "Equal habitats (primary)"),
                         mutate(area_numeric, comparison = "Own-area weights (sensitivity)")),
               file.path(output_dir, "regional_weighting_sensitivity.csv"), na = "")
@@ -6119,20 +6109,20 @@ make_regional_table <- function(prepared, fit, output_dir) {
         evaluation$regional_comparison_method <- settings
         saveRDS(evaluation, evaluation_file)
     }
-    write_csv(formatted, file.path(output_dir, "TableA3_extended.csv"), na = "")
-    write_csv(formatted, file.path(output_dir, "TableA3.csv"), na = "")
+    write_csv(formatted, file.path(output_dir, "TableS3_extended.csv"), na = "")
+    write_csv(formatted, file.path(output_dir, "TableS3.csv"), na = "")
     write_csv(formatted[rows$row_type == "Taxon", c("taxon", "class", habitats)], file.path(output_dir, 
-        "TableA3_PEV_habitats.csv"), na = "")
-    write_csv(averages, file.path(output_dir, "TableA3_habitat_averages_numeric.csv"), na = "")
-    write_csv(cell_summary, file.path(output_dir, "TableA3_regional_comparison_cells.csv"), na = "")
-    write_csv(settings, file.path(output_dir, "TableA3_comparison_method.csv"))
-    write_csv(diagnostics, file.path(output_dir, "TableA3_comparison_diagnostics.csv"))
-    write_csv(validation, file.path(output_dir, "TableA3_comparison_validation.csv"))
-    writeLines(c("Table A3. PEV and Broward-Miami coral densities predicted for DRM2024.", "Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].",
+        "TableS3_PEV_habitats.csv"), na = "")
+    write_csv(averages, file.path(output_dir, "TableS3_habitat_averages_numeric.csv"), na = "")
+    write_csv(cell_summary, file.path(output_dir, "TableS3_regional_comparison_cells.csv"), na = "")
+    write_csv(settings, file.path(output_dir, "TableS3_comparison_method.csv"))
+    write_csv(diagnostics, file.path(output_dir, "TableS3_comparison_diagnostics.csv"))
+    write_csv(validation, file.path(output_dir, "TableS3_comparison_validation.csv"))
+    writeLines(c("Table S3. PEV and Broward-Miami coral densities predicted for DRM2024.", "Densities and PEV-minus-Broward-Miami differences are colonies/m2: posterior mean [pointwise 95% CrI].",
         "The first four columns are habitat-specific PEV densities. The two regional mean columns average NRC, IR, MR and OR equally (1/4 each) in both regions; direction effects are zero.",
         "The primary comparison standardizes habitat composition between regions; it is not weighted by habitat areas or numbers of surveyed sites.",
-        "Own-area results are retained separately in TableA3_own_area_sensitivity_numeric.csv and regional_weighting_sensitivity.csv, not used for the main regional comparison.",
-        "For that sensitivity only, PEV weights use unrounded Table A1 project / monitoring-zone areas, and broader Broward-Miami weights use the complete FDEP map region outside the 1,200 m north/south PEV band. These two PEV footprints are not identical; mapped areas are fixed.",
+        "Own-area results are retained separately in TableS3_own_area_sensitivity_numeric.csv and regional_weighting_sensitivity.csv, not used for the main regional comparison.",
+        "For that sensitivity only, PEV weights use unrounded Table S1 project / monitoring-zone areas, and broader Broward-Miami weights use the complete FDEP map region outside the 1,200 m north/south PEV band. These two PEV footprints are not identical; mapped areas are fixed.",
         "Sensitivity habitat areas and proportions are in regional_habitat_area_weights.csv. Artificial is pooled with NRC and Aggregated Patch Reef with OR; other habitat classes are excluded.",
         "All size classes, species sums and contrasts are calculated within each shared posterior draw before summarizing.", 
         "The adult total sums 17 modeled adult taxa. The full juvenile and All totals have no regional comparison.", 
@@ -6145,12 +6135,12 @@ make_regional_table <- function(prepared, fit, output_dir) {
         sprintf("Probabilities are Monte Carlo estimates from all %d retained draws, displayed to four decimals (draw resolution %.4f).",
             nrow(draw_matrix), 1/nrow(draw_matrix)), "A displayed 0.0000 or 1.0000 means no opposite-sign draw was observed, not certainty about the population difference.", 
         "The model fit and reported comparisons retain the documented convergence and sparse-cell tail caveats."),
-        file.path(output_dir, "TableA3_notes.txt"))
+        file.path(output_dir, "TableS3_notes.txt"))
     manifest_file <- file.path(output_dir, "requested_outputs.csv")
     if (file.exists(manifest_file)) {
         manifest <- read_csv(manifest_file, show_col_types = FALSE)
-        new_paths <- file.path(output_dir, c("TableA3.csv", "TableA3_extended.csv", "TableA3_PEV_habitats.csv", 
-            "TableA3_regional_comparisons_numeric.csv", "TableA3_notes.txt"))
+        new_paths <- file.path(output_dir, c("TableS3.csv", "TableS3_extended.csv", "TableS3_PEV_habitats.csv",
+            "TableS3_regional_comparisons_numeric.csv", "TableS3_notes.txt"))
         manifest <- mutate(distinct(bind_rows(select(manifest, path), data.frame(path = new_paths)), 
             path), bytes = file.info(path)$size)
         write_csv(manifest, manifest_file)
@@ -6173,7 +6163,7 @@ show_table(regional_comparison$validation)
 ## Regional densities and paired differences
 
 The figure uses the same equal-habitat estimates and paired posterior differences
-as Table A3. Points are posterior means and intervals are pointwise 95% CrIs.
+as Table S3. Points are posterior means and intervals are pointwise 95% CrIs.
 No significance flags or posterior-probability cutoffs are applied. The total
 includes the 17 modeled adult taxa. This regional-comparison figure is saved
 separately from the existing numbered PEV manuscript figures. The right-hand
@@ -6271,11 +6261,8 @@ regional_density_figure <- wrap_plots(
     caption = paste0("Posterior means and 95% credible intervals; all 4,000 draws. Survey effects retained; direction effects zero.\n",
                      "Right column: three separate linear x-axis ranges; zero aligned and all intervals complete. Left column: one common log scale.")) &
   theme(legend.position = "bottom")
-save_figure(output_file("regional_density_comparison.png"), regional_density_figure,
+save_figure(output_file("FigS5.png"), regional_density_figure,
             width = 11, height = 10, dpi = 220, bg = "white")
-save_figure(output_file("regional_density_comparison.pdf"), regional_density_figure,
-            width = 11, height = 10, device = grDevices::pdf,
-            encoding = "WinAnsi.enc", useDingbats = FALSE, bg = "white")
 regional_density_figure
 ```
 
@@ -6306,7 +6293,6 @@ write_csv(tot3_intervals, output_file("Table2_intervals.csv"))
 write_csv(tot3, output_file("Table2.csv"))
 file.copy(output_file("intermediate/coral_Table1.csv"), output_file("Table1.csv"), overwrite = TRUE)
 file.copy(output_file("intermediate/coral_Fig1.png"), output_file("Fig1.png"), overwrite = TRUE)
-file.copy(output_file("intermediate/coral_Fig1.pdf"), output_file("Fig1.pdf"), overwrite = TRUE)
 saveRDS(list(survey = draws_equal_weighted, year2024 = draws_drm24_combined,
              trends = trends_combined, impact_survey = tot2_draws, impact_2024 = tot2_2024_draws),
         processed_file("manuscript_posterior_draws.rds"))
@@ -6315,7 +6301,7 @@ saveRDS(list(survey = draws_equal_weighted, year2024 = draws_drm24_combined,
 Table 2 uses `Total = ACER + ORBI + non-ESA` exactly once. The original
 analysis's extra `adorn_totals(where = "col")` step double-counted an already
 present Total column; that arithmetic error is corrected here. All habitat
-areas are kept unrounded for colony-total calculations, while Table A1 retains
+areas are kept unrounded for colony-total calculations, while Table S1 retains
 its original display rounding.
 
 # Model assessment
@@ -6329,13 +6315,11 @@ cat("The count priors remain broad. Review the sparse-cell tail table alongside 
 ```
 
 ```{r final-validation}
-required_outputs <- c(paste0("Fig", 1:6, ".png"), paste0("FigA", 1:6, ".png"),
-                      paste0("Fig", 1:6, ".pdf"), paste0("FigA", 1:6, ".pdf"),
-                      "Table1.csv", "Table2.csv", paste0("TableA", 1:6, ".csv"),
-                      "TableA3_notes.txt", "TableA3_regional_comparisons_numeric.csv",
-                      "TableA3_own_area_sensitivity_numeric.csv", "regional_weighting_sensitivity.csv",
+required_outputs <- c(paste0("Fig", 1:6, ".png"), paste0("FigS", 1:7, ".png"),
+                      "Table1.csv", "Table2.csv", paste0("TableS", 1:6, ".csv"),
+                      "TableS3_notes.txt", "TableS3_regional_comparisons_numeric.csv",
+                      "TableS3_own_area_sensitivity_numeric.csv", "regional_weighting_sensitivity.csv",
                       "regional_habitat_area_weights.csv", "regional_habitat_area_site_audit.csv",
-                      "regional_density_comparison.png", "regional_density_comparison.pdf",
                       "PEV_overall_equal_habitat_densities.csv", "PEV_overall_area_weighted_densities.csv",
                       "temporal_trends_own_area_sensitivity.csv", "temporal_habitat_weight_validation.csv",
                       "survey_locations.png", "zonefig.png", "ACERORBI.png", "ACERORBI_2024.png",
@@ -6383,17 +6367,17 @@ writeLines(capture.output(sessionInfo()), output_file("sessionInfo.txt"))
 ## Publish manuscript outputs
 
 The main `outputs/` directory contains the final manuscript set. This step
-updates the coral figures and appendix tables there. Combined Fig 1, Table 1
+updates the coral figures and supplementary tables there. Combined Fig 1, Table 1
 and Table 2 are produced by `integrated_figures_tables.Rmd`, using the current
 coral intermediates and the existing conch results. Coral-only versions remain
 in `outputs/coral_analysis/` for reference.
 
 ```{r publish-manuscript-products}
 manuscript_products <- c(
-  paste0("Fig", 2:6, ".png"), paste0("Fig", 2:6, ".pdf"),
-  paste0("FigA", 1:6, ".png"), paste0("FigA", 1:6, ".pdf"),
-  paste0("TableA", 1:6, ".csv"), "TableA3_notes.txt", "zonefig.png",
-  "regional_habitat_area_weights.csv", "regional_density_comparison.png", "regional_density_comparison.pdf"
+  paste0("Fig", 2:6, ".png"),
+  paste0("FigS", 1:7, ".png"),
+  paste0("TableS", 1:6, ".csv"), "TableS3_notes.txt", "zonefig.png",
+  "regional_habitat_area_weights.csv"
 )
 manuscript_sources <- file.path(output_dir, manuscript_products)
 manuscript_destinations <- file.path(project_root, "outputs", manuscript_products)
