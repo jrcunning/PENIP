@@ -1630,21 +1630,32 @@ kriging_impact_zone_totals <- kriging_habitat_zone_prediction_area %>%
   st_drop_geometry() %>%
   group_by(name, age_class) %>%
   summarize(
-    estimated_conch = sum(density_m2 * zone_area_m2, na.rm = TRUE),
-    estimate_se = sqrt(sum(total_variance, na.rm = TRUE)),
+    modeled_area_m2 = sum(zone_area_m2, na.rm = TRUE),
+    predicted_area_m2 = sum(zone_area_m2[is.finite(density_m2)], na.rm = TRUE),
+    estimated_conch = if (predicted_area_m2 > 0) sum(density_m2 * zone_area_m2, na.rm = TRUE) else NA_real_,
+    estimate_se = if (predicted_area_m2 > 0) sqrt(sum(total_variance[is.finite(density_m2)], na.rm = TRUE)) else NA_real_,
     lower_95 = pmax(estimated_conch - 1.96 * estimate_se, 0),
     upper_95 = estimated_conch + 1.96 * estimate_se,
     .groups = "drop"
   ) %>%
   pivot_wider(
     names_from = age_class,
-    values_from = c(estimated_conch, estimate_se, lower_95, upper_95),
-    values_fill = 0
+    values_from = c(estimated_conch, estimate_se, lower_95, upper_95,
+                   modeled_area_m2, predicted_area_m2),
+    values_fill = NA_real_
   ) %>%
   left_join(kriging_adult_breeding_activity_zone_totals, by = "name") %>%
   right_join(tibble(name = impact_zone_order), by = "name") %>%
   mutate(
-    across(where(is.numeric), ~ replace_na(., 0)),
+    # Missing zone/class predictions remain unestimated. Zero area is only
+    # coverage bookkeeping, not an estimate of biological absence.
+    across(starts_with("modeled_area_m2_") | starts_with("predicted_area_m2_"),
+           ~ replace_na(.x, 0)),
+    # An estimated adult zone with no breeding-buffer intersection has a
+    # genuine zero contribution to this proximity metric.
+    across(c(estimated_adults_near_breeding, estimate_se_adults_near_breeding,
+             lower_95_adults_near_breeding, upper_95_adults_near_breeding),
+           ~ if_else(is.na(estimated_conch_Adult), NA_real_, replace_na(.x, 0))),
     estimated_total = estimated_conch_Adult + estimated_conch_Juvenile,
     total_se = sqrt(estimate_se_Adult^2 + estimate_se_Juvenile^2),
     total_lower_95 = pmax(estimated_total - 1.96 * total_se, 0),
@@ -1654,9 +1665,9 @@ kriging_impact_zone_totals <- kriging_habitat_zone_prediction_area %>%
   ) %>%
   arrange(name) %>%
   mutate(
-    cumulative_adults = cumsum(estimated_conch_Adult),
-    cumulative_juveniles = cumsum(estimated_conch_Juvenile),
-    cumulative_total = cumsum(estimated_total)
+    cumulative_adults = cumsum(replace_na(estimated_conch_Adult, 0)),
+    cumulative_juveniles = cumsum(replace_na(estimated_conch_Juvenile, 0)),
+    cumulative_total = cumsum(replace_na(estimated_total, 0))
   ) %>%
   select(
     impact_area,
@@ -1678,7 +1689,9 @@ kriging_impact_zone_totals <- kriging_habitat_zone_prediction_area %>%
     total_upper_95,
     cumulative_adults,
     cumulative_juveniles,
-    cumulative_total
+    cumulative_total,
+    starts_with("modeled_area_m2_"),
+    starts_with("predicted_area_m2_")
   )
 
 kriging_impact_zone_totals_with_total <- bind_rows(
@@ -1704,19 +1717,21 @@ kriging_impact_zone_totals_with_total <- bind_rows(
       total_upper_95 = estimated_total + 1.96 * total_se,
       cumulative_adults = sum(estimated_conch_Adult, na.rm = TRUE),
       cumulative_juveniles = sum(estimated_conch_Juvenile, na.rm = TRUE),
-      cumulative_total = sum(estimated_total, na.rm = TRUE)
+      cumulative_total = sum(estimated_total, na.rm = TRUE),
+      across(starts_with("modeled_area_m2_") | starts_with("predicted_area_m2_"),
+             ~ sum(.x, na.rm = TRUE))
     )
 )
 
 format_interval <- function(estimate, lower, upper) {
-  paste0(
+  ifelse(is.na(estimate), "Unestimated", paste0(
     format(round(estimate), big.mark = ",", scientific = FALSE, trim = TRUE),
     " (",
     format(round(lower), big.mark = ",", scientific = FALSE, trim = TRUE),
     "-",
     format(round(upper), big.mark = ",", scientific = FALSE, trim = TRUE),
     ")"
-  )
+  ))
 }
 
 kriging_impact_zone_totals_display <- kriging_impact_zone_totals_with_total %>%
@@ -1737,7 +1752,7 @@ kriging_impact_zone_totals_display <- kriging_impact_zone_totals_with_total %>%
 
 knitr::kable(
   kriging_impact_zone_totals_display,
-  caption = "Recommended kriging-estimated adult and juvenile conch abundance by impact area. Estimates use the age-specific best leave-one-out cross-validation settings; values in parentheses are approximate 95% intervals propagated from cell-level kriging prediction variances. The Total row sums adults and juveniles across all listed impact and monitoring areas. Intervals do not include spatial covariance among cells."
+  caption = "Kriging-estimated adult and juvenile conch abundance by impact area. Estimates use the age-specific best leave-one-out cross-validation settings; values in parentheses are approximate 95% intervals propagated from cell-level kriging prediction variances. Unestimated indicates areas outside the selected prediction habitats or without available predictions, not zero conch abundance. Total and cumulative values sum only estimated contributions within the predicted domain. Intervals do not include spatial covariance among cells."
 )
 ```
 

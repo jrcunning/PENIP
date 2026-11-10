@@ -1212,14 +1212,14 @@ format_count <- function(x) {
 }
 
 format_interval_count <- function(estimate, lower, upper) {
-  paste0(
+  ifelse(is.na(estimate), "Unestimated", paste0(
     format_count(estimate),
     " (",
     format_count(lower),
     "-",
     format_count(upper),
     ")"
-  )
+  ))
 }
 
 coral_table2_area_labels <- c(
@@ -1273,7 +1273,10 @@ if (!file.exists(conch_kriging_impact_zone_totals_rds)) {
   dir.create(dirname(conch_kriging_impact_zone_totals_rds), recursive = TRUE, showWarnings = FALSE)
 
   conch_integrated_script <- tempfile(fileext = ".R")
-  knitr::purl("analysis/conch_analysis.Rmd", output = conch_integrated_script, quiet = TRUE)
+  # Tangling inside this render must not reuse its setup/library chunk labels.
+  conch_source <- readLines("analysis/conch_analysis.Rmd", warn = FALSE)
+  conch_source <- sub("^```\\{r ([^,}]+)", "```{r conch-cache-\\1", conch_source)
+  knitr::purl(text = conch_source, output = conch_integrated_script, quiet = TRUE)
   source(conch_integrated_script)
 
   saveRDS(
@@ -1282,7 +1285,21 @@ if (!file.exists(conch_kriging_impact_zone_totals_rds)) {
   )
 }
 
-table2_conch <- readRDS(conch_kriging_impact_zone_totals_rds) %>%
+conch_table_cache <- readRDS(conch_kriging_impact_zone_totals_rds)
+if (!all(c("predicted_area_m2_Adult", "predicted_area_m2_Juvenile") %in% names(conch_table_cache))) {
+  # The existing cache predates explicit coverage fields. These three known
+  # Outer Reef zones lie outside its selected conch prediction habitats.
+  # Preserve its estimated values; a display correction does not require
+  # rerunning the spatial predictions.
+  unestimated_conch_zones <- conch_table_cache$impact_area %in% c("North", "East", "South")
+  conch_estimate_columns <- setdiff(
+    names(conch_table_cache)[vapply(conch_table_cache, is.numeric, logical(1))],
+    c("cumulative_adults", "cumulative_juveniles", "cumulative_total")
+  )
+  conch_table_cache[unestimated_conch_zones, conch_estimate_columns] <- NA_real_
+}
+
+table2_conch <- conch_table_cache %>%
   filter(impact_area != "Total") %>%
   transmute(
     `Impact area` = impact_area,
@@ -1296,7 +1313,7 @@ table2_conch <- readRDS(conch_kriging_impact_zone_totals_rds) %>%
     `Total conch` = format_interval_count(estimated_total, total_lower_95, total_upper_95)
   )
 
-table2_conch_total <- readRDS(conch_kriging_impact_zone_totals_rds) %>%
+table2_conch_total <- conch_table_cache %>%
   filter(impact_area == "Total") %>%
   transmute(
     `Impact area` = "Total",
@@ -1321,8 +1338,15 @@ table2_new <- full_join(table2_coral, table2_conch, by = "Impact area") %>%
 
 write_csv(table2_new, output_table2)
 
+table2_notes <- paste(
+  "Conch entries labeled Unestimated are outside the selected prediction habitats",
+  "or have no available predictions; they do not represent zero abundance.",
+  "Conch totals sum estimated contributions within the predicted domain and exclude unestimated areas."
+)
+writeLines(table2_notes, "outputs/Table2_notes.txt")
+
 table2_new %>%
-  knitr::kable()
+  knitr::kable(caption = table2_notes)
 ```
 
 ```{r cleanup, include=FALSE}
